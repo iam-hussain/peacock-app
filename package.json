@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "truncate": "ts-node prisma/truncate.ts",
+    "seed": "ts-node prisma/seed.ts",
+    "reset": "npm run truncate && npm run seed"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",

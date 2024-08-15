@@ -3,7 +3,21 @@ import seedData from "../public/peacock_backup.json";
 
 const prisma = new PrismaClient();
 
-function createUsers() {
+const transactionTypeMap: any = {
+  MEMBERS_PERIODIC_DEPOSIT: "PERIODIC_DEPOSIT",
+  MEMBERS_WITHDRAW: "WITHDRAW",
+  MEMBERS_WITHDRAW_PROFIT: "WITHDRAW_PROFIT",
+  MEMBERS_REPAY_PROFIT: "REPAY_PROFIT",
+  NEW_MEMBER_PAST_TALLY: "OFFSET_DEPOSIT",
+  INTER_CASH_TRANSFER: "FUNDS_TRANSFER",
+  VENDOR_PERIODIC_INVEST: "PERIODIC_INVEST",
+  VENDOR_PERIODIC_RETURN: "PERIODIC_RETURN",
+  VENDOR_INVEST: "INVEST",
+  VENDOR_RETURN: "RETURNS",
+  OTHER_EXPENDITURE: "EXPENSE",
+};
+
+function createMembers() {
   return seedData.user
     .filter((e) => e.type == "MEMBER")
     .map(({ createdAt, updatedAt, deleted, deletedAt, ...each }: any) => {
@@ -19,14 +33,9 @@ function createUsers() {
           active: each.isActive,
           createdAt,
           updatedAt,
-          deleted,
-          deletedAt,
           passbook: {
             create: {
               type: "MEMBER",
-              in: {},
-              out: {},
-              profit: {},
             },
           },
         },
@@ -44,17 +53,12 @@ function createVendors() {
           slug: each.nickName,
           type: each.vendorType,
           startAt: each.joinedAt,
-          active: each.isActive,
+          active: each.isActive && !deleted,
           createdAt,
           updatedAt,
-          deleted,
-          deletedAt,
           passbook: {
             create: {
               type: "VENDOR",
-              in: {},
-              out: {},
-              profit: {},
             },
           },
         },
@@ -62,58 +66,109 @@ function createVendors() {
     });
 }
 
-function createConnections(users: Map<any, any>, vendors: Map<any, any>) {
+function createVendorProfitShare(
+  members: Map<any, any>,
+  vendors: Map<any, any>
+) {
   return seedData.interLink.map(
-    ({ deleted, deletedAt, vendorId, memberId, includeProfit }: any) => {
-      return prisma.connection.create({
+    ({ createdAt, updatedAt, vendorId, memberId, includeProfit }: any) => {
+      return prisma.vendorProfitShare.create({
         data: {
-          deleted,
-          deletedAt,
           active: includeProfit,
           vendorId: vendors.get(vendorId),
-          memberId: users.get(memberId),
+          memberId: members.get(memberId),
+          createdAt,
+          updatedAt,
         },
       });
     }
   );
 }
 
-function createTransactions(users: Map<any, any>) {
-  return seedData.transaction.map(({ id, fromId, toId, ...each }: any) => {
-    return prisma.transaction.create({
-      data: {
-        ...each,
-        from: {
-          connect: {
-            id: users.get(fromId),
+function createTransactions(members: Map<any, any>, vendors: Map<any, any>) {
+  return seedData.transaction
+    .filter((e) => !e.deleted)
+    .map(
+      ({
+        id,
+        fromId,
+        toId,
+        method,
+        mode,
+        dot,
+        amount,
+        note,
+        createdAt,
+        updatedAt,
+      }) => {
+        const vendorFrom = vendors.get(fromId);
+        const vendorTo = vendors.get(toId);
+        const memberFrom = members.get(fromId);
+        const memberTo = members.get(toId);
+        if (vendorFrom || vendorTo) {
+          return prisma.vendorTransaction.create({
+            data: {
+              transactionType: transactionTypeMap[mode as any],
+              transactionAt: dot,
+              method: method as any,
+              amount,
+              note: note || "",
+              createdAt,
+              updatedAt,
+              vendor: {
+                connect: {
+                  id: vendorFrom || vendorTo,
+                },
+              },
+              member: {
+                connect: {
+                  id: memberFrom || memberTo,
+                },
+              },
+            },
+          });
+        }
+        return prisma.memberTransaction.create({
+          data: {
+            transactionType: transactionTypeMap[mode as any],
+            transactionAt: dot,
+            method: method as any,
+            amount,
+            note: note || "",
+            createdAt,
+            updatedAt,
+            from: {
+              connect: {
+                id: memberFrom,
+              },
+            },
+            to: {
+              connect: {
+                id: memberTo,
+              },
+            },
           },
-        },
-        to: {
-          connect: {
-            id: users.get(toId),
-          },
-        },
-      },
-    });
-  });
+        });
+      }
+    );
 }
 
-async function getUserMap() {
-  const userMap = new Map();
+async function getMemberMap() {
+  const memberMap = new Map();
   const fetchedUsers = await prisma.member.findMany({
     select: {
       id: true,
       username: true,
-      deleted: true,
+      active: true,
     },
   });
   fetchedUsers.forEach((user) => {
     const match = seedData.user.find((le) => le.nickName === user.username);
     if (match) {
-      userMap.set(match.id, user.id);
+      memberMap.set(match.id, user.id);
     }
   });
-  return userMap;
+  return memberMap;
 }
 
 async function getVendorMap() {
@@ -122,7 +177,7 @@ async function getVendorMap() {
     select: {
       id: true,
       slug: true,
-      deleted: true,
+      active: true,
     },
   });
   fetchedVendor.forEach((user) => {
@@ -135,7 +190,7 @@ async function getVendorMap() {
 }
 
 async function seed() {
-  const userTransactions = createUsers();
+  const userTransactions = createMembers();
   const vendorTransactions = createVendors();
 
   await prisma.$transaction([
@@ -144,36 +199,18 @@ async function seed() {
     prisma.passbook.create({
       data: {
         type: "CLUB",
-        in: {},
-        out: {},
-        profit: {},
       },
     }),
   ]);
 
-  const users = await getUserMap();
+  const members = await getMemberMap();
   const vendors = await getVendorMap();
 
-  const connections = createConnections(users, vendors);
+  const connections = createVendorProfitShare(members, vendors);
   await prisma.$transaction(connections);
 
-  for (const { id, fromId, toId, ...transaction } of seedData.transaction) {
-    await prisma.transaction.create({
-      data: {
-        ...(transaction as any),
-        from: {
-          connect: {
-            id: users.get(fromId),
-          },
-        },
-        to: {
-          connect: {
-            id: users.get(toId),
-          },
-        },
-      },
-    });
-  }
+  const transactions = createTransactions(members, vendors);
+  await prisma.$transaction(transactions);
 
   return;
 }
