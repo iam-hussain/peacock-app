@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  firstName       String
+  lastName        String?
+  username        String        @unique
+  avatar          String?
+  phone           String?
+  email           String?
+  joinedAt        DateTime      @default(now())
+  active          Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deleted         Boolean       @default(false)
+  deletedAt       DateTime?
+  transactionFrom Transaction[] @relation("from")
+  transactionTo   Transaction[] @relation("to")
+  passbook        Passbook      @relation(fields: [passbookId], references: [id])
+  passbookId      String        @unique @db.ObjectId
+  vendors         Vendor[]      @relation("owner")
+  connections     Connection[]
+}
+
+model Connection {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  member    Member    @relation(fields: [memberId], references: [id])
+  memberId  String    @db.ObjectId
+  vendor    Vendor    @relation(fields: [vendorId], references: [id])
+  vendorId  String    @db.ObjectId
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleted   Boolean   @default(false)
+  deletedAt DateTime?
+}
+
+model Vendor {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String       @unique
+  type        VENDOR_TYPE  @default(DEFAULT)
+  amount      Float        @default(0)
+  term        Float        @default(0)
+  totalTerm   Float        @default(0)
+  termType    PERIOD       @default(NONE)
+  startAt     DateTime     @default(now())
+  endAt       DateTime?
+  owner       Member?      @relation(name: "owner", fields: [ownerId], references: [id])
+  ownerId     String?      @db.ObjectId
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deleted     Boolean      @default(false)
+  deletedAt   DateTime?
+  connections Connection[]
+  passbook    Passbook     @relation(fields: [passbookId], references: [id])
+  passbookId  String       @unique @db.ObjectId
+}
+
+enum VENDOR_TYPE {
+  DEFAULT
+  CHIT
+  LEND
+  BANK_INTREST
+}
+
+enum PERIOD {
+  NONE
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+model Transaction {
+  id        String             @id @default(auto()) @map("_id") @db.ObjectId
+  type      TRANSACTION_TYPE   @default(SELF)
+  method    TRANSACTION_METHOD @default(ACCOUNT)
+  mode      TRANSACTION_MODE   @default(MEMBERS_PERIODIC_DEPOSIT)
+  dot       DateTime           @default(now())
+  amount    Float              @default(0)
+  note      String?
+  from      Member             @relation(name: "from", fields: [fromId], references: [id])
+  fromId    String             @db.ObjectId
+  to        Member             @relation(name: "to", fields: [toId], references: [id])
+  toId      String             @db.ObjectId
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  deleted   Boolean            @default(false)
+  deletedAt DateTime?
+}
+
+enum TRANSACTION_TYPE {
+  SELF
+  IN
+  OUT
+}
+
+enum TRANSACTION_METHOD {
+  CASH
+  ACCOUNT
+  UPI
+  BANK
+  CHEQUE
+}
+
+enum TRANSACTION_MODE {
+  MEMBERS_PERIODIC_DEPOSIT
+  MEMBERS_WITHDRAW
+  MEMBERS_WITHDRAW_PROFIT
+  MEMBERS_REPAY_PROFIT
+  NEW_MEMBER_PAST_TALLY
+  INTER_CASH_TRANSFER
+  VENDOR_PERIODIC_INVEST
+  VENDOR_PERIODIC_RETURN
+  VENDOR_INVEST
+  VENDOR_RETURN
+  OTHER_EXPENDITURE
+}
+
+type PASSBOOK_DETAIL {
+  value  Float @default(0)
+  term   Float @default(0)
+  offset Float @default(0)
+  total  Float @default(0)
+}
+
+model Passbook {
+  id        String          @id @default(auto()) @map("_id") @db.ObjectId
+  type      PASSBOOK_TYPE   @default(CLUB)
+  in        PASSBOOK_DETAIL
+  out       PASSBOOK_DETAIL
+  profit    PASSBOOK_DETAIL
+  termCount Float           @default(0)
+  compute   Boolean         @default(true)
+  funds     Float           @default(0)
+  debts     Float           @default(0)
+  balance   Float           @default(0)
+  member    Member?
+  vendor    Vendor?
+}
+
+enum PASSBOOK_TYPE {
+  MEMBER
+  VENDOR
+  CLUB
+}
