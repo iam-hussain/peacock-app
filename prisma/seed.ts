@@ -1,12 +1,15 @@
-import { PrismaClient } from "@prisma/client";
-import seedData from "../public/peacock_backup.json";
+import { MemberTransaction, PrismaClient } from "@prisma/client";
+import { promises as fs } from "fs";
+import seedData from "../public/peacock_backup.json" assert { type: "json" };
+import prisma from "../src/db";
 
-const prisma = new PrismaClient();
-
-const transactionTypeMap: any = {
+type MapListType = Map<number, string>;
+const transactionTypeMap: {
+  [key in string]: any;
+} = {
   MEMBERS_PERIODIC_DEPOSIT: "PERIODIC_DEPOSIT",
   MEMBERS_WITHDRAW: "WITHDRAW",
-  MEMBERS_WITHDRAW_PROFIT: "WITHDRAW_PROFIT",
+  MEMBERS_WITHDRAW_PROFIT: "WITHDRAW",
   MEMBERS_REPAY_PROFIT: "REPAY_PROFIT",
   NEW_MEMBER_PAST_TALLY: "OFFSET_DEPOSIT",
   INTER_CASH_TRANSFER: "FUNDS_TRANSFER",
@@ -20,7 +23,7 @@ const transactionTypeMap: any = {
 function createMembers() {
   return seedData.user
     .filter((e) => e.type == "MEMBER")
-    .map(({ createdAt, updatedAt, deleted, deletedAt, ...each }: any) => {
+    .map(({ createdAt, updatedAt, ...each }) => {
       return prisma.member.create({
         data: {
           firstName: each.firstName,
@@ -30,7 +33,7 @@ function createMembers() {
           joinedAt: each.joinedAt,
           username: each.nickName,
           phone: each.mobileNumber,
-          active: each.isActive,
+          active: !each.deleted,
           createdAt,
           updatedAt,
           passbook: {
@@ -46,12 +49,12 @@ function createMembers() {
 function createVendors() {
   return seedData.user
     .filter((e) => e.type == "VENDOR")
-    .map(({ createdAt, updatedAt, deleted, deletedAt, ...each }: any) => {
+    .map(({ createdAt, updatedAt, deleted, deletedAt, ...each }) => {
       return prisma.vendor.create({
         data: {
           name: each.firstName,
           slug: each.nickName,
-          type: each.vendorType,
+          type: each.vendorType as any,
           startAt: each.joinedAt,
           active: each.isActive && !deleted,
           createdAt,
@@ -66,17 +69,14 @@ function createVendors() {
     });
 }
 
-function createVendorProfitShare(
-  members: Map<any, any>,
-  vendors: Map<any, any>
-) {
+function createVendorProfitShare(members: MapListType, vendors: MapListType) {
   return seedData.interLink.map(
-    ({ createdAt, updatedAt, vendorId, memberId, includeProfit }: any) => {
+    ({ createdAt, updatedAt, vendorId, memberId, includeProfit }) => {
       return prisma.vendorProfitShare.create({
         data: {
           active: includeProfit,
-          vendorId: vendors.get(vendorId),
-          memberId: members.get(memberId),
+          vendorId: vendors.get(vendorId) as string,
+          memberId: members.get(memberId) as string,
           createdAt,
           updatedAt,
         },
@@ -85,76 +85,79 @@ function createVendorProfitShare(
   );
 }
 
-function createTransactions(members: Map<any, any>, vendors: Map<any, any>) {
-  return seedData.transaction
-    .filter((e) => !e.deleted)
-    .map(
-      ({
-        id,
-        fromId,
-        toId,
-        method,
-        mode,
-        dot,
-        amount,
-        note,
-        createdAt,
-        updatedAt,
-      }) => {
-        const vendorFrom = vendors.get(fromId);
-        const vendorTo = vendors.get(toId);
-        const memberFrom = members.get(fromId);
-        const memberTo = members.get(toId);
-        if (vendorFrom || vendorTo) {
-          return prisma.vendorTransaction.create({
-            data: {
-              transactionType: transactionTypeMap[mode as any],
-              transactionAt: dot,
-              method: method as any,
-              amount,
-              note: note || "",
-              createdAt,
-              updatedAt,
-              vendor: {
-                connect: {
-                  id: vendorFrom || vendorTo,
-                },
-              },
-              member: {
-                connect: {
-                  id: memberFrom || memberTo,
-                },
-              },
-            },
-          });
-        }
-        return prisma.memberTransaction.create({
-          data: {
-            transactionType: transactionTypeMap[mode as any],
-            transactionAt: dot,
-            method: method as any,
-            amount,
-            note: note || "",
-            createdAt,
-            updatedAt,
-            from: {
-              connect: {
-                id: memberFrom,
-              },
-            },
-            to: {
-              connect: {
-                id: memberTo,
-              },
-            },
-          },
-        });
-      }
-    );
-}
+// function createTransactions(members, vendors) {
+//   return seedData.transaction
+//     .filter((e) => !e.deleted)
+//     .map(
+//       ({
+//         id,
+//         fromId,
+//         toId,
+//         method,
+//         mode,
+//         dot,
+//         amount,
+//         note,
+//         createdAt,
+//         updatedAt,
+//       }) => {
+//         const vendorFrom = vendors.get(fromId);
+//         const vendorTo = vendors.get(toId);
+//         const memberFrom = members.get(fromId);
+//         const memberTo = members.get(toId);
+
+//         if (vendorFrom || vendorTo) {
+//           return prisma.vendorTransaction.create({
+//             data: {
+//               transactionType: transactionTypeMap[mode],
+//               transactionAt: dot,
+//               method: method,
+//               amount,
+//               note: note || "",
+//               createdAt,
+//               updatedAt,
+//               vendor: {
+//                 connect: {
+//                   id: vendorFrom || vendorTo,
+//                 },
+//               },
+//               member: {
+//                 connect: {
+//                   id: memberFrom || memberTo,
+//                 },
+//               },
+//             },
+//           });
+//         } else {
+//           return prisma.memberTransaction.create({
+//             data: {
+//               transactionType: transactionTypeMap[mode],
+//               transactionAt: dot,
+//               method: method,
+//               amount,
+//               note: note || "",
+//               createdAt,
+//               updatedAt,
+//               from: {
+//                 connect: {
+//                   id: memberFrom,
+//                 },
+//               },
+//               to: {
+//                 connect: {
+//                   id: memberTo,
+//                 },
+//               },
+//             },
+//           });
+//         }
+//       }
+//     )
+//     .filter(Boolean);
+// }
 
 async function getMemberMap() {
-  const memberMap = new Map();
+  const memberMap: MapListType = new Map();
   const fetchedUsers = await prisma.member.findMany({
     select: {
       id: true,
@@ -172,7 +175,7 @@ async function getMemberMap() {
 }
 
 async function getVendorMap() {
-  const venderMap = new Map();
+  const venderMap: MapListType = new Map();
   const fetchedVendor = await prisma.vendor.findMany({
     select: {
       id: true,
@@ -209,8 +212,74 @@ async function seed() {
   const connections = createVendorProfitShare(members, vendors);
   await prisma.$transaction(connections);
 
-  const transactions = createTransactions(members, vendors);
-  await prisma.$transaction(transactions);
+  //   const transactions = createTransactions(members, vendors);
+  //   await prisma.$transaction(transactions);
+
+  const transactionList = seedData.transaction.filter((e) => !e.deleted);
+
+  for (const {
+    id,
+    fromId,
+    toId,
+    method,
+    mode,
+    dot,
+    amount,
+    note,
+    createdAt,
+    updatedAt,
+  } of transactionList) {
+    const vendorFrom = vendors.get(fromId);
+    const vendorTo = vendors.get(toId);
+    const memberFrom = members.get(fromId);
+    const memberTo = members.get(toId);
+
+    if (vendorFrom || vendorTo) {
+      await prisma.vendorTransaction.create({
+        data: {
+          transactionType: transactionTypeMap[mode],
+          transactionAt: dot,
+          method: method as any,
+          amount,
+          note: note || "",
+          createdAt,
+          updatedAt,
+          vendor: {
+            connect: {
+              id: vendorFrom || vendorTo,
+            },
+          },
+          member: {
+            connect: {
+              id: memberFrom || memberTo,
+            },
+          },
+        },
+      });
+    } else {
+      await prisma.memberTransaction.create({
+        data: {
+          transactionType: transactionTypeMap[mode],
+          transactionAt: dot,
+          method: method as any,
+          amount,
+          note: note || "",
+          createdAt,
+          updatedAt,
+          from: {
+            connect: {
+              id: memberFrom,
+            },
+          },
+          to: {
+            connect: {
+              id: memberTo,
+            },
+          },
+        },
+      });
+    }
+  }
 
   return;
 }

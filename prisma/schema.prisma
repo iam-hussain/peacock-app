@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_PRISMA_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Member {
@@ -99,24 +99,27 @@ model VendorProfitShare {
 }
 
 model Passbook {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  type         PASSBOOK_TYPE @default(CLUB)
-  periodIn     Float         @default(0)
-  offsetIn     Float         @default(0)
-  returnsIn    Float         @default(0)
-  periodOut    Float         @default(0)
-  offsetOut    Float         @default(0)
-  returnsOut   Float         @default(0)
-  offset       Float         @default(0)
-  returns      Float         @default(0)
-  terms        Float         @default(0)
-  currentTerms Float         @default(0)
-  calcReturns  Boolean       @default(true)
-  clubFunds    Float         @default(0)
-  member       Member?
-  vendor       Vendor?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  type        PASSBOOK_TYPE @default(CLUB)
+  periodIn    Float         @default(0)
+  offsetIn    Float         @default(0)
+  // returnsIn   Float         @default(0)
+  // periodOut    Float         @default(0)
+  // offsetOut    Float         @default(0)
+  // returnsOut   Float         @default(0)
+  in          Float         @default(0)
+  out         Float         @default(0)
+  offset      Float         @default(0)
+  returns     Float         @default(0)
+  terms       Float         @default(0)
+  currentTerm Float         @default(0)
+  calcReturns Boolean       @default(true)
+  balance     Float         @default(0)
+  fund        Float         @default(0)
+  member      Member?
+  vendor      Vendor?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 enum VENDOR_TYPE {
@@ -138,8 +141,7 @@ enum MEMBER_TRANSACTION_TYPE {
   PERIODIC_DEPOSIT
   OFFSET_DEPOSIT
   WITHDRAW
-  WITHDRAW_PROFIT
-  REPAY_PROFIT
+  REJOIN
   FUNDS_TRANSFER
 }
 
@@ -148,8 +150,8 @@ enum VENDOR_TRANSACTION_TYPE {
   INVEST
   PERIODIC_RETURN
   RETURNS
-  PROFID
-  EXPENSE
+  PROFIT
+  // EXPENSE
 }
 
 // This enum defines the role of a member when they are connected to a vendor

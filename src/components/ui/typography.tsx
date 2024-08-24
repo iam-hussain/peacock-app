@@ -17,6 +17,7 @@ const typographyStyles = cva("w-auto text-foreground", {
       error: "text-[0.8rem] font-medium mt-1 text-destructive",
       caption: "text-xl font-medium",
       brand: "font-brand text-4xl uppercase tracking-normal sm:text-5xl",
+      brandMini: "font-brand text-xl uppercase tracking-normal",
       overline: "text-xs uppercase tracking-wide",
       blockquote: "mt-6 border-l-2 pl-6 italic",
       link: "font-medium text-primary underline underline-offset-4",
@@ -63,7 +64,7 @@ const Typography: React.FC<TypographyProps> = ({
   ...props
 }) => {
   return (
-    <Component className={cn(clsx(typographyStyles(props), className))}>
+    <Component className={cn(clsx(className, typographyStyles(props)))}>
       {children}
     </Component>
   );

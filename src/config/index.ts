@@ -1,6 +1,5 @@
 import { z } from "zod";
 import moment from "moment";
-import { passbookConfig } from "./passbook.config";
 import { formatMoney } from "@/helpers/utils";
 
 export type GroupSlugs = "alpha" | "bravo";
@@ -186,7 +185,6 @@ const configContext = {
       };
     },
   },
-  passbook: passbookConfig,
   message,
   validator: {
     transaction: z

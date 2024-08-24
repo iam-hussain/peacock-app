@@ -15,7 +15,7 @@ const boxStyles = cva("w-full", {
       "stack-center": "flex flex-col justify-center items-center",
       "stack-start": "flex flex-col justify-start items-start",
       "stack-responsive":
-        "flex md:flex-col flex-row justify-start items-center w-auto",
+        "flex flex-col justify-start items-center w-auto",
       "stack-top-center": "flex flex-col justify-start items-center",
       "grid-center": "grid justify-center items-center",
       "grid-top-center": "grid justify-start items-center",

@@ -21468,7 +21468,7 @@
       "type": "VENDOR",
       "joinedAt": "2020-08-31T00:00:00.000Z",
       "isActive": false,
-      "vendorType": "BANK_INTREST",
+      "vendorType": "BANK",
       "passbookId": 36,
       "createdAt": "2023-06-29T12:34:59.365Z",
       "updatedAt": "2023-10-25T17:17:58.659Z",
