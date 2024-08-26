@@ -10,7 +10,7 @@ type MemberToTransform = Member & {
 
 export type MemberResponse = ReturnType<typeof membersTableTransform>
 
-export function membersTableTransform(
+ function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number
 ) {
