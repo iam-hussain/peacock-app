@@ -12,11 +12,11 @@ function fetchMembers() {
     },
   });
 }
-type memberInput = Member & {
+type MemberToTransform = Member & {
   passbook: Passbook;
 };
 
-export function membersTableTransform(member: memberInput) {
+export function membersTableTransform(member: MemberToTransform) {
   console.log({ member });
   return {
     id: member.id,

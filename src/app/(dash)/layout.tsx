@@ -24,7 +24,7 @@ export default function HomeLayout({
                     </CustomLink>
                 </Box>
             </Box>
-            <Box className="max-w-screen-2xl m-auto py-4 pb-16">
+            <Box className="max-w-screen-2xl m-auto mt-0 py-4 pb-16">
                 {children}
             </Box>
         </Box>

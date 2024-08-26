@@ -23,3 +23,19 @@ export const clubConfig = {
   alpha,
   bravo,
 };
+
+
+export const transactionMethodMap =  {
+  CASH: "Cash",
+  ACCOUNT: "Account",
+  UPI: "UPI",
+  BANK: "Bank",
+  CHEQUE: "Cheque",
+}
+export const memberTransactionTypeMap =  {
+  PERIODIC_DEPOSIT: "Deposit",
+  OFFSET_DEPOSIT: "Deposit Offset",
+  WITHDRAW: "Withdraw",
+  REJOIN: "Rejoin",
+  FUNDS_TRANSFER: "Transfer",
+}

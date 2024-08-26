@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
-import { differenceInMonths } from "date-fns";
 import { Member, Passbook } from "@prisma/client";
 import prisma from "@/db";
-import { months } from "moment-timezone";
 import { dateFormat, monthsDiff, newDate } from "@/lib/date";
 import { memberTotalDepositAmount } from "@/lib/club";
 
-type memberInput = Member & {
+type MemberToTransform = Member & {
   passbook: Passbook;
 };
 
+export type MemberResponse = ReturnType<typeof membersTableTransform>
+
 export function membersTableTransform(
-  member: memberInput,
+  member: MemberToTransform,
   memberTotalDeposit: number
 ) {
   const offsetBalance = member.passbook.offsetIn - member.passbook.offset;
@@ -58,13 +58,8 @@ export async function GET(request: Request) {
   const transformedMembers = members
     .map((each) => membersTableTransform(each, memberTotalDeposit))
     .sort((a, b) => (a.name > b.name ? 1 : -1));
-  // .sort((a, b) => (a.status > b.status ? 1 : -1));
-
-  // const totalMembers = await prisma.member.count();
 
   return NextResponse.json({
-    members: transformedMembers,
-    // total: totalMembers,
-    // totalPages: Math.ceil(totalMembers / limit),
+    members: transformedMembers
   });
 }
