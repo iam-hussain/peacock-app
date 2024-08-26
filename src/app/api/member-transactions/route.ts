@@ -21,7 +21,7 @@ type MemberTransactionToTransform = MemberTransaction & {
 
 export type MemberTransactionResponse = ReturnType<typeof membersTransactionTableTransform>
 
-export function membersTransactionTableTransform(
+ function membersTransactionTableTransform(
   transaction: MemberTransactionToTransform
 ) {
   const { from, to } = transaction

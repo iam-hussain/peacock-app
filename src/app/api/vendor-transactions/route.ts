@@ -19,7 +19,7 @@ type VendorTransactionToTransform = VendorTransaction & {
 
 export type VendorTransactionResponse = ReturnType<typeof vendorsTransactionTableTransform>
 
-export function vendorsTransactionTableTransform(
+function vendorsTransactionTableTransform(
   transaction: VendorTransactionToTransform
 ) {
   const { vendor, member } = transaction
