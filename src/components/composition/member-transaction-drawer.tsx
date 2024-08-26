@@ -22,7 +22,7 @@ export function MemberTransactionDrawer({ members }: { members: MembersSelectRes
             <DrawerContent>
                 <div className="mx-auto w-full max-w-sm mb-6">
                     <DrawerHeader>
-                        <DrawerTitle>Add Transaction</DrawerTitle>
+                        <DrawerTitle>Add Member Transaction</DrawerTitle>
                         {/* <DrawerDescription></DrawerDescription> */}
                     </DrawerHeader>
                     <MemberTransactionForm members={members} />

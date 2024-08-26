@@ -21,11 +21,31 @@ import { Toggle } from '../ui/toggle';
 import { FaCircle, FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 
-const columns: ColumnDef<MemberResponse>[] = [
-    // {
-    //     accessorKey: 'id',
-    //     header: 'ID',
-    // },
+
+const columnsAddon: ColumnDef<MemberResponse>[] = [
+    {
+        accessorKey: 'joined',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
+            >
+                Joined
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
+                <p className=''>{row.original.joinedAt}</p>
+                <p className='text-[0.8rem] text-foreground/70 m-0'>{row.original.id}</p>
+            </div>
+        ),
+    },
+]
+
+const columnsBase: ColumnDef<MemberResponse>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => (
@@ -52,26 +72,6 @@ const columns: ColumnDef<MemberResponse>[] = [
                     <span className='text-foreground font-medium'>{row.original.name}</span>
                     {row.original.clubFund != 0 && <p className='text-[0.8rem] text-foreground/70'>{row.original.clubFund.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</p>}
                 </div>
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'joined',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
-            >
-                Joined
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
-                <p className=''>{`${row.original.joined} months`}</p>
-                <p className='text-[0.8rem] text-foreground/70 m-0'>{row.original.joinedAt}</p>
             </div>
         ),
     },
@@ -172,6 +172,14 @@ const MembersTable = () => {
         return data.filter((e) => e.active)
     }, [showInactive, data])
 
+
+    const columns = useMemo(() => {
+        if (showInactive) {
+            return [columnsBase[0], columnsAddon[0], ...columnsBase.slice(1)]
+        }
+        return columnsBase
+    }, [showInactive])
+
     const fetchData = async (page: number) => {
         const res = await fetch(`/api/members?page=${page}&limit=50`);
         const json = await res.json();
@@ -194,7 +202,7 @@ const MembersTable = () => {
 
     return (
         <div className='w-full'>
-            <div className="flex justify-between mb-4">
+            <div className="flex justify-between mb-4 gap-3">
                 <Input
                     type="text"
                     placeholder="Filter names..."

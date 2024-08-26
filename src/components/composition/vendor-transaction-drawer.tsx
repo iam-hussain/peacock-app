@@ -23,7 +23,7 @@ export function VendorTransactionDrawer({ vendors, members }: { vendors: Vendors
             <DrawerContent>
                 <div className="mx-auto w-full max-w-sm mb-6">
                     <DrawerHeader>
-                        <DrawerTitle>Add Transaction</DrawerTitle>
+                        <DrawerTitle>Add Vendor Transaction</DrawerTitle>
                         {/* <DrawerDescription></DrawerDescription> */}
                     </DrawerHeader>
                     <VendorTransactionForm vendors={vendors} members={members} />
