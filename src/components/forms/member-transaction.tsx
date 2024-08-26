@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -17,49 +16,77 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
+import { MembersSelectResponse } from "@/actions/member";
 
+// Transaction method and type enums
 const transactionMethods = ["CASH", "ACCOUNT", "UPI", "BANK", "CHEQUE"] as const;
 const transactionTypes = ["PERIODIC_DEPOSIT", "OFFSET_DEPOSIT", "WITHDRAW", "REJOIN", "FUNDS_TRANSFER"] as const;
+
+// Zod schema definition
 const formSchema = z.object({
-    formId: z.string().min(1, { message: "Please select a 'from' member." }),
+    fromId: z.string().min(1, { message: "Please select a 'from' member." }),
     toId: z.string().min(1, { message: "Please select a 'to' member." }),
     transactionType: z.enum(transactionTypes, {
         required_error: "Please select a transaction type.",
+        invalid_type_error: "Please select a transaction type."
     }),
-    transactionMethod: z.enum(transactionMethods, {
+    method: z.enum(transactionMethods, {
         required_error: "Please select a transaction method.",
+        invalid_type_error: "Please select a transaction method."
     }),
-    amount: z.preprocess((val) => Number(val), z.number().min(0.01, { message: "Amount must be greater than 0." })),
+    amount: z.preprocess((val) => Number(val), z.number().min(1, { message: "Amount must be greater than 0." })),
     note: z.string().optional(),
 });
 
 type MemberTransactionFormProps = {
-    members: { name: string; id: string }[];
-};
+    members: MembersSelectResponse
+}
 
 export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
-    const form = useForm({
+    const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            formId: "",
+            fromId: "",
             toId: "",
-            transactionType: "",
-            transactionMethod: "",
-            amount: 10,
+            transactionType: "FUNDS_TRANSFER",
+            method: "ACCOUNT",
+            amount: 0,
             note: "",
         },
     });
 
-    function onSubmit(data: z.infer<typeof formSchema>) {
-        toast(JSON.stringify(data, null, 2));
+    // Handle form submission
+    async function onSubmit(data: z.infer<typeof formSchema>) {
+        try {
+            const response = await fetch('/api/member-transactions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                toast.error(`Error: ${error.message || 'Failed to create transaction'}`);
+                return;
+            }
+
+            const result = await response.json();
+            toast.success('Transaction successfully added!');
+            form.reset();  // Reset the form after successful submission
+        } catch (error) {
+            toast.error('An unexpected error occurred. Please try again.');
+        }
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-lg">
                 <FormField
                     control={form.control}
-                    name="formId"
+                    name="fromId"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>From</FormLabel>
@@ -119,9 +146,9 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
                                         <SelectValue placeholder="Select transaction type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {transactionTypes.map((type) => (
-                                            <SelectItem key={type} value={type}>
-                                                {type}
+                                        {Object.entries(memberTransactionTypeMap).map(([key, name]) => (
+                                            <SelectItem key={key} value={key}>
+                                                {name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -134,7 +161,7 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
 
                 <FormField
                     control={form.control}
-                    name="transactionMethod"
+                    name="method"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Transaction Method</FormLabel>
@@ -144,9 +171,9 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
                                         <SelectValue placeholder="Select transaction method" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {transactionMethods.map((type) => (
-                                            <SelectItem key={type} value={type}>
-                                                {type}
+                                        {Object.entries(transactionMethodMap).map(([key, name]) => (
+                                            <SelectItem key={key} value={key}>
+                                                {name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -156,7 +183,6 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
                         </FormItem>
                     )}
                 />
-
 
                 <FormField
                     control={form.control}
@@ -186,7 +212,7 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
                     )}
                 />
 
-                <Button type="submit">Submit Transaction</Button>
+                <Button type="submit" className="w-full">Add</Button>
             </form>
         </Form>
     );

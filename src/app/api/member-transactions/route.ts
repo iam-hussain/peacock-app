@@ -36,7 +36,7 @@ export function membersTransactionTableTransform(
     },
     to: {
       id: to.id,
-      name: `${from.firstName}${from.lastName ? ` ${from.lastName}` : ""}`,
+      name: `${to.firstName}${to.lastName ? ` ${to.lastName}` : ""}`,
       avatar: to.avatar
       ? `/image/${to.avatar}`
       : "/image/no_image_available.jpeg",
@@ -115,4 +115,36 @@ export async function GET(request: Request) {
     total: totalTransactions,
     totalPages: Math.ceil(totalTransactions / limit),
   });
+}
+
+
+// POST route for adding a member transaction
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { fromId, toId, amount, transactionType, method, note } = body;
+
+    // Validate the request body
+    if (!fromId || !toId || !amount || !transactionType) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Create the new transaction
+    const transaction = await prisma.memberTransaction.create({
+      data: {
+        fromId,
+        toId,
+        amount: parseFloat(amount),
+        transactionType,
+        method: method || 'ACCOUNT',
+        note: note || "",
+      },
+    });
+
+    return NextResponse.json({ success: true, transaction }, { status: 201 });
+
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+  }
 }

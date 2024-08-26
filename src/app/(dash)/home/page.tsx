@@ -1,5 +1,5 @@
 import MemberTransactionTable from "@/components/composition/members-transaction-table";
-import { MemberTransactionForm } from "@/components/forms/member-tranaction";
+import { MemberTransactionForm } from "@/components/forms/member-transaction";
 import Box from "@/components/ui/box";
 import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
