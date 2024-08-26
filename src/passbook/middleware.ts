@@ -159,15 +159,13 @@ const getVendorTractionPassbook = async ({
     },
   });
 
-  if (passbooks.length !== 3) {
-    return false;
-  }
-
   const result = {
-    MEMBER: passbooks.find((e) => e.member?.id === memberId) as Passbook,
-    VENDOR: passbooks.find((e) => e.vendor?.id === vendorId) as Passbook,
+    MEMBER: passbooks.find((e) => e.type === "MEMBER") as Passbook,
+    VENDOR: passbooks.find((e) => e.type === "VENDOR") as Passbook,
     CLUB: passbooks.find((e) => e.type === "CLUB") as Passbook,
   };
+
+  console.log(JSON.stringify(result));
 
   // Check if all values exist, otherwise return false
   if (result.MEMBER && result.VENDOR && result.CLUB) {

@@ -1,7 +1,6 @@
-import { MemberTransaction, PrismaClient } from "@prisma/client";
-import { promises as fs } from "fs";
 import seedData from "../public/peacock_backup.json" assert { type: "json" };
 import prisma from "../src/db";
+import { calculateReturnsHandler } from "../src/passbook/returns-middleware";
 
 type MapListType = Map<number, string>;
 const transactionTypeMap: {
@@ -280,6 +279,8 @@ async function seed() {
       });
     }
   }
+
+  await calculateReturnsHandler();
 
   return;
 }

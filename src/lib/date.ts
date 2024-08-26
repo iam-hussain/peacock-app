@@ -1,4 +1,4 @@
-import { parse } from "date-fns";
+import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 import { differenceInCalendarMonths } from "date-fns";
@@ -14,5 +14,10 @@ export const newDate = (input: any = new Date()) => {
   return zonedDate;
 };
 export const monthsDiff = (a: Date, b: Date) => {
+  console.log({ a, b });
   return differenceInCalendarMonths(a, b);
+};
+
+export const dateFormat = (input: Date) => {
+  return format(new Date(input), "dd MMM yyyy");
 };

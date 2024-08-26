@@ -1,13 +1,18 @@
 import { clubConfig } from "./config";
 import { monthsDiff, newDate } from "./date";
 
-export const getMemberTotalDepositAmount = () => {
+export const memberTotalDepositAmount = () => {
   const values = clubConfig.stages.map((e) => {
-    const diff = monthsDiff(e.startDate, e?.endDate || newDate());
+    const diff = monthsDiff(
+      e?.endDate ? new Date(e.endDate) : new Date(),
+      new Date(e.startDate)
+    );
+    console.log({ diff, data: new Date(e.startDate) });
     return diff * e.amount;
   });
+  console.log({ values });
   return values.reduce((a, b) => {
-    return a + b;
+    return a + Math.abs(b);
   }, 0);
 };
 

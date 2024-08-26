@@ -25,7 +25,6 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
         in: "amount",
         balance: "amount",
         currentTerm: "term",
-        fund: "amount",
       },
     },
     TO: { ADD: { fund: "amount" } },
@@ -119,6 +118,9 @@ export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
         in: "amount",
         fund: "amount",
       },
+      SUB: {
+        returns: "amount",
+      },
     },
     CLUB: {
       SUB: {
@@ -136,6 +138,9 @@ export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
       ADD: {
         in: "amount",
         fund: "amount",
+      },
+      SUB: {
+        returns: "amount",
       },
     },
     CLUB: {
@@ -156,6 +161,7 @@ export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
         offsetIn: "amount",
         out: "amount",
         balance: "amount",
+        returns: "amount",
       },
     },
     CLUB: {
@@ -174,6 +180,7 @@ export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
       ADD: {
         out: "amount",
         balance: "amount",
+        returns: "amount",
       },
     },
     CLUB: {

@@ -9,11 +9,13 @@ const boxStyles = cva("w-full", {
     preset: {
       "row-center": "flex flex-row justify-center items-center",
       "row-start": "flex flex-row justify-start items-center",
+      "row-between": "flex flex-row justify-between items-center",
       "row-responsive":
         "flex md:flex-row flex-col justify-start items-center md:items-start",
       "row-space-between": "flex flex-row justify-between items-center",
       "stack-center": "flex flex-col justify-center items-center",
       "stack-start": "flex flex-col justify-start items-start",
+      "stack-between": "flex flex-col justify-between items-start",
       "stack-responsive":
         "flex flex-col justify-start items-center w-auto",
       "stack-top-center": "flex flex-col justify-start items-center",
@@ -58,7 +60,7 @@ const Box: React.FC<BoxProps> = ({
 }) => {
   return (
     <div
-      data-name={"box"}
+      data-name={preset || "default"}
       className={cn(clsx(boxStyles({ preset, variant, gap }), className))}
       {...props}
     >

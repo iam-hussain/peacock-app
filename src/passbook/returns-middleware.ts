@@ -37,6 +37,9 @@ function getProfitSharesVendorsAndClub() {
       where: {
         type: "CLUB",
       },
+      select: {
+        id: true,
+      },
     }),
   ]);
 }
@@ -108,22 +111,32 @@ export async function calculateReturnsHandler() {
       }
     }
   }
+  console.log(
+    JSON.stringify({
+      transactionData: Array.from(passbooks),
+      overallExcludeTallyAmount,
+    })
+  );
 
-  const passbookQueries = Array.from(passbooks, ([id, data]) => ({
+  const transactionData = Array.from(passbooks, ([id, data]) => ({
     where: { id },
     data,
   })).map((each) => prisma.passbook.update(each));
 
-  await prisma.$transaction(passbookQueries);
+  if (club?.id) {
+    transactionData.push(
+      prisma.passbook.update({
+        where: {
+          id: club?.id,
+        },
+        data: {
+          offset: overallExcludeTallyAmount,
+        },
+      })
+    );
+  }
 
-  await prisma.passbook.update({
-    where: {
-      id: club?.id,
-    },
-    data: {
-      offset: overallExcludeTallyAmount,
-    },
-  });
+  await prisma.$transaction(transactionData);
 
   return;
 }

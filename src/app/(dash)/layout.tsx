@@ -1,5 +1,6 @@
 import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
+import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
 
 
@@ -9,14 +10,23 @@ export default function HomeLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <Box preset={'stack-start'} className="min-h-screen w-full flex-col md:flex-col-reverse"> <Box className="grow p-4 pb-12 w-full" preset={'stack-responsive'}><Typography variant={'brandMini'} className="md:hidden" >Peacock Club</Typography>{children}</Box> <Box className="w-full p-2 md:px-6 md:border-b-2 md:border-t-0 border-t-2 bg-secondary md:justify-between">
-            <Typography variant={'brandMini'} className="w-full hidden md:flex">Peacock Club</Typography>
-            <Box className="md:w-auto gap-2">
-                <Button variant={'link'}>Home</Button>
-                <Button variant={'link'}>Members</Button>
-                <Button variant={'link'}>Vendors</Button>
-                <Button variant={'link'} className="hidden md:flex">Transaction</Button>
+        <Box preset={'stack-start'} className="min-h-screen w-full bg-paper">
+            <Box preset={'row-between'} className="h-auto px-8 p-4 w-full bg-background border-b">
+                <CustomLink href="/home" variant={'transparent'} className="p-0 px-2">
+                    <Typography variant={'brandMini'} className="w-full">Peacock Club</Typography>
+                </CustomLink>
+                <Box preset={"row-start"} className="w-auto">
+                    <CustomLink href="/members" variant={'accent'}>
+                        Members
+                    </CustomLink>
+                    <CustomLink href="/vendors" variant={'accent'}>
+                        Vendors
+                    </CustomLink>
+                </Box>
             </Box>
-        </Box></Box>
+            <Box className="max-w-screen-2xl m-auto py-4 pb-16">
+                {children}
+            </Box>
+        </Box>
     );
 }

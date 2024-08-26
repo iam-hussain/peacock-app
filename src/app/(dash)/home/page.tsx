@@ -1,4 +1,5 @@
 import MemberTransactionTable from "@/components/composition/members-transaction-table";
+import { MemberTransactionForm } from "@/components/forms/member-tranaction";
 import Box from "@/components/ui/box";
 import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
@@ -9,7 +10,9 @@ export default function Home() {
         <Box preset={'stack-center'} >
             <Box preset={'stack-center'}>
                 <Typography variant={'brand'}>Peacock Club</Typography>
-                <MemberTransactionTable transactions={[]} />
+
+                <MemberTransactionForm members={[{ name: "test", id: "testId" }]} />
+                <MemberTransactionTable />
             </Box>
         </Box>
     );

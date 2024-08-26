@@ -5,69 +5,102 @@ const config = {
   content: ["./src/components/**/*.{ts,tsx}", "./src/app/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+    screens: {
+      sm: "640px",
+      // => @media (min-width: 640px) { ... }
+      // Small devices (phones, 640px and up)
+
+      md: "768px",
+      // => @media (min-width: 768px) { ... }
+      // Medium devices (tablets, 768px and up)
+
+      lg: "1024px",
+      // => @media (min-width: 1024px) { ... }
+      // Large devices (laptops/desktops, 1024px and up)
+
+      xl: "1280px",
+      // => @media (min-width: 1280px) { ... }
+      // Extra large devices (large desktops, 1280px and up)
+
+      "2xl": "1536px",
+      // => @media (min-width: 1536px) { ... }
+      // 2X large devices (larger desktops, 1536px and up)
+
+      "3xl": "1920px",
+      // => @media (min-width: 1920px) { ... }
+      // 3X large devices (ultra wide desktops, 1920px and up)
+
+      "4xl": "2560px",
+      // => @media (min-width: 2560px) { ... }
+      // 4X large devices (4K resolution, 2560px and up)
+
+      "5xl": "3200px",
+      // => @media (min-width: 3200px) { ... }
+      // 5X large devices (5K resolution, 3200px and up)
     },
+
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        border: "#d1d6e0",
+        input: "#c3d1e2",
+        ring: "#c3d1e2",
+        background: "#ffffff",
+        foreground: "#392f49",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#079e48",
+          foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#34aacd",
+          foreground: "#ffffff",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#f03b3b",
+          foreground: "#f5f8fb",
+        },
+        info: {
+          DEFAULT: "#2563eb",
+          foreground: "#f5f8fb",
+        },
+        bw: {
+          DEFAULT: "#ffffff",
+          foreground: "#000000",
+        },
+        paper: {
+          DEFAULT: "#e8edf5",
+          dark: "#c9d1e0",
+          foreground: "#ffffff",
+        },
+        inactive: {
+          DEFAULT: "#737373",
+          foreground: "#737373",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#e3e8f2",
+          foreground: "#757b8e",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#c7d1e6",
+          foreground: "#392f49",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#ffffff",
+          foreground: "#392f49",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#ffffff",
+          foreground: "#392f49",
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        lg: "0.3rem",
+        md: "calc(0.3rem - 2px)",
+        sm: "calc(0.3rem - 4px)",
       },
       fontFamily: {
+        sans: ["Roboto-Regular", "sans-serif"],
+        serif: ["Poppins-Regular", "sans-serif"],
+        // mono: ["BlackEcho", "sans-serif"],
         brand: ["BlackEcho", "sans-serif"],
       },
     },
