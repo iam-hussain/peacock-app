@@ -8,16 +8,15 @@ type MemberToTransform = Member & {
   passbook: Passbook;
 };
 
-export type MemberResponse = ReturnType<typeof membersTableTransform>
+export type MemberResponse = ReturnType<typeof membersTableTransform>;
 
- function membersTableTransform(
+function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number
 ) {
-  const offsetBalance = member.passbook.offsetIn - member.passbook.offset;
+  const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
   const periodBalance = memberTotalDeposit - member.passbook.periodIn;
   const deposit = member.passbook.periodIn + member.passbook.offsetIn;
-  // console.log({ member, periodBalance, offsetBalance, memberTotalDeposit });
   return {
     id: member.id,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
@@ -29,7 +28,7 @@ export type MemberResponse = ReturnType<typeof membersTableTransform>
     joinedAt: dateFormat(member.joinedAt),
     status: member.active ? "Active" : "Disabled",
     active: member.active,
-    deposit,
+    deposit: deposit - member.passbook.out,
     periodIn: member.passbook.periodIn,
     offsetDeposit: member.passbook.offsetIn,
     offsetBalance,
@@ -37,7 +36,8 @@ export type MemberResponse = ReturnType<typeof membersTableTransform>
     balance: periodBalance + offsetBalance,
     returns: member.passbook.returns || 0,
     clubFund: member.passbook.fund,
-    netValue: deposit + member.passbook.returns,
+    netValue:
+      member.passbook.in + member.passbook.returns - member.passbook.out,
   };
 }
 
@@ -60,6 +60,6 @@ export async function GET(request: Request) {
     .sort((a, b) => (a.name > b.name ? 1 : -1));
 
   return NextResponse.json({
-    members: transformedMembers
+    members: transformedMembers,
   });
 }

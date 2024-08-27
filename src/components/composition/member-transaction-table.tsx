@@ -202,10 +202,10 @@ const MemberTransactionTable = () => {
                 </TableBody>
             </Table>
 
-            <div className="mt-4 flex justify-between px-4 align-middle items-center gap-4">
-                <Button onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</Button>
+            <div className="mt-4 flex justify-between align-middle items-center gap-4">
+                <Button onClick={() => setPage(page - 1)} disabled={page === 1} variant={'outline'} className='min-w-[100px]'>Previous</Button>
                 <span className='text-sm text-foreground/90'>Page {page} of {totalPages}</span>
-                <Button onClick={() => setPage(page + 1)} disabled={page === totalPages}>Next</Button>
+                <Button onClick={() => setPage(page + 1)} disabled={page === totalPages} variant={'outline'} className='min-w-[100px]'>Next</Button>
             </div>
         </div>
     );

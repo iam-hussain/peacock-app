@@ -5,6 +5,7 @@ import {
   PassbookConfigAction,
   PassbookConfigActionValue,
   memberTransactionPassbookSettings,
+  vendorTransactionPassbookSettings,
 } from "./settings";
 
 type PassbookConfigActionValueObj = {
@@ -165,8 +166,6 @@ const getVendorTractionPassbook = async ({
     CLUB: passbooks.find((e) => e.type === "CLUB") as Passbook,
   };
 
-  console.log(JSON.stringify(result));
-
   // Check if all values exist, otherwise return false
   if (result.MEMBER && result.VENDOR && result.CLUB) {
     return result;
@@ -191,7 +190,7 @@ export const handleVendorPassbookEntry = async (
     term: 1,
   };
 
-  Object.entries(memberTransactionPassbookSettings).forEach(
+  Object.entries(vendorTransactionPassbookSettings).forEach(
     ([transactionType, passbooksOf]) => {
       if (transaction.transactionType === transactionType) {
         Object.entries(passbooksOf).forEach(([passbookOf, action]: any[]) => {

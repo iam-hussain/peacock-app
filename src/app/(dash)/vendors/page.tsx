@@ -1,7 +1,7 @@
-import MembersTable from "@/components/composition/members-table"
 import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"
+import VendorTable from "@/components/composition/vendor-table"
 
 
 export default async function Members() {
@@ -14,9 +14,9 @@ export default async function Members() {
                     Vendor Transactions
                 </CustomLink>
             </Box>
-            {/* <Box className="bg-background p-4 md:p-6 rounded-md width-avl h-full">
-                <MembersTable />
-            </Box> */}
+            <Box className="bg-background p-4 md:p-6 rounded-md width-avl h-full">
+                <VendorTable />
+            </Box>
         </Box>
     )
 }

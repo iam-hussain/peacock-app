@@ -12,7 +12,7 @@ import { calculateReturnsHandler } from "./passbook/returns-middleware";
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: ["query", "info", "warn", "error"],
+    log: ["error"], // ["query", "info", "warn", "error"],
   }).$extends({
     name: "Passbook",
     query: {

@@ -14,7 +14,6 @@ export const newDate = (input: any = new Date()) => {
   return zonedDate;
 };
 export const monthsDiff = (a: Date, b: Date) => {
-  console.log({ a, b });
   return differenceInCalendarMonths(a, b);
 };
 

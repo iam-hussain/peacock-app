@@ -1,6 +1,6 @@
 import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
-import MemberTransactionTable from "@/components/composition/members-transaction-table"
+import MemberTransactionTable from "@/components/composition/member-transaction-table"
 import { MemberTransactionDrawer } from "@/components/composition/member-transaction-drawer"
 import { membersSelect } from "@/actions/member"
 

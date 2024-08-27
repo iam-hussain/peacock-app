@@ -7,10 +7,9 @@ export const memberTotalDepositAmount = () => {
       e?.endDate ? new Date(e.endDate) : new Date(),
       new Date(e.startDate)
     );
-    console.log({ diff, data: new Date(e.startDate) });
     return diff * e.amount;
   });
-  console.log({ values });
+
   return values.reduce((a, b) => {
     return a + Math.abs(b);
   }, 0);

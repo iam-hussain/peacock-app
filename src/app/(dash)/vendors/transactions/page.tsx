@@ -3,7 +3,7 @@ import Typography from "@/components/ui/typography"
 import { membersSelect } from "@/actions/member"
 import { VendorTransactionDrawer } from "@/components/composition/vendor-transaction-drawer"
 import { vendorsSelect } from "@/actions/vendor"
-import VendorTransactionsTable from "@/components/composition/vendors-table"
+import VendorTransactionsTable from "@/components/composition/vendor-transaction-table"
 
 
 export default async function Members() {

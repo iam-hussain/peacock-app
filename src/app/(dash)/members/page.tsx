@@ -1,4 +1,4 @@
-import MembersTable from "@/components/composition/members-table"
+import MembersTable from "@/components/composition/member-table"
 import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"

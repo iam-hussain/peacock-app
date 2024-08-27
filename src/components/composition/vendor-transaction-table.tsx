@@ -142,15 +142,38 @@ const columns: ColumnDef<any>[] = [
     },
 ]
 
-const VendorTransactionsTable = () => {
+const VendorTransactionTable = () => {
     const [data, setData] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [filters, setFilters] = useState({
+        vendorId: '',
+        memberId: '',
+        transactionType: '',
+        startDate: '',
+        endDate: '',
+    });
+    const [sortField, setSortField] = useState('transactionAt');
+    const [sortOrder, setSortOrder] = useState('desc');
 
     useEffect(() => {
-        fetchData(1);
-    }, []);
+        fetchData(page);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page, filters, sortField, sortOrder]);
 
     const fetchData = async (page: number) => {
-        const res = await fetch(`/api/vendor-transactions?page=${page}&limit=50`);
+        const params = new URLSearchParams({
+            page: page.toString(),
+            vendorId: filters.vendorId,
+            memberId: filters.memberId,
+            transactionType: filters.transactionType,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
+            sortField,
+            sortOrder,
+        });
+
+        const res = await fetch(`/api/vendor-transactions?${params.toString()}`);
         const json = await res.json();
         setData(json.transaction);
     };
@@ -163,48 +186,81 @@ const VendorTransactionsTable = () => {
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         manualPagination: true,
-        pageCount: 1,
+        manualSorting: true,
+        pageCount: totalPages,
         state: {
-            pagination: { pageIndex: 0, pageSize: 50 },
+            pagination: { pageIndex: page - 1, pageSize: 10 },
+            sorting: [{ id: sortField, desc: sortOrder === 'desc' }],
         },
     });
 
     return (
         <div className='w-full'>
+            <div className="flex justify-between mb-4">
+                {/* Filters */}
+                <Input
+                    type="text"
+                    placeholder="Filter by member ID..."
+                    value={filters.vendorId}
+                    onChange={(e) => setFilters({ ...filters, vendorId: e.target.value })}
+                />
+                <Input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                />
+                <Input
+                    type="date"
+                    value={filters.endDate}
+                    onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                />
+            </div>
+
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
+                            {headerGroup.headers.map((header, i) => (
                                 <TableHead key={header.id}>
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                    {![1, 4].includes(i) ? <p className='m-0 p-0 uppercase px-2 text-[0.8rem]'>{flexRender(header.column.columnDef.header, header.getContext())}</p> :
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="uppercase px-2 hover:bg-transparent hover:font-extrabold"
+                                            onClick={() => {
+                                                setSortField(header.column.id);
+                                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                                            }}
+                                        >
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                                        </Button>}
+
                                 </TableHead>
                             ))}
                         </TableRow>
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {table.getRowModel().rows.length > 0 ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className='px-4'>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="text-center">
-                                No results.
-                            </TableCell>
+                    {table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id} >
+                            {row.getVisibleCells().map((cell) => (
+                                <TableCell key={cell.id} className='px-4'>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                </TableCell>
+                            ))}
                         </TableRow>
-                    )}
+                    ))}
                 </TableBody>
             </Table>
+
+            <div className="mt-4 flex justify-between align-middle items-center gap-4">
+                <Button onClick={() => setPage(page - 1)} disabled={page === 1} variant={'outline'} className='min-w-[100px]'>Previous</Button>
+                <span className='text-sm text-foreground/90'>Page {page} of {totalPages}</span>
+                <Button onClick={() => setPage(page + 1)} disabled={page === totalPages} variant={'outline'} className='min-w-[100px]'>Next</Button>
+            </div>
         </div>
     );
 };
 
-export default VendorTransactionsTable;
+export default VendorTransactionTable;
