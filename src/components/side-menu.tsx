@@ -20,6 +20,7 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { RiHome5Fill } from "react-icons/ri";
 import Typography from "./ui/typography";
 import { Separator } from "./ui/separator";
+import { clubAge } from "@/lib/date";
 
 type Menu = {
   Icon: IconType;
@@ -107,7 +108,10 @@ function SideMenu({ className }: { className?: string }) {
               <IoClose className="h-6 w-6" />
             </Button>
           </Box>
-          <Typography variant={'brandMini'} className="w-full text-center pr-4 md:hidden">Peacock Club</Typography>
+          <Box preset={'stack-center'} className="gap-0 pr-4">
+            <Typography variant={'brandMini'} className="w-full text-center">Peacock Club</Typography>
+            <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
+          </Box>
           <Separator className=" md:hidden" />
 
           <ScrollArea className="w-full grow">
