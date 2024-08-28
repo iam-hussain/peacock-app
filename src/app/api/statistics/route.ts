@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   // Simulate fetching statistics data
   const statistics = {
-    membersPerMonth: 120,
+    membersPerMonth: 20,
     membersDeposit: 500000,
     membersBalance: 250000,
     netMembersAmount: 750000,
