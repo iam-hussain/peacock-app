@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 const boxStyles = cva("w-full", {
   variants: {
     preset: {
+      "row-start-auto": "flex flex-row justify-center items-start h-auto",
       "row-center": "flex flex-row justify-center items-center",
       "row-start": "flex flex-row justify-start items-center",
       "row-between": "flex flex-row justify-between items-center",
@@ -39,7 +40,7 @@ const boxStyles = cva("w-full", {
     },
   },
   defaultVariants: {
-    preset: "row-center",
+    preset: "row-start-auto",
     gap: 4,
     variant: "none",
   },

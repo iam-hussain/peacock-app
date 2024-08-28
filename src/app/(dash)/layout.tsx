@@ -1,7 +1,9 @@
-import Box from "@/components/ui/box";
-import { Button } from "@/components/ui/button";
-import { CustomLink } from "@/components/ui/link";
-import Typography from "@/components/ui/typography";
+'use client'
+import SideMenu from "@/components/side-menu";
+import TopMenu from "@/components/top-menu";
+import { cn } from "@/lib/utils";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
 
 
 export default function HomeLayout({
@@ -9,24 +11,28 @@ export default function HomeLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const topBarOpen = useSelector((state: RootState) => state.page.topBarOpen);
     return (
-        <Box preset={'stack-start'} className="min-h-screen w-full bg-paper">
-            <Box preset={'row-between'} className="h-auto px-8 p-4 w-full bg-background border-b">
-                <CustomLink href="/home" variant={'transparent'} className="p-0 px-2">
-                    <Typography variant={'brandMini'} className="w-full">Peacock Club</Typography>
-                </CustomLink>
-                <Box preset={"row-start"} className="w-auto">
-                    <CustomLink href="/members" variant={'accent'}>
-                        Members
-                    </CustomLink>
-                    <CustomLink href="/vendors" variant={'accent'}>
-                        Vendors
-                    </CustomLink>
-                </Box>
-            </Box>
-            <Box className="max-w-screen-2xl m-auto mt-0 py-4 pb-16">
-                {children}
-            </Box>
-        </Box>
+        <div className="main-wrapper">
+            <main className={"page-main bg-paper"}>
+                <TopMenu
+                    className="fixed z-30 block w-full bg-background"
+                    showSideBar={true}
+                />
+                <div
+                    className={cn(
+                        "h-full min-h-svh w-full transition-all duration-300 max-w-7xl m-auto mt-0",
+                        {
+                            "pt-[61px]": topBarOpen,
+                        }
+                    )}
+                >
+                    <div className="w-full flex h-full px-2 py-8">
+                        {children}
+                    </div>
+                </div>
+            </main>
+            <SideMenu />
+        </div>
     );
 }

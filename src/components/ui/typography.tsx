@@ -64,7 +64,7 @@ const Typography: React.FC<TypographyProps> = ({
   ...props
 }) => {
   return (
-    <Component className={cn(clsx(className, typographyStyles(props)))}>
+    <Component className={cn(clsx(typographyStyles(props), className))}>
       {children}
     </Component>
   );

@@ -14,7 +14,7 @@ export default async function Members() {
                     Member Transactions
                 </CustomLink>
             </Box>
-            <Box className="bg-background p-4 md:p-6 rounded-md width-avl h-full">
+            <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
                 <MembersTable />
             </Box>
         </Box>

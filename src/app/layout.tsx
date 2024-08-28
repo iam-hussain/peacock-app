@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
-
+import StoreProvider from "@/components/store-provider";
 
 export const metadata: Metadata = {
   title: "Peacock Club",
@@ -15,7 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <StoreProvider>
+          {children}
+        </StoreProvider>
+      </body>
       <Toaster />
     </html>
   );

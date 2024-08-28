@@ -16,7 +16,7 @@ export default async function Members() {
                 <Typography variant={'h3'} className="">Vendor Transactions</Typography>
                 <VendorTransactionDrawer members={members} vendors={vendors} />
             </Box>
-            <Box className="bg-background p-4 md:p-6 rounded-md width-avl h-full">
+            <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
                 <VendorTransactionsTable />
             </Box>
         </Box>
