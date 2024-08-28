@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <Box preset={'stack-center'} className="min-h-screen w-full">
+    <Box preset={'stack-center'} className="w-full min-h-svh bg-background">
       <Box>
         <Image src={'/peacock.jpg'} alt={"Peacock Club"} width={200} height={200} />
       </Box>

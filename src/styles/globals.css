@@ -55,7 +55,7 @@ body {
 
 .main-screen-wrapper {
   height: 100%;
-  max-height: 100vh;
+  max-height: 100svh;
   width: 100%;
   display: flex;
 }
@@ -63,7 +63,7 @@ body {
 .page-main {
   width: 100%;
   height: auto;
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: row;
 }
