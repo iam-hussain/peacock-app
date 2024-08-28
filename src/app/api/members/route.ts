@@ -63,3 +63,58 @@ export async function GET(request: Request) {
     members: transformedMembers,
   });
 }
+
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    const { id, firstName, lastName, username, phone, email, avatar, active } =
+      data;
+
+    // Validate required fields
+    if (!firstName && !id) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const commonData = {
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+      username:
+        username || firstName?.toLowerCase().trim().replace(/\s+/g, "_"),
+      phone: phone || undefined,
+      email: email || undefined,
+      avatar: avatar || undefined,
+      active: typeof active === "boolean" ? active : true,
+    };
+
+    let member;
+
+    if (id) {
+      // Update existing member
+      member = await prisma.member.update({
+        where: { id },
+        data: commonData,
+      });
+    } else {
+      // Create a new member
+      member = await prisma.member.create({
+        data: {
+          ...commonData,
+          passbook: {
+            create: { type: "MEMBER" },
+          },
+        },
+      });
+    }
+
+    return NextResponse.json({ member }, { status: 200 });
+  } catch (error) {
+    console.error("Error creating/updating member:", error);
+    return NextResponse.json(
+      { error: "Failed to process request" },
+      { status: 500 }
+    );
+  }
+}

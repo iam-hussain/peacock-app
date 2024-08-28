@@ -25,7 +25,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     terms: vendor.terms,
     memberName: vendor?.owner?.firstName
       ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
-      : null,
+      : "sdsd",
     memberAvatar: vendor?.owner?.avatar
       ? `/image/${vendor.owner.avatar}`
       : "/image/no_image_available.jpeg",
@@ -33,7 +33,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     invest: vendor.passbook.in,
     profit: vendor.passbook.out,
     returns: vendor.passbook.calcReturns
-      ? vendor.passbook.in - vendor.passbook.out
+      ? vendor.passbook.out - vendor.passbook.in
       : 0,
   };
 }
@@ -68,4 +68,85 @@ export async function GET(request: Request) {
   return NextResponse.json({
     vendors: transformedVendors,
   });
+}
+
+export async function POST(request: Request) {
+  try {
+    const data = await request.json();
+    const {
+      id,
+      name,
+      slug,
+      terms,
+      type,
+      ownerId,
+      termType,
+      startAt,
+      endAt,
+      active,
+      calcReturns,
+    } = data;
+
+    // Validate required fields
+    if (!name && !id) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    const commonData = {
+      name,
+      slug: slug || name.toLowerCase().trim().replace(" ", "_"),
+      terms: terms ?? 0,
+      type: type ?? "DEFAULT",
+      ownerId: ownerId || undefined,
+      termType: termType ?? "MONTH",
+      startAt: startAt ? new Date(startAt) : new Date(),
+      endAt: endAt ? new Date(endAt) : undefined,
+      active: typeof active === "boolean" ? active : true,
+    };
+
+    let vendor;
+
+    if (id) {
+      // Update vendor if ID is provided
+      vendor = await prisma.vendor.update({
+        where: { id },
+        data: commonData,
+      });
+
+      // Update passbook's calcReturns field if provided
+      if (typeof calcReturns === "boolean") {
+        await prisma.passbook.updateMany({
+          where: {
+            type: "VENDOR",
+            vendor: { id },
+          },
+          data: { calcReturns },
+        });
+      }
+    } else {
+      // Create a new vendor if no ID is provided
+      vendor = await prisma.vendor.create({
+        data: {
+          ...commonData,
+          passbook: {
+            create: {
+              type: "VENDOR",
+              calcReturns: calcReturns ?? true,
+            },
+          },
+        },
+      });
+    }
+
+    return NextResponse.json({ vendor }, { status: 200 });
+  } catch (error) {
+    console.error("Error creating/updating vendor:", error);
+    return NextResponse.json(
+      { error: "Failed to process request" },
+      { status: 500 }
+    );
+  }
 }

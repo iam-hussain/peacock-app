@@ -28,17 +28,19 @@ const columns: ColumnDef<any>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                 className="uppercase hover:bg-transparent hover:font-extrabold px-2"
             >
-                Name / ID
+                Name
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="flex items-center space-x-2 min-w-[100px]" data-id={row.original.id}>
+            <div className="flex items-center space-x-2 min-w-[170px]" data-id={row.original.id}>
+                <img src={row.original.memberAvatar} alt="" className="w-10 h-10 rounded-lg border" />
                 <div className='flex flex-col'>
-                    <span className='text-foreground font-medium'>{row.original.name}</span>
-                    <p className='text-[0.7rem] text-foreground/70'>{row.original.id}</p>
+                    <p className=''>{row.original.name}</p>
+                    {row.original.memberName && <span className='text-[0.7rem] text-foreground/70'>{row.original.memberName}</span>}
                 </div>
             </div>
+
         ),
     },
     {
@@ -58,6 +60,7 @@ const columns: ColumnDef<any>[] = [
             <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
                 <p className=''>{row.original.startAt}</p>
                 {row.original.endAt && <p className='text-[0.8rem] text-foreground/70'>{row.original.endAt}</p>}
+                <p className='text-[0.7rem] text-foreground/70'>{row.original.id}</p>
             </div>
         ),
     },
@@ -80,33 +83,6 @@ const columns: ColumnDef<any>[] = [
             </div>
         ),
     },
-    {
-        accessorKey: 'member',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
-            >
-                Member
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="flex items-center space-x-2 min-w-[170px]" data-id={row.original.id}>
-                {row.original.memberName ? (
-                    <>
-                        <img src={row.original.memberAvatar} alt="" className="w-10 h-10 rounded-lg border" />
-                        <span className='text-foreground font-medium'>{row.original.memberName}</span>
-                    </>
-                ) : (
-                    <span className='text-foreground/50 italic'> - </span>
-                )}
-            </div>
-        ),
-    },
-
     {
         accessorKey: 'invest',
         header: ({ column }) => (
