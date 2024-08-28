@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { FaUsers, FaMoneyBillWave, FaBalanceScale, FaChartLine, FaPiggyBank } from "react-icons/fa";
@@ -11,6 +11,7 @@ import { ArrowUpDown } from "lucide-react";
 import { PieChart } from "@/components/pie-chart";
 import { DoughnutChart } from "@/components/doughnut-chart";
 import Typography from "@/components/ui/typography";
+import { IconType } from "react-icons/lib";
 
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -111,7 +112,7 @@ export default function HomePage() {
 }
 
 // DashboardCard Component with Icon
-function DashboardCard({ title, value, icon }) {
+function DashboardCard({ title, value, icon }: { title: string, value: string | number, icon: ReactElement<any, any> }) {
     return (
         <Card className="shadow-sm flex items-center rounded-lg">
             <CardContent className="p-6 flex space-x-4">
@@ -126,39 +127,39 @@ function DashboardCard({ title, value, icon }) {
 }
 
 // RecentTransactionsTable Component
-function RecentTransactionsTable({ transactions }) {
-    return (
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Member</TableHead>
-                    <TableHead>
-                        <Button variant="ghost" size="sm">
-                            Amount <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </TableHead>
-                    <TableHead>Type</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {transactions.length > 0 ? (
-                    transactions.map((transaction) => (
-                        <TableRow key={transaction.id}>
-                            <TableCell>{transaction.date}</TableCell>
-                            <TableCell>{transaction.member}</TableCell>
-                            <TableCell>{transaction.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</TableCell>
-                            <TableCell>{transaction.type}</TableCell>
-                        </TableRow>
-                    ))
-                ) : (
-                    <TableRow>
-                        <TableCell colSpan={4} className="text-center">
-                            No transactions found.
-                        </TableCell>
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
-    );
-}
+// function RecentTransactionsTable({ transactions }) {
+//     return (
+//         <Table>
+//             <TableHeader>
+//                 <TableRow>
+//                     <TableHead>Date</TableHead>
+//                     <TableHead>Member</TableHead>
+//                     <TableHead>
+//                         <Button variant="ghost" size="sm">
+//                             Amount <ArrowUpDown className="ml-2 h-4 w-4" />
+//                         </Button>
+//                     </TableHead>
+//                     <TableHead>Type</TableHead>
+//                 </TableRow>
+//             </TableHeader>
+//             <TableBody>
+//                 {transactions.length > 0 ? (
+//                     transactions.map((transaction) => (
+//                         <TableRow key={transaction.id}>
+//                             <TableCell>{transaction.date}</TableCell>
+//                             <TableCell>{transaction.member}</TableCell>
+//                             <TableCell>{transaction.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</TableCell>
+//                             <TableCell>{transaction.type}</TableCell>
+//                         </TableRow>
+//                     ))
+//                 ) : (
+//                     <TableRow>
+//                         <TableCell colSpan={4} className="text-center">
+//                             No transactions found.
+//                         </TableCell>
+//                     </TableRow>
+//                 )}
+//             </TableBody>
+//         </Table>
+//     );
+// }

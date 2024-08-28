@@ -17,6 +17,7 @@ import {
 import { HiMenuAlt2 } from "react-icons/hi";
 import Typography from "./ui/typography";
 import { BiHide, BiShow } from "react-icons/bi";
+import { CustomLink } from "./ui/link";
 
 const closerButton = {
   initial: {},
@@ -116,7 +117,7 @@ function TopMenu({
           <></>
         )}
 
-        <Typography variant={'brandMini'}>Peacock Club</Typography>
+        <CustomLink href={'/'} variant={'transparent'} className="p-0"><Typography variant={'brandMini'}>Peacock Club</Typography></CustomLink>
       </Box>
 
       <Box className="w-auto" gap={2}>
