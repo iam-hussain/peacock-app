@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useWindowScroll } from "react-use";
 
 import { RootState } from "@/store";
-import { openSideBar, openTopBar, } from "@/store/pageSlice";
+import { openSideBar } from "@/store/pageSlice";
 import Box from "./ui/box";
 import { Icon } from "lucide-react";
 import { ThemeModeToggle } from "./theme-mode-toggle";
