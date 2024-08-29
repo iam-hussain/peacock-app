@@ -280,7 +280,7 @@ async function seed() {
     }
   }
 
-  await calculateReturnsHandler();
+  // await calculateReturnsHandler();
 
   return;
 }

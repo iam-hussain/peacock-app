@@ -4,6 +4,7 @@ function getProfitSharesVendorsAndClub() {
   return Promise.all([
     prisma.vendor.findMany({
       select: {
+        type: true,
         profitShares: {
           select: {
             id: true,
@@ -48,14 +49,14 @@ function returnsOffsetMembersCount({
   profitShares,
 }: Awaited<ReturnType<typeof getProfitSharesVendorsAndClub>>[0][0]) {
   return {
-    includeCount: profitShares
+    includedCount: profitShares
       .filter((e) => e.active)
       .map((e) => ({
         memberId: e.memberId,
         passbookId: e.member.passbook.id,
       })).length,
-    activeExcludeCount: profitShares
-      .filter((e) => !e.active && !e.member.active)
+    excludedCount: profitShares
+      .filter((e) => !e.active && e.member.active)
       .map((e) => ({
         memberId: e.memberId,
         passbookId: e.member.passbook.id,
@@ -65,78 +66,96 @@ function returnsOffsetMembersCount({
 
 export async function calculateReturnsHandler() {
   const [vendors, club] = await getProfitSharesVendorsAndClub();
+  const toUpdate: Map<string, any> = new Map();
+  let totalOffset = 0;
+  let totalReturns = 0;
 
-  const passbooks: Map<string, any> = new Map();
+  vendors.forEach((vendor) => {
+    const { profitShares, passbook, type } = vendor;
 
-  let overallExcludeTallyAmount = 0;
+    const { includedCount, excludedCount } = returnsOffsetMembersCount(vendor);
 
-  for (let vendor of vendors) {
-    const { profitShares, passbook } = vendor;
+    let returns = Math.abs(Math.round(passbook.out - passbook.in));
+    let memberShare = Math.abs(Math.round(returns / includedCount)) || 0;
 
-    if (!passbook.calcReturns) {
-      return;
+    if (type === "LEND" && !passbook.calcReturns) {
+      returns = Math.abs(Math.round(passbook.out));
+      memberShare = Math.abs(Math.round(passbook.out / includedCount)) || 0;
     }
-    const { includeCount, activeExcludeCount } =
-      returnsOffsetMembersCount(vendor);
 
-    const eachMemberProfit =
-      Math.round((passbook.in - passbook.out) / includeCount) || 0;
-    const excludeTallyAmount =
-      Math.round(eachMemberProfit * activeExcludeCount) || 0;
+    if (!toUpdate.has(passbook.id)) {
+      toUpdate.set(passbook.id, {
+        offset: 0,
+        returns: 0,
+      });
+    }
 
-    overallExcludeTallyAmount = overallExcludeTallyAmount + excludeTallyAmount;
+    if (passbook.calcReturns || type === "LEND") {
+      const vendorOffset = Math.round(memberShare * excludedCount) || 0;
 
+      totalOffset = totalOffset + vendorOffset;
+      totalReturns = totalReturns + returns;
+
+      toUpdate.set(passbook.id, {
+        offset: vendorOffset,
+        returns: returns,
+      });
+    }
     for (let { member, active } of profitShares) {
       const memberPassbookId = member.passbook.id;
 
-      if (!passbooks.has(memberPassbookId)) {
-        passbooks.set(memberPassbookId, {
+      if (!toUpdate.has(memberPassbookId)) {
+        toUpdate.set(memberPassbookId, {
           offset: 0,
           returns: 0,
         });
       }
 
-      const memberPassbookEntry = passbooks.get(memberPassbookId);
+      if (passbook.calcReturns || type === "LEND") {
+        const memberPassbookEntry = toUpdate.get(memberPassbookId);
 
-      if (active) {
-        passbooks.set(memberPassbookId, {
-          ...memberPassbookEntry,
-          returns: memberPassbookEntry.returns + eachMemberProfit,
-        });
-      } else {
-        passbooks.set(memberPassbookId, {
-          ...memberPassbookEntry,
-          offset: memberPassbookEntry.offset + eachMemberProfit,
-        });
+        if (active) {
+          toUpdate.set(memberPassbookId, {
+            ...memberPassbookEntry,
+            returns: memberPassbookEntry.returns + memberShare,
+          });
+        } else {
+          toUpdate.set(memberPassbookId, {
+            ...memberPassbookEntry,
+            offset: memberPassbookEntry.offset + memberShare,
+          });
+        }
       }
     }
-  }
-  console.log(
-    JSON.stringify({
-      transactionData: Array.from(passbooks),
-      overallExcludeTallyAmount,
-    })
-  );
+  });
 
-  const transactionData = Array.from(passbooks, ([id, data]) => ({
+  const passbooksData = Array.from(toUpdate, ([id, data]) => ({
     where: { id },
     data,
-  })).map((each) => prisma.passbook.update(each));
+  }));
+
+  const passbooksUpdate = passbooksData.map((each) =>
+    prisma.passbook.update(each)
+  );
 
   if (club?.id) {
-    transactionData.push(
+    passbooksUpdate.push(
       prisma.passbook.update({
         where: {
           id: club?.id,
         },
         data: {
-          offset: overallExcludeTallyAmount,
+          offset: totalOffset,
+          returns: totalReturns,
         },
       })
     );
   }
 
-  await prisma.$transaction(transactionData);
+  await prisma.$transaction(passbooksUpdate);
 
-  return;
+  return {
+    totalOffset,
+    passbooksData,
+  };
 }

@@ -33,7 +33,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
         returns: vendor.passbook.calcReturns
             ? vendor.passbook.out - vendor.passbook.in
             : 0,
-        vendor: rawVendor
+        vendor: { ...rawVendor, calcReturns: passbook.calcReturns }
     };
 }
 

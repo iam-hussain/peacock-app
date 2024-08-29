@@ -24,6 +24,7 @@ const formSchema = z.object({
     startAt: z.string().optional(),
     endAt: z.string().optional(),
     active: z.boolean(),
+    calcReturns: z.boolean(),
 });
 
 type VendorFormProps = {
@@ -37,14 +38,15 @@ export function VendorForm({ vendor, members }: VendorFormProps) {
         defaultValues: vendor
             ? {
                 name: vendor.name,
-                slug: vendor.slug,
-                terms: vendor.terms,
-                type: vendor.type,
-                ownerId: vendor.ownerId,
-                termType: vendor.termType,
+                slug: vendor.slug || '',
+                terms: vendor.terms || 0,
+                type: vendor.type || 'DEFAULT',
+                ownerId: vendor.ownerId || '',
+                termType: vendor.termType || "NONE",
                 startAt: vendor.startAt ? new Date(vendor.startAt).toISOString().substring(0, 10) : "",
                 endAt: vendor.endAt ? new Date(vendor.endAt).toISOString().substring(0, 10) : "",
-                active: vendor.active,
+                active: vendor.active ?? true,
+                calcReturns: vendor.calcReturns ?? true,
             }
             : {
                 name: "",
@@ -56,24 +58,26 @@ export function VendorForm({ vendor, members }: VendorFormProps) {
                 startAt: "",
                 endAt: "",
                 active: true,
+                calcReturns: true
             },
     });
 
-    useEffect(() => {
-        if (vendor) {
-            form.reset({
-                name: vendor.name,
-                slug: vendor.slug,
-                terms: vendor.terms,
-                type: vendor.type,
-                ownerId: vendor.ownerId,
-                termType: vendor.termType,
-                startAt: vendor.startAt ? new Date(vendor.startAt).toISOString().substring(0, 10) : "",
-                endAt: vendor.endAt ? new Date(vendor.endAt).toISOString().substring(0, 10) : "",
-                active: vendor.active,
-            });
-        }
-    }, [vendor, form]);
+    // useEffect(() => {
+    //     if (vendor) {
+    //         form.reset({
+    //             name: vendor.name,
+    //             slug: vendor.slug || '',
+    //             terms: vendor.terms || 0,
+    //             type: vendor.type || 'DEFAULT',
+    //             ownerId: vendor.ownerId || '',
+    //             termType: vendor.termType || "NONE",
+    //             startAt: vendor.startAt ? new Date(vendor.startAt).toISOString().substring(0, 10) : "",
+    //             endAt: vendor.endAt ? new Date(vendor.endAt).toISOString().substring(0, 10) : "",
+    //             active: vendor.active ?? true,
+    //             calcReturns: vendor.calcReturns ?? true,
+    //         });
+    //     }
+    // }, [vendor, form]);
 
     async function onSubmit(data: z.infer<typeof formSchema>) {
         try {
@@ -93,7 +97,7 @@ export function VendorForm({ vendor, members }: VendorFormProps) {
 
             const result = await response.json();
             toast.success(vendor ? "Vendor updated successfully" : "Vendor created successfully");
-            form.reset(); // Reset form after submission
+            if (!vendor) form.reset(); // Reset form after submission
         } catch (error) {
             toast.error("An unexpected error occurred. Please try again.");
         }
@@ -265,7 +269,26 @@ export function VendorForm({ vendor, members }: VendorFormProps) {
                                 <Switch
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
-                                    defaultChecked={vendor?.active || true}
+                                    defaultChecked={vendor?.active ?? true}
+                                />
+                            )}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+
+                {/* calcReturns */}
+                <FormItem className="flex items-center justify-between">
+                    <FormLabel>Calculate Returns</FormLabel>
+                    <FormControl>
+                        <Controller
+                            name={`calcReturns`}
+                            control={form.control}
+                            render={({ field }) => (
+                                <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    defaultChecked={vendor?.calcReturns ?? true}
                                 />
                             )}
                         />

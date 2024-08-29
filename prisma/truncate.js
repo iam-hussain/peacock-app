@@ -9,9 +9,9 @@ async function truncate() {
   await prisma.memberTransaction.deleteMany();
   await prisma.vendorProfitShare.deleteMany();
   await prisma.vendorTransaction.deleteMany();
+  await prisma.passbook.deleteMany();
   await prisma.member.deleteMany();
   await prisma.vendor.deleteMany();
-  await prisma.passbook.deleteMany();
 
   console.log("All records have been deleted");
 }

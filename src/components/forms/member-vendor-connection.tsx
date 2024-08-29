@@ -24,7 +24,6 @@ export function MemberVendorConnectionsForm({ memberId }: MemberVendorConnection
         async function fetchConnections() {
             const response = await fetch(`/api/vendor-profit-share/member/${memberId}`);
             const data = await response.json();
-            console.log({ data })
             setConnections(data.connections);
             reset({ connections: data.connections });
         }

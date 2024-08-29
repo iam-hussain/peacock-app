@@ -9,7 +9,7 @@ export function DashboardCard({ title, value, icon }: { title: string, value: st
                 {icon}
                 <div>
                     <h3 className="text-sm text-gray-500">{title}</h3>
-                    <p className="text-xl font-bold tracking-wider">{value}</p>
+                    <p className="text-xl font-bold tracking-wide">{value}</p>
                 </div>
             </CardContent>
         </Card>

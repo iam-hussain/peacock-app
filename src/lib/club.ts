@@ -53,6 +53,5 @@ export const calculateTotalDeposit = (membersCount: number): number => {
 };
 
 export const clubMonthsFromStart = () => {
-  console.log({ diff: monthsDiff(clubConfig.startedAt, new Date()) });
   return monthsDiff(new Date(), clubConfig.startedAt) + 1;
 };

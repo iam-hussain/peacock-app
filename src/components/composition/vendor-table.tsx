@@ -25,6 +25,9 @@ import { Button } from '@/components/ui/button';
 import { FaEdit } from "react-icons/fa";
 import { GetVendorResponse, GetVendorsResponse } from '@/actions/vendors';
 import { VendorForm } from '../forms/vendor';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { MembersSelectResponse } from '@/actions/member-select';
 
 // Column Definitions for Vendor Table
 const columnsBase: ColumnDef<GetVendorResponse>[] = [
@@ -152,7 +155,7 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
     },
 ]
 
-const VendorTable = ({ vendors }: { vendors: GetVendorsResponse }) => {
+const VendorTable = ({ vendors, members }: { vendors: GetVendorsResponse; members: MembersSelectResponse }) => {
     const [formSelected, setFormSelected] = useState<null | GetVendorResponse['vendor']>(null);
 
 
@@ -234,7 +237,7 @@ const VendorTable = ({ vendors }: { vendors: GetVendorsResponse }) => {
                         {formSelected && <DialogDescription>Vendor ID: {formSelected.id}</DialogDescription>}
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <VendorForm vendor={formSelected} members={[]} />
+                        <VendorForm vendor={formSelected} members={members} />
                     </div>
                 </DialogContent>
             </div>

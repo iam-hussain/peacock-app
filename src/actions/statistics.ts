@@ -19,20 +19,25 @@ export async function getStatistics() {
     throw new Error("Invalid club statistics");
   }
 
-  const totalDeposit = calculateTotalDeposit(membersCount);
+  const currentIn = statistics.in - statistics.out;
+  const totalDeposit = calculateTotalDeposit(membersCount) + 36000;
   const offsetBalance = statistics.offset - statistics.offsetIn;
-  const netValue = statistics.in + statistics.returns + statistics.offset;
+  const netAmount = currentIn + statistics.returns;
+  const netValue = totalDeposit + statistics.returns + statistics.offset;
 
   return {
     membersCount,
     totalMonths: clubMonthsFromStart(),
-    deposit: statistics.in + statistics.offsetIn,
-    balance: totalDeposit - statistics.in + offsetBalance,
-    offset: statistics.offsetIn,
+    deposit: currentIn,
+    balance: totalDeposit - currentIn + offsetBalance,
+    offset: statistics.offset,
+    offsetIn: statistics.offsetIn,
+    offsetBalance,
     returns: statistics.returns,
-    memberValue: netValue / membersCount,
+    memberValue: Math.round(netValue / membersCount),
     invested: statistics.fund - statistics.balance,
-    liquidity: statistics.fund,
+    liquidity: statistics.balance,
+    netAmount,
     netValue,
   };
 }

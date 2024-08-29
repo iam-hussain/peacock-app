@@ -1,6 +1,7 @@
 'use client'
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Card } from "./ui/card";
 
 // Register necessary Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -24,10 +25,10 @@ export function DoughnutChart({ deposit, offset, returns }: DoughnutChartProps) 
     };
 
     return (
-        <div className="bg-background rounded-lg w-full px-4 py-4 shadow-sm">
+        <Card className="shadow-sm flex items-center rounded-lg p-4 flex-col">
             <h2 className="text-lg font-medium font-serif text-center">Fund Overview</h2>
             <div className="mx-auto w-4/5 md:w-[350px] bg-background flex justify-center align-middle items-center">
                 <Doughnut data={chartData} />
             </div>
-        </div>)
+        </Card>)
 }

@@ -2,8 +2,7 @@
 import SideMenu from "@/components/side-menu";
 import SideMenuMobile from "@/components/side-menu-mobile";
 import TopMenu from "@/components/top-menu";
-import { cn } from "@/lib/utils";
-
+import { store } from "@/store";
 
 export default function HomeLayout({
     children,

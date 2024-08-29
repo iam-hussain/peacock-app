@@ -41,7 +41,7 @@ export function MemberForm({ member }: MemberFormProps) {
                 phone: member.phone || '',
                 email: member.email || '',
                 avatar: member.avatar || '',
-                active: member.active,
+                active: member.active ?? true,
             }
             : {
                 firstName: "",
@@ -54,19 +54,19 @@ export function MemberForm({ member }: MemberFormProps) {
             },
     });
 
-    useEffect(() => {
-        if (member) {
-            form.reset({
-                firstName: member.firstName,
-                lastName: member.lastName || '',
-                username: member.username,
-                phone: member.phone || '',
-                email: member.email || '',
-                avatar: member.avatar || '',
-                active: member.active,
-            });
-        }
-    }, [member, form]);
+    // useEffect(() => {
+    //     if (member) {
+    //         form.reset({
+    //             firstName: member.firstName,
+    //             lastName: member.lastName || '',
+    //             username: member.username,
+    //             phone: member.phone || '',
+    //             email: member.email || '',
+    //             avatar: member.avatar || '',
+    //             active: member.active ?? true,
+    //         });
+    //     }
+    // }, [member, form]);
 
     async function onSubmit(data: z.infer<typeof formSchema>) {
         try {
@@ -86,7 +86,7 @@ export function MemberForm({ member }: MemberFormProps) {
 
             const result = await response.json();
             toast.success(member ? "Member updated successfully" : "Member created successfully");
-            form.reset(); // Reset form after submission
+            if (!member) form.reset(); // Reset form after submission
         } catch (error) {
             toast.error("An unexpected error occurred. Please try again.");
         }
@@ -204,7 +204,7 @@ export function MemberForm({ member }: MemberFormProps) {
                                     <Switch
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
-                                        defaultChecked={member?.active || true}
+                                        defaultChecked={member?.active ?? true}
                                     />
                                 )}
                             />
