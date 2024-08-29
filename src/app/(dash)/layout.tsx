@@ -1,10 +1,8 @@
-'use client'
+
 import SideMenu from "@/components/side-menu";
 import SideMenuMobile from "@/components/side-menu-mobile";
 import TopMenu from "@/components/top-menu";
 import { cn } from "@/lib/utils";
-import { RootState } from "@/store";
-import { useSelector } from "react-redux";
 
 
 export default function HomeLayout({
@@ -12,7 +10,6 @@ export default function HomeLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const topBarOpen = useSelector((state: RootState) => state.page.topBarOpen);
     return (
         <div className="main-wrapper">
             <main className={"page-main bg-paper"}>
@@ -21,12 +18,7 @@ export default function HomeLayout({
                 />
                 <SideMenu />
                 <div
-                    className={cn(
-                        "h-full min-h-svh w-full transition-all duration-300 max-w-7xl m-auto mt-0",
-                        {
-                            "pt-[61px]": topBarOpen,
-                        }
-                    )}
+                    className={"h-full min-h-svh w-full transition-all duration-300 max-w-7xl m-auto mt-0 pt-[61px]"}
                 >
                     <div className="w-full flex h-full px-2 py-8">
                         {children}

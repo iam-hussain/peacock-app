@@ -4,18 +4,18 @@ export const pageSlice = createSlice({
   name: "page",
   initialState: {
     sideBarOpen: false,
-    topBarOpen: true,
+    modalOpen: false,
   },
   reducers: {
     openSideBar: (state) => {
       state.sideBarOpen = !state.sideBarOpen;
     },
-    openTopBar: (state) => {
-      state.topBarOpen = !state.topBarOpen;
+    openModal: (state) => {
+      state.modalOpen = !state.modalOpen;
     },
   },
 });
 
-export const { openSideBar, openTopBar } = pageSlice.actions;
+export const { openSideBar, openModal } = pageSlice.actions;
 
 export default pageSlice.reducer;

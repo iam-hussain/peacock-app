@@ -3,6 +3,7 @@ import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"
 import { getMembers } from "@/actions/members"
+import { Dialog } from "@/components/ui/dialog"
 
 
 export default async function Members() {

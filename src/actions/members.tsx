@@ -12,6 +12,7 @@ function membersTableTransform(
     member: MemberToTransform,
     memberTotalDeposit: number
 ) {
+    const { passbook, ...rawMember } = member;
     const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
     const periodBalance = memberTotalDeposit - member.passbook.periodIn;
     const deposit = member.passbook.periodIn + member.passbook.offsetIn;
@@ -36,6 +37,8 @@ function membersTableTransform(
         clubFund: member.passbook.fund,
         netValue:
             member.passbook.in + member.passbook.returns - member.passbook.out,
+        member: rawMember
+
     };
 }
 
@@ -53,5 +56,6 @@ export async function getMembers() {
     return transformedMembers
 }
 
+export type GetMemberResponse = ReturnType<typeof membersTableTransform>;
 
 export type GetMembersResponse = Awaited<ReturnType<typeof getMembers>>;

@@ -11,15 +11,23 @@ import {
     getFilteredRowModel,
     flexRender,
 } from '@tanstack/react-table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { FaCircle } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { GetVendorResponse, GetVendorsResponse } from '@/actions/vendors';
+import { VendorForm } from '../forms/vendor';
 
 // Column Definitions for Vendor Table
-const columns: ColumnDef<GetVendorResponse>[] = [
+const columnsBase: ColumnDef<GetVendorResponse>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => (
@@ -145,6 +153,31 @@ const columns: ColumnDef<GetVendorResponse>[] = [
 ]
 
 const VendorTable = ({ vendors }: { vendors: GetVendorsResponse }) => {
+    const [formSelected, setFormSelected] = useState<null | GetVendorResponse['vendor']>(null);
+
+
+    const action: ColumnDef<GetVendorResponse> = {
+        accessorKey: 'vendor.id',
+        header: ({ column }) => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+                Action
+            </div>
+        ),
+        cell: ({ row }) => (
+            <DialogTrigger asChild>
+                <Button variant={'ghost'} className='px-3 py-1' onClick={() => setFormSelected(row.original.vendor)}><FaEdit className='h-4 w-4' /></Button>
+            </DialogTrigger>
+        ),
+    }
+
+
+    const columns = useMemo(() => {
+
+        return [...columnsBase, action]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+
 
     const table = useReactTable({
         data: vendors,
@@ -161,40 +194,51 @@ const VendorTable = ({ vendors }: { vendors: GetVendorsResponse }) => {
     });
 
     return (
-        <div className='w-full'>
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                                <TableHead key={header.id}>
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows.length > 0 ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className='px-4'>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
+        <Dialog>
+            <div className='w-full'>
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
                                 ))}
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="text-center">
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length > 0 ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className='px-4'>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="text-center">
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                <DialogContent className="">
+                    <DialogHeader>
+                        <DialogTitle>{formSelected ? 'Update' : 'Add'} Vendor</DialogTitle>
+                        {formSelected && <DialogDescription>Vendor ID: {formSelected.id}</DialogDescription>}
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <VendorForm vendor={formSelected} members={[]} />
+                    </div>
+                </DialogContent>
+            </div>
+        </Dialog>
     );
 };
 

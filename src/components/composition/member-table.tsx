@@ -11,6 +11,14 @@ import {
     getFilteredRowModel,
     flexRender,
 } from '@tanstack/react-table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -20,10 +28,13 @@ import { cn } from '@/lib/utils';
 import { Toggle } from '../ui/toggle';
 import { FaCircle, FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import { GetMembersResponse } from '@/actions/members';
+import { GetMemberResponse, GetMembersResponse } from '@/actions/members';
+import { MemberForm } from '../forms/member';
+import { FaEdit } from "react-icons/fa";
+import Box from '../ui/box';
 
 
-const columnsAddon: ColumnDef<MemberResponse>[] = [
+const columnsAddon: ColumnDef<GetMemberResponse>[] = [
     {
         accessorKey: 'joined',
         header: ({ column }) => (
@@ -46,7 +57,8 @@ const columnsAddon: ColumnDef<MemberResponse>[] = [
     },
 ]
 
-const columnsBase: ColumnDef<MemberResponse>[] = [
+
+const columnsBase: ColumnDef<GetMemberResponse>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => (
@@ -155,11 +167,12 @@ const columnsBase: ColumnDef<MemberResponse>[] = [
             </div>
         ),
     },
-
 ]
+
 
 const MembersTable = ({ members }: { members: GetMembersResponse }) => {
     const [showInactive, setShowInactive] = useState(false);
+    const [formSelected, setFormSelected] = useState<null | GetMemberResponse['member']>(null);
 
     const data = useMemo(() => {
         if (showInactive) {
@@ -168,12 +181,32 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
         return members.filter((e) => e.active)
     }, [showInactive, members])
 
+
+    const action: ColumnDef<GetMemberResponse> = {
+        accessorKey: 'member.id',
+        header: ({ column }) => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+                Action
+            </div>
+        ),
+        cell: ({ row }) => (
+            <DialogTrigger asChild>
+                <Button variant={'ghost'} className='px-3 py-1' onClick={() => setFormSelected(row.original.member)}><FaEdit className='h-4 w-4' /></Button>
+            </DialogTrigger>
+        ),
+    }
+
+
     const columns = useMemo(() => {
         if (showInactive) {
             return [columnsBase[0], columnsAddon[0], ...columnsBase.slice(1)]
         }
-        return columnsBase
+        return [...columnsBase, action]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showInactive])
+
+
+
 
     const table = useReactTable({
         data,
@@ -190,57 +223,72 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
     });
 
     return (
-        <div className='w-full'>
-            <div className="flex justify-between mb-4 gap-3">
-                <Input
-                    type="text"
-                    placeholder="Filter names..."
-                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("name")?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
+        <Dialog>
+            <div className='w-full'>
+                <div className="flex justify-between mb-4 gap-3">
+                    <Input
+                        type="text"
+                        placeholder="Filter names..."
+                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("name")?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                    />
+                    <Box className='w-auto'>
+                        <Toggle aria-label="Toggle italic" onPressedChange={setShowInactive} className='gap-2'>
+                            {showInactive ? <FaEye /> : <FaEyeSlash />}
+                            Inactive
+                        </Toggle>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" onClick={() => setFormSelected(null)}>Add Member</Button>
+                        </DialogTrigger>
+                    </Box>
+                </div>
 
-                <Toggle aria-label="Toggle italic" onPressedChange={setShowInactive} className='gap-2'>
-                    {showInactive ? <FaEye /> : <FaEyeSlash />}
-                    Inactive
-                </Toggle>
-            </div>
-
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                                <TableHead key={header.id}>
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
-                                </TableHead>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows.length > 0 ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id} >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id} className='px-4'>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </TableCell>
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {flexRender(header.column.columnDef.header, header.getContext())}
+                                    </TableHead>
                                 ))}
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={columns.length} className="text-center">
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length > 0 ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className='px-4'>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="text-center">
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                <DialogContent className="">
+                    <DialogHeader>
+                        <DialogTitle>{formSelected ? 'Update' : 'Add'} Member</DialogTitle>
+                        {formSelected && <DialogDescription>Member ID: {formSelected.id}</DialogDescription>}
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <MemberForm member={formSelected} />
+                    </div>
+                </DialogContent>
+            </div>
+        </Dialog>
     );
 };
 

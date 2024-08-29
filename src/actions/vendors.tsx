@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { dateFormat } from "@/lib/date";
 import prisma from "@/db";
 import { Passbook, Vendor } from "@prisma/client";
@@ -15,6 +14,7 @@ type VendorToTransform = Vendor & {
 };
 
 function vendorsTableTransform(vendor: VendorToTransform) {
+    const { passbook, owner, ...rawVendor } = vendor;
     return {
         id: vendor.id,
         name: vendor.name,
@@ -33,6 +33,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
         returns: vendor.passbook.calcReturns
             ? vendor.passbook.out - vendor.passbook.in
             : 0,
+        vendor: rawVendor
     };
 }
 
