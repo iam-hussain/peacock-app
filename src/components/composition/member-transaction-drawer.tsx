@@ -9,7 +9,7 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import { MemberTransactionForm } from "../forms/member-transaction"
-import { MembersSelectResponse } from "@/actions/member"
+import { MembersSelectResponse } from "@/actions/member-select"
 
 
 export function MemberTransactionDrawer({ members }: { members: MembersSelectResponse }) {

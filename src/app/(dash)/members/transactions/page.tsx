@@ -2,7 +2,7 @@ import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import MemberTransactionTable from "@/components/composition/member-transaction-table"
 import { MemberTransactionDrawer } from "@/components/composition/member-transaction-drawer"
-import { membersSelect } from "@/actions/member"
+import { membersSelect } from "@/actions/member-select"
 
 
 export default async function Members() {

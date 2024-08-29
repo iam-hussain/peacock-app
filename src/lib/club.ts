@@ -25,7 +25,7 @@ export const calculateMonthsPaid = (totalPaid: number): number => {
 
     // Calculate the number of months in the current stage
     const stageEndDate = endDate || new Date(); // Use current date if endDate is not provided
-    const monthsInStage = monthsDiff(startDate, stageEndDate) + 1; // +1 to include the starting month
+    const monthsInStage = monthsDiff(stageEndDate, startDate) + 1; // +1 to include the starting month
 
     // Calculate the total amount for this stage
     const stageTotalAmount = monthsInStage * amount;
@@ -44,4 +44,15 @@ export const calculateMonthsPaid = (totalPaid: number): number => {
   }
 
   return totalMonths;
+};
+
+export const calculateTotalDeposit = (membersCount: number): number => {
+  const perMember = memberTotalDepositAmount();
+
+  return perMember * membersCount;
+};
+
+export const clubMonthsFromStart = () => {
+  console.log({ diff: monthsDiff(clubConfig.startedAt, new Date()) });
+  return monthsDiff(new Date(), clubConfig.startedAt) + 1;
 };

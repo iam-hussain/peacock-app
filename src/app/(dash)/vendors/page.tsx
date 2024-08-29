@@ -2,10 +2,11 @@ import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"
 import VendorTable from "@/components/composition/vendor-table"
+import { getVendors } from "@/actions/vendors"
 
 
-export default async function Members() {
-
+export default async function Vendors() {
+    const vendors = await getVendors()
     return (
         <Box preset={'stack-start'} >
             <Box preset={'row-between'} className="px-4 md:px-6">
@@ -15,7 +16,7 @@ export default async function Members() {
                 </CustomLink>
             </Box>
             <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-                <VendorTable />
+                <VendorTable vendors={vendors} />
             </Box>
         </Box>
     )

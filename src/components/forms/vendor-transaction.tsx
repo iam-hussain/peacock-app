@@ -16,8 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { VendorsSelectResponse } from "@/actions/vendor";
-import { MembersSelectResponse } from "@/actions/member";
+import { VendorsSelectResponse } from "@/actions/vendor-select";
+import { MembersSelectResponse } from "@/actions/member-select";
 
 const transactionMethods = ["CASH", "ACCOUNT", "UPI", "BANK", "CHEQUE"] as const;
 const transactionTypes = ["PERIODIC_INVEST", "INVEST", "PERIODIC_RETURN", "RETURNS", "PROFIT"] as const;

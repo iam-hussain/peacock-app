@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     ColumnDef,
     useReactTable,
@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { Toggle } from '../ui/toggle';
 import { FaCircle, FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { GetMembersResponse } from '@/actions/members';
 
 
 const columnsAddon: ColumnDef<MemberResponse>[] = [
@@ -157,21 +158,15 @@ const columnsBase: ColumnDef<MemberResponse>[] = [
 
 ]
 
-const MembersTable = () => {
+const MembersTable = ({ members }: { members: GetMembersResponse }) => {
     const [showInactive, setShowInactive] = useState(false);
-    const [data, setData] = useState<MemberResponse[]>([]);
 
-    useEffect(() => {
-        fetchData(1);
-    }, []);
-
-    const membersData = useMemo(() => {
+    const data = useMemo(() => {
         if (showInactive) {
-            return data
+            return members
         }
-        return data.filter((e) => e.active)
-    }, [showInactive, data])
-
+        return members.filter((e) => e.active)
+    }, [showInactive, members])
 
     const columns = useMemo(() => {
         if (showInactive) {
@@ -180,14 +175,8 @@ const MembersTable = () => {
         return columnsBase
     }, [showInactive])
 
-    const fetchData = async (page: number) => {
-        const res = await fetch(`/api/members?page=${page}&limit=50`);
-        const json = await res.json();
-        setData(json.members);
-    };
-
     const table = useReactTable({
-        data: membersData,
+        data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

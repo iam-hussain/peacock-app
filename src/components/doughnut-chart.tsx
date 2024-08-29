@@ -1,3 +1,4 @@
+'use client'
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -15,9 +16,8 @@ export function DoughnutChart({ deposit, offset, returns }: DoughnutChartProps) 
         labels: ["Deposit", "Offset", "Returns"],
         datasets: [
             {
-                label: "Financial Breakdown",
                 data: [deposit, offset, returns],
-                backgroundColor: ["#4CAF50", "#FF5722", "#FFC107"],
+                backgroundColor: ["#4CAF50", "#2196F3", "#FFC107"],
                 hoverOffset: 4,
             },
         ],

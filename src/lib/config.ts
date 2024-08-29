@@ -18,24 +18,23 @@ const bravo: Stage = {
 };
 
 export const clubConfig = {
-  startedAt: new Date("09/01/2020s"),
+  startedAt: new Date("09/01/2020"),
   stages: [alpha, bravo],
   alpha,
   bravo,
 };
 
-
-export const transactionMethodMap =  {
+export const transactionMethodMap = {
   CASH: "Cash",
   ACCOUNT: "Account",
   UPI: "UPI",
   BANK: "Bank",
   CHEQUE: "Cheque",
-}
-export const memberTransactionTypeMap =  {
+};
+export const memberTransactionTypeMap = {
   PERIODIC_DEPOSIT: "Deposit",
   OFFSET_DEPOSIT: "Deposit Offset",
   WITHDRAW: "Withdraw",
   REJOIN: "Rejoin",
   FUNDS_TRANSFER: "Transfer",
-}
+};

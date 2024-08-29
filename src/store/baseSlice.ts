@@ -1,5 +1,5 @@
-import { MembersSelectResponse } from "@/actions/member";
-import { VendorsSelectResponse } from "@/actions/vendor";
+import { MembersSelectResponse } from "@/actions/member-select";
+import { VendorsSelectResponse } from "@/actions/vendor-select";
 import { MemberResponse } from "@/app/api/members/route";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 

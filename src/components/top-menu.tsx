@@ -59,16 +59,13 @@ const animator = {
 
 function TopMenu({
   className,
-  showSideBar,
 }: {
   className?: string;
-  showSideBar: boolean;
 }) {
   const { y } = useWindowScroll();
   const dispatch = useDispatch();
   const [scrollDirection, setScrollDirection] = useState("IDEAL");
   const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const topBarOpen = useSelector((state: RootState) => state.page.topBarOpen);
 
   const callback = useCallback(
     (event: any) => {
@@ -85,8 +82,8 @@ function TopMenu({
   );
 
   const shouldHide = useMemo(() => {
-    return topBarOpen && (y <= 100 || scrollDirection === "UP");
-  }, [topBarOpen, scrollDirection, y]);
+    return (y <= 100 || scrollDirection === "UP");
+  }, [scrollDirection, y]);
 
   useEffect(() => {
     document.body.addEventListener("wheel", callback);
@@ -96,7 +93,7 @@ function TopMenu({
   return (
     <motion.nav
       className={clsx(
-        "border-b w-full h-[60px] align-middle items-center fixed px-4 md:px-8 flex justify-between",
+        "lg:pl-[350px] w-full h-[60px] align-middle items-center fixed px-4 lg:px-8 flex justify-start lg:justify-center",
         className
       )}
       initial="show"
@@ -105,44 +102,16 @@ function TopMenu({
       animate={shouldHide ? "show" : "hide"}
     >
       <Box className="w-auto" gap={6} preset={'row-center'}>
-        {showSideBar ? (
-          <Button
-            variant={"outline"}
-            size={"icon"}
-            onClick={() => dispatch(openSideBar())}
-          >
-            {sideBarOpen ? <IoClose /> : <HiMenuAlt2 />}
-          </Button>
-        ) : (
-          <></>
-        )}
-
-        <CustomLink href={'/'} variant={'transparent'} className="p-0"><Typography variant={'brandMini'}>Peacock Club</Typography></CustomLink>
-      </Box>
-
-      <Box className="w-auto" gap={2}>
-        <motion.div
-          initial="initial"
-          whileTap="pressed"
-          transition={{ type: "spring", stiffness: 100 }}
-          animate={topBarOpen ? "in" : "out"}
-          variants={closerButton}
-          className="hidden w-auto h-auto right-4 md:flex"
-          tabIndex={-1}
+        <Button
+          variant={"outline"}
+          size={"icon"}
+          onClick={() => dispatch(openSideBar())}
+          className="lg:hidden"
         >
-          <Button
-            variant={"outline"}
-            size={"icon"}
-            onClick={() => {
-              if (!topBarOpen) {
-                setScrollDirection("UP");
-              }
-              dispatch(openTopBar());
-            }}
-          >
-            {topBarOpen ? <BiShow /> : <BiHide />}
-          </Button>
-        </motion.div>
+          {sideBarOpen ? <IoClose /> : <HiMenuAlt2 />}
+        </Button>
+
+        <CustomLink href={'/'} variant={'transparent'} className="p-0 px-3"><Typography variant={'brandMini'}>Peacock Club</Typography></CustomLink>
       </Box>
     </motion.nav>
   );

@@ -2,9 +2,11 @@ import MembersTable from "@/components/composition/member-table"
 import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"
+import { getMembers } from "@/actions/members"
 
 
 export default async function Members() {
+    const members = await getMembers()
 
     return (
         <Box preset={'stack-start'} >
@@ -15,7 +17,7 @@ export default async function Members() {
                 </CustomLink>
             </Box>
             <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-                <MembersTable />
+                <MembersTable members={members} />
             </Box>
         </Box>
     )

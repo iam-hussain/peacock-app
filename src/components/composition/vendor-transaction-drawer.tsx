@@ -9,8 +9,8 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import { VendorTransactionForm } from "../forms/vendor-transaction"
-import { VendorsSelectResponse } from "@/actions/vendor"
-import { MembersSelectResponse } from "@/actions/member"
+import { VendorsSelectResponse } from "@/actions/vendor-select"
+import { MembersSelectResponse } from "@/actions/member-select"
 
 
 export function VendorTransactionDrawer({ vendors, members }: { vendors: VendorsSelectResponse, members: MembersSelectResponse }) {

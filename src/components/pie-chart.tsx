@@ -1,3 +1,4 @@
+'use client'
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -15,7 +16,6 @@ export function PieChart({ available, invested, pending }: PieChartProps) {
         labels: ["Available", "Invested", "Pending"],
         datasets: [
             {
-                label: "Funds Distribution",
                 data: [available, invested, pending],
                 backgroundColor: ["#4CAF50", "#2196F3", "#FFC107"],
                 hoverOffset: 4,

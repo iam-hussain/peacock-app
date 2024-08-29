@@ -16,9 +16,10 @@ import { ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FaCircle } from "react-icons/fa";
+import { GetVendorResponse, GetVendorsResponse } from '@/actions/vendors';
 
 // Column Definitions for Vendor Table
-const columns: ColumnDef<any>[] = [
+const columns: ColumnDef<GetVendorResponse>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => (
@@ -143,24 +144,10 @@ const columns: ColumnDef<any>[] = [
     },
 ]
 
-const VendorTable = () => {
-    const [data, setData] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (data.length === 0) {
-            fetchData(1);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const fetchData = async (page: number) => {
-        const res = await fetch(`/api/vendors?page=${page}&limit=50`);
-        const json = await res.json();
-        setData(json.vendors);
-    };
+const VendorTable = ({ vendors }: { vendors: GetVendorsResponse }) => {
 
     const table = useReactTable({
-        data,
+        data: vendors,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
