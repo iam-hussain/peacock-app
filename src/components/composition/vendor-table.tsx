@@ -25,9 +25,13 @@ import { Button } from '@/components/ui/button';
 import { FaEdit } from "react-icons/fa";
 import { GetVendorResponse, GetVendorsResponse } from '@/actions/vendors';
 import { VendorForm } from '../forms/vendor';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
 import { MembersSelectResponse } from '@/actions/member-select';
+import { dateFormat } from '@/lib/date';
+import { FaCircle } from 'react-icons/fa6';
+import { cn } from '@/lib/utils';
+import { Input } from '../ui/input';
+import Box from '../ui/box';
+import { TiUserAdd } from 'react-icons/ti';
 
 // Column Definitions for Vendor Table
 const columnsBase: ColumnDef<GetVendorResponse>[] = [
@@ -46,12 +50,18 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
         ),
         cell: ({ row }) => (
             <div className="flex items-center space-x-2 min-w-[170px]" data-id={row.original.id}>
-                <img src={row.original.memberAvatar} alt="" className="w-10 h-10 rounded-lg border" />
+                <div className='relative'>
+                    <img src={row.original.memberAvatar} alt="" className="w-10 h-10 rounded-lg border" />
+                    <FaCircle name={"FaCircle"} className={cn("h-3 w-3 absolute -top-1 -right-1", {
+                        'text-primary': row.original.active,
+                        'text-destructive': !row.original.active
+                    })} />
+                </div>
                 <div className='flex flex-col'>
                     <p className=''>{row.original.name}</p>
                     {row.original.memberName && <span className='text-[0.7rem] text-foreground/70'>{row.original.memberName}</span>}
                 </div>
-            </div>
+            </div >
 
         ),
     },
@@ -70,8 +80,8 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
         ),
         cell: ({ row }) => (
             <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
-                <p className=''>{row.original.startAt}</p>
-                {row.original.endAt && <p className='text-[0.8rem] text-foreground/70'>{row.original.endAt}</p>}
+                <p className=''>{dateFormat(new Date(row.original.startAt))}</p>
+                {row.original.endAt && <p className='text-[0.8rem] text-foreground/70'>{dateFormat(new Date(row.original.endAt))}</p>}
                 <p className='text-[0.7rem] text-foreground/70'>{row.original.id}</p>
             </div>
         ),
@@ -149,7 +159,8 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
         ),
         cell: ({ row }) => (
             <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
-                <p className='text-emerald-500'>{row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</p>
+                {row.original.calcReturns && <p className={'text-emerald-500'}>{row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</p>}
+                {!row.original.calcReturns && <p> - </p>}
             </div>
         ),
     },
@@ -199,6 +210,23 @@ const VendorTable = ({ vendors, members }: { vendors: GetVendorsResponse; member
     return (
         <Dialog>
             <div className='w-full'>
+                <div className="flex justify-between mb-4 gap-3">
+                    <Input
+                        type="text"
+                        placeholder="Filter names..."
+                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("name")?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                    />
+                    <Box className='w-auto gap-4'>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" onClick={() => setFormSelected(null)}><TiUserAdd className='w-6 h-6' /></Button>
+                        </DialogTrigger>
+                    </Box>
+                </div>
+
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

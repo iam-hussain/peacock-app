@@ -28,7 +28,7 @@ export async function getStatistics() {
   return {
     membersCount,
     totalMonths: clubMonthsFromStart(),
-    deposit: currentIn,
+    deposit: currentIn - statistics.offsetIn,
     balance: totalDeposit - currentIn + offsetBalance,
     offset: statistics.offset,
     offsetIn: statistics.offsetIn,

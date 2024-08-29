@@ -1,6 +1,7 @@
 import prisma from "@/db";
 
-function getProfitSharesVendorsAndClub() {
+// Function to fetch profit shares, vendors, and club data
+async function getProfitSharesVendorsAndClub() {
   return Promise.all([
     prisma.vendor.findMany({
       select: {
@@ -35,127 +36,93 @@ function getProfitSharesVendorsAndClub() {
       },
     }),
     prisma.passbook.findFirst({
-      where: {
-        type: "CLUB",
-      },
-      select: {
-        id: true,
-      },
+      where: { type: "CLUB" },
+      select: { id: true },
     }),
   ]);
 }
 
-function returnsOffsetMembersCount({
-  profitShares,
-}: Awaited<ReturnType<typeof getProfitSharesVendorsAndClub>>[0][0]) {
-  return {
-    includedCount: profitShares
-      .filter((e) => e.active)
-      .map((e) => ({
-        memberId: e.memberId,
-        passbookId: e.member.passbook.id,
-      })).length,
-    excludedCount: profitShares
-      .filter((e) => !e.active && e.member.active)
-      .map((e) => ({
-        memberId: e.memberId,
-        passbookId: e.member.passbook.id,
-      })).length,
-  };
+// Function to calculate included and excluded members counts
+function calculateMembersCount({ profitShares }: { profitShares: any[] }) {
+  const includedCount = profitShares.filter((e) => e.active).length;
+  const excludedCount = profitShares.filter(
+    (e) => !e.active && e.member.active
+  ).length;
+
+  return { includedCount, excludedCount };
 }
 
+// Main function to handle return calculations
 export async function calculateReturnsHandler() {
   const [vendors, club] = await getProfitSharesVendorsAndClub();
-  const toUpdate: Map<string, any> = new Map();
+  const toUpdate = new Map<string, { offset: number; returns: number }>();
   let totalOffset = 0;
   let totalReturns = 0;
 
-  vendors.forEach((vendor) => {
-    const { profitShares, passbook, type } = vendor;
+  vendors.forEach(({ profitShares, passbook, type }) => {
+    const { includedCount, excludedCount } = calculateMembersCount({
+      profitShares,
+    });
 
-    const { includedCount, excludedCount } = returnsOffsetMembersCount(vendor);
-
-    let returns = Math.abs(Math.round(passbook.out - passbook.in));
-    let memberShare = Math.abs(Math.round(returns / includedCount)) || 0;
+    let returns = Math.abs(passbook.out - passbook.in);
+    let memberShare = includedCount
+      ? Math.abs(Math.round(returns / includedCount))
+      : 0;
 
     if (type === "LEND" && !passbook.calcReturns) {
-      returns = Math.abs(Math.round(passbook.out));
-      memberShare = Math.abs(Math.round(passbook.out / includedCount)) || 0;
+      returns = Math.abs(passbook.out);
+      memberShare = includedCount
+        ? Math.abs(Math.round(passbook.out / includedCount))
+        : 0;
     }
 
-    if (!toUpdate.has(passbook.id)) {
-      toUpdate.set(passbook.id, {
-        offset: 0,
-        returns: 0,
-      });
-    }
+    const currentPassbook = toUpdate.get(passbook.id) || {
+      offset: 0,
+      returns: 0,
+    };
 
     if (passbook.calcReturns || type === "LEND") {
       const vendorOffset = Math.round(memberShare * excludedCount) || 0;
 
-      totalOffset = totalOffset + vendorOffset;
-      totalReturns = totalReturns + returns;
+      totalOffset += vendorOffset;
+      totalReturns += returns;
 
       toUpdate.set(passbook.id, {
-        offset: vendorOffset,
-        returns: returns,
+        offset: currentPassbook.offset + vendorOffset,
+        returns: currentPassbook.returns + returns,
       });
     }
-    for (let { member, active } of profitShares) {
-      const memberPassbookId = member.passbook.id;
 
-      if (!toUpdate.has(memberPassbookId)) {
-        toUpdate.set(memberPassbookId, {
-          offset: 0,
-          returns: 0,
-        });
-      }
+    profitShares.forEach(({ member, active }) => {
+      const memberPassbookId = member.passbook.id;
+      const memberPassbookEntry = toUpdate.get(memberPassbookId) || {
+        offset: 0,
+        returns: 0,
+      };
 
       if (passbook.calcReturns || type === "LEND") {
-        const memberPassbookEntry = toUpdate.get(memberPassbookId);
-
-        if (active) {
-          toUpdate.set(memberPassbookId, {
-            ...memberPassbookEntry,
-            returns: memberPassbookEntry.returns + memberShare,
-          });
-        } else {
-          toUpdate.set(memberPassbookId, {
-            ...memberPassbookEntry,
-            offset: memberPassbookEntry.offset + memberShare,
-          });
-        }
+        toUpdate.set(memberPassbookId, {
+          offset: memberPassbookEntry.offset + (active ? 0 : memberShare),
+          returns: memberPassbookEntry.returns + (active ? memberShare : 0),
+        });
       }
-    }
+    });
   });
 
-  const passbooksData = Array.from(toUpdate, ([id, data]) => ({
-    where: { id },
-    data,
-  }));
-
-  const passbooksUpdate = passbooksData.map((each) =>
-    prisma.passbook.update(each)
+  const passbooksUpdate = Array.from(toUpdate.entries()).map(([id, data]) =>
+    prisma.passbook.update({ where: { id }, data })
   );
 
   if (club?.id) {
     passbooksUpdate.push(
       prisma.passbook.update({
-        where: {
-          id: club?.id,
-        },
-        data: {
-          offset: totalOffset,
-          returns: totalReturns,
-        },
+        where: { id: club.id },
+        data: { offset: totalOffset, returns: totalReturns },
       })
     );
   }
 
   await prisma.$transaction(passbooksUpdate);
 
-  return {
-    totalOffset,
-    passbooksData,
-  };
+  return { totalOffset, passbooksData: Array.from(toUpdate) };
 }

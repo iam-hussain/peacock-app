@@ -23,20 +23,21 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { ArrowUpDown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { MemberResponse } from '@/app/api/members/route';
 import { cn } from '@/lib/utils';
 import { Toggle } from '../ui/toggle';
-import { FaCircle, FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
+import { FaCircle } from 'react-icons/fa6';
 import { GetMemberResponse, GetMembersResponse } from '@/actions/members';
 import { MemberForm } from '../forms/member';
 import { FaEdit } from "react-icons/fa";
 import Box from '../ui/box';
+import { dateFormat } from '@/lib/date';
+import { MdDeleteOutline, MdDeleteForever } from "react-icons/md";
+import { TiUserAdd } from "react-icons/ti";
 
 
 const columnsAddon: ColumnDef<GetMemberResponse>[] = [
     {
-        accessorKey: 'joined',
+        accessorKey: 'joinedAt',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -50,7 +51,7 @@ const columnsAddon: ColumnDef<GetMemberResponse>[] = [
         ),
         cell: ({ row }) => (
             <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
-                <p className=''>{row.original.joinedAt}</p>
+                <p className=''>{dateFormat(new Date(row.original.joinedAt))}</p>
                 <p className='text-[0.8rem] text-foreground/70 m-0'>{row.original.id}</p>
             </div>
         ),
@@ -60,7 +61,7 @@ const columnsAddon: ColumnDef<GetMemberResponse>[] = [
 
 const columnsBase: ColumnDef<GetMemberResponse>[] = [
     {
-        accessorKey: 'name',
+        accessorKey: 'searchName',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -229,19 +230,18 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
                     <Input
                         type="text"
                         placeholder="Filter names..."
-                        value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                        value={(table.getColumn("searchName")?.getFilterValue() as string) ?? ""}
                         onChange={(event) =>
-                            table.getColumn("name")?.setFilterValue(event.target.value)
+                            table.getColumn("searchName")?.setFilterValue(event.target.value)
                         }
                         className="max-w-sm"
                     />
-                    <Box className='w-auto'>
+                    <Box className='w-auto gap-4'>
                         <Toggle aria-label="Toggle italic" onPressedChange={setShowInactive} className='gap-2'>
-                            {showInactive ? <FaEye /> : <FaEyeSlash />}
-                            Inactive
+                            {showInactive ? <MdDeleteForever className='w-6 h-6' /> : <MdDeleteOutline className='w-6 h-6' />}
                         </Toggle>
                         <DialogTrigger asChild>
-                            <Button variant="outline" onClick={() => setFormSelected(null)}>Add Member</Button>
+                            <Button variant="outline" onClick={() => setFormSelected(null)}><TiUserAdd className='w-6 h-6' /></Button>
                         </DialogTrigger>
                     </Box>
                 </div>
