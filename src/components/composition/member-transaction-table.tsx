@@ -3,9 +3,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, flexRender, ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
+import { Calendar } from "@/components/ui/calendar"
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Member, MEMBER_TRANSACTION_TYPE, MemberTransaction, TRANSACTION_METHOD } from '@prisma/client';
@@ -14,13 +15,20 @@ import { cn } from '@/lib/utils';
 import { FaCircle } from 'react-icons/fa';
 import { AiOutlineDelete } from "react-icons/ai";
 import { memberTransactionTypeMap, transactionMethodMap } from '@/lib/config';
-
-
+import { MembersSelectResponse } from '@/actions/member-select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { DateRange } from "react-day-picker"
+import { CalendarIcon } from "@radix-ui/react-icons"
 
 const columns: ColumnDef<MemberTransactionResponse>[] = [
     {
-        header: 'From',
         accessorKey: 'from.name',
+        header: () => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+                From
+            </div>
+        ),
         cell: ({ row }: any) => (
             <div className="flex items-center space-x-2 min-w-[170px] w-auto" data-id={row.original.from.id}>
                 <div className='relative'>
@@ -44,8 +52,12 @@ const columns: ColumnDef<MemberTransactionResponse>[] = [
         </div>,
     },
     {
-        header: 'To',
         accessorKey: 'to.name',
+        header: () => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+                To
+            </div>
+        ),
         cell: ({ row }: any) => (
             <div className="flex items-center space-x-2 min-w-[170px] w-auto" data-id={row.original.to.id}>
                 <div className='relative'>
@@ -75,20 +87,27 @@ const columns: ColumnDef<MemberTransactionResponse>[] = [
         accessorKey: 'transactionAt',
         cell: ({ row }: any) => <div className="flex flex-col items-start min-w-[140px]">
             <p className='text-foreground font-medium'>{format(new Date(row.original.transactionAt), 'dd MMM yyyy hh:mm a')}</p>
-            <p className='text-[0.7rem] text-foreground/70 m-0'>{format(new Date(row.original.createdAt), 'dd MMM yyyy hh:mm a')}</p>
         </div>,
     },
     {
-        header: 'ID',
         accessorKey: 'id',
-        cell: ({ row }: any) => <div className="flex items-center justify-start gap-2 align-middle min-w-[175px]">
-            <p className='text-[0.7rem] text-foreground/70 m-0'>{row.original.id}</p>
-            <Button className='p-1' variant={'ghost'}> <AiOutlineDelete /> </Button>
+        header: () => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+                ID
+            </div>
+        ),
+        cell: ({ row }: any) => <div className="flex items-center justify-start gap-4 align-middle min-w-[175px]">
+            <div>
+
+                <p className='text-[0.7rem] text-foreground/70 m-0'>{row.original.id}</p>
+                <p className='text-[0.7rem] text-foreground/70 m-0'>{format(new Date(row.original.createdAt), 'dd MMM yyyy hh:mm a')}</p>
+            </div>
+            <Button className='' variant={'ghost'}> <AiOutlineDelete className='w-4 h-4' /> </Button>
         </div>,
     },
 ]
 
-const MemberTransactionTable = () => {
+const MemberTransactionTable = ({ members }: { members: MembersSelectResponse }) => {
     const [data, setData] = useState<MemberTransactionResponse[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -96,27 +115,27 @@ const MemberTransactionTable = () => {
         fromId: '',
         toId: '',
         transactionType: '',
-        startDate: '',
-        endDate: '',
     });
     const [sortField, setSortField] = useState('transactionAt');
     const [sortOrder, setSortOrder] = useState('desc');
+    const [date, setDate] = React.useState<DateRange | undefined>(undefined)
+
 
     useEffect(() => {
         fetchData(page);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, filters, sortField, sortOrder]);
+    }, [page, filters, sortField, sortOrder, date]);
 
     const fetchData = async (page: number) => {
         const params = new URLSearchParams({
             page: page.toString(),
-            fromId: filters.fromId,
-            toId: filters.toId,
-            transactionType: filters.transactionType,
-            startDate: filters.startDate,
-            endDate: filters.endDate,
+            fromId: filters.fromId.trim(),
+            toId: filters.toId.trim(),
+            transactionType: filters.transactionType.trim(),
             sortField,
             sortOrder,
+            ...(date?.from ? { startDate: date.from as any, } : {}),
+            ...(date?.to ? { endDate: date.to as any, } : {}),
         });
 
         const res = await fetch(`/api/member-transactions?${params.toString()}`);
@@ -124,8 +143,6 @@ const MemberTransactionTable = () => {
         setData(json.transactions);
         setTotalPages(json.totalPages);
     };
-
-
 
     const table = useReactTable({
         data,
@@ -144,24 +161,100 @@ const MemberTransactionTable = () => {
 
     return (
         <div className='w-full'>
-            <div className="flex justify-between mb-4">
+            <div className="flex justify-between gap-4 mb-4 flex-wrap md:flex-nowrap">
                 {/* Filters */}
-                <Input
-                    type="text"
-                    placeholder="Filter by member ID..."
-                    value={filters.fromId}
-                    onChange={(e) => setFilters({ ...filters, fromId: e.target.value })}
-                />
-                <Input
-                    type="date"
-                    value={filters.startDate}
-                    onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                />
-                <Input
-                    type="date"
-                    value={filters.endDate}
-                    onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                />
+                <div className='flex justify-between gap-4 mb-4 flex-wrap md:flex-nowrap w-full'>
+                    <Select
+                        value={filters.fromId}
+                        onValueChange={(e) => setFilters({ ...filters, fromId: e })} defaultValue='  '>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select FROM member" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={'  '}>
+                                Select FROM member
+                            </SelectItem>
+                            {Object.entries(members).map(([key, value]) => (
+                                <SelectItem key={key} value={value.id}>
+                                    {value.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select
+                        value={filters.toId}
+                        onValueChange={(e) => setFilters({ ...filters, toId: e })} defaultValue='  '>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select TO member" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={'  '}>
+                                Select TO member
+                            </SelectItem>
+                            {Object.entries(members).map(([key, value]) => (
+                                <SelectItem key={key} value={value.id}>
+                                    {value.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select
+                        value={filters.transactionType}
+                        onValueChange={(e) => setFilters({ ...filters, transactionType: e })} defaultValue='  '>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select TYPE" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={'  '}>
+                                Select TYPE
+                            </SelectItem>
+                            {Object.entries(memberTransactionTypeMap).map(([key, value]) => (
+                                <SelectItem key={key} value={key}>
+                                    {value}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className={"grid gap-2 w-auto"}>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                id="date"
+                                variant={"outline"}
+                                className={cn(
+                                    "w-[300px] justify-start text-left font-normal",
+                                    !date && "text-muted-foreground"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {date?.from ? (
+                                    date.to ? (
+                                        <>
+                                            {format(date.from, "LLL dd, y")} -{" "}
+                                            {format(date.to, "LLL dd, y")}
+                                        </>
+                                    ) : (
+                                        format(date.from, "LLL dd, y")
+                                    )
+                                ) : (
+                                    <span>Pick a date</span>
+                                )}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                initialFocus
+                                mode="range"
+                                defaultMonth={date?.from}
+                                selected={date}
+                                onSelect={setDate}
+                                numberOfMonths={2}
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+
             </div>
 
             <Table>

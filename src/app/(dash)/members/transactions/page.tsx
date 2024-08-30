@@ -15,7 +15,7 @@ export default async function Members() {
                 <MemberTransactionDrawer members={members} />
             </Box>
             <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-                <MemberTransactionTable />
+                <MemberTransactionTable members={members} />
             </Box>
         </Box>
     )

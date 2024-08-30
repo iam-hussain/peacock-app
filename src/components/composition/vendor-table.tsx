@@ -32,6 +32,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
 import Box from '../ui/box';
 import { TiUserAdd } from 'react-icons/ti';
+import { vendorTypeMap } from '@/lib/config';
 
 // Column Definitions for Vendor Table
 const columnsBase: ColumnDef<GetVendorResponse>[] = [
@@ -87,7 +88,7 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
         ),
     },
     {
-        accessorKey: 'terms',
+        accessorKey: 'type',
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -95,13 +96,14 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                 className="uppercase hover:bg-transparent hover:font-extrabold px-2 w-full"
             >
-                Terms
+                Type
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
         cell: ({ row }) => (
             <div className="flex flex-col items-center min-w-[50px]" data-id={row.original.id}>
-                <p className=''>{row.original.terms}</p>
+                <p className=''>{vendorTypeMap[row.original.type]}</p>
+                {['LEND', "CHIT"].includes(row.original.type) && <p className='text-[0.7rem] text-foreground/70'>{row.original.terms} terms</p>}
             </div>
         ),
     },
@@ -160,7 +162,7 @@ const columnsBase: ColumnDef<GetVendorResponse>[] = [
         cell: ({ row }) => (
             <div className="flex flex-col items-start min-w-[80px]" data-id={row.original.id}>
                 {row.original.calcReturns && <p className={'text-emerald-500'}>{row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</p>}
-                {!row.original.calcReturns && <p> - </p>}
+                {!row.original.calcReturns && <p>{row.original.type === 'LEND' ? row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : ' - '}</p>}
             </div>
         ),
     },

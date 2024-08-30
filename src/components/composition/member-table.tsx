@@ -185,7 +185,7 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
 
     const action: ColumnDef<GetMemberResponse> = {
         accessorKey: 'member.id',
-        header: ({ column }) => (
+        header: () => (
             <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
                 Action
             </div>

@@ -24,6 +24,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     startAt: vendor.startAt.getTime(),
     endAt: vendor.endAt ? vendor.endAt.getTime() : null,
     terms: vendor.terms,
+    type: vendor.type,
     memberName,
     memberAvatar: vendor?.owner?.avatar
       ? `/image/${vendor.owner.avatar}`
@@ -31,9 +32,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     active: vendor.active,
     invest: vendor.passbook.in,
     profit: vendor.passbook.out,
-    returns: vendor.passbook.calcReturns
-      ? vendor.passbook.out - vendor.passbook.in
-      : 0,
+    returns: vendor.passbook.returns,
     calcReturns: passbook.calcReturns,
     vendor: { ...rawVendor, calcReturns: passbook.calcReturns },
   };
