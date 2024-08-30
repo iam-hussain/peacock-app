@@ -49,6 +49,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<VendorTra
                 id={row.original.member.id}
                 avatar={row.original.member.avatar}
                 name={row.original.member.name}
+                active={row.original.member.active}
             />
         ),
     },
