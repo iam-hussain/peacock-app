@@ -35,7 +35,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },
@@ -58,7 +58,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
             <CommonTableCell
                 label={memberTransactionTypeMap[row.original.transactionType]}
                 subLabel={transactionMethodMap[row.original.method]}
-                minWidth="120px"
+                className="min-w-[120px]"
             />
         ),
     },
@@ -68,7 +68,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={format(new Date(row.original.transactionAt), 'dd MMM yyyy hh:mm a')}
-                minWidth="150px"
+                className="min-w-[140px]"
             />
         ),
     },
@@ -79,7 +79,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
             <CommonTableCell
                 label={row.original.id}
                 subLabel={format(new Date(row.original.createdAt), 'dd MMM yyyy hh:mm a')}
-                minWidth="100px"
+                className="min-w-[100px]"
             />
         ),
     },

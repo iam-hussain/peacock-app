@@ -40,7 +40,7 @@ type TableHeaderProps = {
 };
 
 export const PlainTableHeader = ({ label }: TableHeaderProps) => (
-    <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold">
+    <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
         {label}
     </div>
 );
@@ -63,12 +63,12 @@ export const ActionTableHeader = ({ label, column, onClick }: TableHeaderProps &
 type CommonTableCellProps = {
     label: string;
     subLabel?: string;
-    minWidth?: string;
+    className?: string;
     greenLabel?: boolean
 };
 
-export const CommonTableCell = ({ label, subLabel, minWidth = '120px', greenLabel = false }: CommonTableCellProps) => (
-    <div className={`flex flex-col items-start min-w-[${minWidth}]`}>
+export const CommonTableCell = ({ label, subLabel, className, greenLabel = false }: CommonTableCellProps) => (
+    <div className={cn('flex flex-col items-start min-w-[120px]', className)}>
         <p className={cn('text-foreground font-medium', {
             'text-emerald-500': greenLabel
         })}>{label}</p>

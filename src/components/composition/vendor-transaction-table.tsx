@@ -37,7 +37,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<VendorTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                minWidth="100px"
+                className="min-w-[100px]"
             />
         ),
     },
@@ -59,6 +59,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<VendorTra
             <CommonTableCell
                 label={vendorTransactionTypeMap[row.original.transactionType]}
                 subLabel={transactionMethodMap[row.original.method]}
+                className="min-w-[120px]"
             />
         ),
     },
@@ -68,7 +69,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<VendorTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={format(new Date(row.original.transactionAt), 'dd MMM yyyy hh:mm a')}
-                minWidth="150px"
+                className="min-w-[140px]"
             />
         ),
     },

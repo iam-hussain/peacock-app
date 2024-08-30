@@ -33,7 +33,7 @@ const baseColumns: ColumnDef<GetMemberResponse>[] = [
             <CommonTableCell
                 label={row.original.deposit.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                 subLabel={row.original.offsetDeposit !== 0 ? `${row.original.periodIn.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} + ${row.original.offsetDeposit.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}` : ''}
-                minWidth="150px"
+                className="min-w-[120px]"
             />
         ),
     },
@@ -44,7 +44,7 @@ const baseColumns: ColumnDef<GetMemberResponse>[] = [
             <CommonTableCell
                 label={row.original.balance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                 subLabel={row.original.offsetBalance !== 0 ? `${row.original.periodBalance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} + ${row.original.offsetBalance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}` : ''}
-                minWidth="150px"
+                className="min-w-[120px]"
             />
         ),
     },
@@ -54,7 +54,7 @@ const baseColumns: ColumnDef<GetMemberResponse>[] = [
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },
@@ -64,7 +64,7 @@ const baseColumns: ColumnDef<GetMemberResponse>[] = [
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.netValue.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },
@@ -78,7 +78,7 @@ const editColumns: ColumnDef<GetMemberResponse>[] = [
             <CommonTableCell
                 label={dateFormat(new Date(row.original.joinedAt))}
                 subLabel={row.original.id}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },

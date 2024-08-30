@@ -39,7 +39,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
             <CommonTableCell
                 label={dateFormat(new Date(row.original.startAt))}
                 subLabel={row.original.endAt ? dateFormat(new Date(row.original.endAt)) : row.original.id}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },
@@ -50,7 +50,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
             <CommonTableCell
                 label={vendorTypeMap[row.original.type]}
                 subLabel={['LEND', 'CHIT'].includes(row.original.type) ? `${row.original.terms} terms` : ''}
-                minWidth="50px"
+                className="min-w-[50px]"
             />
         ),
     },
@@ -60,7 +60,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.invest.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },
@@ -70,7 +70,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.profit.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                minWidth="80px"
+                className="min-w-[80px]"
             />
         ),
     },
@@ -80,7 +80,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.calcReturns ? row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : (row.original.type === 'LEND' ? row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : ' - ')}
-                minWidth="80px"
+                className="min-w-[80px]"
                 greenLabel={row.original.calcReturns}
             />
         ),
