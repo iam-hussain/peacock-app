@@ -67,14 +67,44 @@ function vendorsTransactionTableTransform(
 
 // GET: Fetch vendor transactions with pagination
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1");
-  const limit = parseInt(url.searchParams.get("limit") || "10");
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = parseInt(searchParams.get("limit") || "10");
+  const memberId = searchParams.get("memberId");
+  const vendorId = searchParams.get("vendorId");
+  const transactionType = searchParams.get("transactionType");
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+  const sortField = searchParams.get("sortField") || "transactionAt";
+  const sortOrder = searchParams.get("sortOrder") || "desc";
 
+  const filters: any = {};
+
+  if (memberId) filters.memberId = memberId;
+  if (vendorId) filters.vendorId = vendorId;
+  if (transactionType) filters.transactionType = transactionType;
+  if (startDate && endDate) {
+    filters.transactionAt = {
+      gte: new Date(startDate),
+      lte: new Date(endDate),
+    };
+  }
+  console.log({
+    where: filters,
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: {
+      [sortField]: sortOrder,
+    },
+  });
   try {
-    const transaction = await prisma.vendorTransaction.findMany({
+    const transactions = await prisma.vendorTransaction.findMany({
+      where: filters,
       skip: (page - 1) * limit,
       take: limit,
+      orderBy: {
+        [sortField]: sortOrder,
+      },
       include: {
         vendor: {
           select: {
@@ -101,15 +131,12 @@ export async function GET(request: Request) {
           },
         },
       },
-      orderBy: {
-        transactionAt: "desc", // Sort by transaction date
-      },
     });
 
     const totalTransactions = await prisma.vendorTransaction.count();
 
     return NextResponse.json({
-      transaction: transaction.map(vendorsTransactionTableTransform),
+      transactions: transactions.map(vendorsTransactionTableTransform),
       total: totalTransactions,
       page,
       totalPages: Math.ceil(totalTransactions / limit),

@@ -1,45 +1,47 @@
 import prisma from "@/db";
-import {  MemberTransaction } from "@prisma/client";
+import { MemberTransaction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 type MemberTransactionToTransform = MemberTransaction & {
   to: {
-    id: string
-    firstName: string
-    lastName: string | null
-    avatar: string | null
-    active: boolean
+    id: string;
+    firstName: string;
+    lastName: string | null;
+    avatar: string | null;
+    active: boolean;
   };
-  from:  {
-    id: string
-    firstName: string
-    lastName: string | null
-    avatar: string | null
-    active: boolean
+  from: {
+    id: string;
+    firstName: string;
+    lastName: string | null;
+    avatar: string | null;
+    active: boolean;
   };
 };
 
-export type MemberTransactionResponse = ReturnType<typeof membersTransactionTableTransform>
+export type MemberTransactionResponse = ReturnType<
+  typeof membersTransactionTableTransform
+>;
 
- function membersTransactionTableTransform(
+function membersTransactionTableTransform(
   transaction: MemberTransactionToTransform
 ) {
-  const { from, to } = transaction
+  const { from, to } = transaction;
   return {
     from: {
       id: from.id,
       name: `${from.firstName}${from.lastName ? ` ${from.lastName}` : ""}`,
       avatar: from.avatar
-      ? `/image/${from.avatar}`
-      : "/image/no_image_available.jpeg",
+        ? `/image/${from.avatar}`
+        : "/image/no_image_available.jpeg",
       active: from.active,
     },
     to: {
       id: to.id,
       name: `${to.firstName}${to.lastName ? ` ${to.lastName}` : ""}`,
       avatar: to.avatar
-      ? `/image/${to.avatar}`
-      : "/image/no_image_available.jpeg",
+        ? `/image/${to.avatar}`
+        : "/image/no_image_available.jpeg",
       active: to.active,
     },
     transactionType: transaction.transactionType,
@@ -49,7 +51,7 @@ export type MemberTransactionResponse = ReturnType<typeof membersTransactionTabl
     note: transaction.note,
     createdAt: transaction.createdAt,
     id: transaction.id,
-  }
+  };
 }
 
 export async function GET(request: Request) {
@@ -79,6 +81,11 @@ export async function GET(request: Request) {
 
   const transactions = await prisma.memberTransaction.findMany({
     where: filters,
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: {
+      [sortField]: sortOrder,
+    },
     include: {
       from: {
         select: {
@@ -86,23 +93,18 @@ export async function GET(request: Request) {
           avatar: true,
           firstName: true,
           lastName: true,
-          active: true
-        }
+          active: true,
+        },
       },
-      to: {    
+      to: {
         select: {
           id: true,
           avatar: true,
           firstName: true,
           lastName: true,
-          active: true
-        }
+          active: true,
+        },
       },
-    },
-    skip: (page - 1) * limit,
-    take: limit,
-    orderBy: {
-      [sortField]: sortOrder,
     },
   });
 
@@ -117,7 +119,6 @@ export async function GET(request: Request) {
   });
 }
 
-
 // POST route for adding a member transaction
 export async function POST(request: Request) {
   try {
@@ -126,7 +127,10 @@ export async function POST(request: Request) {
 
     // Validate the request body
     if (!fromId || !toId || !amount || !transactionType) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
     // Create the new transaction
@@ -136,15 +140,17 @@ export async function POST(request: Request) {
         toId,
         amount: parseFloat(amount),
         transactionType,
-        method: method || 'ACCOUNT',
+        method: method || "ACCOUNT",
         note: note || "",
       },
     });
 
     return NextResponse.json({ success: true, transaction }, { status: 201 });
-
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

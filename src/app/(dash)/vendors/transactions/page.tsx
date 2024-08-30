@@ -17,7 +17,7 @@ export default async function Members() {
                 <VendorTransactionDrawer members={members} vendors={vendors} />
             </Box>
             <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-                <VendorTransactionsTable />
+                <VendorTransactionsTable members={members} vendors={vendors} />
             </Box>
         </Box>
     )

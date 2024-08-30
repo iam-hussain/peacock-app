@@ -53,7 +53,7 @@ export const memberTransactionTypeMap = {
 export const vendorTransactionTypeMap = {
   PERIODIC_INVEST: "Periodic Invest",
   INVEST: "Invest",
-  PERIODIC_RETURN: "Periodic Return",
+  PERIODIC_RETURN: "Periodic Returns",
   RETURNS: "Returns",
   PROFIT: "Profit",
   // EXPENSE (commented out in the enum, so not included here)
