@@ -24,7 +24,7 @@ function TableLayout<T>({ table, columns, loading, noDataMessage = "No results."
                 ))}
             </TableHeader>
             <TableBody>
-                {table.getRowModel().rows.length === 0 && loading ? (
+                {loading ? (
                     <TableRow>
                         <TableCell colSpan={columns.length} className="text-center p-6">
                             Loading...
