@@ -60,7 +60,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<VendorTra
             <CommonTableCell
                 label={vendorTransactionTypeMap[row.original.transactionType]}
                 subLabel={transactionMethodMap[row.original.method]}
-                className="min-w-[120px]"
+                className="min-w-[130px]"
             />
         ),
     },
