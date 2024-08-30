@@ -271,7 +271,7 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="text-center">
+                                <TableCell colSpan={columns.length} className="text-center p-6">
                                     No results.
                                 </TableCell>
                             </TableRow>

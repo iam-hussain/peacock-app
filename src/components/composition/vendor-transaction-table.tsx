@@ -16,6 +16,9 @@ import { ArrowUpDown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { FaCircle } from "react-icons/fa";
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { AiOutlineDelete } from 'react-icons/ai';
 
 const columns: ColumnDef<any>[] = [
     {
@@ -32,11 +35,19 @@ const columns: ColumnDef<any>[] = [
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="flex items-center space-x-2 min-w-[170px] w-auto" data-id={row.original.id}>
-                <div className='flex flex-col'>
-                    <span className='text-foreground font-medium'>{row.original.vendor.name}</span>
+            <div className="flex items-center space-x-2 min-w-[170px]" data-id={row.original.vendor.id}>
+                <div className='relative'>
+                    <img src={row.original.vendor.memberAvatar} alt="" className="w-10 h-10 rounded-lg border" />
+                    <FaCircle name={"FaCircle"} className={cn("h-3 w-3 absolute -top-1 -right-1", {
+                        'text-primary': row.original.vendor.active,
+                        'text-destructive': !row.original.vendor.active
+                    })} />
                 </div>
-            </div>
+                <div className='flex flex-col'>
+                    <p className=''>{row.original.vendor.name}</p>
+                    {row.original.vendor.memberName && <span className='text-[0.7rem] text-foreground/70'>{row.original.vendor.memberName}</span>}
+                </div>
+            </div >
         ),
     },
     {
@@ -53,65 +64,8 @@ const columns: ColumnDef<any>[] = [
             </Button>
         ),
         cell: ({ row }) => (
-            <div className="flex flex-col items-start min-w-[150px]" data-id={row.original.id}>
+            <div className="flex flex-col items-start min-w-[100px]" data-id={row.original.id}>
                 <p className=''>{row.original.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</p>
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'transactionType',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
-            >
-                Transaction Type
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="flex flex-col items-start min-w-[150px]" data-id={row.original.id}>
-                <p className=''>{row.original.transactionType}</p>
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'method',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
-            >
-                Method
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="flex flex-col items-start min-w-[150px]" data-id={row.original.id}>
-                <p className=''>{row.original.method}</p>
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'transactionAt',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
-            >
-                Date
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
-        cell: ({ row }) => (
-            <div className="flex flex-col items-start min-w-[150px]" data-id={row.original.id}>
-                <p className=''>{new Date(row.original.transactionAt).toLocaleDateString()}</p>
             </div>
         ),
     },
@@ -139,6 +93,66 @@ const columns: ColumnDef<any>[] = [
                 </div>
             </div>
         ),
+    },
+    {
+        accessorKey: 'transactionType',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
+            >
+                Type
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => (
+            <div className="flex flex-col items-start min-w-[120px]" data-id={row.original.id}>
+                <p className=''>{row.original.transactionType}</p>
+                <p className='text-[0.7rem] text-foreground/70'>{row.original.method}</p>
+            </div>
+        ),
+    },
+    {
+        accessorKey: 'transactionAt',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                className="uppercase hover:bg-transparent hover:font-extrabold px-2"
+            >
+                Transaction At
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }: any) => <div className="flex flex-col items-start min-w-[150px]">
+            <p className='text-foreground font-medium'>{format(new Date(row.original.transactionAt), 'dd MMM yyyy hh:mm a')}</p>
+        </div>,
+    },
+    {
+        accessorKey: 'id',
+        header: () => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+                ID
+            </div>
+        ),
+        cell: ({ row }: any) => <div className="flex flex-col items-start min-w-[100px]">
+            <p className='text-[0.7rem] text-foreground/70 m-0'>{row.original.id}</p>
+            <p className='text-[0.7rem] text-foreground/70 m-0'>{format(new Date(row.original.createdAt), 'dd MMM yyyy hh:mm a')}</p>
+        </div>,
+    },
+    {
+        accessorKey: 'action',
+        header: () => (
+            <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold text-center">
+                Action
+            </div>
+        ),
+        cell: ({ row }: any) => <div className="flex items-center justify-center gap-4 align-middle min-w-[40px]">
+            <Button className='' variant={'ghost'}> <AiOutlineDelete className='w-4 h-4' /> </Button>
+        </div>,
     },
 ]
 
@@ -222,20 +236,7 @@ const VendorTransactionTable = () => {
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header, i) => (
                                 <TableHead key={header.id}>
-                                    {![1, 4].includes(i) ? <p className='m-0 p-0 uppercase px-2 text-[0.8rem]'>{flexRender(header.column.columnDef.header, header.getContext())}</p> :
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="uppercase px-2 hover:bg-transparent hover:font-extrabold"
-                                            onClick={() => {
-                                                setSortField(header.column.id);
-                                                setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                                            }}
-                                        >
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                                        </Button>}
-
+                                    {flexRender(header.column.columnDef.header, header.getContext())}
                                 </TableHead>
                             ))}
                         </TableRow>

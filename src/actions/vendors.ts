@@ -8,7 +8,6 @@ type VendorToTransform = Vendor & {
     firstName: string;
     lastName: string | null;
     avatar: string | null;
-    active: boolean;
   } | null;
 };
 
@@ -47,7 +46,6 @@ export async function getVendors() {
           avatar: true,
           firstName: true,
           lastName: true,
-          active: true,
         },
       },
       passbook: true,

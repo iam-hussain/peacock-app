@@ -254,7 +254,7 @@ const VendorTable = ({ vendors, members }: { vendors: GetVendorsResponse; member
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="text-center">
+                                <TableCell colSpan={columns.length} className="text-center p-6">
                                     No results.
                                 </TableCell>
                             </TableRow>
