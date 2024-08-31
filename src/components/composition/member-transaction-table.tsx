@@ -2,15 +2,13 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef } from '@tanstack/react-table';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { AvatarCell, PlainTableHeader, CommonTableCell, PaginationControls, ActionTableHeader } from '../table-helpers/table-component';
+
+import { Dialog, } from '@/components/ui/dialog';
+import { AvatarCell, PlainTableHeader, CommonTableCell, PaginationControls, ActionTableHeader, ActionCell } from '../table-helpers/table-component';
 import TableLayout from '../table-helpers/table-layout';
-import { MemberForm } from '../forms/member';
 import { MemberTransactionResponse } from '@/app/api/member-transactions/route';
 import { memberTransactionTypeMap, transactionMethodMap } from '@/lib/config';
 import { format } from 'date-fns';
-import { AiOutlineDelete } from 'react-icons/ai';
 import { MembersSelectResponse } from '@/actions/member-select';
 import { SelectInputGroup } from '../select-input-group';
 import { DatePickerGroup } from '../date-picker-group';
@@ -78,7 +76,7 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.id}
-                subLabel={format(new Date(row.original.createdAt), 'dd MMM yyyy hh:mm a')}
+                subLabel={format(new Date(row.original.updatedAt), 'dd MMM yyyy hh:mm a')}
                 className="min-w-[100px]"
             />
         ),
@@ -100,11 +98,14 @@ const initialOptions = {
     sortOrder: 'desc'
 }
 
+export type MembersTransactionTableProps = {
+    members: MembersSelectResponse;
+    handleAction: (select: null | MemberTransactionResponse) => void
+}
 
-const MembersTransactionTable = ({ members }: { members: MembersSelectResponse }) => {
+const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTableProps) => {
     const [editMode, setEditMode] = useState(true);
     const [data, setData] = useState<MemberTransactionResponse[]>([]);
-    const [selected, setSelected] = useState<null | MemberTransactionResponse>(null);
 
     const [loading, setLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
@@ -161,12 +162,11 @@ const MembersTransactionTable = ({ members }: { members: MembersSelectResponse }
                 accessorKey: 'id',
                 header: () => <PlainTableHeader label="Action" />,
                 cell: ({ row }) => (
-                    <Button variant="ghost">
-                        <AiOutlineDelete onClick={() => setSelected(row.original)} />
-                    </Button>
+                    <ActionCell onClick={() => handleAction(row.original)} />
                 ),
             }
         ]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editMode]);
 
     const table = useReactTable({
@@ -223,15 +223,6 @@ const MembersTransactionTable = ({ members }: { members: MembersSelectResponse }
 
                 <TableLayout table={table} columns={columns} loading={loading} />
                 <PaginationControls page={options.page} totalPages={totalPages} loading={loading} setPage={((page) => setOptions({ ...options, page }))} />
-                <DialogContent className="">
-                    <DialogHeader>
-                        <DialogTitle>{selected ? 'Update' : 'Add'} Member</DialogTitle>
-                        {selected && <DialogDescription>Member ID: {selected.id}</DialogDescription>}
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        {/* <MemberForm member={selected} /> */}
-                    </div>
-                </DialogContent>
             </div>
         </Dialog>
     );

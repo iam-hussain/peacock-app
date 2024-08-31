@@ -1,15 +1,12 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
-import { Button } from '../ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, PaginationControls } from '../table-helpers/table-component';
+import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef } from '@tanstack/react-table';
+import { Dialog } from '@/components/ui/dialog';
+import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, PaginationControls, ActionCell } from '../table-helpers/table-component';
 import TableLayout from '../table-helpers/table-layout';
-import { MemberForm } from '../forms/member';
 import { transactionMethodMap, vendorTransactionTypeMap } from '@/lib/config';
 import { format } from 'date-fns';
-import { AiOutlineDelete } from 'react-icons/ai';
 import { MembersSelectResponse } from '@/actions/member-select';
 import { SelectInputGroup } from '../select-input-group';
 import { DatePickerGroup } from '../date-picker-group';
@@ -74,6 +71,17 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<VendorTra
             />
         ),
     },
+    {
+        accessorKey: 'id',
+        header: () => <PlainTableHeader label="ID" />,
+        cell: ({ row }) => (
+            <CommonTableCell
+                label={row.original.id}
+                subLabel={format(new Date(row.original.updatedAt), 'dd MMM yyyy hh:mm a')}
+                className="min-w-[100px]"
+            />
+        ),
+    },
 ];
 
 const editColumns: ColumnDef<VendorTransactionResponse>[] = [
@@ -92,10 +100,15 @@ const initialOptions = {
 }
 
 
-const VendorsTransactionTable = ({ members, vendors }: { members: MembersSelectResponse, vendors: VendorsSelectResponse }) => {
+export type MembersTransactionTableProps = {
+    members: MembersSelectResponse,
+    vendors: VendorsSelectResponse
+    handleAction: (select: null | VendorTransactionResponse) => void
+}
+
+const VendorsTransactionTable = ({ members, vendors, handleAction }: MembersTransactionTableProps) => {
     const [editMode, setEditMode] = useState(true);
     const [data, setData] = useState<VendorTransactionResponse[]>([]);
-    const [selected, setSelected] = useState<null | VendorTransactionResponse>(null);
 
     const [loading, setLoading] = useState(true);
     const [totalPages, setTotalPages] = useState(1);
@@ -152,9 +165,7 @@ const VendorsTransactionTable = ({ members, vendors }: { members: MembersSelectR
                 accessorKey: 'id',
                 header: () => <PlainTableHeader label="Action" />,
                 cell: ({ row }) => (
-                    <Button variant="ghost">
-                        <AiOutlineDelete onClick={() => setSelected(row.original)} />
-                    </Button>
+                    <ActionCell onClick={() => handleAction(row.original)} />
                 ),
             }
         ]
@@ -214,15 +225,6 @@ const VendorsTransactionTable = ({ members, vendors }: { members: MembersSelectR
 
                 <TableLayout table={table} columns={columns} loading={loading} />
                 <PaginationControls page={options.page} totalPages={totalPages} loading={loading} setPage={((page) => setOptions({ ...options, page }))} />
-                <DialogContent className="">
-                    <DialogHeader>
-                        <DialogTitle>{selected ? 'Update' : 'Add'} Vendor</DialogTitle>
-                        {selected && <DialogDescription>Vendor ID: {selected.id}</DialogDescription>}
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        {/* <MemberForm member={selected} /> */}
-                    </div>
-                </DialogContent>
             </div>
         </Dialog>
     );

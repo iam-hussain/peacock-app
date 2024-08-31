@@ -2,8 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -18,53 +16,50 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { MembersSelectResponse } from "@/actions/member-select";
+import { MemberTransactionResponse } from "@/app/api/member-transactions/route";
+import { GenericModalFooter } from "../generic-modal";
+import { memberTransactionFormSchema, MemberTransactionFormSchema } from "@/lib/form-schema";
+import Box from "../ui/box";
 
-// Transaction method and type enums
-const transactionMethods = ["CASH", "ACCOUNT", "UPI", "BANK", "CHEQUE"] as const;
-const transactionTypes = ["PERIODIC_DEPOSIT", "OFFSET_DEPOSIT", "WITHDRAW", "REJOIN", "FUNDS_TRANSFER"] as const;
-
-// Zod schema definition
-const formSchema = z.object({
-    fromId: z.string().min(1, { message: "Please select a 'from' member." }),
-    toId: z.string().min(1, { message: "Please select a 'to' member." }),
-    transactionType: z.enum(transactionTypes, {
-        required_error: "Please select a transaction type.",
-        invalid_type_error: "Please select a transaction type."
-    }),
-    method: z.enum(transactionMethods, {
-        required_error: "Please select a transaction method.",
-        invalid_type_error: "Please select a transaction method."
-    }),
-    amount: z.preprocess((val) => Number(val), z.number().min(1, { message: "Amount must be greater than 0." })),
-    note: z.string().optional(),
-});
 
 type MemberTransactionFormProps = {
     members: MembersSelectResponse
+    selected: null | MemberTransactionResponse
+    onSuccess: () => void
+    onCancel?: () => void
 }
 
-export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            fromId: "",
-            toId: "",
-            transactionType: "FUNDS_TRANSFER",
-            method: "ACCOUNT",
-            amount: 0,
-            note: "",
-        },
+export function MemberTransactionForm({ members, selected, onSuccess, onCancel }: MemberTransactionFormProps) {
+    const form = useForm<MemberTransactionFormSchema>({
+        resolver: zodResolver(memberTransactionFormSchema),
+        defaultValues: selected
+            ? {
+                fromId: selected.fromId,
+                toId: selected.toId || '',
+                transactionType: selected.transactionType as any,
+                method: selected.method as any || 'ACCOUNT',
+                amount: selected.amount || 0,
+                note: selected.note || '',
+            }
+            : {
+                fromId: "",
+                toId: "",
+                transactionType: "FUNDS_TRANSFER",
+                method: "ACCOUNT",
+                amount: 0,
+                note: "",
+            },
     });
 
     // Handle form submission
-    async function onSubmit(data: z.infer<typeof formSchema>) {
+    async function onSubmit(data: MemberTransactionFormSchema) {
         try {
             const response = await fetch('/api/member-transactions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ createdAt: selected?.transactionAt, transactionAt: selected?.transactionAt, ...data }),
             });
 
             if (!response.ok) {
@@ -73,9 +68,17 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
                 return;
             }
 
+            if (selected) {
+                await fetch(`/api/member-transactions/${selected.id}`, {
+                    method: "DELETE",
+                });
+            }
             const result = await response.json();
             toast.success('Transaction successfully added!');
-            form.reset();  // Reset the form after successful submission
+            if (!selected) form.reset(); // Reset form after submission
+            if (onSuccess) {
+                onSuccess()
+            }
         } catch (error) {
             toast.error('An unexpected error occurred. Please try again.');
         }
@@ -83,107 +86,109 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-lg">
-                <FormField
-                    control={form.control}
-                    name="fromId"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>From</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select member" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {members.map((member) => (
-                                            <SelectItem key={member.id} value={member.id}>
-                                                {member.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-4">
+                <Box preset={'grid-split'}>
+                    <FormField
+                        control={form.control}
+                        name="fromId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>From</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select member" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {members.map((member) => (
+                                                <SelectItem key={member.id} value={member.id}>
+                                                    {member.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name="toId"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>To</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select member" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {members.map((member) => (
-                                            <SelectItem key={member.id} value={member.id}>
-                                                {member.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    <FormField
+                        control={form.control}
+                        name="toId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>To</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select member" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {members.map((member) => (
+                                                <SelectItem key={member.id} value={member.id}>
+                                                    {member.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </Box>
+                <Box preset={'grid-split'}>
+                    <FormField
+                        control={form.control}
+                        name="transactionType"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Transaction Type</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select transaction type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(memberTransactionTypeMap).map(([key, name]) => (
+                                                <SelectItem key={key} value={key}>
+                                                    {name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name="transactionType"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Transaction Type</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select transaction type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {Object.entries(memberTransactionTypeMap).map(([key, name]) => (
-                                            <SelectItem key={key} value={key}>
-                                                {name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="method"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Transaction Method</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select transaction method" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {Object.entries(transactionMethodMap).map(([key, name]) => (
-                                            <SelectItem key={key} value={key}>
-                                                {name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
+                    <FormField
+                        control={form.control}
+                        name="method"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Transaction Method</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select transaction method" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(transactionMethodMap).map(([key, name]) => (
+                                                <SelectItem key={key} value={key}>
+                                                    {name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </Box>
                 <FormField
                     control={form.control}
                     name="amount"
@@ -211,8 +216,7 @@ export function MemberTransactionForm({ members }: MemberTransactionFormProps) {
                         </FormItem>
                     )}
                 />
-
-                <Button type="submit" className="w-full">Add</Button>
+                <GenericModalFooter actionLabel={selected ? "Update" : "Add"} onCancel={onCancel} />
             </form>
         </Form>
     );

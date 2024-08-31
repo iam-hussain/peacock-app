@@ -46,7 +46,10 @@ function membersTransactionTableTransform(
     method: transaction.method,
     note: transaction.note,
     createdAt: transaction.createdAt,
+    updatedAt: transaction.updatedAt,
     id: transaction.id,
+    fromId: transaction.fromId,
+    toId: transaction.toId,
   };
 }
 
@@ -119,7 +122,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { fromId, toId, amount, transactionType, method, note } = body;
+    const {
+      createdAt,
+      transactionAt,
+      fromId,
+      toId,
+      amount,
+      transactionType,
+      method,
+      note,
+    } = body;
 
     // Validate the request body
     if (!fromId || !toId || !amount || !transactionType) {
@@ -138,6 +150,8 @@ export async function POST(request: Request) {
         transactionType,
         method: method || "ACCOUNT",
         note: note || "",
+        transactionAt: transactionAt || undefined,
+        createdAt: createdAt || undefined,
       },
     });
 
@@ -146,6 +160,43 @@ export async function POST(request: Request) {
     console.error(error);
     return NextResponse.json(
       { error: "Something went wrong" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
+
+  try {
+    // Check if the transaction exists
+    const transaction = await prisma.memberTransaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return NextResponse.json(
+        { message: "Transaction not found." },
+        { status: 404 }
+      );
+    }
+
+    // Delete the transaction
+    await prisma.memberTransaction.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { message: "Transaction deleted successfully." },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    return NextResponse.json(
+      { message: "Failed to delete transaction." },
       { status: 500 }
     );
   }

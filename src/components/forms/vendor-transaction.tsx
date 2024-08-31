@@ -18,6 +18,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { VendorsSelectResponse } from "@/actions/vendor-select";
 import { MembersSelectResponse } from "@/actions/member-select";
+import { VendorTransactionResponse } from "@/app/api/vendor-transactions/route";
+import { GenericModalFooter } from "../generic-modal";
+import Box from "../ui/box";
+import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
 
 const transactionMethods = ["CASH", "ACCOUNT", "UPI", "BANK", "CHEQUE"] as const;
 const transactionTypes = ["PERIODIC_INVEST", "INVEST", "PERIODIC_RETURN", "RETURNS", "PROFIT"] as const;
@@ -40,20 +44,32 @@ const formSchema = z.object({
 
 type VendorTransactionFormProps = {
     vendors: VendorsSelectResponse;
-    members: MembersSelectResponse
+    members: MembersSelectResponse;
+    selected: null | VendorTransactionResponse
+    onSuccess: () => void
+    onCancel?: () => void
 };
 
-export function VendorTransactionForm({ vendors, members }: VendorTransactionFormProps) {
+export function VendorTransactionForm({ vendors, members, selected, onSuccess, onCancel }: VendorTransactionFormProps) {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            vendorId: "",
-            memberId: "",
-            transactionType: "INVEST",
-            method: "ACCOUNT",
-            amount: 0,
-            note: "",
-        },
+        defaultValues: selected
+            ? {
+                vendorId: selected.vendorId,
+                memberId: selected.memberId || '',
+                transactionType: selected.transactionType as any,
+                method: selected.method as any || 'ACCOUNT',
+                amount: selected.amount || 0,
+                note: selected.note || '',
+            }
+            : {
+                vendorId: "",
+                memberId: "",
+                transactionType: "INVEST",
+                method: "ACCOUNT",
+                amount: 0,
+                note: "",
+            },
     });
 
     // Handle form submission
@@ -64,7 +80,7 @@ export function VendorTransactionForm({ vendors, members }: VendorTransactionFor
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({ createdAt: selected?.transactionAt, transactionAt: selected?.transactionAt, ...data }),
             });
 
             if (!response.ok) {
@@ -73,9 +89,18 @@ export function VendorTransactionForm({ vendors, members }: VendorTransactionFor
                 return;
             }
 
+            if (selected) {
+                await fetch(`/api/vendor-transactions/${selected.id}`, {
+                    method: "DELETE",
+                });
+            }
+
             const result = await response.json();
             toast.success('Transaction successfully added!');
-            form.reset();  // Reset the form after successful submission
+            if (!selected) form.reset(); // Reset form after submission
+            if (onSuccess) {
+                onSuccess()
+            }
         } catch (error) {
             toast.error('An unexpected error occurred. Please try again.');
         }
@@ -83,110 +108,115 @@ export function VendorTransactionForm({ vendors, members }: VendorTransactionFor
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-lg">
-                {/* Vendor Selection */}
-                <FormField
-                    control={form.control}
-                    name="vendorId"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Vendor</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select vendor" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {vendors.map((vendor) => (
-                                            <SelectItem key={vendor.id} value={vendor.id}>
-                                                {vendor.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-4">
 
-                {/* Member Selection */}
-                <FormField
-                    control={form.control}
-                    name="memberId"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Member</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select member" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {members.map((member) => (
-                                            <SelectItem key={member.id} value={member.id}>
-                                                {member.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <Box preset={'grid-split'}>
+                    {/* Vendor Selection */}
+                    <FormField
+                        control={form.control}
+                        name="vendorId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Vendor</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select vendor" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {vendors.map((vendor) => (
+                                                <SelectItem key={vendor.id} value={vendor.id}>
+                                                    {vendor.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                {/* Transaction Type Selection */}
-                <FormField
-                    control={form.control}
-                    name="transactionType"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Transaction Type</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select transaction type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {transactionTypes.map((type) => (
-                                            <SelectItem key={type} value={type}>
-                                                {type}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    {/* Member Selection */}
+                    <FormField
+                        control={form.control}
+                        name="memberId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Member</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select member" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {members.map((member) => (
+                                                <SelectItem key={member.id} value={member.id}>
+                                                    {member.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </Box>
 
-                {/* Transaction Method Selection */}
-                <FormField
-                    control={form.control}
-                    name="method"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Transaction Method</FormLabel>
-                            <FormControl>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select transaction method" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {transactionMethods.map((method) => (
-                                            <SelectItem key={method} value={method}>
-                                                {method}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <Box preset={'grid-split'}>
+                    {/* Transaction Type Selection */}
+                    <FormField
+                        control={form.control}
+                        name="transactionType"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Transaction Type</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select transaction type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(vendorTransactionTypeMap).map(([key, name]) => (
+                                                <SelectItem key={key} value={key}>
+                                                    {name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Transaction Method Selection */}
+                    <FormField
+                        control={form.control}
+                        name="method"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Transaction Method</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select transaction method" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(transactionMethodMap).map(([key, name]) => (
+                                                <SelectItem key={key} value={key}>
+                                                    {name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </Box>
 
                 {/* Amount Input */}
                 <FormField
@@ -219,7 +249,7 @@ export function VendorTransactionForm({ vendors, members }: VendorTransactionFor
                 />
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full">Add Transaction</Button>
+                <GenericModalFooter actionLabel={selected ? "Update" : "Add"} onCancel={onCancel} />
             </form>
         </Form>
     );

@@ -58,8 +58,11 @@ function vendorsTransactionTableTransform(
     amount: transaction.amount,
     method: transaction.method,
     note: transaction.note,
+    updatedAt: transaction.updatedAt,
     createdAt: transaction.createdAt,
     id: transaction.id,
+    vendorId: transaction.vendorId,
+    memberId: transaction.memberId,
   };
 }
 
@@ -150,8 +153,16 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { vendorId, memberId, amount, transactionType, method, note } =
-      await request.json();
+    const {
+      createdAt,
+      transactionAt,
+      vendorId,
+      memberId,
+      amount,
+      transactionType,
+      method,
+      note,
+    } = await request.json();
 
     // Validate required fields
     if (!vendorId || !memberId || !amount || !transactionType) {
@@ -170,6 +181,8 @@ export async function POST(request: Request) {
         transactionType,
         method: method || "ACCOUNT",
         note: note || undefined,
+        transactionAt: transactionAt || undefined,
+        createdAt: createdAt || undefined,
       },
     });
 

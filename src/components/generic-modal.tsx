@@ -27,14 +27,13 @@ export const GenericModalFooter = ({ actionLabel, onCancel, onConfirm, isDelete 
 type GenericModalProps = {
     title: string;
     description?: string;
-    actionLabel: string;
     onCancel?: () => void
     onConfirm?: () => void;
     children: ReactNode;
     isDelete?: boolean;
 };
 
-export const GenericModal = ({ title, description, actionLabel, onCancel, onConfirm, children, isDelete }: GenericModalProps) => {
+export const GenericModal = ({ title, description, onCancel, onConfirm, children }: GenericModalProps) => {
     return (
         <DialogContent className='h-auto max-h-svh flex flex-col overflow-auto'>
             <DialogHeader>
@@ -44,7 +43,7 @@ export const GenericModal = ({ title, description, actionLabel, onCancel, onConf
             <div className='h-auto py-2'>
                 {children}
             </div>
-            {isDelete && <GenericModalFooter actionLabel={actionLabel} onCancel={onCancel} onConfirm={onConfirm} isDelete={isDelete} />}
+
         </DialogContent>
     );
 };
