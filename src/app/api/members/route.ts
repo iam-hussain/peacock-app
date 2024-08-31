@@ -14,6 +14,7 @@ function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number
 ) {
+  const { passbook, ...rawMember } = member;
   const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
   const periodBalance = memberTotalDeposit - member.passbook.periodIn;
   const deposit = member.passbook.periodIn + member.passbook.offsetIn;
@@ -23,7 +24,7 @@ function membersTableTransform(
     username: member.username,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     joined: monthsDiff(new Date(), new Date(member.joinedAt)),
-    joinedAt: dateFormat(member.joinedAt),
+    joinedAt: member.joinedAt.getTime(),
     status: member.active ? "Active" : "Disabled",
     active: member.active,
     deposit: deposit - member.passbook.out,
@@ -36,22 +37,16 @@ function membersTableTransform(
     clubFund: member.passbook.fund,
     netValue:
       member.passbook.in + member.passbook.returns - member.passbook.out,
+    member: rawMember,
   };
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1");
-  const limit = parseInt(url.searchParams.get("limit") || "50");
-
   const members = await prisma.member.findMany({
-    skip: (page - 1) * limit,
-    take: limit,
     include: {
       passbook: true,
     },
   });
-
   const memberTotalDeposit = memberTotalDepositAmount();
   const transformedMembers = members
     .map((each) => membersTableTransform(each, memberTotalDeposit))

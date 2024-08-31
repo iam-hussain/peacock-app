@@ -10,42 +10,39 @@ type VendorToTransform = Vendor & {
     firstName: string;
     lastName: string | null;
     avatar: string | null;
-    active: boolean;
   } | null;
 };
 
 export type VendorResponse = ReturnType<typeof vendorsTableTransform>;
 
 function vendorsTableTransform(vendor: VendorToTransform) {
+  const { passbook, owner, ...rawVendor } = vendor;
+  const memberName = vendor?.owner?.firstName
+    ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
+    : "";
   return {
     id: vendor.id,
     name: vendor.name,
-    startAt: dateFormat(vendor.startAt),
-    endAt: vendor.endAt ? dateFormat(vendor.endAt) : null,
+    searchName: `${vendor.name} ${memberName}`.trim(),
+    startAt: vendor.startAt.getTime(),
+    endAt: vendor.endAt ? vendor.endAt.getTime() : null,
     terms: vendor.terms,
-    memberName: vendor?.owner?.firstName
-      ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
-      : "",
+    type: vendor.type,
+    memberName,
     memberAvatar: vendor?.owner?.avatar
       ? `/image/${vendor.owner.avatar}`
       : undefined,
     active: vendor.active,
     invest: vendor.passbook.in,
     profit: vendor.passbook.out,
-    returns: vendor.passbook.calcReturns
-      ? vendor.passbook.out - vendor.passbook.in
-      : 0,
+    returns: vendor.passbook.returns,
+    calcReturns: passbook.calcReturns,
+    vendor: { ...rawVendor, calcReturns: passbook.calcReturns },
   };
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1");
-  const limit = parseInt(url.searchParams.get("limit") || "50");
-
   const vendors = await prisma.vendor.findMany({
-    skip: (page - 1) * limit,
-    take: limit,
     include: {
       owner: {
         select: {
@@ -53,7 +50,6 @@ export async function GET(request: Request) {
           avatar: true,
           firstName: true,
           lastName: true,
-          active: true,
         },
       },
       passbook: true,
@@ -63,7 +59,7 @@ export async function GET(request: Request) {
   const transformedVendors = vendors
     .map(vendorsTableTransform)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.active > b.active ? 1 : -1));
+    .sort((a, b) => (a.active > b.active ? -1 : 1));
 
   return NextResponse.json({
     vendors: transformedVendors,

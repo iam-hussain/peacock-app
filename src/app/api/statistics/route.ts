@@ -1,17 +1,44 @@
+import prisma from "@/db";
+import { calculateTotalDeposit, clubMonthsFromStart } from "@/lib/club";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  // Simulate fetching statistics data
-  const statistics = {
-    membersPerMonth: 20,
-    membersDeposit: 500000,
-    membersBalance: 250000,
-    netMembersAmount: 750000,
-    netProfit: 20000,
-    netValuePerMember: 6250,
-    netLiquidity: 100000,
-    clubNetValue: 850000,
-  };
+  const statistics = await prisma.passbook.findFirst({
+    where: {
+      type: "CLUB",
+    },
+  });
+  const membersCount = await prisma.member.count({
+    where: {
+      active: true,
+    },
+  });
+  if (!statistics) {
+    throw new Error("Invalid club statistics");
+  }
 
-  return NextResponse.json(statistics);
+  const currentIn = statistics.in - statistics.out;
+  const totalDeposit = calculateTotalDeposit(membersCount) + 36000;
+  const offsetBalance = statistics.offset - statistics.offsetIn;
+  const netAmount = currentIn + statistics.returns;
+  const netValue = totalDeposit + statistics.returns + statistics.offset;
+
+  return NextResponse.json({
+    success: true,
+    statistics: {
+      membersCount,
+      totalMonths: clubMonthsFromStart(),
+      deposit: currentIn - statistics.offsetIn,
+      balance: totalDeposit - currentIn + offsetBalance,
+      offset: statistics.offset,
+      offsetIn: statistics.offsetIn,
+      offsetBalance,
+      returns: statistics.returns,
+      memberValue: Math.round(netValue / membersCount),
+      invested: statistics.fund - statistics.balance,
+      liquidity: statistics.balance,
+      netAmount,
+      netValue,
+    },
+  });
 }
