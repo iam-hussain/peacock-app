@@ -5,6 +5,7 @@ export const pageSlice = createSlice({
   initialState: {
     sideBarOpen: false,
     modalOpen: false,
+    isLoggedIn: false, // Add isLoggedIn state
   },
   reducers: {
     openSideBar: (state) => {
@@ -13,9 +14,12 @@ export const pageSlice = createSlice({
     openModal: (state) => {
       state.modalOpen = !state.modalOpen;
     },
+    setIsLoggedIn: (state, action) => {
+      state.isLoggedIn = action.payload;
+    },
   },
 });
 
-export const { openSideBar, openModal } = pageSlice.actions;
+export const { openSideBar, openModal, setIsLoggedIn } = pageSlice.actions;
 
 export default pageSlice.reducer;

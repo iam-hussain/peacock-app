@@ -1,14 +1,47 @@
-
+'use client'
 import SideMenu from "@/components/side-menu";
 import SideMenuMobile from "@/components/side-menu-mobile";
 import TopMenu from "@/components/top-menu";
 import { store } from "@/store";
+import { setIsLoggedIn } from "@/store/pageSlice";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 export default function HomeLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("/api/login/status", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    dispatch(setIsLoggedIn(data.isLoggedIn));
+                } else {
+                    dispatch(setIsLoggedIn(false));
+                }
+            } catch (error) {
+                console.error("Failed to fetch auth status:", error);
+                dispatch(setIsLoggedIn(false));
+            }
+        };
+
+        checkAuth();
+    }, [dispatch]);
+
     return (
         <div className="main-wrapper">
             <main className={"page-main bg-paper"}>
