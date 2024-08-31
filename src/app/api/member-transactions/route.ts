@@ -150,7 +150,7 @@ export async function POST(request: Request) {
         transactionType,
         method: method || "ACCOUNT",
         note: note || "",
-        transactionAt: transactionAt || undefined,
+        transactionAt: new Date(transactionAt || new Date()),
         createdAt: createdAt || undefined,
       },
     });

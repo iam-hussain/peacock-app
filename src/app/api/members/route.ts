@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Member, Passbook } from "@prisma/client";
 import prisma from "@/db";
-import { dateFormat, monthsDiff, newDate } from "@/lib/date";
+import { dateFormat, monthsDiff } from "@/lib/date";
 import { memberTotalDepositAmount } from "@/lib/club";
 
 type MemberToTransform = Member & {
@@ -65,8 +65,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { id, firstName, lastName, username, phone, email, avatar, active } =
-      data;
+    const {
+      id,
+      firstName,
+      lastName,
+      username,
+      phone,
+      email,
+      avatar,
+      active,
+      joinedAt,
+    } = data;
 
     // Validate required fields
     if (!firstName && !id) {
@@ -84,9 +93,11 @@ export async function POST(request: Request) {
       phone: phone || undefined,
       email: email || undefined,
       avatar: avatar || undefined,
+      joinedAt: new Date(joinedAt || new Date()),
       active: typeof active === "boolean" ? active : true,
     };
 
+    console.log({ commonData });
     let member;
 
     if (id) {

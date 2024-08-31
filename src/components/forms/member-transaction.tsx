@@ -40,6 +40,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                 method: selected.method as any || 'ACCOUNT',
                 amount: selected.amount || 0,
                 note: selected.note || '',
+                transactionAt: selected.transactionAt ? new Date(selected.transactionAt).toISOString().substring(0, 10) : "",
             }
             : {
                 fromId: "",
@@ -48,6 +49,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                 method: "ACCOUNT",
                 amount: 0,
                 note: "",
+                transactionAt: ''
             },
     });
 
@@ -59,7 +61,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ createdAt: selected?.transactionAt, transactionAt: selected?.transactionAt, ...data }),
+                body: JSON.stringify({ createdAt: selected?.transactionAt, ...data }),
             });
 
             if (!response.ok) {
@@ -189,19 +191,37 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                         )}
                     />
                 </Box>
-                <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Amount</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="Enter amount" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                <Box preset={'grid-split'}>
+                    {/* Start Date */}
+
+                    {/* Amount Input */}
+                    <FormField
+                        control={form.control}
+                        name="amount"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Amount</FormLabel>
+                                <FormControl>
+                                    <Input type="number" placeholder="Enter amount" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="transactionAt"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Transaction Date</FormLabel>
+                                <FormControl>
+                                    <Input type="date" {...field} placeholder="Transaction date" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </Box>
 
                 <FormField
                     control={form.control}

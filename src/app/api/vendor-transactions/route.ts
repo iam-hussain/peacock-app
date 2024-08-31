@@ -1,4 +1,5 @@
 import prisma from "@/db";
+import { dateFormat } from "@/lib/date";
 import { VendorTransaction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -181,7 +182,7 @@ export async function POST(request: Request) {
         transactionType,
         method: method || "ACCOUNT",
         note: note || undefined,
-        transactionAt: transactionAt || undefined,
+        transactionAt: new Date(transactionAt || new Date()),
         createdAt: createdAt || undefined,
       },
     });

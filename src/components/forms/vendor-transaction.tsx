@@ -22,25 +22,8 @@ import { VendorTransactionResponse } from "@/app/api/vendor-transactions/route";
 import { GenericModalFooter } from "../generic-modal";
 import Box from "../ui/box";
 import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
+import { VendorTransactionFormSchema, vendorTransactionFormSchema } from "@/lib/form-schema";
 
-const transactionMethods = ["CASH", "ACCOUNT", "UPI", "BANK", "CHEQUE"] as const;
-const transactionTypes = ["PERIODIC_INVEST", "INVEST", "PERIODIC_RETURN", "RETURNS", "PROFIT"] as const;
-
-// Zod schema definition
-const formSchema = z.object({
-    vendorId: z.string().min(1, { message: "Please select a vendor." }),
-    memberId: z.string().min(1, { message: "Please select a member." }),
-    transactionType: z.enum(transactionTypes, {
-        required_error: "Please select a transaction type.",
-        invalid_type_error: "Please select a transaction type."
-    }),
-    method: z.enum(transactionMethods, {
-        required_error: "Please select a transaction method.",
-        invalid_type_error: "Please select a transaction method."
-    }),
-    amount: z.preprocess((val) => Number(val), z.number().min(0.01, { message: "Amount must be greater than 0." })),
-    note: z.string().optional(),
-});
 
 type VendorTransactionFormProps = {
     vendors: VendorsSelectResponse;
@@ -51,8 +34,8 @@ type VendorTransactionFormProps = {
 };
 
 export function VendorTransactionForm({ vendors, members, selected, onSuccess, onCancel }: VendorTransactionFormProps) {
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<VendorTransactionFormSchema>({
+        resolver: zodResolver(vendorTransactionFormSchema),
         defaultValues: selected
             ? {
                 vendorId: selected.vendorId,
@@ -61,6 +44,7 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                 method: selected.method as any || 'ACCOUNT',
                 amount: selected.amount || 0,
                 note: selected.note || '',
+                transactionAt: selected.transactionAt ? new Date(selected.transactionAt).toISOString().substring(0, 10) : "",
             }
             : {
                 vendorId: "",
@@ -69,18 +53,19 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                 method: "ACCOUNT",
                 amount: 0,
                 note: "",
+                transactionAt: ''
             },
     });
 
     // Handle form submission
-    async function onSubmit(data: z.infer<typeof formSchema>) {
+    async function onSubmit(data: VendorTransactionFormSchema) {
         try {
             const response = await fetch('/api/vendor-transactions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ createdAt: selected?.transactionAt, transactionAt: selected?.transactionAt, ...data }),
+                body: JSON.stringify({ createdAt: selected?.transactionAt, ...data }),
             });
 
             if (!response.ok) {
@@ -217,21 +202,37 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                         )}
                     />
                 </Box>
+                <Box preset={'grid-split'}>
+                    {/* Start Date */}
 
-                {/* Amount Input */}
-                <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Amount</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="Enter amount" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                    {/* Amount Input */}
+                    <FormField
+                        control={form.control}
+                        name="amount"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Amount</FormLabel>
+                                <FormControl>
+                                    <Input type="number" placeholder="Enter amount" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="transactionAt"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Transaction Date</FormLabel>
+                                <FormControl>
+                                    <Input type="date" {...field} placeholder="Transaction date" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </Box>
 
                 {/* Note Input */}
                 <FormField

@@ -29,6 +29,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                 email: selected.email || '',
                 avatar: selected.avatar || '',
                 active: selected.active ?? true,
+                joinedAt: selected.joinedAt ? new Date(selected.joinedAt).toISOString().substring(0, 10) : "",
             }
             : {
                 firstName: "",
@@ -38,6 +39,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                 email: "",
                 avatar: "",
                 active: true,
+                joinedAt: "",
             },
     });
 
@@ -170,6 +172,21 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                 </Box>
 
                 <Box preset={'grid-split'}>
+                    <FormField
+                        control={form.control}
+                        name="joinedAt"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Joined Date</FormLabel>
+                                <FormControl>
+                                    <Input type="date" {...field} placeholder="Joined date" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+
                     {/* Active */}
                     <FormItem className="flex items-center justify-between">
                         <FormLabel>Active</FormLabel>
