@@ -14,7 +14,7 @@ type GenericModalFooterProps = {
 
 export const GenericModalFooter = ({ actionLabel, onCancel, onConfirm, isDelete }: GenericModalFooterProps) => {
     return (
-        <DialogFooter className='gap-2 flex sm:flex-row flex-row justify-between'>
+        <DialogFooter className='gap-2 flex sm:flex-row flex-row justify-between pt-4'>
             <Button variant="outline" onClick={onCancel} className='min-w-[140px]'>Cancel</Button>
             <Button type={isDelete ? "button" : "submit"} variant={isDelete ? "destructive" : 'default'} className='min-w-[140px]' onClick={onConfirm}>
                 {actionLabel}
@@ -41,7 +41,7 @@ export const GenericModal = ({ title, description, actionLabel, onCancel, onConf
                 <DialogTitle>{title}</DialogTitle>
                 {description && <DialogDescription>{description}</DialogDescription>}
             </DialogHeader>
-            <div className='h-auto'>
+            <div className='h-auto py-2'>
                 {children}
             </div>
             {isDelete && <GenericModalFooter actionLabel={actionLabel} onCancel={onCancel} onConfirm={onConfirm} isDelete={isDelete} />}

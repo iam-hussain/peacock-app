@@ -8,7 +8,7 @@ import { FaCircle } from "react-icons/fa"
 
 export function AvatarGroup({ src, name, active }: { src: string, name: string, active?: boolean }) {
     const nameArr = name.split(' ');
-    const fallback = nameArr.length >= 2 ? nameArr.map(e => e.slice(0, 1)).join('') : name.slice(0, 2)
+    const fallback = nameArr.length >= 2 ? nameArr.map(e => e.slice(0, 1)).join('').slice(0, 3) : name.slice(0, 2)
     return (
         <div className='relative'>
             <Avatar>

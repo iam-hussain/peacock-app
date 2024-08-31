@@ -86,7 +86,7 @@ const editColumns: ColumnDef<GetMemberResponse>[] = [
 
 export type MemberTableProps = {
     members: GetMembersResponse;
-    handleAction: (select: null | GetMemberResponse['member'], mode?: 'A' | "U" | "D",) => void
+    handleAction: (select: null | GetMemberResponse['member'], mode?: string) => void
 }
 
 const MembersTable = ({ members, handleAction }: MemberTableProps) => {
@@ -132,19 +132,17 @@ const MembersTable = ({ members, handleAction }: MemberTableProps) => {
     });
 
     return (
-        <Dialog>
-            <div className='w-full'>
-                <FilterBar
-                    searchValue={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onSearchChange={(value) =>
-                        table.getColumn("name")?.setFilterValue(value)
-                    }
-                    onToggleChange={setShowInactive}
-                    toggleState={showInactive}
-                    onAddClick={() => handleAction(null)} />
-                <TableLayout table={table} columns={columns} loading={false} />
-            </div>
-        </Dialog>
+        <div className='w-full'>
+            <FilterBar
+                searchValue={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                onSearchChange={(value) =>
+                    table.getColumn("name")?.setFilterValue(value)
+                }
+                onToggleChange={setShowInactive}
+                toggleState={showInactive}
+                onAddClick={() => handleAction(null)} />
+            <TableLayout table={table} columns={columns} loading={false} />
+        </div>
     );
 };
 

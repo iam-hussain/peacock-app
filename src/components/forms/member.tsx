@@ -2,34 +2,33 @@
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Switch } from "../ui/switch";
 import Box from "../ui/box";
-import { DialogFooter } from "../ui/dialog";
 import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
 import { GenericModalFooter } from "../generic-modal";
+import { toast } from "sonner";
 
 
 type MemberFormProps = {
-    member?: any,
-    onSubmit(data: MemberFromSchema, cb?: () => void): void
+    selected?: any,
+    onSuccess: () => void
     onCancel?: () => void
 };
 
-export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
+export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     const form = useForm({
         resolver: zodResolver(memberFormSchema),
-        defaultValues: member
+        defaultValues: selected
             ? {
-                firstName: member.firstName,
-                lastName: member.lastName || '',
-                username: member.username,
-                phone: member.phone || '',
-                email: member.email || '',
-                avatar: member.avatar || '',
-                active: member.active ?? true,
+                firstName: selected.firstName,
+                lastName: selected.lastName || '',
+                username: selected.username,
+                phone: selected.phone || '',
+                email: selected.email || '',
+                avatar: selected.avatar || '',
+                active: selected.active ?? true,
             }
             : {
                 firstName: "",
@@ -42,15 +41,37 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
             },
     });
 
-    const onSubmitHandler = (data: MemberFromSchema) => {
-        onSubmit(data, () => {
-            if (!member) form.reset(); // Reset form after submission
-        })
+    async function onSubmit(data: MemberFromSchema) {
+        try {
+            const response = await fetch(`/api/members`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: selected?.id, ...data }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                toast.error(error.message || "Failed to process request");
+                return;
+            }
+
+            const result = await response.json();
+            toast.success(selected ? "Member updated successfully" : "Member created successfully");
+            if (!selected) form.reset(); // Reset form after submission
+            if (onSuccess) {
+                onSuccess()
+            }
+
+        } catch (error) {
+            toast.error("An unexpected error occurred. Please try again.");
+        }
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitHandler)} className="w-full max-w-2xl space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-4">
                 <Box preset={'grid-split'}>
                     {/* First Name */}
                     <FormField
@@ -160,7 +181,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                                     <Switch
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
-                                        defaultChecked={member?.active ?? true}
+                                        defaultChecked={selected?.active ?? true}
                                     />
                                 )}
                             />
@@ -169,7 +190,7 @@ export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
                     </FormItem>
                 </Box>
 
-                <GenericModalFooter actionLabel={member ? "Update Member" : "Add Member"} onCancel={onCancel} />
+                <GenericModalFooter actionLabel={selected ? "Update Member" : "Add Member"} onCancel={onCancel} />
             </form>
         </Form>
     );

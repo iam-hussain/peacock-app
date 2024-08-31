@@ -90,10 +90,13 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
 const editColumns: ColumnDef<GetVendorResponse>[] = [];
 
 
-const VendorsTable = ({ vendors, members }: { vendors: GetVendorsResponse, members: MembersSelectResponse }) => {
-    const [editMode, setEditMode] = useState(false);
-    const [selected, setSelected] = useState<null | GetVendorResponse['vendor']>(null);
+export type VendorTableProps = {
+    vendors: GetVendorsResponse;
+    handleAction: (select: null | GetVendorResponse['vendor'], mode?: string) => void
+}
 
+const VendorsTable = ({ vendors, handleAction }: VendorTableProps) => {
+    const [editMode, setEditMode] = useState(false);
     const columns = useMemo(() => {
         if (!editMode) {
             return baseColumns
@@ -105,10 +108,11 @@ const VendorsTable = ({ vendors, members }: { vendors: GetVendorsResponse, membe
                 accessorKey: 'vendor.id',
                 header: () => <PlainTableHeader label="Action" />,
                 cell: ({ row }) => (
-                    <ActionCell onClick={() => setSelected(row.original.vendor)} />
+                    <ActionCell onClick={() => handleAction(row.original.vendor)} />
                 ),
             }
         ]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editMode]);
 
     const table = useReactTable({
@@ -126,28 +130,17 @@ const VendorsTable = ({ vendors, members }: { vendors: GetVendorsResponse, membe
     });
 
     return (
-        <Dialog>
-            <div className='w-full'>
-                <FilterBar
-                    searchValue={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onSearchChange={(value) =>
-                        table.getColumn("name")?.setFilterValue(value)
-                    }
-                    onToggleChange={setEditMode}
-                    toggleState={editMode}
-                    onAddClick={() => setSelected(null)} />
-                <TableLayout table={table} columns={columns} loading={false} />
-                <DialogContent className="">
-                    <DialogHeader>
-                        <DialogTitle>{selected ? 'Update' : 'Add'} Vendor</DialogTitle>
-                        {selected && <DialogDescription>Vendor ID: {selected.id}</DialogDescription>}
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <VendorForm vendor={selected} members={members} />
-                    </div>
-                </DialogContent>
-            </div>
-        </Dialog>
+        <div className='w-full'>
+            <FilterBar
+                searchValue={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                onSearchChange={(value) =>
+                    table.getColumn("name")?.setFilterValue(value)
+                }
+                onToggleChange={setEditMode}
+                toggleState={editMode}
+                onAddClick={() => handleAction(null)} />
+            <TableLayout table={table} columns={columns} loading={false} />
+        </div>
     );
 };
 

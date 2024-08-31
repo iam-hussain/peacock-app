@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import Box from "../ui/box";
 
 type VendorConnection = {
     id: string;
@@ -14,9 +15,11 @@ type VendorConnection = {
 
 type MemberVendorConnectionsFormProps = {
     memberId: string;
+    onSuccess: () => void
+    onCancel?: () => void
 };
 
-export function MemberVendorConnectionsForm({ memberId }: MemberVendorConnectionsFormProps) {
+export function MemberVendorConnectionsForm({ memberId, onSuccess, onCancel }: MemberVendorConnectionsFormProps) {
     const { control, handleSubmit, reset } = useForm();
     const [connections, setConnections] = useState<VendorConnection[]>([]);
 
@@ -44,31 +47,36 @@ export function MemberVendorConnectionsForm({ memberId }: MemberVendorConnection
             if (!response.ok) throw new Error("Failed to update connections");
 
             toast.success("Connections updated successfully");
+            if (onSuccess) {
+                onSuccess()
+            }
         } catch (error) {
             toast.error("Failed to update connections");
         }
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <h2 className="text-lg font-medium">Manage Vendor Connections</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
 
-            {connections.map((connection, index) => (
-                <div key={connection.id} className="flex items-center justify-between">
-                    <span>{connection.vendor.name}</span>
-                    <Controller
-                        name={`connections.${index}.active`}
-                        control={control}
-                        render={({ field }) => (
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                defaultChecked={connection.active}
-                            />
-                        )}
-                    />
-                </div>
-            ))}
+            {connections.length === 0 && <p className="w-full text-center p-6">Loading...</p>}
+            <Box preset={'grid-split'} className="gap-0">
+                {connections.map((connection, index) => (
+                    <div key={connection.id} className="flex items-center justify-between border p-2 rounded-md">
+                        <span>{connection.vendor.name}</span>
+                        <Controller
+                            name={`connections.${index}.active`}
+                            control={control}
+                            render={({ field }) => (
+                                <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    defaultChecked={connection.active}
+                                />
+                            )}
+                        />
+                    </div>
+                ))}
+            </Box>
 
             <Button type="submit" className="w-full">
                 Save Changes

@@ -4,6 +4,7 @@ import { CustomLink } from "@/components/ui/link"
 import VendorTable from "@/components/composition/vendor-table"
 import { getVendors } from "@/actions/vendors"
 import { membersSelect } from "@/actions/member-select"
+import VendorAction from "@/components/vendor-action"
 
 
 export default async function Vendors() {
@@ -19,7 +20,7 @@ export default async function Vendors() {
                 </CustomLink>
             </Box>
             <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-                <VendorTable vendors={vendors} members={members} />
+                <VendorAction members={members} vendors={vendors} />
             </Box>
         </Box>
     )

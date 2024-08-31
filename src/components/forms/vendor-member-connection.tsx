@@ -5,6 +5,8 @@ import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { GenericModalFooter } from "../generic-modal";
+import Box from "../ui/box";
 
 type MemberConnection = {
     id: string;
@@ -14,9 +16,11 @@ type MemberConnection = {
 
 type VendorMemberConnectionsFormProps = {
     vendorId: string;
+    onSuccess: () => void
+    onCancel?: () => void
 };
 
-export function VendorMemberConnectionsForm({ vendorId }: VendorMemberConnectionsFormProps) {
+export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: VendorMemberConnectionsFormProps) {
     const { control, handleSubmit, reset } = useForm();
     const [connections, setConnections] = useState<MemberConnection[]>([]);
 
@@ -44,35 +48,36 @@ export function VendorMemberConnectionsForm({ vendorId }: VendorMemberConnection
             if (!response.ok) throw new Error("Failed to update connections");
 
             toast.success("Connections updated successfully");
+            if (onSuccess) {
+                onSuccess()
+            }
         } catch (error) {
             toast.error("Failed to update connections");
         }
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <h2 className="text-lg font-medium">Manage Member Connections</h2>
-
-            {connections.map((connection, index) => (
-                <div key={connection.id} className="flex items-center justify-between">
-                    <span>{`${connection.member.firstName} ${connection.member.lastName}`}</span>
-                    <Controller
-                        name={`connections.${index}.active`}
-                        control={control}
-                        render={({ field }) => (
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                defaultChecked={connection.active}
-                            />
-                        )}
-                    />
-                </div>
-            ))}
-
-            <Button type="submit" className="w-full">
-                Save Changes
-            </Button>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
+            {connections.length === 0 && <p className="w-full text-center p-6">Loading...</p>}
+            <Box preset={'grid-split'} className="gap-0">
+                {connections.map((connection, index) => (
+                    <div key={connection.id} className="flex items-center justify-between border p-2 rounded-md">
+                        <span>{`${connection.member.firstName} ${connection.member.lastName}`}</span>
+                        <Controller
+                            name={`connections.${index}.active`}
+                            control={control}
+                            render={({ field }) => (
+                                <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    defaultChecked={connection.active}
+                                />
+                            )}
+                        />
+                    </div>
+                ))}
+            </Box>
+            <GenericModalFooter actionLabel={"Save Changes"} onCancel={onCancel} />
         </form>
     );
 }
