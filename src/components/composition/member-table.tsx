@@ -84,10 +84,13 @@ const editColumns: ColumnDef<GetMemberResponse>[] = [
     },
 ];
 
+export type MemberTableProps = {
+    members: GetMembersResponse;
+    handleAction: (select: null | GetMemberResponse['member'], mode?: 'A' | "U" | "D",) => void
+}
 
-const MembersTable = ({ members }: { members: GetMembersResponse }) => {
+const MembersTable = ({ members, handleAction }: MemberTableProps) => {
     const [showInactive, setShowInactive] = useState(false);
-    const [selected, setSelected] = useState<null | GetMemberResponse['member']>(null);
 
     const data = useMemo(() => {
         if (showInactive) {
@@ -95,8 +98,6 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
         }
         return members.filter((e) => e.active)
     }, [showInactive, members])
-
-
 
     const columns = useMemo(() => {
         if (!showInactive) {
@@ -109,12 +110,11 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
                 accessorKey: 'member.id',
                 header: () => <PlainTableHeader label="Action" />,
                 cell: ({ row }) => (
-                    <Button variant="ghost">
-                        <ActionCell onClick={() => setSelected(row.original.member)} />
-                    </Button>
+                    <ActionCell onClick={() => handleAction(row.original.member)} />
                 ),
             }
         ]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showInactive]);
 
     const table = useReactTable({
@@ -141,17 +141,8 @@ const MembersTable = ({ members }: { members: GetMembersResponse }) => {
                     }
                     onToggleChange={setShowInactive}
                     toggleState={showInactive}
-                    onAddClick={() => setSelected(null)} />
+                    onAddClick={() => handleAction(null)} />
                 <TableLayout table={table} columns={columns} loading={false} />
-                <DialogContent className="">
-                    <DialogHeader>
-                        <DialogTitle>{selected ? 'Update' : 'Add'} Member</DialogTitle>
-                        {selected && <DialogDescription>Member ID: {selected.id}</DialogDescription>}
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <MemberForm member={selected} />
-                    </div>
-                </DialogContent>
             </div>
         </Dialog>
     );

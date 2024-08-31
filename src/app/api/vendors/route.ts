@@ -25,10 +25,10 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     terms: vendor.terms,
     memberName: vendor?.owner?.firstName
       ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
-      : "sdsd",
+      : "",
     memberAvatar: vendor?.owner?.avatar
       ? `/image/${vendor.owner.avatar}`
-      : "/image/no_image_available.jpeg",
+      : undefined,
     active: vendor.active,
     invest: vendor.passbook.in,
     profit: vendor.passbook.out,

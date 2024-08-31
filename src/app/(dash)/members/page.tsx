@@ -3,7 +3,7 @@ import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"
 import { getMembers } from "@/actions/members"
-import { Dialog } from "@/components/ui/dialog"
+import MemberAction from "@/components/members-action"
 
 
 export default async function Members() {
@@ -18,7 +18,7 @@ export default async function Members() {
                 </CustomLink>
             </Box>
             <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-                <MembersTable members={members} />
+                <MemberAction members={members} />
             </Box>
         </Box>
     )

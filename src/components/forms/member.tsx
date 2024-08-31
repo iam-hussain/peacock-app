@@ -2,37 +2,25 @@
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { toast } from "sonner";
-import { useEffect } from "react";
 import { Switch } from "../ui/switch";
 import Box from "../ui/box";
 import { DialogFooter } from "../ui/dialog";
+import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
+import { GenericModalFooter } from "../generic-modal";
 
-// Zod schema for validation
-const formSchema = z.object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().optional(),
-    username: z.string().min(1, "Username is required"),
-    phone: z.string().optional(),
-    email: z.union([
-        z.literal(''),
-        z.string().email(),
-    ]),
-    avatar: z.string().optional(),
-    active: z.boolean().optional(),
-});
 
 type MemberFormProps = {
-    member?: any; // existing member object, if updating
+    member?: any,
+    onSubmit(data: MemberFromSchema, cb?: () => void): void
+    onCancel?: () => void
 };
 
-export function MemberForm({ member }: MemberFormProps) {
+export function MemberForm({ member, onSubmit, onCancel }: MemberFormProps) {
     const form = useForm({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(memberFormSchema),
         defaultValues: member
             ? {
                 firstName: member.firstName,
@@ -54,47 +42,15 @@ export function MemberForm({ member }: MemberFormProps) {
             },
     });
 
-    // useEffect(() => {
-    //     if (member) {
-    //         form.reset({
-    //             firstName: member.firstName,
-    //             lastName: member.lastName || '',
-    //             username: member.username,
-    //             phone: member.phone || '',
-    //             email: member.email || '',
-    //             avatar: member.avatar || '',
-    //             active: member.active ?? true,
-    //         });
-    //     }
-    // }, [member, form]);
-
-    async function onSubmit(data: z.infer<typeof formSchema>) {
-        try {
-            const response = await fetch(`/api/members`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ id: member?.id, ...data }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                toast.error(error.message || "Failed to process request");
-                return;
-            }
-
-            const result = await response.json();
-            toast.success(member ? "Member updated successfully" : "Member created successfully");
+    const onSubmitHandler = (data: MemberFromSchema) => {
+        onSubmit(data, () => {
             if (!member) form.reset(); // Reset form after submission
-        } catch (error) {
-            toast.error("An unexpected error occurred. Please try again.");
-        }
+        })
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-2xl space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmitHandler)} className="w-full max-w-2xl space-y-4">
                 <Box preset={'grid-split'}>
                     {/* First Name */}
                     <FormField
@@ -213,12 +169,7 @@ export function MemberForm({ member }: MemberFormProps) {
                     </FormItem>
                 </Box>
 
-                <DialogFooter>
-                    <Button type="submit">
-                        {member ? "Update Member" : "Add Member"}
-                    </Button>
-                </DialogFooter>
-
+                <GenericModalFooter actionLabel={member ? "Update Member" : "Add Member"} onCancel={onCancel} />
             </form>
         </Form>
     );

@@ -27,7 +27,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     memberName,
     memberAvatar: vendor?.owner?.avatar
       ? `/image/${vendor.owner.avatar}`
-      : "/image/no_image_available.jpeg",
+      : undefined,
     active: vendor.active,
     invest: vendor.passbook.in,
     profit: vendor.passbook.out,

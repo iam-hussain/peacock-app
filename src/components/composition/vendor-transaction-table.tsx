@@ -220,7 +220,7 @@ const VendorsTransactionTable = ({ members, vendors }: { members: MembersSelectR
                         {selected && <DialogDescription>Vendor ID: {selected.id}</DialogDescription>}
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <MemberForm member={selected} />
+                        {/* <MemberForm member={selected} /> */}
                     </div>
                 </DialogContent>
             </div>

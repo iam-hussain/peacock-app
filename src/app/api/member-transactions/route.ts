@@ -31,17 +31,13 @@ function membersTransactionTableTransform(
     from: {
       id: from.id,
       name: `${from.firstName}${from.lastName ? ` ${from.lastName}` : ""}`,
-      avatar: from.avatar
-        ? `/image/${from.avatar}`
-        : "/image/no_image_available.jpeg",
+      avatar: from.avatar ? `/image/${from.avatar}` : undefined,
       active: from.active,
     },
     to: {
       id: to.id,
       name: `${to.firstName}${to.lastName ? ` ${to.lastName}` : ""}`,
-      avatar: to.avatar
-        ? `/image/${to.avatar}`
-        : "/image/no_image_available.jpeg",
+      avatar: to.avatar ? `/image/${to.avatar}` : undefined,
       active: to.active,
     },
     transactionType: transaction.transactionType,

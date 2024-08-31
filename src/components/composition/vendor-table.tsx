@@ -105,9 +105,7 @@ const VendorsTable = ({ vendors, members }: { vendors: GetVendorsResponse, membe
                 accessorKey: 'vendor.id',
                 header: () => <PlainTableHeader label="Action" />,
                 cell: ({ row }) => (
-                    <Button variant="ghost">
-                        <ActionCell onClick={() => setSelected(row.original.vendor)} />
-                    </Button>
+                    <ActionCell onClick={() => setSelected(row.original.vendor)} />
                 ),
             }
         ]

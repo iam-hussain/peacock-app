@@ -11,7 +11,7 @@ type TableLayoutProps<T> = {
 
 function TableLayout<T>({ table, columns, loading, noDataMessage = "No results." }: TableLayoutProps<T>) {
     return (
-        <Table>
+        <Table className=''>
             <TableHeader>
                 {table.getHeaderGroups().map((headerGroup: any) => (
                     <TableRow key={headerGroup.id}>

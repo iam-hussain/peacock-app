@@ -43,16 +43,14 @@ function vendorsTransactionTableTransform(
       memberName,
       memberAvatar: vendor?.owner?.avatar
         ? `/image/${vendor.owner.avatar}`
-        : "/image/no_image_available.jpeg",
+        : undefined,
     },
     member: {
       id: member.id,
       name: `${member.firstName}${
         member.lastName ? ` ${member.lastName}` : ""
       }`,
-      avatar: member.avatar
-        ? `/image/${member.avatar}`
-        : "/image/no_image_available.jpeg",
+      avatar: member.avatar ? `/image/${member.avatar}` : undefined,
       active: member.active,
     },
     transactionType: transaction.transactionType,

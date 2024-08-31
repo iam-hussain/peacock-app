@@ -21,9 +21,7 @@ function membersTableTransform(
     id: member.id,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     username: member.username,
-    avatar: member.avatar
-      ? `/image/${member.avatar}`
-      : "/image/no_image_available.jpeg",
+    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     joined: monthsDiff(new Date(), new Date(member.joinedAt)),
     joinedAt: dateFormat(member.joinedAt),
     status: member.active ? "Active" : "Disabled",

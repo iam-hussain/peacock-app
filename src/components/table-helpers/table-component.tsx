@@ -8,10 +8,11 @@ import { Column } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import { FaCircle, FaEdit } from 'react-icons/fa';
 import { DialogTrigger } from '../ui/dialog';
+import { AvatarGroup } from '../avatar-group';
 
 type AvatarCellProps = {
     id: string;
-    avatar: string;
+    avatar?: string;
     name: string;
     active?: boolean;
     subLabel?: string;
@@ -19,15 +20,7 @@ type AvatarCellProps = {
 
 export const AvatarCell = ({ id, avatar, name, active, subLabel }: AvatarCellProps) => (
     <div className="flex items-center space-x-2 min-w-[170px]" data-id={id}>
-        <div className='relative'>
-            <img src={avatar} alt="" className="w-10 h-10 rounded-lg border" />
-            {active !== undefined && (
-                <FaCircle className={cn("h-3 w-3 absolute -top-1 -right-1", {
-                    'text-primary': active,
-                    'text-destructive': !active,
-                })} />
-            )}
-        </div>
+        <AvatarGroup src={avatar || ''} name={name} active={active || false} />
         <div className='flex flex-col'>
             <p className='text-foreground font-medium'>{name}</p>
             {subLabel && <p className='text-[0.7rem] text-foreground/70'>{subLabel}</p>}
@@ -81,11 +74,9 @@ type ActionCellProps = {
 };
 
 export const ActionCell = ({ onClick }: ActionCellProps) => (
-    <DialogTrigger asChild>
-        <Button variant={'ghost'} className='px-3 py-1' onClick={onClick}>
-            <FaEdit className='h-4 w-4' />
-        </Button>
-    </DialogTrigger>
+    <Button variant={'ghost'} className='px-3 py-1' onClick={onClick}>
+        <FaEdit className='h-4 w-4' />
+    </Button>
 );
 
 type PaginationControlsProps = {
