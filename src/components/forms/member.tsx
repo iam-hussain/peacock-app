@@ -187,7 +187,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
 
 
                     {/* Active */}
-                    <FormItem className="flex items-center justify-between">
+                    <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
                         <FormLabel>Active</FormLabel>
                         <FormControl>
                             <Controller

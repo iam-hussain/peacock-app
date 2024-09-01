@@ -143,6 +143,12 @@ const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTa
         setLoading(false)
     };
 
+    useEffect(() => {
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [options]);
+
+
     const handleOptionsReset = () => {
         setOptions(initialOptions)
     }
@@ -154,12 +160,6 @@ const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTa
             sortOrder: item.sortOrder === 'asc' ? 'desc' : 'asc'
         }))
     }
-
-    useEffect(() => {
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [options]);
-
 
     const columns = useMemo(() => {
         if (!editMode) {

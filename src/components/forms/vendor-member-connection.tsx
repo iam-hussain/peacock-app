@@ -57,12 +57,12 @@ export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: V
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="py-2">
             {connections.length === 0 && <p className="w-full text-center p-6">Loading...</p>}
-            <Box preset={'grid-split'} className="gap-0">
+            <Box preset={'grid-split'} className="gap-2">
                 {connections.map((connection, index) => (
-                    <div key={connection.id} className="flex items-center justify-between border p-2 rounded-md">
-                        <span>{`${connection.member.firstName} ${connection.member.lastName}`}</span>
+                    <div key={connection.id} className="flex w-full items-center justify-between border border-input px-2 min-h-[36px] py-1 rounded-md">
+                        <span className="truncate text-[14px] pr-1">{`${connection.member.firstName} ${connection.member.lastName}`}</span>
                         <Controller
                             name={`connections.${index}.active`}
                             control={control}

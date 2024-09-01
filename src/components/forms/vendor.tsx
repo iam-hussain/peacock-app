@@ -30,7 +30,7 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                 terms: selected.terms || 0,
                 type: selected.type || 'DEFAULT',
                 ownerId: selected.ownerId || '',
-                termType: selected.termType || "NONE",
+                termType: selected.termType || "MONTH",
                 startAt: selected.startAt ? new Date(selected.startAt) : undefined,
                 endAt: selected.endAt ? new Date(selected.endAt) : undefined,
                 active: selected.active ?? true,
@@ -42,7 +42,7 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                 terms: 0,
                 type: "DEFAULT",
                 ownerId: "",
-                termType: "NONE",
+                termType: "MONTH",
                 startAt: new Date(),
                 endAt: undefined,
                 active: true,
@@ -129,38 +129,6 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                             </FormItem>
                         )}
                     />
-
-                    {/* Term Type */}
-                    <FormField
-                        control={form.control}
-                        name="termType"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Term Type</FormLabel>
-                                <FormControl>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select term type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="NONE">NONE</SelectItem>
-                                            <SelectItem value="DAY">DAY</SelectItem>
-                                            <SelectItem value="WEEK">WEEK</SelectItem>
-                                            <SelectItem value="MONTH">MONTH</SelectItem>
-                                            <SelectItem value="YEAR">YEAR</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-
-                </Box>
-
-                <Box preset={'grid-split'}>
-
                     {/* Type */}
                     <FormField
                         control={form.control}
@@ -185,32 +153,36 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                             </FormItem>
                         )}
                     />
-                    {/* Owner */}
+                    {/* Term Type
                     <FormField
                         control={form.control}
-                        name="ownerId"
+                        name="termType"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Owner</FormLabel>
+                                <FormLabel>Term Type</FormLabel>
                                 <FormControl>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select owner" />
+                                            <SelectValue placeholder="Select term type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {members.map((member) => (
-                                                <SelectItem key={member.id} value={member.id}>
-                                                    {member.name}
-                                                </SelectItem>
-                                            ))}
+                                            <SelectItem value="NONE">NONE</SelectItem>
+                                            <SelectItem value="DAY">DAY</SelectItem>
+                                            <SelectItem value="WEEK">WEEK</SelectItem>
+                                            <SelectItem value="MONTH">MONTH</SelectItem>
+                                            <SelectItem value="YEAR">YEAR</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
-                    />
+                    /> */}
+
+
                 </Box>
+
+
 
                 <Box preset={'grid-split'}>
                     {/* Start Date */}
@@ -243,9 +215,59 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                         )}
                     />
                 </Box>
+
+                <Box preset={'grid-split'} className="items-end ">
+
+                    {/* Owner */}
+                    <FormField
+                        control={form.control}
+                        name="ownerId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Owner</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select owner" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {members.map((member) => (
+                                                <SelectItem key={member.id} value={member.id}>
+                                                    {member.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* calcReturns */}
+                    <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
+                        <FormLabel>Calculate Returns</FormLabel>
+                        <FormControl>
+                            <Controller
+                                name={`calcReturns`}
+                                control={form.control}
+                                render={({ field }) => (
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        defaultChecked={selected?.calcReturns ?? true}
+                                        className="m-0 mt-0"
+                                    />
+                                )}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </Box>
+
                 <Box preset={'grid-split'}>
                     {/* Active */}
-                    <FormItem className="flex items-center justify-between">
+                    <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
                         <FormLabel>Active</FormLabel>
                         <FormControl>
                             <Controller
@@ -263,24 +285,7 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                         <FormMessage />
                     </FormItem>
 
-                    {/* calcReturns */}
-                    <FormItem className="flex items-center justify-between">
-                        <FormLabel>Calculate Returns</FormLabel>
-                        <FormControl>
-                            <Controller
-                                name={`calcReturns`}
-                                control={form.control}
-                                render={({ field }) => (
-                                    <Switch
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        defaultChecked={selected?.calcReturns ?? true}
-                                    />
-                                )}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
+
                 </Box>
                 <GenericModalFooter actionLabel={selected ? "Update Vendor" : "Add Vendor"} onCancel={onCancel} isSubmitting={form.formState.isSubmitting} />
             </form>

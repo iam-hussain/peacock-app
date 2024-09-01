@@ -7,6 +7,9 @@ import {
   formatDistance,
   formatRelative,
   addMonths,
+  isBefore,
+  isAfter,
+  subDays,
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
@@ -73,3 +76,32 @@ export const displayDateTime = (input: Date = new Date()) => {
 export const fileDateTime = (input: Date = new Date()) => {
   return format(new Date(input), "dd_mm_yy_HH_mm");
 };
+
+type DueDates = {
+  nextDueDate: Date;
+  recentDueDate: Date;
+  monthsPassed: number;
+};
+
+export function calculateDueDates(
+  startDate: Date,
+  now: Date = new Date(),
+  toleranceDays: number = 5
+): DueDates {
+  // Calculate the number of months passed since the start date
+  const monthsPassed = differenceInMonths(now, new Date(startDate));
+
+  // Calculate the next and recent due dates
+  let nextDueDate = addMonths(startDate, monthsPassed);
+  let recentDueDate = addMonths(startDate, monthsPassed);
+
+  // Adjust the recent due date if the current date is before or within the tolerance
+  if (isAfter(now, subDays(nextDueDate, toleranceDays))) {
+    recentDueDate = nextDueDate;
+    nextDueDate = addMonths(nextDueDate, 1);
+  } else {
+    recentDueDate = addMonths(recentDueDate, -1);
+  }
+
+  return { nextDueDate, recentDueDate, monthsPassed };
+}

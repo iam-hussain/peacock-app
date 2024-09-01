@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { dateFormat } from "@/lib/date";
+import { calculateDueDates, dateFormat } from "@/lib/date";
 import prisma from "@/db";
 import { Passbook, Vendor } from "@prisma/client";
 
@@ -20,6 +20,21 @@ function vendorsTableTransform(vendor: VendorToTransform) {
   const memberName = vendor?.owner?.firstName
     ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
     : "";
+
+  const due = {
+    nextDueDate: 0,
+    recentDueDate: 0,
+    currentTerm: 0,
+    dueAmount: 0,
+  };
+
+  if (rawVendor.type === "CHIT") {
+    const dueDates = calculateDueDates(vendor.startAt);
+    due.nextDueDate = dueDates.nextDueDate.getTime();
+    due.recentDueDate = dueDates.recentDueDate.getTime();
+    due.currentTerm = dueDates.monthsPassed;
+  }
+
   return {
     id: vendor.id,
     name: vendor.name,
@@ -37,6 +52,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     profit: vendor.passbook.out,
     returns: vendor.passbook.returns,
     calcReturns: passbook.calcReturns,
+    ...due,
     vendor: { ...rawVendor, calcReturns: passbook.calcReturns },
   };
 }
