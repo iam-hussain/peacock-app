@@ -13,11 +13,12 @@ import { CustomLink } from "@/components/ui/link";
 
 export default function Login() {
   const router = useRouter()
-
   const [password, setPassword] = useState("");
+  const [isSubmitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true)
 
     const res = await fetch("/api/login", {
       method: "POST",
@@ -33,6 +34,7 @@ export default function Login() {
     } else {
       const { error } = await res.json();
       toast.error(error || "Failed to log in");
+      setSubmitting(false);
     }
   };
 
@@ -54,7 +56,7 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>Login</Button>
           </form>
 
 

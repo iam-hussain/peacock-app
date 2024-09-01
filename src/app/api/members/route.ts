@@ -101,12 +101,23 @@ export async function POST(request: Request) {
         data: commonData,
       });
     } else {
+      const vendors = await prisma.vendor.findMany({
+        select: { id: true, active: true },
+      });
       // Create a new member
       member = await prisma.member.create({
         data: {
           ...commonData,
           passbook: {
             create: { type: "MEMBER" },
+          },
+          profitShares: {
+            createMany: {
+              data: vendors.map((e) => ({
+                vendorId: e.id,
+                active: e.active,
+              })),
+            },
           },
         },
       });

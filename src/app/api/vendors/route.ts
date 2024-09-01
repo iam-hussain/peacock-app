@@ -123,6 +123,9 @@ export async function POST(request: Request) {
         });
       }
     } else {
+      const members = await prisma.member.findMany({
+        select: { id: true, active: true },
+      });
       // Create a new vendor if no ID is provided
       vendor = await prisma.vendor.create({
         data: {
@@ -131,6 +134,14 @@ export async function POST(request: Request) {
             create: {
               type: "VENDOR",
               calcReturns: calcReturns ?? true,
+            },
+          },
+          profitShares: {
+            createMany: {
+              data: members.map((e) => ({
+                memberId: e.id,
+                active: e.active,
+              })),
             },
           },
         },
