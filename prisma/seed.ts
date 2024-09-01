@@ -24,6 +24,14 @@ const transactionTypeMap: {
   OTHER_EXPENDITURE: "EXPENSE",
 };
 
+const vendorTypeMap: {
+  [key in string]: any;
+} = {
+  LOAD_BORROWER: "LEND",
+  DEFAULT: "BANK",
+  CHIT_FUND_COMPANY: "CHIT",
+};
+
 function createMembers() {
   return seedData.user
     .filter((e) => e.type == "MEMBER")
@@ -58,7 +66,7 @@ function createVendors() {
         data: {
           name: each.firstName,
           slug: each.nickName,
-          type: each.vendorType as any,
+          type: vendorTypeMap[each.vendorType] as any,
           startAt: each.joinedAt,
           active: each.isActive && !deleted,
           createdAt,

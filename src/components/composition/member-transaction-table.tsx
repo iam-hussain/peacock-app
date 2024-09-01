@@ -197,7 +197,7 @@ const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTa
     return (
         <Dialog>
             <div className='w-full'>
-                <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-7 w-full">
+                <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-7 w-full mb-4">
                     <SelectInputGroup value={options.fromId}
                         onChange={(e) => setOptions({ ...options, fromId: e })}
                         placeholder="Select FROM member"
