@@ -116,7 +116,7 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                 </Box>
                 <Box preset={'grid-split'}>
                     {/* Terms */}
-                    <FormField
+                    {/* <FormField
                         control={form.control}
                         name="terms"
                         render={({ field }) => (
@@ -128,7 +128,34 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                                 <FormMessage />
                             </FormItem>
                         )}
+                    /> */}
+
+                    {/* Owner */}
+                    <FormField
+                        control={form.control}
+                        name="ownerId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Owner</FormLabel>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select owner" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {members.map((member) => (
+                                                <SelectItem key={member.id} value={member.id}>
+                                                    {member.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
+
                     {/* Type */}
                     <FormField
                         control={form.control}
@@ -216,33 +243,9 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                     />
                 </Box>
 
-                <Box preset={'grid-split'} className="items-end ">
 
-                    {/* Owner */}
-                    <FormField
-                        control={form.control}
-                        name="ownerId"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Owner</FormLabel>
-                                <FormControl>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select owner" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {members.map((member) => (
-                                                <SelectItem key={member.id} value={member.id}>
-                                                    {member.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                <Box preset={'grid-split'} className="pt-2">
+
 
                     {/* calcReturns */}
                     <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
@@ -263,9 +266,6 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                         </FormControl>
                         <FormMessage />
                     </FormItem>
-                </Box>
-
-                <Box preset={'grid-split'}>
                     {/* Active */}
                     <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
                         <FormLabel>Active</FormLabel>

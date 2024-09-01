@@ -35,12 +35,23 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
         ),
     },
     {
+        accessorKey: 'nextDueDate',
+        header: ({ column }) => <ActionTableHeader label="Type" column={column} />,
+        cell: ({ row }) => (
+            <CommonTableCell
+                label={row.original.nextDueDate ? dateFormat(new Date(row.original.nextDueDate)) : '-'}
+                subLabel={row.original.dueAmount ? row.original.dueAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : undefined}
+                className="min-w-[50px]"
+            />
+        ),
+    },
+    {
         accessorKey: 'type',
         header: ({ column }) => <ActionTableHeader label="Type" column={column} />,
         cell: ({ row }) => (
             <CommonTableCell
                 label={vendorTypeMap[row.original.type]}
-                subLabel={['LEND', 'CHIT'].includes(row.original.type) ? `${row.original.terms} terms` : ''}
+                subLabel={row.original.nextDueDate ? `${row.original.currentTerm} / ${row.original.terms} terms` : ''}
                 className="min-w-[50px]"
             />
         ),

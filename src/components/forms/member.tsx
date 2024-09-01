@@ -187,7 +187,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
 
 
                     {/* Active */}
-                    <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
+                    <FormItem className="flex items-center justify-between align-bottom border border-input px-3 min-h-[36px] mt-auto w-full rounded-md">
                         <FormLabel>Active</FormLabel>
                         <FormControl>
                             <Controller
@@ -198,6 +198,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                         defaultChecked={selected?.active ?? true}
+
                                     />
                                 )}
                             />

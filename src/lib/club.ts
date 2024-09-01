@@ -55,3 +55,12 @@ export const calculateTotalDeposit = (membersCount: number): number => {
 export const clubMonthsFromStart = () => {
   return monthsDiff(new Date(), clubConfig.startedAt) + 1;
 };
+
+export function calculateMonthlyInterest(
+  principal: number,
+  annualRate: number = 12
+): number {
+  // Convert the annual interest rate to a monthly interest rate
+  const monthlyInterest = (principal * annualRate) / (12 * 100);
+  return monthlyInterest;
+}

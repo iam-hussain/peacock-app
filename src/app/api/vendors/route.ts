@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { calculateDueDates, dateFormat } from "@/lib/date";
+import { calculateDueDates, dateFormat, monthsDiff } from "@/lib/date";
 import prisma from "@/db";
 import { Passbook, Vendor } from "@prisma/client";
+import { differenceInMonths } from "date-fns";
+import { calculateMonthlyInterest } from "@/lib/club";
 
 type VendorToTransform = Vendor & {
   passbook: Passbook;
@@ -26,13 +28,30 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     recentDueDate: 0,
     currentTerm: 0,
     dueAmount: 0,
+    terms: 0,
   };
 
-  if (rawVendor.type === "CHIT") {
+  if (rawVendor.type === "CHIT" && rawVendor.active) {
     const dueDates = calculateDueDates(vendor.startAt);
     due.nextDueDate = dueDates.nextDueDate.getTime();
     due.recentDueDate = dueDates.recentDueDate.getTime();
     due.currentTerm = dueDates.monthsPassed;
+    due.terms = monthsDiff(rawVendor.startAt, rawVendor.endAt);
+  }
+
+  if (rawVendor.type === "LEND") {
+    due.terms = monthsDiff(rawVendor.startAt, rawVendor.endAt);
+    const dueDates = calculateDueDates(vendor.startAt);
+    due.nextDueDate = dueDates.nextDueDate.getTime();
+    due.recentDueDate = dueDates.recentDueDate.getTime();
+    due.currentTerm = dueDates.monthsPassed;
+    const monthlyInterest = calculateMonthlyInterest(passbook.in);
+    const expectedPaid = monthlyInterest * dueDates.monthsPassed;
+    due.dueAmount = expectedPaid - passbook.out;
+    console.log({ monthlyInterest, expectedPaid, passbook, due });
+    if (passbook.calcReturns) {
+      due.dueAmount = passbook.in + expectedPaid - passbook.out;
+    }
   }
 
   return {
@@ -41,7 +60,6 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     searchName: `${vendor.name} ${memberName}`.trim(),
     startAt: vendor.startAt.getTime(),
     endAt: vendor.endAt ? vendor.endAt.getTime() : null,
-    terms: vendor.terms,
     type: vendor.type,
     memberName,
     memberAvatar: vendor?.owner?.avatar

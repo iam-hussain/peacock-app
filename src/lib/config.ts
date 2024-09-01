@@ -9,12 +9,12 @@ type Stage = {
 const alpha: Stage = {
   amount: 1000,
   startDate: new Date("09/01/2020"),
-  endDate: new Date("09/01/2023"),
+  endDate: new Date("08/31/2023"),
 };
 
 const bravo: Stage = {
   amount: 2000,
-  startDate: new Date("09/01/2023"),
+  startDate: new Date("08/31/2023"),
 };
 
 export const clubConfig = {

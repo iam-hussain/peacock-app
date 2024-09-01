@@ -90,7 +90,7 @@ export const CommonTableCell = ({ label, subLabel, className, greenLabel = false
         <p className={cn('text-foreground font-medium', {
             'text-emerald-500': greenLabel
         })}>{label}</p>
-        {subLabel && <p className='text-[0.7rem] text-foreground/70 m-0'>{subLabel}</p>}
+        {subLabel && <p className='text-[0.8rem] text-foreground/70 m-0'>{subLabel}</p>}
     </div>
 );
 

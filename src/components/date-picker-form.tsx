@@ -39,6 +39,8 @@ export const DatePickerForm = ({ placeholder, field }: DatePickerFormProps) => (
                 mode="single"
                 selected={field.value}
                 onSelect={field.onChange}
+                initialFocus={true}
+                defaultMonth={field.value}
             />
         </PopoverContent>
     </Popover>

@@ -26,7 +26,9 @@ export const DatePickerGroup = ({ selectedDate, onSelectDate, placeholder }: Dat
             </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={selectedDate} onSelect={onSelectDate} initialFocus />
+            <Calendar mode="single" selected={selectedDate} onSelect={onSelectDate}
+                initialFocus={true}
+                defaultMonth={selectedDate} />
         </PopoverContent>
     </Popover>
 );
