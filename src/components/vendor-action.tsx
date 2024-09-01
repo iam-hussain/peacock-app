@@ -27,7 +27,6 @@ const VendorAction = ({ members, vendors }: {
             <GenericModal
                 title={selected ? 'Update Vendor' : 'Add Vendor'}
                 description={selected ? `Vendor ID: ${selected.name} [${selected.id}]` : undefined}
-                onCancel={() => setIsOpen(!isOpen)}
             >
 
                 {selected && selected.id ?

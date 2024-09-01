@@ -36,7 +36,6 @@ const VendorTransactionsAction = ({ members, vendors }: {
                     <GenericModal
                         title={selected ? 'Vendor Transactions' : 'Add Vendor Transactions'}
                         description={selected ? `Vendor ID: ${selected.id}` : undefined}
-                        onCancel={() => setIsOpen(!isOpen)}
                     >
 
                         {selected && selected.id ?

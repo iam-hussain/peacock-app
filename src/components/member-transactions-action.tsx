@@ -34,7 +34,6 @@ const MemberTransactionsAction = ({ members }: {
                     <GenericModal
                         title={selected ? 'Member Transactions' : 'Add Member Transactions'}
                         description={selected ? `Member ID: ${selected.id}` : undefined}
-                        onCancel={() => setIsOpen(!isOpen)}
                     >
 
                         {selected && selected.id ?

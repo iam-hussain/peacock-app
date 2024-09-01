@@ -24,7 +24,6 @@ const MemberAction = ({ members }: {
             <GenericModal
                 title={selected ? 'Update Member' : 'Add Member'}
                 description={selected ? `Member ID: ${selected.id}` : undefined}
-                onCancel={() => setIsOpen(!isOpen)}
             >
 
 
