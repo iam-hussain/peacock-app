@@ -2,15 +2,11 @@
 
 import React, { useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-
 import { GetMembersResponse, GetMemberResponse } from '@/actions/members';
 import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
 import { dateFormat } from '@/lib/date';
 import TableLayout from '../table-helpers/table-layout';
-import { MemberForm } from '../forms/member';
 import { FilterBar } from '../filter-bar-group';
-import { Button } from '../ui/button';
 
 const baseColumns: ColumnDef<GetMemberResponse>[] = [
     {
@@ -90,17 +86,17 @@ export type MemberTableProps = {
 }
 
 const MembersTable = ({ members, handleAction }: MemberTableProps) => {
-    const [showInactive, setShowInactive] = useState(false);
+    const [editMode, setEditMode] = useState(false);
 
     const data = useMemo(() => {
-        if (showInactive) {
+        if (editMode) {
             return members
         }
         return members.filter((e) => e.active)
-    }, [showInactive, members])
+    }, [editMode, members])
 
     const columns = useMemo(() => {
-        if (!showInactive) {
+        if (!editMode) {
             return baseColumns
         }
         return [
@@ -115,7 +111,7 @@ const MembersTable = ({ members, handleAction }: MemberTableProps) => {
             }
         ]
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showInactive]);
+    }, [editMode]);
 
     const table = useReactTable({
         data,
@@ -138,8 +134,8 @@ const MembersTable = ({ members, handleAction }: MemberTableProps) => {
                 onSearchChange={(value) =>
                     table.getColumn("name")?.setFilterValue(value)
                 }
-                onToggleChange={setShowInactive}
-                toggleState={showInactive}
+                onToggleChange={setEditMode}
+                toggleState={editMode}
                 onAddClick={() => handleAction(null)} />
             <TableLayout table={table} columns={columns} loading={false} />
         </div>

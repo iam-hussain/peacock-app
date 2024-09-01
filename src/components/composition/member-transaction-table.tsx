@@ -66,7 +66,21 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={format(new Date(row.original.transactionAt), 'dd MMM yyyy hh:mm a')}
-                className="min-w-[140px]"
+                className="min-w-[150px]"
+            />
+        ),
+    },
+]);
+
+const editColumns: ColumnDef<MemberTransactionResponse>[] = [
+    {
+        accessorKey: 'updatedAt',
+        header: () => <PlainTableHeader label="Updated / Created" />,
+        cell: ({ row }) => (
+            <CommonTableCell
+                label={format(new Date(row.original.updatedAt), 'dd MMM yyyy hh:mm a')}
+                subLabel={format(new Date(row.original.createdAt), 'dd MMM yyyy hh:mm a')}
+                className="min-w-[150px]"
             />
         ),
     },
@@ -76,14 +90,10 @@ const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTra
         cell: ({ row }) => (
             <CommonTableCell
                 label={row.original.id}
-                subLabel={format(new Date(row.original.updatedAt), 'dd MMM yyyy hh:mm a')}
                 className="min-w-[100px]"
             />
         ),
     },
-]);
-
-const editColumns: ColumnDef<MemberTransactionResponse>[] = [
 ];
 
 const initialOptions = {
@@ -159,7 +169,7 @@ const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTa
             ...baseColumns(handleSortClick),
             ...editColumns,
             {
-                accessorKey: 'id',
+                accessorKey: 'action',
                 header: () => <PlainTableHeader label="Action" />,
                 cell: ({ row }) => (
                     <ActionCell onClick={() => handleAction(row.original)} />
@@ -187,7 +197,7 @@ const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTa
     return (
         <Dialog>
             <div className='w-full'>
-                <div className="grid gap-2 pb-6 sm:grid-cols-3 md:grid-cols-6 grid-cols-2">
+                <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-7 w-full">
                     <SelectInputGroup value={options.fromId}
                         onChange={(e) => setOptions({ ...options, fromId: e })}
                         placeholder="Select FROM member"
@@ -218,6 +228,8 @@ const MembersTransactionTable = ({ members, handleAction }: MembersTransactionTa
                         limit={Number(options.limit)}
                         onLimitChange={(limit: any) => setOptions({ ...options, limit })}
                         onReset={handleOptionsReset}
+                        onToggleChange={setEditMode}
+                        toggleState={editMode}
                     />
                 </div>
 

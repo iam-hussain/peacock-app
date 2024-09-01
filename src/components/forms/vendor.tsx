@@ -10,6 +10,7 @@ import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
 import Box from "../ui/box";
 import { GenericModalFooter } from "../generic-modal";
 import { toast } from "sonner";
+import { DatePickerForm } from "../date-picker-form";
 
 
 type VendorFormProps = {
@@ -30,8 +31,8 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                 type: selected.type || 'DEFAULT',
                 ownerId: selected.ownerId || '',
                 termType: selected.termType || "NONE",
-                startAt: selected.startAt ? new Date(selected.startAt).toISOString().substring(0, 10) : "",
-                endAt: selected.endAt ? new Date(selected.endAt).toISOString().substring(0, 10) : "",
+                startAt: selected.startAt ? new Date(selected.startAt) : undefined,
+                endAt: selected.endAt ? new Date(selected.endAt) : undefined,
                 active: selected.active ?? true,
                 calcReturns: selected.calcReturns ?? true,
             }
@@ -42,8 +43,8 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                 type: "DEFAULT",
                 ownerId: "",
                 termType: "NONE",
-                startAt: "",
-                endAt: "",
+                startAt: new Date(),
+                endAt: undefined,
                 active: true,
                 calcReturns: true
             },
@@ -220,7 +221,7 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                             <FormItem>
                                 <FormLabel>Start Date</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} placeholder="Start date" />
+                                    <DatePickerForm field={field} placeholder="Start date" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -235,7 +236,7 @@ export function VendorForm({ selected, members, onSuccess, onCancel }: VendorFor
                             <FormItem>
                                 <FormLabel>End Date</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} placeholder="End date" />
+                                    <DatePickerForm field={field} placeholder="End date" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

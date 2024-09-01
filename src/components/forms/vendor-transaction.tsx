@@ -23,6 +23,7 @@ import { GenericModalFooter } from "../generic-modal";
 import Box from "../ui/box";
 import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
 import { VendorTransactionFormSchema, vendorTransactionFormSchema } from "@/lib/form-schema";
+import { DatePickerForm } from "../date-picker-form";
 
 
 type VendorTransactionFormProps = {
@@ -44,7 +45,7 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                 method: selected.method as any || 'ACCOUNT',
                 amount: selected.amount || 0,
                 note: selected.note || '',
-                transactionAt: selected.transactionAt ? new Date(selected.transactionAt).toISOString().substring(0, 10) : "",
+                transactionAt: selected.transactionAt ? new Date(selected.transactionAt) : new Date(),
             }
             : {
                 vendorId: "",
@@ -53,7 +54,7 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                 method: "ACCOUNT",
                 amount: 0,
                 note: "",
-                transactionAt: ''
+                transactionAt: new Date()
             },
     });
 
@@ -226,7 +227,7 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                             <FormItem>
                                 <FormLabel>Transaction Date</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} placeholder="Transaction date" />
+                                    <DatePickerForm field={field} placeholder="Transaction date" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

@@ -50,7 +50,7 @@ export default function HomeLayout({
                 />
                 <SideMenu />
                 <div
-                    className={"h-full min-h-svh w-full transition-all duration-300 max-w-7xl m-auto mt-0 pt-[61px]"}
+                    className={"h-full min-h-svh w-full transition-all duration-300 max-w-7xl max-w-[2000px] m-auto mt-0 pt-[61px]"}
                 >
                     <div className="w-full flex h-full px-2 py-8">
                         {children}

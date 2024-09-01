@@ -20,6 +20,7 @@ import { MemberTransactionResponse } from "@/app/api/member-transactions/route";
 import { GenericModalFooter } from "../generic-modal";
 import { memberTransactionFormSchema, MemberTransactionFormSchema } from "@/lib/form-schema";
 import Box from "../ui/box";
+import { DatePickerForm } from "../date-picker-form";
 
 
 type MemberTransactionFormProps = {
@@ -40,7 +41,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                 method: selected.method as any || 'ACCOUNT',
                 amount: selected.amount || 0,
                 note: selected.note || '',
-                transactionAt: selected.transactionAt ? new Date(selected.transactionAt).toISOString().substring(0, 10) : "",
+                transactionAt: selected.transactionAt ? new Date(selected.transactionAt) : new Date(),
             }
             : {
                 fromId: "",
@@ -49,7 +50,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                 method: "ACCOUNT",
                 amount: 0,
                 note: "",
-                transactionAt: ''
+                transactionAt: new Date()
             },
     });
 
@@ -215,7 +216,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                             <FormItem>
                                 <FormLabel>Transaction Date</FormLabel>
                                 <FormControl>
-                                    <Input type="date" {...field} placeholder="Transaction date" />
+                                    <DatePickerForm field={field} placeholder="Transaction date" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

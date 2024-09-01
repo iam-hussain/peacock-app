@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const datePickerFormSchema = z
+  .date()
+  .optional()
+  .refine((date) => !date || date instanceof Date, {
+    message: "Invalid date",
+  });
+
 export const memberFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().optional(),
@@ -8,7 +15,7 @@ export const memberFormSchema = z.object({
   email: z.union([z.literal(""), z.string().email()]),
   avatar: z.string().optional(),
   active: z.boolean().optional(),
-  joinedAt: z.string().optional(),
+  joinedAt: datePickerFormSchema,
 });
 
 export type MemberFromSchema = z.infer<typeof memberFormSchema>;
@@ -22,9 +29,8 @@ export const vendorFormSchema = z.object({
   }),
   ownerId: z.string().optional(),
   termType: z.enum(["NONE", "DAY", "WEEK", "MONTH", "YEAR"]).optional(),
-  startAt: z.string().optional(),
-  endAt: z.string().optional(),
-  active: z.boolean(),
+  startAt: datePickerFormSchema,
+  endAt: datePickerFormSchema,
   calcReturns: z.boolean(),
 });
 
@@ -63,7 +69,7 @@ export const memberTransactionFormSchema = z.object({
     z.number().min(1, { message: "Amount must be greater than 0." })
   ),
   note: z.string().optional(),
-  transactionAt: z.string().optional(),
+  transactionAt: datePickerFormSchema,
 });
 
 export type MemberTransactionFormSchema = z.infer<
@@ -95,7 +101,7 @@ export const vendorTransactionFormSchema = z.object({
     z.number().min(0.01, { message: "Amount must be greater than 0." })
   ),
   note: z.string().optional(),
-  transactionAt: z.string().optional(),
+  transactionAt: datePickerFormSchema,
 });
 
 export type VendorTransactionFormSchema = z.infer<

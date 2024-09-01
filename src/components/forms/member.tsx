@@ -9,6 +9,7 @@ import Box from "../ui/box";
 import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
 import { GenericModalFooter } from "../generic-modal";
 import { toast } from "sonner";
+import { DatePickerForm } from "../date-picker-form";
 
 
 type MemberFormProps = {
@@ -29,7 +30,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                 email: selected.email || '',
                 avatar: selected.avatar || '',
                 active: selected.active ?? true,
-                joinedAt: selected.joinedAt ? new Date(selected.joinedAt).toISOString().substring(0, 10) : "",
+                joinedAt: selected.joinedAt ? new Date(selected.joinedAt) : new Date(),
             }
             : {
                 firstName: "",
@@ -39,7 +40,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                 email: "",
                 avatar: "",
                 active: true,
-                joinedAt: "",
+                joinedAt: new Date()
             },
     });
 
@@ -178,9 +179,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Joined Date</FormLabel>
-                                <FormControl>
-                                    <Input type="date" {...field} placeholder="Joined date" />
-                                </FormControl>
+                                <DatePickerForm field={field} placeholder="Joined date" />
                                 <FormMessage />
                             </FormItem>
                         )}

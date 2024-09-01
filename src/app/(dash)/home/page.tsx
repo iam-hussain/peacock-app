@@ -1,12 +1,23 @@
 
-import { FaUsers, FaMoneyBillWave, FaBalanceScale, FaChartLine, FaPiggyBank } from "react-icons/fa";
+import { FaUsers, FaBalanceScale, FaPiggyBank } from "react-icons/fa";
+import { GiHandBandage } from "react-icons/gi";
+import { RiMoneyRupeeCircleFill } from "react-icons/ri";
+import { GiReceiveMoney } from "react-icons/gi";
+import { GiPayMoney } from "react-icons/gi";
+import { FaMoneyBillTrendUp } from "react-icons/fa6";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
+import { FaScaleUnbalancedFlip } from "react-icons/fa6";
+
+
 import { PieChart } from "@/components/pie-chart";
 import { DoughnutChart } from "@/components/doughnut-chart";
 import { getStatistics } from "@/actions/statistics";
 import { DashboardCard } from "@/components/composition/dashboard-card";
+import { clubAge } from "@/lib/date";
 
 export default async function HomePage() {
     const statistics = await getStatistics();
+    const club = clubAge()
 
     return (
         <div className="px-6 md:py-6 space-y-6 w-full">
@@ -14,13 +25,13 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <DashboardCard
                     title="Members / Months"
-                    value={`${statistics.membersCount} / ${statistics.totalMonths}`}
+                    value={`${statistics.membersCount} / ${club.inMonth}`}
                     icon={<FaUsers className="text-3xl text-blue-600" />}
                 />
                 <DashboardCard
-                    title="Net Returns"
-                    value={statistics.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaPiggyBank className="text-3xl text-purple-600" />}
+                    title="Since"
+                    value={clubAge().since}
+                    icon={<GiHandBandage className="text-3xl text-purple-600" />}
                 />
             </div>
 
@@ -28,7 +39,7 @@ export default async function HomePage() {
                 <DashboardCard
                     title="Members Deposit"
                     value={statistics.deposit.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaMoneyBillWave className="text-3xl text-green-600" />}
+                    icon={<FaPiggyBank className="text-3xl text-green-600" />}
                 />
                 <DashboardCard
                     title="Members Balance"
@@ -47,7 +58,7 @@ export default async function HomePage() {
                 <DashboardCard
                     title="Offset Balance"
                     value={statistics.offsetBalance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaChartLine className="text-3xl text-red-600" />}
+                    icon={<FaBalanceScale className="text-3xl text-red-600" />}
                 />
             </div>
 
@@ -56,12 +67,12 @@ export default async function HomePage() {
                 <DashboardCard
                     title="Offset Value"
                     value={statistics.offset.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaChartLine className="text-3xl text-red-600" />}
+                    icon={<FaScaleUnbalancedFlip className="text-3xl text-red-600" />}
                 />
                 <DashboardCard
                     title="Net Returns"
                     value={statistics.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaPiggyBank className="text-3xl text-purple-600" />}
+                    icon={<GiPayMoney className="text-3xl text-purple-600" />}
                 />
 
             </div>
@@ -70,22 +81,22 @@ export default async function HomePage() {
                 <DashboardCard
                     title="Liquidity Amount"
                     value={statistics.liquidity.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaBalanceScale className="text-3xl text-orange-600" />}
+                    icon={<GiReceiveMoney className="text-3xl text-orange-600" />}
                 />
                 <DashboardCard
                     title="Club Net Amount"
                     value={statistics.netAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaMoneyBillWave className="text-3xl text-teal-600" />}
+                    icon={<RiMoneyRupeeCircleFill className="text-3xl text-teal-600" />}
                 />
                 <DashboardCard
                     title="Member Value"
                     value={statistics.memberValue.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaUsers className="text-3xl text-indigo-600" />}
+                    icon={<FaMoneyBillTransfer className="text-3xl text-indigo-600" />}
                 />
                 <DashboardCard
                     title="Club Value"
                     value={statistics.netValue.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-                    icon={<FaMoneyBillWave className="text-3xl text-teal-600" />}
+                    icon={<FaMoneyBillTrendUp className="text-3xl text-teal-600" />}
                 />
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

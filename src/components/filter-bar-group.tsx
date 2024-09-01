@@ -5,10 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
 import { Button } from '@/components/ui/button';
 import Box from '@/components/ui/box';
-import { MdDeleteOutline, MdDeleteForever } from "react-icons/md";
 import { TiUserAdd } from 'react-icons/ti';
 import { DialogTrigger } from '@/components/ui/dialog';
 import { IconType } from 'react-icons/lib';
+import { PiColumnsFill } from "react-icons/pi";
+import { HiMiniViewColumns } from "react-icons/hi2";
+
 
 type FilterBarProps = {
     searchValue: string;
@@ -23,7 +25,7 @@ type FilterBarProps = {
 
 export const FilterBar = ({ children, searchValue, onSearchChange, onToggleChange, toggleState, onAddClick, toggleIcons, searchPlaceholder = "Filter names..." }: FilterBarProps) => {
 
-    const { TrueIcon = MdDeleteForever, FalseIcon = MdDeleteOutline } = toggleIcons || {};
+    const { TrueIcon = HiMiniViewColumns, FalseIcon = PiColumnsFill } = toggleIcons || {};
 
     return (
         <div className="flex justify-between mb-4 gap-3 px-2">

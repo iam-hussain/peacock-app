@@ -2,20 +2,11 @@
 
 import React, { useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { TiUserAdd } from 'react-icons/ti';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
-import { MdEditDocument, MdEditAttributes } from "react-icons/md";
 import { dateFormat } from '@/lib/date';
 import TableLayout from '../table-helpers/table-layout';
-import Box from '../ui/box';
-import { Toggle } from '../ui/toggle';
 import { GetVendorResponse, GetVendorsResponse } from '@/actions/vendors';
 import { vendorTypeMap } from '@/lib/config';
-import { VendorForm } from '../forms/vendor';
-import { MembersSelectResponse } from '@/actions/member-select';
 import { FilterBar } from '../filter-bar-group';
 
 const baseColumns: ColumnDef<GetVendorResponse>[] = [
@@ -38,7 +29,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
         cell: ({ row }) => (
             <CommonTableCell
                 label={dateFormat(new Date(row.original.startAt))}
-                subLabel={row.original.endAt ? dateFormat(new Date(row.original.endAt)) : row.original.id}
+                subLabel={row.original.endAt ? dateFormat(new Date(row.original.endAt)) : undefined}
                 className="min-w-[80px]"
             />
         ),
@@ -87,7 +78,18 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
     },
 ];
 
-const editColumns: ColumnDef<GetVendorResponse>[] = [];
+const editColumns: ColumnDef<GetVendorResponse>[] = [
+    {
+        accessorKey: 'id',
+        header: () => <PlainTableHeader label="ID" />,
+        cell: ({ row }) => (
+            <CommonTableCell
+                label={row.original.id}
+                className="min-w-[100px]"
+            />
+        ),
+    },
+];
 
 
 export type VendorTableProps = {
