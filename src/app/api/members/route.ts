@@ -92,7 +92,6 @@ export async function POST(request: Request) {
       active: typeof active === "boolean" ? active : true,
     };
 
-    console.log({ commonData });
     let member;
 
     if (id) {

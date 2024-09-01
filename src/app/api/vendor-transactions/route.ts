@@ -91,14 +91,7 @@ export async function GET(request: Request) {
       lte: new Date(endDate),
     };
   }
-  console.log({
-    where: filters,
-    skip: (page - 1) * limit,
-    take: limit,
-    orderBy: {
-      [sortField]: sortOrder,
-    },
-  });
+
   try {
     const transactions = await prisma.vendorTransaction.findMany({
       where: filters,

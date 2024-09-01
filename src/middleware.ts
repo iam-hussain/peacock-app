@@ -66,10 +66,8 @@ export function middleware(request: NextRequest) {
     }
 
     try {
-      const decoded = verifyJwt(token, process.env.JWT_SECRET!);
-      console.log({ decoded });
+      verifyJwt(token, process.env.JWT_SECRET!);
     } catch (error) {
-      console.log(error);
       return NextResponse.json(
         {
           message:
