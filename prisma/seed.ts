@@ -1,6 +1,11 @@
+import { PrismaClient } from "@prisma/client";
 import seedData from "../public/peacock_backup.json" assert { type: "json" };
-import prisma from "../src/db";
+import { passbookExtends } from "../src/db";
 import { calculateReturnsHandler } from "../src/passbook/returns-middleware";
+
+const prisma = new PrismaClient({
+  log: ["query", "info", "warn", "error"],
+}).$extends(passbookExtends);
 
 type MapListType = Map<number, string>;
 const transactionTypeMap: {
@@ -83,77 +88,6 @@ function createVendorProfitShare(members: MapListType, vendors: MapListType) {
     }
   );
 }
-
-// function createTransactions(members, vendors) {
-//   return seedData.transaction
-//     .filter((e) => !e.deleted)
-//     .map(
-//       ({
-//         id,
-//         fromId,
-//         toId,
-//         method,
-//         mode,
-//         dot,
-//         amount,
-//         note,
-//         createdAt,
-//         updatedAt,
-//       }) => {
-//         const vendorFrom = vendors.get(fromId);
-//         const vendorTo = vendors.get(toId);
-//         const memberFrom = members.get(fromId);
-//         const memberTo = members.get(toId);
-
-//         if (vendorFrom || vendorTo) {
-//           return prisma.vendorTransaction.create({
-//             data: {
-//               transactionType: transactionTypeMap[mode],
-//               transactionAt: dot,
-//               method: method,
-//               amount,
-//               note: note || "",
-//               createdAt,
-//               updatedAt,
-//               vendor: {
-//                 connect: {
-//                   id: vendorFrom || vendorTo,
-//                 },
-//               },
-//               member: {
-//                 connect: {
-//                   id: memberFrom || memberTo,
-//                 },
-//               },
-//             },
-//           });
-//         } else {
-//           return prisma.memberTransaction.create({
-//             data: {
-//               transactionType: transactionTypeMap[mode],
-//               transactionAt: dot,
-//               method: method,
-//               amount,
-//               note: note || "",
-//               createdAt,
-//               updatedAt,
-//               from: {
-//                 connect: {
-//                   id: memberFrom,
-//                 },
-//               },
-//               to: {
-//                 connect: {
-//                   id: memberTo,
-//                 },
-//               },
-//             },
-//           });
-//         }
-//       }
-//     )
-//     .filter(Boolean);
-// }
 
 async function getMemberMap() {
   const memberMap: MapListType = new Map();
@@ -280,7 +214,7 @@ async function seed() {
     }
   }
 
-  // await calculateReturnsHandler();
+  await calculateReturnsHandler();
 
   return;
 }
