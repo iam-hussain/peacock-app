@@ -1,3 +1,4 @@
+'use client'
 
 import { FaUsers, FaBalanceScale, FaPiggyBank } from "react-icons/fa";
 import { GiHandBandage } from "react-icons/gi";
@@ -11,13 +12,34 @@ import { FaScaleUnbalancedFlip } from "react-icons/fa6";
 
 import { PieChart } from "@/components/pie-chart";
 import { DoughnutChart } from "@/components/doughnut-chart";
-import { getStatistics } from "@/actions/statistics";
 import { DashboardCard } from "@/components/composition/dashboard-card";
 import { clubAge } from "@/lib/date";
+import Box from "@/components/ui/box";
+import { useEffect, useState } from "react";
+import { StatisticsResponse } from "@/app/api/statistics/route";
 
-export default async function HomePage() {
-    const statistics = await getStatistics();
+export default function HomePage() {
+    const [statistics, setStatistics] = useState<null | StatisticsResponse>(null);
     const club = clubAge()
+
+    const fetchData = async () => {
+        const res = await fetch('/api/statistics');
+        const json = await res.json();
+        setStatistics(json.statistics);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+
+    if (!statistics) {
+        return (
+            <Box>
+                <p className="p-8">Loading...</p>
+            </Box>
+        )
+    }
 
     return (
         <div className="px-6 md:py-6 space-y-6 w-full">

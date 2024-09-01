@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
-import { GetMembersResponse, GetMemberResponse } from '@/actions/members';
 import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
 import { dateFormat, displayDateTime, fileDateTime } from '@/lib/date';
 import TableLayout from '../table-helpers/table-layout';
@@ -10,8 +9,9 @@ import { FilterBar } from '../filter-bar-group';
 import html2canvas from 'html2canvas';
 import { cn } from '@/lib/utils';
 import Typography from '../ui/typography';
+import { MemberResponse } from '@/app/api/members/route';
 
-const baseColumns: ColumnDef<GetMemberResponse>[] = [
+const baseColumns: ColumnDef<MemberResponse>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => <ActionTableHeader label="Name" column={column} />,
@@ -69,7 +69,7 @@ const baseColumns: ColumnDef<GetMemberResponse>[] = [
     },
 ];
 
-const editColumns: ColumnDef<GetMemberResponse>[] = [
+const editColumns: ColumnDef<MemberResponse>[] = [
     {
         accessorKey: 'joinedAt',
         header: ({ column }) => <ActionTableHeader label="Joined" column={column} />,
@@ -84,14 +84,29 @@ const editColumns: ColumnDef<GetMemberResponse>[] = [
 ];
 
 export type MemberTableProps = {
-    members: GetMembersResponse;
-    handleAction: (select: null | GetMemberResponse['member'], mode?: string) => void
+    handleAction: (select: null | MemberResponse['member'], mode?: string) => void
 }
 
-const MembersTable = ({ members, handleAction }: MemberTableProps) => {
-    const [editMode, setEditMode] = useState(false);
+const MembersTable = ({ handleAction }: MemberTableProps) => {
     const captureRef = useRef<HTMLDivElement>(null);
     const [captureMode, setCaptureMode] = useState(false);
+
+    const [editMode, setEditMode] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [members, setMembers] = useState<MemberResponse[]>([]);
+
+    const fetchData = async () => {
+        setLoading(true)
+        const res = await fetch('/api/members');
+        const json = await res.json();
+        setMembers(json.members);
+        setLoading(false)
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
 
     const onCapture = async () => {
         if (captureRef.current) {
@@ -120,6 +135,7 @@ const MembersTable = ({ members, handleAction }: MemberTableProps) => {
         }
 
     }, [captureMode])
+
 
 
 
@@ -183,7 +199,7 @@ const MembersTable = ({ members, handleAction }: MemberTableProps) => {
                     <Typography variant={'brandMini'} className='text-4xl'>Peacock Club</Typography>
                     <p className='test-sm text-foreground/80'>{displayDateTime()}</p>
                 </div>
-                <TableLayout table={table} columns={columns} loading={false} className={cn({
+                <TableLayout table={table} columns={columns} loading={loading} className={cn({
                     'w-auto p-8': captureMode
                 })} />
             </div>

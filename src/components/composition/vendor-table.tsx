@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
 import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
 import { dateFormat } from '@/lib/date';
 import TableLayout from '../table-helpers/table-layout';
-import { GetVendorResponse, GetVendorsResponse } from '@/actions/vendors';
 import { vendorTypeMap } from '@/lib/config';
 import { FilterBar } from '../filter-bar-group';
+import { VendorResponse } from '@/app/api/vendors/route';
 
-const baseColumns: ColumnDef<GetVendorResponse>[] = [
+const baseColumns: ColumnDef<VendorResponse>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => <ActionTableHeader label="Name" column={column} />,
@@ -78,7 +78,7 @@ const baseColumns: ColumnDef<GetVendorResponse>[] = [
     },
 ];
 
-const editColumns: ColumnDef<GetVendorResponse>[] = [
+const editColumns: ColumnDef<VendorResponse>[] = [
     {
         accessorKey: 'id',
         header: () => <PlainTableHeader label="ID" />,
@@ -93,12 +93,28 @@ const editColumns: ColumnDef<GetVendorResponse>[] = [
 
 
 export type VendorTableProps = {
-    vendors: GetVendorsResponse;
-    handleAction: (select: null | GetVendorResponse['vendor'], mode?: string) => void
+    handleAction: (select: null | VendorResponse['vendor'], mode?: string) => void
 }
 
-const VendorsTable = ({ vendors, handleAction }: VendorTableProps) => {
+const VendorsTable = ({ handleAction }: VendorTableProps) => {
     const [editMode, setEditMode] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [vendors, setVendors] = useState<VendorResponse[]>([]);
+
+    const fetchData = async () => {
+        setLoading(true)
+        const res = await fetch('/api/vendors');
+        const json = await res.json();
+        setVendors(json.vendors);
+        setLoading(false)
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+
+
     const columns = useMemo(() => {
         if (!editMode) {
             return baseColumns
@@ -141,7 +157,7 @@ const VendorsTable = ({ vendors, handleAction }: VendorTableProps) => {
                 onToggleChange={setEditMode}
                 toggleState={editMode}
                 onAddClick={() => handleAction(null)} />
-            <TableLayout table={table} columns={columns} loading={false} />
+            <TableLayout table={table} columns={columns} loading={loading} />
         </div>
     );
 };
