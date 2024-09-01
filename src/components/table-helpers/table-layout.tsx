@@ -1,17 +1,19 @@
 import React from 'react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { flexRender } from '@tanstack/react-table';
+import { cn } from '@/lib/utils';
 
 type TableLayoutProps<T> = {
     table: any;
     columns: any[];
     loading: boolean;
     noDataMessage?: string;
+    className?: string;
 };
 
-function TableLayout<T>({ table, columns, loading, noDataMessage = "No results." }: TableLayoutProps<T>) {
+function TableLayout<T>({ table, columns, loading, noDataMessage = "No results.", className }: TableLayoutProps<T>) {
     return (
-        <Table className=''>
+        <Table className={cn(className)}>
             <TableHeader>
                 {table.getHeaderGroups().map((headerGroup: any) => (
                     <TableRow key={headerGroup.id}>

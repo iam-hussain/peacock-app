@@ -33,7 +33,7 @@ export const PaginationFilters = ({ limit, onLimitChange, onReset, onToggleChang
             <Button onClick={onReset} variant={'outline'} className='w-auto'>
                 Clear
             </Button>
-            <Toggle aria-label="Toggle" onPressedChange={onToggleChange} className='gap-2'>
+            <Toggle aria-label="Toggle" onPressedChange={onToggleChange} variant={'outline'} className='gap-2'>
                 {toggleState ? (<HiMiniViewColumns className='w-6 h-6' />) : <PiColumnsFill className='w-6 h-6' />}
             </Toggle>
         </div>

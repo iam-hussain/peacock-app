@@ -65,3 +65,11 @@ export const clubAge = () => {
     since: format(clubStart, "dd MMM yyyy"),
   };
 };
+
+export const displayDateTime = (input: Date = new Date()) => {
+  return format(new Date(input), "dd MMM yyyy hh:mm a");
+};
+
+export const fileDateTime = (input: Date = new Date()) => {
+  return format(new Date(input), "dd_mm_yy_HH_mm");
+};

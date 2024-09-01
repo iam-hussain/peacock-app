@@ -3,12 +3,16 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown } from 'lucide-react';
+import { FaArrowDownShortWide } from "react-icons/fa6";
+
 import { Column } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
-import { FaCircle, FaEdit } from 'react-icons/fa';
-import { DialogTrigger } from '../ui/dialog';
+import { LuClipboardEdit } from "react-icons/lu";
+
 import { AvatarGroup } from '../avatar-group';
+import { FaSortAmountUp } from 'react-icons/fa';
+import { FaSortAmountDown, FaSortAmountDownAlt } from "react-icons/fa";
+
 
 type AvatarCellProps = {
     id: string;
@@ -40,15 +44,36 @@ export const PlainTableHeader = ({ label }: TableHeaderProps) => (
 
 export const ActionTableHeader = ({ label, column, onClick }: TableHeaderProps & { column: Column<any>, onClick?: (id: any) => void }) => {
 
+    const isSorted = column.getIsSorted();
+    const isSortedAsc = isSorted === 'asc';
+    const isSortedDesc = isSorted === 'desc';
+
     return (
         <Button
             variant="ghost"
             size="sm"
             onClick={() => onClick ? onClick(column.id) : column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="uppercase hover:bg-transparent hover:font-extrabold px-2"
+            className={cn(
+                "uppercase hover:bg-transparent hover:font-extrabold px-2 flex gap-2 justify-center align-middle items-center",
+                isSorted && "text-primary font-bold" // Highlight when sorted
+            )}
         >
-            {label}
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            <span className=''>{label}</span>
+            <span
+                data-id="sort_icon"
+                className={cn(
+                    "ml-2 h-auto w-4 transition-transform duration-300 ease-in-out sort_icon",
+                    isSorted && "rotate-180", // Rotate when sorted in ascending order
+                )}
+            >
+                {isSortedAsc ? (
+                    <FaSortAmountDown className="transition-opacity duration-300 opacity-100" />
+                ) : isSortedDesc ? (
+                    <FaSortAmountDownAlt className="transition-opacity duration-300 opacity-100" />
+                ) : (
+                    <FaSortAmountDownAlt className="transition-opacity duration-300 opacity-50" /> // Default state
+                )}
+            </span>
         </Button>
     )
 };
@@ -75,7 +100,7 @@ type ActionCellProps = {
 
 export const ActionCell = ({ onClick }: ActionCellProps) => (
     <Button variant={'ghost'} className='px-3 py-1' onClick={onClick}>
-        <FaEdit className='h-4 w-4' />
+        <LuClipboardEdit className='h-4 w-4' />
     </Button>
 );
 

@@ -46,6 +46,7 @@
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.1.3",
     "framer-motion": "^11.3.30",
+    "html2canvas": "^1.4.1",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",

@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
 import { GetMembersResponse, GetMemberResponse } from '@/actions/members';
 import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
-import { dateFormat } from '@/lib/date';
+import { dateFormat, displayDateTime, fileDateTime } from '@/lib/date';
 import TableLayout from '../table-helpers/table-layout';
 import { FilterBar } from '../filter-bar-group';
+import html2canvas from 'html2canvas';
+import { cn } from '@/lib/utils';
+import Typography from '../ui/typography';
 
 const baseColumns: ColumnDef<GetMemberResponse>[] = [
     {
@@ -87,6 +90,38 @@ export type MemberTableProps = {
 
 const MembersTable = ({ members, handleAction }: MemberTableProps) => {
     const [editMode, setEditMode] = useState(false);
+    const captureRef = useRef<HTMLDivElement>(null);
+    const [captureMode, setCaptureMode] = useState(false);
+
+    const onCapture = async () => {
+        if (captureRef.current) {
+            setCaptureMode(true);
+        }
+    };
+
+    const handleOnCapture = async () => {
+        if (captureRef.current) {
+            const canvas = await html2canvas(captureRef.current, {
+                scrollX: window.scrollX,
+                scrollY: window.scrollY,
+            });
+            setCaptureMode(false);
+            const capturedImage = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `peacock_club_${fileDateTime()}.png`;
+            link.href = capturedImage;
+            link.click();
+        }
+    };
+
+    useEffect(() => {
+        if (captureMode) {
+            handleOnCapture()
+        }
+
+    }, [captureMode])
+
+
 
     const data = useMemo(() => {
         if (editMode) {
@@ -136,8 +171,22 @@ const MembersTable = ({ members, handleAction }: MemberTableProps) => {
                 }
                 onToggleChange={setEditMode}
                 toggleState={editMode}
-                onAddClick={() => handleAction(null)} />
-            <TableLayout table={table} columns={columns} loading={false} />
+                onAddClick={() => handleAction(null)}
+                onCapture={onCapture}
+            />
+            <div ref={captureRef} className={cn('flex bg-background', {
+                'absolute p-8 pb-10 flex-col': captureMode
+            })}>
+                <div className={cn("hidden justify-end align-middle items-center flex-col pb-6 gap-2", {
+                    'flex': captureMode
+                })}>
+                    <Typography variant={'brandMini'} className='text-4xl'>Peacock Club</Typography>
+                    <p className='test-sm text-foreground/80'>{displayDateTime()}</p>
+                </div>
+                <TableLayout table={table} columns={columns} loading={false} className={cn({
+                    'w-auto p-8': captureMode
+                })} />
+            </div>
         </div>
     );
 };
