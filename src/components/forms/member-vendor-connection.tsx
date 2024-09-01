@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import Box from "../ui/box";
+import { GenericModalFooter } from "../generic-modal";
 
 type VendorConnection = {
     id: string;
@@ -20,7 +21,7 @@ type MemberVendorConnectionsFormProps = {
 };
 
 export function MemberVendorConnectionsForm({ memberId, onSuccess, onCancel }: MemberVendorConnectionsFormProps) {
-    const { control, handleSubmit, reset } = useForm();
+    const { control, handleSubmit, reset, formState } = useForm();
     const [connections, setConnections] = useState<VendorConnection[]>([]);
 
     useEffect(() => {
@@ -77,10 +78,7 @@ export function MemberVendorConnectionsForm({ memberId, onSuccess, onCancel }: M
                     </div>
                 ))}
             </Box>
-
-            <Button type="submit" className="w-full">
-                Save Changes
-            </Button>
+            <GenericModalFooter actionLabel={"Save"} onCancel={onCancel} isSubmitting={formState.isSubmitting} />
         </form>
     );
 }

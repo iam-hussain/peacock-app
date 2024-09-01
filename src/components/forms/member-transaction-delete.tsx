@@ -2,6 +2,7 @@
 import { toast } from "sonner";
 import { GenericModalFooter } from "../generic-modal";
 import { MemberTransactionResponse } from "@/app/api/member-transactions/route";
+import { useState } from "react";
 
 
 type MemberTransactionDeleteFormProps = {
@@ -11,8 +12,10 @@ type MemberTransactionDeleteFormProps = {
 }
 
 export function MemberTransactionDeleteForm({ transaction, onSuccess, onCancel }: MemberTransactionDeleteFormProps) {
+    const [isSubmitting, setSubmitting] = useState(false)
 
     const handleDelete = async () => {
+        setSubmitting(true)
         try {
             const response = await fetch(`/api/member-transactions/${transaction.id}`, {
                 method: "DELETE",
@@ -32,6 +35,7 @@ export function MemberTransactionDeleteForm({ transaction, onSuccess, onCancel }
         } catch (error) {
             toast.error("An unexpected error occurred. Please try again.");
         }
+        setSubmitting(false)
     };
 
     return (
@@ -45,7 +49,7 @@ export function MemberTransactionDeleteForm({ transaction, onSuccess, onCancel }
                     <p><span className="text-foreground/80">Amount:  </span>{transaction.amount}</p>
                 </div>
             </div>
-            <GenericModalFooter isDelete={true} actionLabel={"Delete"} onCancel={onCancel} onConfirm={handleDelete} />
+            <GenericModalFooter isDelete={true} actionLabel={"Delete"} onCancel={onCancel} onConfirm={handleDelete} isSubmitting={isSubmitting} />
         </div>
     );
 }

@@ -21,7 +21,7 @@ type VendorMemberConnectionsFormProps = {
 };
 
 export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: VendorMemberConnectionsFormProps) {
-    const { control, handleSubmit, reset } = useForm();
+    const { control, handleSubmit, reset, formState } = useForm();
     const [connections, setConnections] = useState<MemberConnection[]>([]);
 
     useEffect(() => {
@@ -76,8 +76,7 @@ export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: V
                         />
                     </div>
                 ))}
-            </Box>
-            <GenericModalFooter actionLabel={"Save Changes"} onCancel={onCancel} />
+            </Box><GenericModalFooter actionLabel={"Save"} onCancel={onCancel} isSubmitting={formState.isSubmitting} />
         </form>
     );
 }

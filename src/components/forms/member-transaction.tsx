@@ -237,7 +237,7 @@ export function MemberTransactionForm({ members, selected, onSuccess, onCancel }
                         </FormItem>
                     )}
                 />
-                <GenericModalFooter actionLabel={selected ? "Update" : "Add"} onCancel={onCancel} />
+                <GenericModalFooter actionLabel={selected ? "Update" : "Add"} onCancel={onCancel} isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form>
     );

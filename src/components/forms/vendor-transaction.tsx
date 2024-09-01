@@ -251,7 +251,7 @@ export function VendorTransactionForm({ vendors, members, selected, onSuccess, o
                 />
 
                 {/* Submit Button */}
-                <GenericModalFooter actionLabel={selected ? "Update" : "Add"} onCancel={onCancel} />
+                <GenericModalFooter actionLabel={selected ? "Update" : "Add"} onCancel={onCancel} isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form>
     );

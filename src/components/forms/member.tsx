@@ -60,7 +60,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                 return;
             }
 
-            const result = await response.json();
+            await response.json();
             toast.success(selected ? "Member updated successfully" : "Member created successfully");
             if (!selected) form.reset(); // Reset form after submission
             if (onSuccess) {
@@ -206,7 +206,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
                     </FormItem>
                 </Box>
 
-                <GenericModalFooter actionLabel={selected ? "Update Member" : "Add Member"} onCancel={onCancel} />
+                <GenericModalFooter actionLabel={selected ? "Update Member" : "Add Member"} onCancel={onCancel} isSubmitting={form.formState.isSubmitting} />
             </form>
         </Form>
     );
