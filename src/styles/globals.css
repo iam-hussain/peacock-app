@@ -17,8 +17,6 @@
   src: url("../../public/Poppins-Regular.ttf");
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -29,7 +27,6 @@
   }
 }
 
-
 /* * {
   background-color: rgba(0, 136, 255, 0.096);
 } */
@@ -37,7 +34,6 @@
 .width-avl {
   width: -webkit-fill-available;
 }
-
 
 html,
 body {

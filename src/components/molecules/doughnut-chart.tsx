@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Card } from "../ui/card";
@@ -7,28 +7,35 @@ import { Card } from "../ui/card";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 type DoughnutChartProps = {
-    deposit: number;
-    offset: number;
-    returns: number;
+  deposit: number;
+  offset: number;
+  returns: number;
 };
 
-export function DoughnutChart({ deposit, offset, returns }: DoughnutChartProps) {
-    const chartData = {
-        labels: ["Deposit", "Offset", "Returns"],
-        datasets: [
-            {
-                data: [deposit, offset, returns],
-                backgroundColor: ["#4CAF50", "#2196F3", "#FFC107"],
-                hoverOffset: 4,
-            },
-        ],
-    };
+export function DoughnutChart({
+  deposit,
+  offset,
+  returns,
+}: DoughnutChartProps) {
+  const chartData = {
+    labels: ["Deposit", "Offset", "Returns"],
+    datasets: [
+      {
+        data: [deposit, offset, returns],
+        backgroundColor: ["#4CAF50", "#2196F3", "#FFC107"],
+        hoverOffset: 4,
+      },
+    ],
+  };
 
-    return (
-        <Card className="shadow-sm flex items-center rounded-lg p-4 flex-col">
-            <h2 className="text-lg font-medium font-serif text-center">Fund Overview</h2>
-            <div className="mx-auto w-4/5 md:w-[350px] bg-background flex justify-center align-middle items-center">
-                <Doughnut data={chartData} />
-            </div>
-        </Card>)
+  return (
+    <Card className="shadow-sm flex items-center rounded-lg p-4 flex-col">
+      <h2 className="text-lg font-medium font-serif text-center">
+        Fund Overview
+      </h2>
+      <div className="mx-auto w-4/5 md:w-[350px] bg-background flex justify-center align-middle items-center">
+        <Doughnut data={chartData} />
+      </div>
+    </Card>
+  );
 }

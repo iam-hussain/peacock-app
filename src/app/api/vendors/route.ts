@@ -49,7 +49,7 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     due.recentDueDate = dueDates.recentDueDate.getTime();
     due.currentTerm = dueDates.monthsPassed;
     due.dueAmount = expectedPaid - passbook.out;
-    
+
     if (!passbook.calcReturns) {
       due.dueAmount = expectedPaid - passbook.out;
     }
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     if (!name && !id) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -188,7 +188,7 @@ export async function POST(request: Request) {
     console.error("Error creating/updating vendor:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

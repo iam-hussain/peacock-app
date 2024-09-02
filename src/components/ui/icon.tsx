@@ -4,7 +4,7 @@ import { FaCircle } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 
 const icons = {
-  FaCircle
+  FaCircle,
 };
 
 export type IconKey = keyof typeof icons;
@@ -15,9 +15,7 @@ export interface IconProps extends React.SVGAttributes<SVGAElement> {
 
 const Icon = ({ name, ...props }: IconProps) => {
   const IconComp = icons[name];
-  return (
-    <IconComp {...props} className={cn(props.className || "h-4 w-4")} />
-  );
+  return <IconComp {...props} className={cn(props.className || "h-4 w-4")} />;
 };
 
 Icon.displayName = "Icon";

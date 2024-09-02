@@ -24,7 +24,7 @@ export type MemberTransactionResponse = ReturnType<
 >;
 
 function membersTransactionTableTransform(
-  transaction: MemberTransactionToTransform
+  transaction: MemberTransactionToTransform,
 ) {
   const { from, to } = transaction;
   return {
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
     if (!fromId || !toId || !amount || !transactionType) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -160,14 +160,14 @@ export async function POST(request: Request) {
     console.error(error);
     return NextResponse.json(
       { error: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const { id } = params;
 
@@ -180,7 +180,7 @@ export async function DELETE(
     if (!transaction) {
       return NextResponse.json(
         { message: "Transaction not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -191,13 +191,13 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Transaction deleted successfully." },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error deleting transaction:", error);
     return NextResponse.json(
       { message: "Failed to delete transaction." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

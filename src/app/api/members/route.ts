@@ -12,7 +12,7 @@ export type MemberResponse = ReturnType<typeof membersTableTransform>;
 
 function membersTableTransform(
   member: MemberToTransform,
-  memberTotalDeposit: number
+  memberTotalDeposit: number,
 ) {
   const { passbook, ...rawMember } = member;
   const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     if (!firstName && !id) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     console.error("Error creating/updating member:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

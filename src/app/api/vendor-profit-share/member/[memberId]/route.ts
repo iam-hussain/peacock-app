@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 // GET Request to fetch the member's vendor connections
 export async function GET(
   request: Request,
-  { params }: { params: { memberId: string } }
+  { params }: { params: { memberId: string } },
 ) {
   const { memberId } = params;
 
@@ -21,7 +21,7 @@ export async function GET(
 // PATCH Request to update the member's vendor connections
 export async function PATCH(
   request: Request,
-  { params }: { params: { memberId: string } }
+  { params }: { params: { memberId: string } },
 ) {
   const { memberId } = params;
   const data = await request.json();
@@ -31,8 +31,8 @@ export async function PATCH(
       prisma.vendorProfitShare.update({
         where: { id: update.id },
         data: { active: update.active },
-      })
-    )
+      }),
+    ),
   );
 
   return NextResponse.json({ updates });

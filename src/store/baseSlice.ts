@@ -22,7 +22,7 @@ export const fetchMembers = createAsyncThunk(
   async () => {
     const response = await membersSelect();
     return response;
-  }
+  },
 );
 
 // Async thunk for fetching vendors
@@ -31,7 +31,7 @@ export const fetchVendors = createAsyncThunk(
   async () => {
     const response = await vendorsSelect();
     return response;
-  }
+  },
 );
 
 const pageSlice = createSlice({

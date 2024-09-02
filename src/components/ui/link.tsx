@@ -1,4 +1,3 @@
-
 import { Slot, Slottable } from "@radix-ui/react-slot";
 import * as React from "react";
 import { cn } from "@/lib/utils";
@@ -22,7 +21,8 @@ const linkVariants = cva(
         menu: "no-touch:hover:bg-accent no-touch:hover:text-accent-foreground justify-start gap-4 text-foreground/80 w-full",
         transparent: "bg-transparent active:bg-bw border-0",
         link: "text-primary underline-offset-4 no-touch:hover:underline",
-        accent: "bg-accent text-accent-foreground shadow-sm no-touch:hover:bg-accent/90",
+        accent:
+          "bg-accent text-accent-foreground shadow-sm no-touch:hover:bg-accent/90",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -42,7 +42,7 @@ const linkVariants = cva(
       size: "default",
       animation: "default",
     },
-  }
+  },
 );
 
 type LinkVariantProps = VariantProps<typeof linkVariants>;
@@ -59,8 +59,8 @@ interface IconRefProps {
 
 export interface CustomLinkProps
   extends LinkProps,
-  // React.AnchorHTMLAttributes<HTMLAnchorElement>,
-  LinkVariantProps {
+    // React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    LinkVariantProps {
   asChild?: boolean;
   className?: string;
   children: any;
@@ -85,7 +85,7 @@ const CustomLink = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const Comp = asChild ? Slot : Link;
 
@@ -104,7 +104,7 @@ const CustomLink = React.forwardRef<
         )}
       </Comp>
     );
-  }
+  },
 );
 
 CustomLink.displayName = "CustomLink";

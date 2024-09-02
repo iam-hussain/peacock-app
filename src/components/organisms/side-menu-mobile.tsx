@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -41,7 +41,7 @@ function SideMenuMobile({ className }: { className?: string }) {
         variants={variants}
         className={cn(
           "side-menu bg-background p-6 z-50 relative left-0 items-start rounded-tr-xl rounded-br-xl w-[300px] lg:hidden",
-          className
+          className,
         )}
       >
         <MenuItems onItemClick={handleSidebarToggle} hasCloseButton={true} />

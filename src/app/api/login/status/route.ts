@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const decoded = verify(token, process.env.JWT_SECRET!);
     return NextResponse.json(
       { isLoggedIn: true, user: decoded },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json({ isLoggedIn: false }, { status: 200 });

@@ -15,7 +15,7 @@ type PassbookConfigActionValueObj = {
 function getPassbookUpdateQuery(
   passbook: Passbook,
   values: PassbookConfigActionValueObj,
-  action: PassbookConfigAction
+  action: PassbookConfigAction,
 ): Parameters<typeof prisma.passbook.update>[0] {
   return {
     where: {
@@ -26,13 +26,13 @@ function getPassbookUpdateQuery(
         Object.entries(action.ADD || {}).map(([key, value]) => [
           key,
           Number(passbook[key as keyof Passbook]) + values[value],
-        ])
+        ]),
       ),
       ...Object.fromEntries(
         Object.entries(action.SUB || {}).map(([key, value]) => [
           key,
           Number(passbook[key as keyof Passbook]) - values[value],
-        ])
+        ]),
       ),
     },
   };
@@ -78,7 +78,7 @@ const getMemberTractionPassbook = async ({
 
 export const handleMemberPassbookEntry = async (
   transaction: MemberTransaction,
-  isRevert: Boolean = false
+  isRevert: Boolean = false,
 ) => {
   const passbookToUpdate: Parameters<typeof prisma.passbook.update>[0][] = [];
 
@@ -106,21 +106,21 @@ export const handleMemberPassbookEntry = async (
                 getPassbookUpdateQuery(currentPassbook, values, {
                   ADD: action.SUB || {},
                   SUB: action.ADD || {},
-                } as PassbookConfigAction)
+                } as PassbookConfigAction),
               );
             } else {
               passbookToUpdate.push(
                 getPassbookUpdateQuery(
                   currentPassbook,
                   values,
-                  action as PassbookConfigAction
-                )
+                  action as PassbookConfigAction,
+                ),
               );
             }
           }
         });
       }
-    }
+    },
   );
 
   await prisma.$transaction(passbookToUpdate.map(prisma.passbook.update));
@@ -176,7 +176,7 @@ const getVendorTractionPassbook = async ({
 
 export const handleVendorPassbookEntry = async (
   transaction: VendorTransaction,
-  isRevert: Boolean = false
+  isRevert: Boolean = false,
 ) => {
   const passbookToUpdate: Parameters<typeof prisma.passbook.update>[0][] = [];
 
@@ -202,21 +202,21 @@ export const handleVendorPassbookEntry = async (
                 getPassbookUpdateQuery(currentPassbook, values, {
                   ADD: action.SUB || {},
                   SUB: action.ADD || {},
-                } as PassbookConfigAction)
+                } as PassbookConfigAction),
               );
             } else {
               passbookToUpdate.push(
                 getPassbookUpdateQuery(
                   currentPassbook,
                   values,
-                  action as PassbookConfigAction
-                )
+                  action as PassbookConfigAction,
+                ),
               );
             }
           }
         });
       }
-    }
+    },
   );
 
   await prisma.$transaction(passbookToUpdate.map(prisma.passbook.update));

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,19 +6,17 @@ import Typography from "@/components/ui/typography";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 import { CustomLink } from "@/components/ui/link";
 
-
-
 export default function Login() {
-  const router = useRouter()
+  const router = useRouter();
   const [password, setPassword] = useState("");
-  const [isSubmitting, setSubmitting] = useState(false)
+  const [isSubmitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true)
+    setSubmitting(true);
 
     const res = await fetch("/api/login", {
       method: "POST",
@@ -38,14 +36,18 @@ export default function Login() {
     }
   };
 
-
   return (
-    <Box preset={'stack-center'} className="w-full min-h-svh bg-background">
+    <Box preset={"stack-center"} className="w-full min-h-svh bg-background">
       <Box>
-        <Image src={'/peacock.jpg'} alt={"Peacock Club"} width={200} height={200} />
+        <Image
+          src={"/peacock.jpg"}
+          alt={"Peacock Club"}
+          width={200}
+          height={200}
+        />
       </Box>
-      <Box preset={'stack-center'}>
-        <Typography variant={'brand'}>Peacock Club</Typography>
+      <Box preset={"stack-center"}>
+        <Typography variant={"brand"}>Peacock Club</Typography>
 
         <div className="py-6">
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -56,15 +58,16 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>Login</Button>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              Login
+            </Button>
           </form>
-
-
         </div>
         <div>
-          <CustomLink href={'/home'} variant={'outline'}>Back to club</CustomLink>
+          <CustomLink href={"/home"} variant={"outline"}>
+            Back to club
+          </CustomLink>
         </div>
-
       </Box>
     </Box>
   );

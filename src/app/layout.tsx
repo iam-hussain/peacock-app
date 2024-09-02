@@ -16,9 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light">
       <body className="bg-paper">
-        <StoreProvider>
-          {children}
-        </StoreProvider>
+        <StoreProvider>{children}</StoreProvider>
       </body>
       <Toaster />
     </html>
