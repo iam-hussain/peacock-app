@@ -1,7 +1,7 @@
 'use client'
-import SideMenu from "@/components/side-menu";
-import SideMenuMobile from "@/components/side-menu-mobile";
-import TopMenu from "@/components/top-menu";
+import SideMenu from "@/components/organisms/side-menu";
+import SideMenuMobile from "@/components/organisms/side-menu-mobile";
+import TopMenu from "@/components/organisms/top-menu";
 import { store } from "@/store";
 import { setIsLoggedIn } from "@/store/pageSlice";
 import Cookies from "js-cookie";

@@ -9,7 +9,7 @@ import { Column } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import { LuClipboardEdit } from "react-icons/lu";
 
-import { AvatarGroup } from '../avatar-group';
+import { AvatarGroup } from './avatar-group';
 import { FaSortAmountUp } from 'react-icons/fa';
 import { FaSortAmountDown, FaSortAmountDownAlt } from "react-icons/fa";
 

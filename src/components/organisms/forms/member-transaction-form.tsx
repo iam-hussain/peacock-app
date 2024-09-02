@@ -17,10 +17,10 @@ import { toast } from "sonner";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { MembersSelectResponse } from "@/actions/member-select";
 import { MemberTransactionResponse } from "@/app/api/member-transactions/route";
-import { GenericModalFooter } from "../generic-modal";
+import { GenericModalFooter } from "../../atoms/generic-modal";
 import { memberTransactionFormSchema, MemberTransactionFormSchema } from "@/lib/form-schema";
-import Box from "../ui/box";
-import { DatePickerForm } from "../date-picker-form";
+import Box from "../../ui/box";
+import { DatePickerForm } from "../../atoms/date-picker-form";
 
 
 type MemberTransactionFormProps = {

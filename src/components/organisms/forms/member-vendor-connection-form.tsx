@@ -5,39 +5,39 @@ import { useForm, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { GenericModalFooter } from "../generic-modal";
-import Box from "../ui/box";
+import Box from "../../ui/box";
+import { GenericModalFooter } from "../../atoms/generic-modal";
 
-type MemberConnection = {
+type VendorConnection = {
     id: string;
-    member: { firstName: string; lastName: string };
+    vendor: { name: string };
     active: boolean;
 };
 
-type VendorMemberConnectionsFormProps = {
-    vendorId: string;
+type MemberVendorConnectionsFormProps = {
+    memberId: string;
     onSuccess: () => void
     onCancel?: () => void
 };
 
-export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: VendorMemberConnectionsFormProps) {
+export function MemberVendorConnectionsForm({ memberId, onSuccess, onCancel }: MemberVendorConnectionsFormProps) {
     const { control, handleSubmit, reset, formState } = useForm();
-    const [connections, setConnections] = useState<MemberConnection[]>([]);
+    const [connections, setConnections] = useState<VendorConnection[]>([]);
 
     useEffect(() => {
         async function fetchConnections() {
-            const response = await fetch(`/api/vendor-profit-share/vendor/${vendorId}`);
+            const response = await fetch(`/api/vendor-profit-share/member/${memberId}`);
             const data = await response.json();
             setConnections(data.connections);
             reset({ connections: data.connections });
         }
 
         fetchConnections();
-    }, [vendorId, reset]);
+    }, [memberId, reset]);
 
     const onSubmit = async (data: any) => {
         try {
-            const response = await fetch(`/api/vendor-profit-share/vendor/${vendorId}`, {
+            const response = await fetch(`/api/vendor-profit-share/member/${memberId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -57,12 +57,14 @@ export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: V
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="py-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
+
             {connections.length === 0 && <p className="w-full text-center p-6">Loading...</p>}
             <Box preset={'grid-split'} className="gap-2">
                 {connections.map((connection, index) => (
+
                     <div key={connection.id} className="flex w-full items-center justify-between border border-input px-2 min-h-[36px] py-1 rounded-md">
-                        <span className="truncate text-[14px] pr-1">{`${connection.member.firstName} ${connection.member.lastName}`}</span>
+                        <span className="truncate text-[14px] pr-1">{connection.vendor.name}</span>
                         <Controller
                             name={`connections.${index}.active`}
                             control={control}
@@ -76,7 +78,8 @@ export function VendorMemberConnectionsForm({ vendorId, onSuccess, onCancel }: V
                         />
                     </div>
                 ))}
-            </Box><GenericModalFooter actionLabel={"Save"} onCancel={onCancel} isSubmitting={formState.isSubmitting} />
+            </Box>
+            <GenericModalFooter actionLabel={"Save"} onCancel={onCancel} isSubmitting={formState.isSubmitting} />
         </form>
     );
 }

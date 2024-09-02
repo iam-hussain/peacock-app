@@ -1,6 +1,6 @@
 
 import { membersSelect } from "@/actions/member-select"
-import MemberTransactionsAction from "@/components/member-transactions-action"
+import MemberTransactionsAction from "@/components/templates/member-transactions-action"
 
 
 export default async function Members() {

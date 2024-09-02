@@ -10,9 +10,9 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { FaScaleUnbalancedFlip } from "react-icons/fa6";
 
 
-import { PieChart } from "@/components/pie-chart";
-import { DoughnutChart } from "@/components/doughnut-chart";
-import { DashboardCard } from "@/components/composition/dashboard-card";
+import { PieChart } from "@/components/molecules/pie-chart";
+import { DoughnutChart } from "@/components/molecules/doughnut-chart";
+import { DashboardCard } from "@/components/atoms/dashboard-card";
 import { clubAge } from "@/lib/date";
 import Box from "@/components/ui/box";
 import { useEffect, useState } from "react";

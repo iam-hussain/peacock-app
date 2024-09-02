@@ -5,12 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Switch } from "../ui/switch";
+import { Switch } from "../../ui/switch";
 import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
-import Box from "../ui/box";
-import { GenericModalFooter } from "../generic-modal";
+import Box from "../../ui/box";
+import { GenericModalFooter } from "../../atoms/generic-modal";
 import { toast } from "sonner";
-import { DatePickerForm } from "../date-picker-form";
+import { DatePickerForm } from "../../atoms/date-picker-form";
 
 
 type VendorFormProps = {

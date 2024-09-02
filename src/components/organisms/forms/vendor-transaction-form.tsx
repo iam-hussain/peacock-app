@@ -19,11 +19,11 @@ import { toast } from "sonner";
 import { VendorsSelectResponse } from "@/actions/vendor-select";
 import { MembersSelectResponse } from "@/actions/member-select";
 import { VendorTransactionResponse } from "@/app/api/vendor-transactions/route";
-import { GenericModalFooter } from "../generic-modal";
-import Box from "../ui/box";
+import { GenericModalFooter } from "../../atoms/generic-modal";
+import Box from "../../ui/box";
 import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
 import { VendorTransactionFormSchema, vendorTransactionFormSchema } from "@/lib/form-schema";
-import { DatePickerForm } from "../date-picker-form";
+import { DatePickerForm } from "../../atoms/date-picker-form";
 
 
 type VendorTransactionFormProps = {

@@ -2,7 +2,7 @@ import Box from "@/components/ui/box"
 import Typography from "@/components/ui/typography"
 import { CustomLink } from "@/components/ui/link"
 import { membersSelect } from "@/actions/member-select"
-import VendorAction from "@/components/vendor-action"
+import VendorAction from "@/components/templates/vendor-action"
 
 
 export default async function Vendors() {

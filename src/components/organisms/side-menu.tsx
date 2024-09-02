@@ -1,7 +1,7 @@
 
 import MenuItems from "./menu-items";
 
-function SideMenu({ className }: { className?: string }) {
+function SideMenu() {
 
   return (
     <div className={

@@ -1,32 +1,30 @@
 'use client'
 import React, { useState } from 'react';
-import { GenericModal } from './generic-modal';
+import { MemberForm } from '../organisms/forms/member-form';
+import { GenericModal } from '../atoms/generic-modal';
 import { Dialog } from '@radix-ui/react-dialog';
-import { VendorForm } from './forms/vendor';
-import VendorsTable from './composition/vendor-table';
-import { MembersSelectResponse } from '@/actions/member-select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { VendorMemberConnectionsForm } from './forms/vendor-member-connection';
-import { VendorResponse } from '@/app/api/vendors/route';
+import MembersTable from '../organisms/tables/member-table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { MemberVendorConnectionsForm } from '../organisms/forms/member-vendor-connection-form';
+import { MemberResponse } from '@/app/api/members/route';
 
-const VendorAction = ({ members }: {
-    members: MembersSelectResponse
-}) => {
-    const [selected, setSelected] = useState<null | VendorResponse['vendor']>(null);
+const MemberAction = () => {
+    const [selected, setSelected] = useState<null | MemberResponse['member']>(null);
     const [isOpen, setIsOpen] = useState(false);
 
+    const handleAction = (select: null | MemberResponse['member'], mode?: string) => {
+        setSelected(select);
+        setIsOpen(!isOpen);
+    };
 
-    const handleAction = (select: null | VendorResponse['vendor'], mode?: string) => {
-        setSelected(select)
-        setIsOpen(true)
-    }
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <VendorsTable handleAction={handleAction} />
+        <Dialog open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
+            <MembersTable handleAction={handleAction} />
             <GenericModal
-                title={selected ? 'Update Vendor' : 'Add Vendor'}
-                description={selected ? `Vendor ID: ${selected.name} [${selected.id}]` : undefined}
+                title={selected ? 'Update Member' : 'Add Member'}
+                description={selected ? `Member ID: ${selected.id}` : undefined}
             >
+
 
                 {selected && selected.id ?
                     <Tabs defaultValue="details" className="w-full">
@@ -35,33 +33,32 @@ const VendorAction = ({ members }: {
                             <TabsTrigger value="account">Account</TabsTrigger>
                         </TabsList>
                         <TabsContent value="details">
-                            <VendorForm
+                            <MemberForm
                                 selected={selected}
-                                members={members}
                                 onSuccess={() => setIsOpen(false)}
                                 onCancel={() => setIsOpen(false)}
                             />
                         </TabsContent>
 
                         <TabsContent value="account">
-                            <VendorMemberConnectionsForm
+                            <MemberVendorConnectionsForm
                                 onSuccess={() => setIsOpen(false)}
                                 onCancel={() => setIsOpen(false)}
-                                vendorId={selected.id}
+                                memberId={selected.id}
                             />
                         </TabsContent>
                     </Tabs> :
-                    <VendorForm
+                    <MemberForm
                         selected={selected}
-                        members={members}
                         onSuccess={() => setIsOpen(false)}
                         onCancel={() => setIsOpen(false)}
                     />
                 }
+
 
             </GenericModal>
         </Dialog>
     );
 };
 
-export default VendorAction;
+export default MemberAction;

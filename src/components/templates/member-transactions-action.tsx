@@ -1,16 +1,16 @@
 'use client'
 import React, { useState } from 'react';
-import { GenericModal } from './generic-modal';
+import { GenericModal } from '../atoms/generic-modal';
 import { Dialog } from '@radix-ui/react-dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import MembersTransactionTable from './composition/member-transaction-table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import MembersTransactionTable from '../organisms/tables/member-transaction-table';
 import { MemberTransactionResponse } from '@/app/api/member-transactions/route';
 import { MembersSelectResponse } from '@/actions/member-select';
-import { MemberTransactionForm } from './forms/member-transaction';
-import Typography from './ui/typography';
-import Box from './ui/box';
-import { Button } from './ui/button';
-import { MemberTransactionDeleteForm } from './forms/member-transaction-delete';
+import { MemberTransactionForm } from '../organisms/forms/member-transaction-form';
+import Typography from '../ui/typography';
+import Box from '../ui/box';
+import { Button } from '../ui/button';
+import { MemberTransactionDeleteForm } from '../organisms/forms/member-transaction-delete-form';
 
 const MemberTransactionsAction = ({ members }: {
     members: MembersSelectResponse

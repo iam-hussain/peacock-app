@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { SelectInputGroup } from './select-input-group';
+import { SelectInputGroup } from '../atoms/select-input-group';
 import { Button } from '@/components/ui/button';
-import { Toggle } from './ui/toggle';
+import { Toggle } from '../ui/toggle';
 import { PiColumnsFill } from "react-icons/pi";
 import { HiMiniViewColumns } from "react-icons/hi2";
 

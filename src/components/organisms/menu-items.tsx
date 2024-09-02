@@ -1,11 +1,11 @@
 'use client'
 
 import { IconType } from "react-icons/lib";
-import { Button } from "./ui/button";
-import { CustomLink } from "./ui/link";
-import Box from "./ui/box";
+import { Button } from "../ui/button";
+import { CustomLink } from "../ui/link";
+import Box from "../ui/box";
 import { IoClose } from "react-icons/io5";
-import { ScrollArea } from "./ui/scroll-area";
+import { ScrollArea } from "../ui/scroll-area";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { BsMotherboard } from "react-icons/bs";
 import { PiHandDepositDuotone } from "react-icons/pi";
@@ -13,8 +13,8 @@ import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { IoMdLogIn } from "react-icons/io";
 
 import { RiHome5Fill } from "react-icons/ri";
-import Typography from "./ui/typography";
-import { Separator } from "./ui/separator";
+import Typography from "../ui/typography";
+import { Separator } from "../ui/separator";
 import { clubAge } from "@/lib/date";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation'

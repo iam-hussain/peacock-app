@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 
 

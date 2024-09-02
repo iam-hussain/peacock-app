@@ -40,17 +40,18 @@ function vendorsTableTransform(vendor: VendorToTransform) {
   }
 
   if (rawVendor.type === "LEND") {
-    due.terms = monthsDiff(rawVendor.startAt, rawVendor.endAt);
     const dueDates = calculateDueDates(vendor.startAt);
+    const monthlyInterest = calculateMonthlyInterest(passbook.in);
+    const expectedPaid = monthlyInterest * dueDates.monthsPassed;
+
+    due.terms = monthsDiff(rawVendor.startAt, rawVendor.endAt);
     due.nextDueDate = dueDates.nextDueDate.getTime();
     due.recentDueDate = dueDates.recentDueDate.getTime();
     due.currentTerm = dueDates.monthsPassed;
-    const monthlyInterest = calculateMonthlyInterest(passbook.in);
-    const expectedPaid = monthlyInterest * dueDates.monthsPassed;
     due.dueAmount = expectedPaid - passbook.out;
-    console.log({ monthlyInterest, expectedPaid, passbook, due });
-    if (passbook.calcReturns) {
-      due.dueAmount = passbook.in + expectedPaid - passbook.out;
+    
+    if (!passbook.calcReturns) {
+      due.dueAmount = expectedPaid - passbook.out;
     }
   }
 

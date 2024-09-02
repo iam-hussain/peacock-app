@@ -4,12 +4,12 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Switch } from "../ui/switch";
-import Box from "../ui/box";
+import { Switch } from "../../ui/switch";
+import Box from "../../ui/box";
 import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
-import { GenericModalFooter } from "../generic-modal";
+import { GenericModalFooter } from "../../atoms/generic-modal";
 import { toast } from "sonner";
-import { DatePickerForm } from "../date-picker-form";
+import { DatePickerForm } from "../../atoms/date-picker-form";
 
 
 type MemberFormProps = {

@@ -2,11 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
-import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
+import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../../atoms/table-component';
 import { dateFormat } from '@/lib/date';
-import TableLayout from '../table-helpers/table-layout';
+import TableLayout from '../../atoms/table-layout';
 import { vendorTypeMap } from '@/lib/config';
-import { FilterBar } from '../filter-bar-group';
+import { FilterBar } from '../../molecules/filter-bar-group';
 import { VendorResponse } from '@/app/api/vendors/route';
 
 const baseColumns: ColumnDef<VendorResponse>[] = [
@@ -81,7 +81,7 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
         header: ({ column }) => <ActionTableHeader label="Return" column={column} />,
         cell: ({ row }) => (
             <CommonTableCell
-                label={row.original.calcReturns ? row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : (row.original.type === 'LEND' ? row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) : ' - ')}
+                label={row.original.calcReturns || row.original.type === 'LEND' ?  row.original.returns.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })  : ' - '}
                 className="min-w-[80px]"
                 greenLabel={row.original.calcReturns}
             />

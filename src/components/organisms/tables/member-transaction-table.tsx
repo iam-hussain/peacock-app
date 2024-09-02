@@ -4,15 +4,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef } from '@tanstack/react-table';
 
 import { Dialog, } from '@/components/ui/dialog';
-import { AvatarCell, PlainTableHeader, CommonTableCell, PaginationControls, ActionTableHeader, ActionCell } from '../table-helpers/table-component';
-import TableLayout from '../table-helpers/table-layout';
+import { AvatarCell, PlainTableHeader, CommonTableCell, PaginationControls, ActionTableHeader, ActionCell } from '../../atoms/table-component';
+import TableLayout from '../../atoms/table-layout';
 import { MemberTransactionResponse } from '@/app/api/member-transactions/route';
 import { memberTransactionTypeMap, transactionMethodMap } from '@/lib/config';
 import { format } from 'date-fns';
 import { MembersSelectResponse } from '@/actions/member-select';
-import { SelectInputGroup } from '../select-input-group';
-import { DatePickerGroup } from '../date-picker-group';
-import { PaginationFilters } from '../pagination-filters';
+import { SelectInputGroup } from '../../atoms/select-input-group';
+import { DatePickerGroup } from '../../atoms/date-picker-group';
+import { PaginationFilters } from '../../molecules/pagination-filters';
 
 const baseColumns = (handleSortClick: (id: string) => void): ColumnDef<MemberTransactionResponse>[] => ([
     {

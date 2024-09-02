@@ -2,13 +2,13 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef, getFilteredRowModel } from '@tanstack/react-table';
-import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../table-helpers/table-component';
+import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, ActionCell } from '../../atoms/table-component';
 import { dateFormat, displayDateTime, fileDateTime } from '@/lib/date';
-import TableLayout from '../table-helpers/table-layout';
-import { FilterBar } from '../filter-bar-group';
+import TableLayout from '../../atoms/table-layout';
+import { FilterBar } from '../../molecules/filter-bar-group';
 import html2canvas from 'html2canvas';
 import { cn } from '@/lib/utils';
-import Typography from '../ui/typography';
+import Typography from '../../ui/typography';
 import { MemberResponse } from '@/app/api/members/route';
 
 const baseColumns: ColumnDef<MemberResponse>[] = [

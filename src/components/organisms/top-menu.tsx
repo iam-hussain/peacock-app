@@ -7,40 +7,14 @@ import { useWindowScroll } from "react-use";
 
 import { RootState } from "@/store";
 import { openSideBar } from "@/store/pageSlice";
-import Box from "./ui/box";
-import { Icon } from "lucide-react";
-import { ThemeModeToggle } from "./theme-mode-toggle";
-import { Button } from "./ui/button";
+import Box from "../ui/box";
+import { Button } from "../ui/button";
 import {
   IoClose,
 } from "react-icons/io5";
 import { HiMenuAlt2 } from "react-icons/hi";
-import Typography from "./ui/typography";
-import { BiHide, BiShow } from "react-icons/bi";
-import { CustomLink } from "./ui/link";
-
-const closerButton = {
-  initial: {},
-  pressed: { scale: 0.9 },
-  hover: {
-    y: 70,
-    opacity: 1,
-  },
-  out: {
-    opacity: 1,
-    y: 60,
-    x: 0,
-    transition: {
-      duration: 0.6,
-    },
-  },
-  in: {
-    y: 0,
-    transition: {
-      duration: 0.6,
-    },
-  },
-};
+import Typography from "../ui/typography";
+import { CustomLink } from "../ui/link";``
 
 const animator = {
   hide: {

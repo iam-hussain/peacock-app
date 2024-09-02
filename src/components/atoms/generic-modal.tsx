@@ -3,7 +3,7 @@
 import React, { ReactNode, useCallback } from 'react';
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from './ui/scroll-area';
+import { ScrollArea } from '../ui/scroll-area';
 import { throttle } from 'lodash';
 
 type GenericModalFooterProps = {

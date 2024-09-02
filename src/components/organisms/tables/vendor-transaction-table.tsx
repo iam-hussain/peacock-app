@@ -3,14 +3,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, getSortedRowModel, ColumnDef } from '@tanstack/react-table';
 import { Dialog } from '@/components/ui/dialog';
-import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, PaginationControls, ActionCell } from '../table-helpers/table-component';
-import TableLayout from '../table-helpers/table-layout';
+import { AvatarCell, PlainTableHeader, ActionTableHeader, CommonTableCell, PaginationControls, ActionCell } from '../../atoms/table-component';
+import TableLayout from '../../atoms/table-layout';
 import { transactionMethodMap, vendorTransactionTypeMap } from '@/lib/config';
 import { format } from 'date-fns';
 import { MembersSelectResponse } from '@/actions/member-select';
-import { SelectInputGroup } from '../select-input-group';
-import { DatePickerGroup } from '../date-picker-group';
-import { PaginationFilters } from '../pagination-filters';
+import { SelectInputGroup } from '../../atoms/select-input-group';
+import { DatePickerGroup } from '../../atoms/date-picker-group';
+import { PaginationFilters } from '../../molecules/pagination-filters';
 import { VendorsSelectResponse } from '@/actions/vendor-select';
 import { VendorTransactionResponse } from '@/app/api/vendor-transactions/route';
 

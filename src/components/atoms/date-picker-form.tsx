@@ -7,7 +7,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from '@radix-ui/react-icons';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { FormControl } from './ui/form';
+import { FormControl } from '../ui/form';
 
 type DatePickerFormProps = {
     field: any,

@@ -1,17 +1,17 @@
 'use client'
 import React, { useState } from 'react';
-import { GenericModal } from './generic-modal';
+import { GenericModal } from '../atoms/generic-modal';
 import { Dialog } from '@radix-ui/react-dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import Typography from './ui/typography';
-import Box from './ui/box';
-import { Button } from './ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import Typography from '../ui/typography';
+import Box from '../ui/box';
+import { Button } from '../ui/button';
 import { VendorsSelectResponse } from '@/actions/vendor-select';
 import { MembersSelectResponse } from '@/actions/member-select';
 import { VendorTransactionResponse } from '@/app/api/vendor-transactions/route';
-import VendorsTransactionTable from './composition/vendor-transaction-table';
-import { VendorTransactionForm } from './forms/vendor-transaction';
-import { VendorTransactionDeleteForm } from './forms/vendor-transaction-delete';
+import VendorsTransactionTable from '../organisms/tables/vendor-transaction-table';
+import { VendorTransactionForm } from '../organisms/forms/vendor-transaction-form';
+import { VendorTransactionDeleteForm } from '../organisms/forms/vendor-transaction-delete-form';
 
 const VendorTransactionsAction = ({ members, vendors }: {
     members: MembersSelectResponse
