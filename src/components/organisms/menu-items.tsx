@@ -22,6 +22,7 @@ import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { setIsLoggedIn } from "@/store/pageSlice";
+import BackupAction from "../molecules/backup-action";
 
 type Menu = {
   Icon: IconType;
@@ -134,6 +135,12 @@ function MenuItems({
               <Icon className="h-5 w-5" /> {each.label}
             </CustomLink>
           ))}
+
+          {isLoggedIn && <>
+              <Separator className="my-4" />
+              <BackupAction />
+          </>}
+
           <Separator className="my-4" />
 
           {isLoggedIn && (
@@ -160,6 +167,8 @@ function MenuItems({
               <IoMdLogIn className="h-5 w-5" /> Login
             </CustomLink>
           )}
+
+
         </Box>
       </ScrollArea>
     </Box>

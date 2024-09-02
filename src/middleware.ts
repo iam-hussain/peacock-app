@@ -100,6 +100,7 @@ export const config = {
     "/api/vendor-profit-share/:path*",
     "/api/vendor-transactions/:path*",
     "/api/vendors/:path*",
-    "/api/calc/:path*",
+    "/api/returns/:path*",
+    "/api/backup/:path*",
   ], // Apply to all API routes
 };

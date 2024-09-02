@@ -128,5 +128,5 @@ export async function calculateReturnsHandler() {
 
   await prisma.$transaction(passbooksUpdate);
 
-  return { totalOffset, passbooksData: Array.from(toUpdate) };
+  return { totalReturns, totalOffset, passbooksData: Array.from(toUpdate) };
 }
