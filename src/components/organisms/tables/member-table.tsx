@@ -23,6 +23,8 @@ import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils";
 import Typography from "../../ui/typography";
 import { MemberResponse } from "@/app/api/members/route";
+import { fetchMemberTransactions, fetchMembers } from "@/lib/fetch-api";
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 
 const baseColumns: ColumnDef<MemberResponse>[] = [
   {
@@ -144,21 +146,14 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
   const captureRef = useRef<HTMLDivElement>(null);
   const [captureMode, setCaptureMode] = useState(false);
 
-  const [editMode, setEditMode] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [members, setMembers] = useState<MemberResponse[]>([]);
+  const [editMode, setEditMode] = useState(true);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const res = await fetch("/api/members");
-    const json = await res.json();
-    setMembers(json.members);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data, isLoading, isError } = useQuery(
+   { queryKey: ['members'], 
+   queryFn: fetchMembers,  
+   placeholderData: keepPreviousData,
+  },
+  );
 
   const onCapture = async () => {
     if (captureRef.current) {
@@ -194,12 +189,15 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
     }
   }, [captureMode]);
 
-  const data = useMemo(() => {
-    if (editMode) {
-      return members;
+  const tableData = useMemo(() => {
+    if(!data || !data.members) {
+      return []
     }
-    return members.filter((e) => e.active);
-  }, [editMode, members]);
+    if (editMode) {
+      return data.members;
+    }
+    return data.members.filter((e) => e.active);
+  }, [editMode, data]);
 
   const columns = useMemo(() => {
     if (!editMode) {
@@ -220,8 +218,8 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
   }, [editMode]);
 
   const table = useReactTable({
-    data,
-    columns,
+    data:tableData,
+    columns: columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -269,7 +267,8 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
         <TableLayout
           table={table}
           columns={columns}
-          loading={loading}
+          isLoading={isLoading}
+          isError={isError}
           className={cn({
             "w-auto p-8": captureMode,
           })}

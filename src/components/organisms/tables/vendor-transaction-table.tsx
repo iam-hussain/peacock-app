@@ -162,7 +162,7 @@ const VendorsTransactionTable = ({
   const [editMode, setEditMode] = useState(true);
   const [data, setData] = useState<VendorTransactionResponse[]>([]);
 
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [options, setOptions] = useState<any>(initialOptions);
 
@@ -282,11 +282,11 @@ const VendorsTransactionTable = ({
           />
         </div>
 
-        <TableLayout table={table} columns={columns} loading={loading} />
+        <TableLayout table={table} columns={columns} isLoading={isLoading} />
         <PaginationControls
           page={options.page}
           totalPages={totalPages}
-          loading={loading}
+          isLoading={isLoading}
           setPage={(page) => setOptions({ ...options, page })}
         />
       </div>

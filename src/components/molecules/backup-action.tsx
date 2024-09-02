@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { FaCalculator } from "react-icons/fa";
 
 const BackupAction = () => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(
     "/peacock_backup.json",
@@ -56,13 +56,13 @@ const BackupAction = () => {
 
   return (
     <>
-      <Button variant={"menu"} onClick={handleReturns} disabled={loading}>
+      <Button variant={"menu"} onClick={handleReturns} disabled={isLoading}>
         <FaCalculator className="h-5 w-5" />{" "}
         {calculating ? "Recalculated ..." : "Recalculated Returns"}
       </Button>
-      <Button variant={"menu"} onClick={handleBackup} disabled={loading}>
+      <Button variant={"menu"} onClick={handleBackup} disabled={isLoading}>
         <BsDatabaseFillCheck className="h-5 w-5" />{" "}
-        {loading ? "Backing up..." : "Backup Data"}
+        {isLoading ? "Backing up..." : "Backup Data"}
       </Button>
       {downloadLink && (
         <a

@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
 type TableLayoutProps<T> = {
   table: any;
   columns: any[];
-  loading: boolean;
+  isLoading: boolean;
+  isError?: boolean;
   noDataMessage?: string;
   className?: string;
 };
@@ -21,10 +22,18 @@ type TableLayoutProps<T> = {
 function TableLayout<T>({
   table,
   columns,
-  loading,
+  isLoading,
+  isError = false,
   noDataMessage = "No results.",
   className,
 }: TableLayoutProps<T>) {
+
+  const itemLength = table.getRowModel().rows.length;
+  const isValid = !isError && !isLoading && itemLength > 0;
+  const isNoData = !isError && !isLoading && itemLength === 0;
+  const isTrueError = isError && !isLoading
+  const isTrueLoading = !isError && isLoading
+
   return (
     <Table className={cn(className)}>
       <TableHeader>
@@ -42,14 +51,21 @@ function TableLayout<T>({
         ))}
       </TableHeader>
       <TableBody>
-        {loading ? (
+        {isTrueError && <TableRow>
+            <TableCell colSpan={columns.length} className="text-center p-6 text-destructive">
+              Unexpected error on fetching the data
+            </TableCell>
+          </TableRow> }
+
+        {isTrueLoading && (
           <TableRow>
             <TableCell colSpan={columns.length} className="text-center p-6">
               Loading...
             </TableCell>
           </TableRow>
-        ) : (
-          table.getRowModel().rows.map((row: any) => (
+        )}
+
+        {isValid && table.getRowModel().rows.map((row: any) => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map((cell: any) => (
                 <TableCell key={cell.id} className="px-4">
@@ -57,9 +73,9 @@ function TableLayout<T>({
                 </TableCell>
               ))}
             </TableRow>
-          ))
-        )}
-        {table.getRowModel().rows.length === 0 && !loading && (
+          ))}
+
+        {isNoData && (
           <TableRow>
             <TableCell colSpan={columns.length} className="text-center p-6">
               {noDataMessage}

@@ -26,6 +26,8 @@ import { MembersSelectResponse } from "@/actions/member-select";
 import { SelectInputGroup } from "../../atoms/select-input-group";
 import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
+import { fetchMemberTransactions } from "@/lib/fetch-api";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
@@ -157,37 +159,14 @@ const MembersTransactionTable = ({
   handleAction,
 }: MembersTransactionTableProps) => {
   const [editMode, setEditMode] = useState(true);
-  const [data, setData] = useState<MemberTransactionResponse[]>([]);
-
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
   const [options, setOptions] = useState<any>(initialOptions);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const params = new URLSearchParams({
-      page: options.page.toString(),
-      limit: options.limit.toString(),
-      fromId: options.fromId.trim(),
-      toId: options.toId.trim(),
-      transactionType: options.transactionType.trim(),
-      sortField: options.sortField,
-      sortOrder: options.sortOrder,
-      ...(options?.startDate ? { startDate: options.startDate as any } : {}),
-      ...(options?.endDate ? { endDate: options.startDate as any } : {}),
-    });
-
-    const res = await fetch(`/api/member-transactions?${params.toString()}`);
-    const json = await res.json();
-    setData(json.transactions);
-    setTotalPages(json.totalPages);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options]);
+  const { data, isLoading, isError } = useQuery(
+    { queryKey: ['memberTransactions', options], 
+    queryFn: () => fetchMemberTransactions(options),  
+    placeholderData: keepPreviousData,
+   },
+   )
 
   const handleOptionsReset = () => {
     setOptions(initialOptions);
@@ -220,14 +199,14 @@ const MembersTransactionTable = ({
   }, [editMode]);
 
   const table = useReactTable({
-    data,
+    data: data?.transactions || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
     manualSorting: true,
-    pageCount: totalPages,
+    pageCount: data?.totalPages || 0,
     state: {
       pagination: { pageIndex: options.page - 1, pageSize: 10 },
       sorting: [{ id: options.sortField, desc: options.sortOrder === "desc" }],
@@ -279,11 +258,11 @@ const MembersTransactionTable = ({
           />
         </div>
 
-        <TableLayout table={table} columns={columns} loading={loading} />
+        <TableLayout table={table} columns={columns} isLoading={isLoading} isError={isError} />
         <PaginationControls
           page={options.page}
-          totalPages={totalPages}
-          loading={loading}
+          totalPages={data?.totalPages || 0}
+          isLoading={isLoading}
           setPage={(page) => setOptions({ ...options, page })}
         />
       </div>

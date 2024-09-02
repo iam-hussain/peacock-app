@@ -3,14 +3,12 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { FaArrowDownShortWide } from "react-icons/fa6";
 
 import { Column } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { LuClipboardEdit } from "react-icons/lu";
 
 import { AvatarGroup } from "./avatar-group";
-import { FaSortAmountUp } from "react-icons/fa";
 import { FaSortAmountDown, FaSortAmountDownAlt } from "react-icons/fa";
 
 type AvatarCellProps = {
@@ -132,20 +130,20 @@ export const ActionCell = ({ onClick }: ActionCellProps) => (
 type PaginationControlsProps = {
   page: number;
   totalPages: number;
-  loading: boolean;
+  isLoading: boolean;
   setPage: (page: number) => void;
 };
 
 export const PaginationControls = ({
   page,
   totalPages,
-  loading,
+  isLoading,
   setPage,
 }: PaginationControlsProps) => (
   <div className="mt-4 flex justify-between align-middle items-center gap-4">
     <Button
       onClick={() => setPage(page - 1)}
-      disabled={page === 1 || loading}
+      disabled={page === 1 || isLoading}
       variant={"outline"}
       className="min-w-[100px]"
     >
@@ -156,7 +154,7 @@ export const PaginationControls = ({
     </span>
     <Button
       onClick={() => setPage(page + 1)}
-      disabled={page === totalPages || loading}
+      disabled={page === totalPages || isLoading}
       variant={"outline"}
       className="min-w-[100px]"
     >

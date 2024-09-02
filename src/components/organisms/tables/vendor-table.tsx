@@ -161,7 +161,7 @@ export type VendorTableProps = {
 
 const VendorsTable = ({ handleAction }: VendorTableProps) => {
   const [editMode, setEditMode] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [vendors, setVendors] = useState<VendorResponse[]>([]);
 
   const fetchData = async () => {
@@ -221,7 +221,7 @@ const VendorsTable = ({ handleAction }: VendorTableProps) => {
         toggleState={editMode}
         onAddClick={() => handleAction(null)}
       />
-      <TableLayout table={table} columns={columns} loading={loading} />
+      <TableLayout table={table} columns={columns} isLoading={isLoading} />
     </div>
   );
 };
