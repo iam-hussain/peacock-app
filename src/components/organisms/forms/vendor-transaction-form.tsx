@@ -56,25 +56,25 @@ export function VendorTransactionForm({
     resolver: zodResolver(vendorTransactionFormSchema),
     defaultValues: selected
       ? {
-        vendorId: selected.vendorId,
-        memberId: selected.memberId || "",
-        transactionType: selected.transactionType as any,
-        method: (selected.method as any) || "ACCOUNT",
-        amount: selected.amount || 0,
-        note: selected.note || "",
-        transactionAt: selected.transactionAt
-          ? new Date(selected.transactionAt)
-          : new Date(),
-      }
+          vendorId: selected.vendorId,
+          memberId: selected.memberId || "",
+          transactionType: selected.transactionType as any,
+          method: (selected.method as any) || "ACCOUNT",
+          amount: selected.amount || 0,
+          note: selected.note || "",
+          transactionAt: selected.transactionAt
+            ? new Date(selected.transactionAt)
+            : new Date(),
+        }
       : {
-        vendorId: "",
-        memberId: "",
-        transactionType: "INVEST",
-        method: "ACCOUNT",
-        amount: 0,
-        note: "",
-        transactionAt: new Date(),
-      },
+          vendorId: "",
+          memberId: "",
+          transactionType: "INVEST",
+          method: "ACCOUNT",
+          amount: 0,
+          note: "",
+          transactionAt: new Date(),
+        },
   });
 
   // Handle form submission

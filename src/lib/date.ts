@@ -38,7 +38,7 @@ export const clubAge = () => {
   const months = differenceInMonths(current, clubStart) % 12; // Remove the years from months
   const days = differenceInDays(
     current,
-    addMonths(clubStart, years * 12 + months)
+    addMonths(clubStart, years * 12 + months),
   );
 
   // Construct the inYear string
@@ -82,7 +82,7 @@ type DueDates = {
 export function calculateDueDates(
   startDate: Date,
   now: Date = new Date(),
-  toleranceDays: number = 5
+  toleranceDays: number = 5,
 ): DueDates {
   // Calculate the number of months passed since the start date
   const monthsPassed = differenceInMonths(now, new Date(startDate)) + 1;
@@ -109,7 +109,7 @@ export function calculateDueDates(
 
 export const calculateMonthsDifference = (
   a: Date,
-  b: Date | null = new Date()
+  b: Date | null = new Date(),
 ) => {
   return Math.abs(differenceInCalendarMonths(a, b || new Date()));
 };

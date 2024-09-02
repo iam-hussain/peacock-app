@@ -30,7 +30,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
-  members: TransformedMemberSelect[] // list of members for selection
+  members: TransformedMemberSelect[]; // list of members for selection
   onSuccess: () => void;
   onCancel?: () => void;
 };
@@ -47,33 +47,33 @@ export function VendorForm({
     resolver: zodResolver(vendorFormSchema),
     defaultValues: selected
       ? {
-        name: selected.name,
-        slug: selected.slug || "",
-        terms: selected.terms || 0,
-        type: selected.type || "DEFAULT",
-        ownerId: selected.ownerId || "",
-        termType: selected.termType || "MONTH",
-        startAt: selected.startAt ? new Date(selected.startAt) : undefined,
-        endAt: selected.endAt ? new Date(selected.endAt) : undefined,
-        active: selected.active ?? true,
-        calcReturns: selected.calcReturns ?? true,
-      }
+          name: selected.name,
+          slug: selected.slug || "",
+          terms: selected.terms || 0,
+          type: selected.type || "DEFAULT",
+          ownerId: selected.ownerId || "",
+          termType: selected.termType || "MONTH",
+          startAt: selected.startAt ? new Date(selected.startAt) : undefined,
+          endAt: selected.endAt ? new Date(selected.endAt) : undefined,
+          active: selected.active ?? true,
+          calcReturns: selected.calcReturns ?? true,
+        }
       : {
-        name: "",
-        slug: "",
-        terms: 0,
-        type: "DEFAULT",
-        ownerId: "",
-        termType: "MONTH",
-        startAt: new Date(),
-        endAt: undefined,
-        active: true,
-        calcReturns: true,
-      },
+          name: "",
+          slug: "",
+          terms: 0,
+          type: "DEFAULT",
+          ownerId: "",
+          termType: "MONTH",
+          startAt: new Date(),
+          endAt: undefined,
+          active: true,
+          calcReturns: true,
+        },
   });
 
   async function onSubmit(data: VendorFromSchema) {
-    console.log({ data })
+    console.log({ data });
     try {
       const response = await fetch(`/api/vendors`, {
         method: "POST",

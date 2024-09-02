@@ -22,7 +22,7 @@ import { fetchStatistics } from "@/lib/query-options";
 export default function HomePage() {
   const club = clubAge();
   const { data, isLoading, isError } = useQuery(fetchStatistics());
-  const statistics = data?.statistics || null
+  const statistics = data?.statistics || null;
 
   if (isLoading) {
     return (
@@ -35,7 +35,9 @@ export default function HomePage() {
   if (isError || !statistics) {
     return (
       <Box>
-        <p className="p-8 text-center w-full text-destructive">Unexpected error on fetching the data</p>
+        <p className="p-8 text-center w-full text-destructive">
+          Unexpected error on fetching the data
+        </p>
       </Box>
     );
   }

@@ -32,27 +32,27 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     resolver: zodResolver(memberFormSchema),
     defaultValues: selected
       ? {
-        firstName: selected.firstName,
-        lastName: selected.lastName || "",
-        username: selected.username,
-        phone: selected.phone || "",
-        email: selected.email || "",
-        avatar: selected.avatar || "",
-        active: selected.active ?? true,
-        joinedAt: selected.joinedAt
-          ? new Date(selected.joinedAt)
-          : new Date(),
-      }
+          firstName: selected.firstName,
+          lastName: selected.lastName || "",
+          username: selected.username,
+          phone: selected.phone || "",
+          email: selected.email || "",
+          avatar: selected.avatar || "",
+          active: selected.active ?? true,
+          joinedAt: selected.joinedAt
+            ? new Date(selected.joinedAt)
+            : new Date(),
+        }
       : {
-        firstName: "",
-        lastName: "",
-        username: "",
-        phone: "",
-        email: "",
-        avatar: "",
-        active: true,
-        joinedAt: new Date(),
-      },
+          firstName: "",
+          lastName: "",
+          username: "",
+          phone: "",
+          email: "",
+          avatar: "",
+          active: true,
+          joinedAt: new Date(),
+        },
   });
 
   async function onSubmit(data: MemberFromSchema) {

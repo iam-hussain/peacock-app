@@ -31,6 +31,6 @@ export async function GET(request: Request) {
   return NextResponse.json(
     members
       .map(membersSelectTransform)
-      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .sort((a, b) => (a.name > b.name ? 1 : -1)),
   );
 }

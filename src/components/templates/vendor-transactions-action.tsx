@@ -14,8 +14,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMembersSelect, fetchVendorsSelect } from "@/lib/query-options";
 
 const VendorTransactionsAction = () => {
-  const { data: members = [] } = useQuery(fetchMembersSelect())
-  const { data: vendors = [] } = useQuery(fetchVendorsSelect())
+  const { data: members = [] } = useQuery(fetchMembersSelect());
+  const { data: vendors = [] } = useQuery(fetchVendorsSelect());
   const [selected, setSelected] = useState<null | TransformedVendorTransaction>(
     null,
   );

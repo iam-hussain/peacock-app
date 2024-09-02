@@ -39,9 +39,9 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         subLabel={
           row.original.clubFund
             ? row.original.clubFund.toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })
+                style: "currency",
+                currency: "INR",
+              })
             : ""
         }
       />

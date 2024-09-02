@@ -14,15 +14,13 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchMembersSelect } from "@/lib/query-options";
 
 const MemberTransactionsAction = () => {
-  const { data: members = [] } = useQuery(fetchMembersSelect())
+  const { data: members = [] } = useQuery(fetchMembersSelect());
   const [selected, setSelected] = useState<null | TransformedMemberTransaction>(
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAction = (
-    select: null | TransformedMemberTransaction,
-  ) => {
+  const handleAction = (select: null | TransformedMemberTransaction) => {
     setSelected(select);
     setIsOpen(!isOpen);
   };

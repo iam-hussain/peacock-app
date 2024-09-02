@@ -4,7 +4,6 @@ import { CustomLink } from "@/components/ui/link";
 import VendorAction from "@/components/templates/vendor-action";
 
 export default async function Vendors() {
-
   return (
     <Box preset={"stack-start"}>
       <Box preset={"row-between"} className="px-4 md:px-6">

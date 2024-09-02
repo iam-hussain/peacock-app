@@ -13,7 +13,8 @@ import { TransformedMemberSelect } from "@/app/api/members/select/route";
 
 const noRefetchConfigs = {
   refetchOnMount: false,
-  refetchOnReconnect: false,
+  refetchInactive: true,
+  refetchOnReconnect: true,
   refetchOnWindowFocus: false,
 };
 
@@ -48,7 +49,7 @@ export const fetchMemberTransactions = (options: any) => {
     queryKey: ["member-transactions", options],
     queryFn: () =>
       fetcher(
-        `/api/member-transactions?${params.toString()}`
+        `/api/member-transactions?${params.toString()}`,
       ) as unknown as GetMemberTransactionResponse,
     ...noRefetchConfigs,
   });
@@ -71,7 +72,7 @@ export const fetchVendorTransactions = (options: any) => {
     queryKey: ["vendor-transactions", options],
     queryFn: () =>
       fetcher(
-        `/api/vendor-transactions?${params.toString()}`
+        `/api/vendor-transactions?${params.toString()}`,
       ) as unknown as GetVendorTransactionResponse,
     ...noRefetchConfigs,
   });
@@ -105,7 +106,7 @@ export const fetchProfitMemberVendor = (memberId: string) =>
     queryKey: ["vendor-profit-member"],
     queryFn: () =>
       fetcher(
-        `/api/vendor-profit-share/member/${memberId}`
+        `/api/vendor-profit-share/member/${memberId}`,
       ) as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
@@ -115,7 +116,7 @@ export const fetchProfitVendorMember = (vendorId: string) =>
     queryKey: ["vendor-profit-member"],
     queryFn: () =>
       fetcher(
-        `/api/vendor-profit-share/vendor/${vendorId}`
+        `/api/vendor-profit-share/vendor/${vendorId}`,
       ) as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
