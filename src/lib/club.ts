@@ -25,7 +25,8 @@ export const calculateMonthsPaid = (totalPaid: number): number => {
 
     // Calculate the number of months in the current stage
     const stageEndDate = endDate || new Date(); // Use current date if endDate is not provided
-    const monthsInStage = calculateMonthsDifference(stageEndDate, startDate) + 1; // +1 to include the starting month
+    const monthsInStage =
+      calculateMonthsDifference(stageEndDate, startDate) + 1; // +1 to include the starting month
 
     // Calculate the total amount for this stage
     const stageTotalAmount = monthsInStage * amount;

@@ -113,9 +113,16 @@ export async function calculateReturnsHandler() {
     prisma.passbook.update({ where: { id }, data }),
   );
 
-  console.log(JSON.stringify({ passbooks: Array.from(toUpdate.entries()).map(([id, data]) =>
-    ({ where: { id }, data }),
-  ), totalOffset, totalReturns  }))
+  console.log(
+    JSON.stringify({
+      passbooks: Array.from(toUpdate.entries()).map(([id, data]) => ({
+        where: { id },
+        data,
+      })),
+      totalOffset,
+      totalReturns,
+    }),
+  );
 
   if (club?.id) {
     passbooksUpdate.push(

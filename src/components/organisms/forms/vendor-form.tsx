@@ -192,13 +192,11 @@ export function VendorForm({
                       <SelectValue placeholder="Select vendor type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(vendorTypeMap).map(
-                        ([key, name]) => (
-                          <SelectItem key={key} value={key}>
-                            {name}
-                          </SelectItem>
-                        ),
-                      )}
+                      {Object.entries(vendorTypeMap).map(([key, name]) => (
+                        <SelectItem key={key} value={key}>
+                          {name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>

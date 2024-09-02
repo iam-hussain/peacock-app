@@ -19,7 +19,9 @@ export type VendorResponse = ReturnType<typeof transformVendorForTable>;
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, owner, ...vendor } = vendorInput;
-  const memberName = owner?.firstName ? `${owner.firstName} ${owner.lastName || ""}` : "";
+  const memberName = owner?.firstName
+    ? `${owner.firstName} ${owner.lastName || ""}`
+    : "";
 
   const dueDetails = {
     nextDueDate: 0,
@@ -34,16 +36,33 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
     dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
     dueDetails.currentTerm = dueDates.monthsPassed;
-    dueDetails.totalTerms = calculateMonthsDifference(vendor.startAt, vendor.endAt);
+    dueDetails.totalTerms = calculateMonthsDifference(
+      vendor.startAt,
+      vendor.endAt,
+    );
   }
 
   if (vendor.type === "LEND" && vendor.active) {
     const dueDates = calculateDueDates(vendor.startAt);
     const monthlyInterest = calculateMonthlyInterest(passbook.in);
     const expectedPayment = monthlyInterest * dueDates.monthsPassed;
-    console.log({ monthlyInterest, dueDates, expectedPayment, name: vendor.name, passbook, type: vendor.type, start: vendor.startAt, end: vendor.endAt,  active: vendor.active, calcReturns: passbook.calcReturns   })
-    
-    dueDetails.totalTerms = calculateMonthsDifference(vendor.startAt, vendor.endAt);
+    console.log({
+      monthlyInterest,
+      dueDates,
+      expectedPayment,
+      name: vendor.name,
+      passbook,
+      type: vendor.type,
+      start: vendor.startAt,
+      end: vendor.endAt,
+      active: vendor.active,
+      calcReturns: passbook.calcReturns,
+    });
+
+    dueDetails.totalTerms = calculateMonthsDifference(
+      vendor.startAt,
+      vendor.endAt,
+    );
     dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
     dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
     dueDetails.currentTerm = dueDates.monthsPassed;

@@ -136,10 +136,12 @@ function MenuItems({
             </CustomLink>
           ))}
 
-          {isLoggedIn && <>
+          {isLoggedIn && (
+            <>
               <Separator className="my-4" />
               <BackupAction />
-          </>}
+            </>
+          )}
 
           <Separator className="my-4" />
 
@@ -167,8 +169,6 @@ function MenuItems({
               <IoMdLogIn className="h-5 w-5" /> Login
             </CustomLink>
           )}
-
-
         </Box>
       </ScrollArea>
     </Box>

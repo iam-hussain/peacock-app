@@ -108,6 +108,9 @@ export function calculateDueDates(
 //   return Math.abs(differenceInMonths(now, new Date(startDate)));
 // }
 
-export const calculateMonthsDifference = (a: Date, b: Date | null = new Date()) => {
+export const calculateMonthsDifference = (
+  a: Date,
+  b: Date | null = new Date(),
+) => {
   return Math.abs(differenceInCalendarMonths(a, b || new Date()));
 };
