@@ -7,11 +7,6 @@ import Box from "../ui/box";
 import { IoClose } from "react-icons/io5";
 import { ScrollArea } from "../ui/scroll-area";
 import { FaPeopleGroup } from "react-icons/fa6";
-import { BsMotherboard } from "react-icons/bs";
-import { PiHandDepositDuotone } from "react-icons/pi";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
-import { IoMdLogIn } from "react-icons/io";
-
 import { RiHome5Fill } from "react-icons/ri";
 import Typography from "../ui/typography";
 import { Separator } from "../ui/separator";
@@ -23,6 +18,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { setIsLoggedIn } from "@/store/pageSlice";
 import BackupAction from "../molecules/backup-action";
+import { HiBriefcase } from "react-icons/hi";
+import { RiFolderTransferFill } from "react-icons/ri";
+import { FaPiggyBank } from "react-icons/fa";
+import { PiSignInBold } from "react-icons/pi";
+import { PiSignOutBold } from "react-icons/pi";
 
 type Menu = {
   Icon: IconType;
@@ -43,7 +43,7 @@ const appMenus: Menu[] = [
     link: "/members",
   },
   {
-    Icon: BsMotherboard,
+    Icon: HiBriefcase,
     label: "Vendors",
     link: "/vendors",
   },
@@ -51,12 +51,12 @@ const appMenus: Menu[] = [
 
 const transactionsMenus: Menu[] = [
   {
-    Icon: PiHandDepositDuotone,
+    Icon: FaPiggyBank,
     label: "Members Transaction",
     link: "/members/transactions",
   },
   {
-    Icon: FaMoneyBillTransfer,
+    Icon: RiFolderTransferFill,
     label: "Vendors Transaction",
     link: "/vendors/transactions",
   },
@@ -104,13 +104,13 @@ function MenuItems({
           </Button>
         </Box>
       )}
-      <Box preset={"stack-center"} className="gap-0 pr-4 md:hidden">
+      <Box preset={"stack-center"} className="gap-0 pr-4 pb-2">
         <Typography variant={"brandMini"} className="w-full text-center">
           Peacock Club
         </Typography>
         <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
       </Box>
-      <Separator className="my-4 md:hidden" />
+      <Separator className="my-4" />
 
       <ScrollArea className="w-full grow">
         <Box preset={"stack-start"} className="gap-4" gap={1}>
@@ -153,7 +153,7 @@ function MenuItems({
                 handleOnItemClick();
               }}
             >
-              <IoMdLogIn className="h-5 w-5" /> Logout
+              <PiSignOutBold className="h-5 w-5" /> Logout
             </Button>
           )}
 
@@ -166,7 +166,7 @@ function MenuItems({
                 handleOnItemClick();
               }}
             >
-              <IoMdLogIn className="h-5 w-5" /> Login
+              <PiSignInBold className="h-5 w-5" /> Login
             </CustomLink>
           )}
         </Box>

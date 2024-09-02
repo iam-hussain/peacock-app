@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import StoreProvider from "@/components/store-provider";
+import QueryProvider from "@/components/query-provider";
 
 export const metadata: Metadata = {
   title: "Peacock Club",
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light">
       <body className="bg-paper">
-        <StoreProvider>{children}</StoreProvider>
+        <QueryProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </QueryProvider>
       </body>
-      <Toaster />
+      <Toaster position="top-right" />
     </html>
   );
 }
