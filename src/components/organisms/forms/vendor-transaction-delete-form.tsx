@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type VendorTransactionDeleteFormProps = {
   transaction: TransformedVendorTransaction;
@@ -15,6 +16,7 @@ export function VendorTransactionDeleteForm({
   onSuccess,
   onCancel,
 }: VendorTransactionDeleteFormProps) {
+  const queryClient = useQueryClient();
   const [isSubmitting, setSubmitting] = useState(false);
 
   const handleDelete = async () => {
@@ -37,6 +39,11 @@ export function VendorTransactionDeleteForm({
 
       const result = await response.json();
       toast.success("Vendor transaction deleted successfully");
+
+      queryClient.invalidateQueries({
+        queryKey: ["vendor-transactions"],
+      });
+
       if (onSuccess) {
         onSuccess();
       }

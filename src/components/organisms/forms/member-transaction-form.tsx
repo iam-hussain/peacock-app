@@ -30,6 +30,7 @@ import {
 import Box from "../../ui/box";
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { useQueryClient } from "@tanstack/react-query";
 
 type MemberTransactionFormProps = {
   members: TransformedMemberSelect[];
@@ -44,6 +45,7 @@ export function MemberTransactionForm({
   onSuccess,
   onCancel,
 }: MemberTransactionFormProps) {
+  const queryClient = useQueryClient();
   const form = useForm<MemberTransactionFormSchema>({
     resolver: zodResolver(memberTransactionFormSchema),
     defaultValues: selected
@@ -95,6 +97,11 @@ export function MemberTransactionForm({
       }
       const result = await response.json();
       toast.success("Transaction successfully added!");
+      queryClient.invalidateQueries({
+        queryKey: ["member-transactions"],
+      });
+
+
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
         onSuccess();

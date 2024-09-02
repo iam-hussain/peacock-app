@@ -5,8 +5,9 @@ export const memberTotalDepositAmount = () => {
   const values = clubConfig.stages.map((e) => {
     const diff = calculateMonthsDifference(
       e?.endDate ? new Date(e.endDate) : new Date(),
-      new Date(e.startDate),
+      new Date(e.startDate)
     );
+    console.log({ name: e.name, diff, am: e.amount });
     return diff * e.amount;
   });
 
@@ -59,7 +60,7 @@ export const clubMonthsFromStart = () => {
 
 export function calculateMonthlyInterest(
   principal: number,
-  annualRate: number = 12,
+  annualRate: number = 12
 ): number {
   // Convert the annual interest rate to a monthly interest rate
   const monthlyInterest = (principal * annualRate) / (12 * 100);

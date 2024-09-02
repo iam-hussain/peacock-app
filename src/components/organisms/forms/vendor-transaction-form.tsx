@@ -33,6 +33,7 @@ import {
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { TransformedVendorSelect } from "@/app/api/vendors/select/route";
 import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { useQueryClient } from "@tanstack/react-query";
 
 type VendorTransactionFormProps = {
   vendors: TransformedMemberSelect[];
@@ -49,6 +50,8 @@ export function VendorTransactionForm({
   onSuccess,
   onCancel,
 }: VendorTransactionFormProps) {
+  const queryClient = useQueryClient();
+
   const form = useForm<VendorTransactionFormSchema>({
     resolver: zodResolver(vendorTransactionFormSchema),
     defaultValues: selected
@@ -101,6 +104,10 @@ export function VendorTransactionForm({
 
       const result = await response.json();
       toast.success("Transaction successfully added!");
+      queryClient.invalidateQueries({
+        queryKey: ["vendor-transactions"],
+      });
+
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
         onSuccess();

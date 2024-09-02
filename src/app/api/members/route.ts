@@ -12,11 +12,12 @@ export type TransformedMember = ReturnType<typeof membersTableTransform>;
 
 function membersTableTransform(
   member: MemberToTransform,
-  memberTotalDeposit: number,
+  memberTotalDeposit: number
 ) {
   const { passbook, ...rawMember } = member;
   const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
-  const periodBalance = memberTotalDeposit - member.passbook.periodIn;
+  const periodBalance =
+    memberTotalDeposit - (member.passbook.periodIn - member.passbook.out);
   const deposit = member.passbook.periodIn + member.passbook.offsetIn;
   return {
     id: member.id,
@@ -52,6 +53,7 @@ export async function GET(request: Request) {
     },
   });
   const memberTotalDeposit = memberTotalDepositAmount();
+  console.log({ memberTotalDeposit });
   const transformedMembers = members
     .map((each) => membersTableTransform(each, memberTotalDeposit))
     .sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -80,7 +82,7 @@ export async function POST(request: Request) {
     if (!firstName && !id) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -132,7 +134,7 @@ export async function POST(request: Request) {
     console.error("Error creating/updating member:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -99,3 +99,23 @@ export const fetchStatistics = () =>
     queryFn: () => fetcher("/api/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
+
+export const fetchProfitMemberVendor = (memberId: string) =>
+  queryOptions({
+    queryKey: ["vendor-profit-member"],
+    queryFn: () =>
+      fetcher(
+        `/api/vendor-profit-share/member/${memberId}`
+      ) as never as GetStatisticsResponse,
+    ...noRefetchConfigs,
+  });
+
+export const fetchProfitVendorMember = (vendorId: string) =>
+  queryOptions({
+    queryKey: ["vendor-profit-member"],
+    queryFn: () =>
+      fetcher(
+        `/api/vendor-profit-share/vendor/${vendorId}`
+      ) as never as GetStatisticsResponse,
+    ...noRefetchConfigs,
+  });

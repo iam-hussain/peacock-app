@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type MemberTransactionDeleteFormProps = {
   transaction: TransformedMemberTransaction;
@@ -15,6 +16,7 @@ export function MemberTransactionDeleteForm({
   onSuccess,
   onCancel,
 }: MemberTransactionDeleteFormProps) {
+  const queryClient = useQueryClient();
   const [isSubmitting, setSubmitting] = useState(false);
 
   const handleDelete = async () => {
@@ -37,6 +39,10 @@ export function MemberTransactionDeleteForm({
 
       const result = await response.json();
       toast.success("Member transaction deleted successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["member-transactions"],
+      });
+
       if (onSuccess) {
         onSuccess();
       }

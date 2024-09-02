@@ -17,6 +17,7 @@ import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { toast } from "sonner";
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { useQueryClient } from "@tanstack/react-query";
 
 type MemberFormProps = {
   selected?: any;
@@ -25,31 +26,33 @@ type MemberFormProps = {
 };
 
 export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
+  const queryClient = useQueryClient();
+
   const form = useForm({
     resolver: zodResolver(memberFormSchema),
     defaultValues: selected
       ? {
-          firstName: selected.firstName,
-          lastName: selected.lastName || "",
-          username: selected.username,
-          phone: selected.phone || "",
-          email: selected.email || "",
-          avatar: selected.avatar || "",
-          active: selected.active ?? true,
-          joinedAt: selected.joinedAt
-            ? new Date(selected.joinedAt)
-            : new Date(),
-        }
+        firstName: selected.firstName,
+        lastName: selected.lastName || "",
+        username: selected.username,
+        phone: selected.phone || "",
+        email: selected.email || "",
+        avatar: selected.avatar || "",
+        active: selected.active ?? true,
+        joinedAt: selected.joinedAt
+          ? new Date(selected.joinedAt)
+          : new Date(),
+      }
       : {
-          firstName: "",
-          lastName: "",
-          username: "",
-          phone: "",
-          email: "",
-          avatar: "",
-          active: true,
-          joinedAt: new Date(),
-        },
+        firstName: "",
+        lastName: "",
+        username: "",
+        phone: "",
+        email: "",
+        avatar: "",
+        active: true,
+        joinedAt: new Date(),
+      },
   });
 
   async function onSubmit(data: MemberFromSchema) {
@@ -74,7 +77,13 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
           ? "Member updated successfully"
           : "Member created successfully",
       );
+
+      queryClient.invalidateQueries({
+        queryKey: ["members", "members-select"],
+      });
+
       if (!selected) form.reset(); // Reset form after submission
+
       if (onSuccess) {
         onSuccess();
       }

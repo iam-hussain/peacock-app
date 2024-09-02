@@ -36,14 +36,15 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
     dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
     dueDetails.currentTerm = dueDates.monthsPassed;
-    dueDetails.totalTerms = calculateMonthsDifference(
-      vendor.startAt,
-      vendor.endAt,
-    );
+    dueDetails.totalTerms =
+      calculateMonthsDifference(vendor.startAt, vendor.endAt) + 1;
   }
 
   if (vendor.type === "LEND" && vendor.active) {
-    const dueDates = calculateDueDates(vendor.startAt);
+    const dueDates = calculateDueDates(
+      vendor.startAt,
+      vendor?.endAt || new Date()
+    );
     const monthlyInterest = calculateMonthlyInterest(passbook.in);
     const expectedPayment = monthlyInterest * dueDates.monthsPassed;
     console.log({
@@ -59,10 +60,8 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
       calcReturns: passbook.calcReturns,
     });
 
-    dueDetails.totalTerms = calculateMonthsDifference(
-      vendor.startAt,
-      vendor.endAt,
-    );
+    dueDetails.totalTerms =
+      calculateMonthsDifference(vendor.startAt, vendor.endAt) + 1;
     dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
     dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
     dueDetails.currentTerm = dueDates.monthsPassed;
@@ -142,7 +141,7 @@ export async function POST(request: Request) {
     if (!name && !id) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -208,7 +207,7 @@ export async function POST(request: Request) {
     console.error("Error creating/updating vendor:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

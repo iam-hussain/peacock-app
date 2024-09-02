@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { vendorTypeMap } from "@/lib/config";
 import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { useQueryClient } from "@tanstack/react-query";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
@@ -40,6 +41,8 @@ export function VendorForm({
   onSuccess,
   onCancel,
 }: VendorFormProps) {
+  const queryClient = useQueryClient();
+
   const form = useForm({
     resolver: zodResolver(vendorFormSchema),
     defaultValues: selected
@@ -70,6 +73,7 @@ export function VendorForm({
   });
 
   async function onSubmit(data: VendorFromSchema) {
+    console.log({ data })
     try {
       const response = await fetch(`/api/vendors`, {
         method: "POST",
@@ -91,6 +95,10 @@ export function VendorForm({
           ? "Vendor updated successfully"
           : "Vendor created successfully",
       );
+
+      queryClient.invalidateQueries({
+        queryKey: ["vendors", "vendors-select"],
+      });
 
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
