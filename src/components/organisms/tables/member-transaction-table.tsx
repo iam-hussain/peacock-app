@@ -19,19 +19,19 @@ import {
   ActionCell,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
-import { MemberTransactionResponse } from "@/app/api/member-transactions/route";
+import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { format } from "date-fns";
 import { MembersSelectResponse } from "@/actions/member-select";
 import { SelectInputGroup } from "../../atoms/select-input-group";
 import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
-import { fetchMemberTransactions } from "@/lib/fetch-api";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMemberTransactions } from "@/lib/query-options";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
-): ColumnDef<MemberTransactionResponse>[] => [
+): ColumnDef<TransformedMemberTransaction>[] => [
   {
     accessorKey: "from.name",
     header: () => <PlainTableHeader label="From" />,
@@ -59,7 +59,6 @@ const baseColumns = (
           style: "currency",
           currency: "INR",
         })}
-        className="min-w-[80px]"
       />
     ),
   },
@@ -88,7 +87,6 @@ const baseColumns = (
       <CommonTableCell
         label={memberTransactionTypeMap[row.original.transactionType]}
         subLabel={transactionMethodMap[row.original.method]}
-        className="min-w-[130px]"
       />
     ),
   },
@@ -107,13 +105,12 @@ const baseColumns = (
           new Date(row.original.transactionAt),
           "dd MMM yyyy hh:mm a",
         )}
-        className="min-w-[150px]"
       />
     ),
   },
 ];
 
-const editColumns: ColumnDef<MemberTransactionResponse>[] = [
+const editColumns: ColumnDef<TransformedMemberTransaction>[] = [
   {
     accessorKey: "updatedAt",
     header: () => <PlainTableHeader label="Updated / Created" />,
@@ -124,16 +121,13 @@ const editColumns: ColumnDef<MemberTransactionResponse>[] = [
           new Date(row.original.createdAt),
           "dd MMM yyyy hh:mm a",
         )}
-        className="min-w-[150px]"
       />
     ),
   },
   {
     accessorKey: "id",
     header: () => <PlainTableHeader label="ID" />,
-    cell: ({ row }) => (
-      <CommonTableCell label={row.original.id} className="min-w-[100px]" />
-    ),
+    cell: ({ row }) => <CommonTableCell label={row.original.id} />,
   },
 ];
 
@@ -151,22 +145,19 @@ const initialOptions = {
 
 export type MembersTransactionTableProps = {
   members: MembersSelectResponse;
-  handleAction: (select: null | MemberTransactionResponse) => void;
+  handleAction: (select: null | TransformedMemberTransaction) => void;
 };
 
 const MembersTransactionTable = ({
   members,
   handleAction,
 }: MembersTransactionTableProps) => {
-  const [editMode, setEditMode] = useState(true);
+  const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<any>(initialOptions);
 
   const { data, isLoading, isError } = useQuery(
-    { queryKey: ['memberTransactions', options], 
-    queryFn: () => fetchMemberTransactions(options),  
-    placeholderData: keepPreviousData,
-   },
-   )
+    fetchMemberTransactions(options),
+  );
 
   const handleOptionsReset = () => {
     setOptions(initialOptions);
@@ -216,53 +207,67 @@ const MembersTransactionTable = ({
   return (
     <Dialog>
       <div className="w-full">
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-7 w-full mb-4">
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full mb-4">
           <SelectInputGroup
             value={options.fromId}
-            onChange={(e) => setOptions({ ...options, fromId: e })}
+            onChange={(e) => setOptions({ ...options, fromId: e, page: 1 })}
             placeholder="Select FROM member"
             options={members.map((each) => [each.id, each.name])}
           />
 
           <SelectInputGroup
             value={options.toId}
-            onChange={(e) => setOptions({ ...options, toId: e })}
+            onChange={(e) => setOptions({ ...options, toId: e, page: 1 })}
             placeholder="Select TO member"
             options={members.map((each) => [each.id, each.name])}
           />
 
           <DatePickerGroup
             selectedDate={options.startDate}
-            onSelectDate={(e) => setOptions({ ...options, startDate: e })}
+            onSelectDate={(e) =>
+              setOptions({ ...options, startDate: e, page: 1 })
+            }
             placeholder={"Date FROM"}
           />
 
           <DatePickerGroup
             selectedDate={options.endDate}
-            onSelectDate={(e) => setOptions({ ...options, endDate: e })}
+            onSelectDate={(e) =>
+              setOptions({ ...options, endDate: e, page: 1 })
+            }
             placeholder={"Date TO"}
           />
 
           <SelectInputGroup
             value={options.transactionType}
-            onChange={(e) => setOptions({ ...options, transactionType: e })}
+            onChange={(e) =>
+              setOptions({ ...options, transactionType: e, page: 1 })
+            }
             placeholder="Select TYPE"
             options={Object.entries(memberTransactionTypeMap)}
           />
           <PaginationFilters
             limit={Number(options.limit)}
-            onLimitChange={(limit: any) => setOptions({ ...options, limit })}
+            onLimitChange={(limit: any) =>
+              setOptions({ ...options, limit, page: 1 })
+            }
             onReset={handleOptionsReset}
             onToggleChange={setEditMode}
             toggleState={editMode}
           />
         </div>
 
-        <TableLayout table={table} columns={columns} isLoading={isLoading} isError={isError} />
+        <TableLayout
+          table={table}
+          columns={columns}
+          isLoading={isLoading}
+          isError={isError}
+        />
         <PaginationControls
           page={options.page}
           totalPages={data?.totalPages || 0}
           isLoading={isLoading}
+          isError={isError}
           setPage={(page) => setOptions({ ...options, page })}
         />
       </div>

@@ -1,11 +1,11 @@
 "use client";
 import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
-import { VendorTransactionResponse } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
 import { useState } from "react";
 
 type VendorTransactionDeleteFormProps = {
-  transaction: VendorTransactionResponse;
+  transaction: TransformedVendorTransaction;
   onSuccess: () => void;
   onCancel?: () => void;
 };

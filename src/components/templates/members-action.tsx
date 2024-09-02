@@ -6,16 +6,16 @@ import { Dialog } from "@radix-ui/react-dialog";
 import MembersTable from "../organisms/tables/member-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { MemberVendorConnectionsForm } from "../organisms/forms/member-vendor-connection-form";
-import { MemberResponse } from "@/app/api/members/route";
+import { TransformedMember } from "@/app/api/members/route";
 
 const MemberAction = () => {
-  const [selected, setSelected] = useState<null | MemberResponse["member"]>(
+  const [selected, setSelected] = useState<null | TransformedMember["member"]>(
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
 
   const handleAction = (
-    select: null | MemberResponse["member"],
+    select: null | TransformedMember["member"],
     mode?: string,
   ) => {
     setSelected(select);

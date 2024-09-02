@@ -23,7 +23,7 @@ export const PaginationFilters = ({
   toggleState,
 }: PaginationFiltersProps) => (
   <>
-    <div className="flex justify-end gap-2 flex-wrap md:flex-nowrap justify-between">
+    <div className="flex justify-end gap-2">
       <SelectInputGroup
         value={limit}
         onChange={(value: number | string) => onLimitChange(Number(value))}
@@ -38,11 +38,6 @@ export const PaginationFilters = ({
           ["50", "50/page"],
         ]}
       />
-    </div>
-    <div className="flex justify-between col-span-2 lg:col-span-1">
-      <Button onClick={onReset} variant={"outline"} className="w-auto">
-        Clear
-      </Button>
       <Toggle
         aria-label="Toggle"
         onPressedChange={onToggleChange}
@@ -56,5 +51,11 @@ export const PaginationFilters = ({
         )}
       </Toggle>
     </div>
+    {/* <div className="flex justify-between md:justify-start gap-2 col-span-2 lg:col-span-1 flex-row-reverse"> */}
+    {/* <Button onClick={onReset} variant={"outline"} className="w-auto">
+        Clear
+      </Button> */}
+
+    {/* </div> */}
   </>
 );

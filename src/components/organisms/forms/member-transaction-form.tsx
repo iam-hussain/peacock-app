@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { MembersSelectResponse } from "@/actions/member-select";
-import { MemberTransactionResponse } from "@/app/api/member-transactions/route";
+import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import {
   memberTransactionFormSchema,
@@ -33,7 +33,7 @@ import { DatePickerForm } from "../../atoms/date-picker-form";
 
 type MemberTransactionFormProps = {
   members: MembersSelectResponse;
-  selected: null | MemberTransactionResponse;
+  selected: null | TransformedMemberTransaction;
   onSuccess: () => void;
   onCancel?: () => void;
 };

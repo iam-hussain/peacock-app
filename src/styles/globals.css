@@ -99,3 +99,52 @@ body {
 .link {
   color: blue;
 }
+
+[data-table="action"] {
+  min-width: 50px;
+}
+
+[data-table="id"] {
+  min-width: 220px;
+}
+
+[data-table="updatedAt"],
+[data-table="transactionAt"],
+[data-table="transactionType"] {
+  min-width: 200px;
+}
+
+[data-table="nextDueDate"] [data-table="startAt"] [data-table="amount"] {
+  min-width: 140px;
+}
+
+[data-table="member_name"],
+[data-table="vendor_name"],
+[data-table="from_name"],
+[data-table="to_name"] {
+  min-width: 205px;
+}
+
+[data-table="name"] {
+  min-width: 215px;
+}
+
+[data-table="amount"],
+[data-table="deposit"],
+[data-table="balance"],
+[data-table="joinedAt"] {
+  min-width: 180px;
+}
+
+[data-table="type"],
+[data-table="invest"],
+[data-table="profit"],
+[data-table="returns"],
+[data-table="netValue"] {
+  min-width: 120px;
+}
+
+/* [data-table="netValue"] {
+  width: 100px;
+  min-width: 100px;
+} */

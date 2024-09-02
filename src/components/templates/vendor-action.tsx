@@ -7,16 +7,16 @@ import VendorsTable from "../organisms/tables/vendor-table";
 import { MembersSelectResponse } from "@/actions/member-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { VendorMemberConnectionsForm } from "../organisms/forms/vendor-member-connection-form";
-import { VendorResponse } from "@/app/api/vendors/route";
+import { TransformedVendor } from "@/app/api/vendors/route";
 
 const VendorAction = ({ members }: { members: MembersSelectResponse }) => {
-  const [selected, setSelected] = useState<null | VendorResponse["vendor"]>(
+  const [selected, setSelected] = useState<null | TransformedVendor["vendor"]>(
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
 
   const handleAction = (
-    select: null | VendorResponse["vendor"],
+    select: null | TransformedVendor["vendor"],
     mode?: string,
   ) => {
     setSelected(select);

@@ -22,11 +22,11 @@ import { FilterBar } from "../../molecules/filter-bar-group";
 import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils";
 import Typography from "../../ui/typography";
-import { MemberResponse } from "@/app/api/members/route";
-import { fetchMemberTransactions, fetchMembers } from "@/lib/fetch-api";
-import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { TransformedMember } from "@/app/api/members/route";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMembers } from "@/lib/query-options";
 
-const baseColumns: ColumnDef<MemberResponse>[] = [
+const baseColumns: ColumnDef<TransformedMember>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <ActionTableHeader label="Name" column={column} />,
@@ -63,7 +63,6 @@ const baseColumns: ColumnDef<MemberResponse>[] = [
             ? `${row.original.periodIn.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDeposit.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
             : ""
         }
-        className="min-w-[120px]"
       />
     ),
   },
@@ -83,7 +82,6 @@ const baseColumns: ColumnDef<MemberResponse>[] = [
             ? `${row.original.periodBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
             : ""
         }
-        className="min-w-[120px]"
       />
     ),
   },
@@ -98,7 +96,6 @@ const baseColumns: ColumnDef<MemberResponse>[] = [
           style: "currency",
           currency: "INR",
         })}
-        className="min-w-[80px]"
       />
     ),
   },
@@ -113,13 +110,12 @@ const baseColumns: ColumnDef<MemberResponse>[] = [
           style: "currency",
           currency: "INR",
         })}
-        className="min-w-[80px]"
       />
     ),
   },
 ];
 
-const editColumns: ColumnDef<MemberResponse>[] = [
+const editColumns: ColumnDef<TransformedMember>[] = [
   {
     accessorKey: "joinedAt",
     header: ({ column }) => (
@@ -129,7 +125,6 @@ const editColumns: ColumnDef<MemberResponse>[] = [
       <CommonTableCell
         label={dateFormat(new Date(row.original.joinedAt))}
         subLabel={row.original.id}
-        className="min-w-[80px]"
       />
     ),
   },
@@ -137,7 +132,7 @@ const editColumns: ColumnDef<MemberResponse>[] = [
 
 export type MemberTableProps = {
   handleAction: (
-    select: null | MemberResponse["member"],
+    select: null | TransformedMember["member"],
     mode?: string,
   ) => void;
 };
@@ -148,12 +143,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
 
   const [editMode, setEditMode] = useState(true);
 
-  const { data, isLoading, isError } = useQuery(
-   { queryKey: ['members'], 
-   queryFn: fetchMembers,  
-   placeholderData: keepPreviousData,
-  },
-  );
+  const { data, isLoading, isError } = useQuery(fetchMembers());
 
   const onCapture = async () => {
     if (captureRef.current) {
@@ -172,7 +162,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       const newTab = window.open();
       if (newTab) {
         newTab.document.write(
-          `<img src="${capturedImage}" alt="Captured Image" />`,
+          `<img src="${capturedImage}" alt="peacock_club_${fileDateTime()}" />`,
         );
       } else {
         const link = document.createElement("a");
@@ -190,8 +180,8 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
   }, [captureMode]);
 
   const tableData = useMemo(() => {
-    if(!data || !data.members) {
-      return []
+    if (!data || !data.members) {
+      return [];
     }
     if (editMode) {
       return data.members;
@@ -207,7 +197,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       ...baseColumns,
       ...editColumns,
       {
-        accessorKey: "member.id",
+        accessorKey: "action",
         header: () => <PlainTableHeader label="Action" />,
         cell: ({ row }) => (
           <ActionCell onClick={() => handleAction(row.original.member)} />
@@ -218,7 +208,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
   }, [editMode]);
 
   const table = useReactTable({
-    data:tableData,
+    data: tableData,
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -232,7 +222,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <FilterBar
         searchValue={
           (table.getColumn("name")?.getFilterValue() as string) ?? ""
@@ -248,7 +238,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       <div
         ref={captureRef}
         className={cn("flex bg-background", {
-          "absolute p-8 pb-10 flex-col": captureMode,
+          "absolute p-8 pb-16 flex-col": captureMode,
         })}
       >
         <div
@@ -270,7 +260,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
           isLoading={isLoading}
           isError={isError}
           className={cn({
-            "w-auto p-8": captureMode,
+            "w-auto p-8 border": captureMode,
           })}
         />
       </div>

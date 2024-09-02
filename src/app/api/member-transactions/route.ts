@@ -19,7 +19,7 @@ type MemberTransactionToTransform = MemberTransaction & {
   };
 };
 
-export type MemberTransactionResponse = ReturnType<
+export type TransformedMemberTransaction = ReturnType<
   typeof membersTransactionTableTransform
 >;
 
@@ -52,6 +52,13 @@ function membersTransactionTableTransform(
     toId: transaction.toId,
   };
 }
+
+export type GetMemberTransactionResponse = {
+  transactions: TransformedMemberTransaction[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -114,6 +121,7 @@ export async function GET(request: Request) {
   return NextResponse.json({
     transactions: transactions.map(membersTransactionTableTransform),
     total: totalTransactions,
+    page,
     totalPages: Math.ceil(totalTransactions / limit),
   });
 }

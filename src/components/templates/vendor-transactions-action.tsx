@@ -8,7 +8,7 @@ import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { VendorsSelectResponse } from "@/actions/vendor-select";
 import { MembersSelectResponse } from "@/actions/member-select";
-import { VendorTransactionResponse } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
 import VendorsTransactionTable from "../organisms/tables/vendor-transaction-table";
 import { VendorTransactionForm } from "../organisms/forms/vendor-transaction-form";
 import { VendorTransactionDeleteForm } from "../organisms/forms/vendor-transaction-delete-form";
@@ -20,13 +20,13 @@ const VendorTransactionsAction = ({
   members: MembersSelectResponse;
   vendors: VendorsSelectResponse;
 }) => {
-  const [selected, setSelected] = useState<null | VendorTransactionResponse>(
+  const [selected, setSelected] = useState<null | TransformedVendorTransaction>(
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
 
   const handleAction = (
-    select: null | VendorTransactionResponse,
+    select: null | TransformedVendorTransaction,
     mode?: string,
   ) => {
     setSelected(select);

@@ -34,7 +34,7 @@ export const SelectInputGroup = ({
     <SelectTrigger>
       <SelectValue placeholder={placeholder} />
     </SelectTrigger>
-    <SelectContent>
+    <SelectContent className="z-50">
       {!noPlaceHolderValue && (
         <SelectItem value={defaultValue} className="text-muted-foreground">
           {placeholder}

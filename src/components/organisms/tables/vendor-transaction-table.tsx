@@ -25,11 +25,13 @@ import { SelectInputGroup } from "../../atoms/select-input-group";
 import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
 import { VendorsSelectResponse } from "@/actions/vendor-select";
-import { VendorTransactionResponse } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
+import { useQuery } from "@tanstack/react-query";
+import { fetchVendorTransactions } from "@/lib/query-options";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
-): ColumnDef<VendorTransactionResponse>[] => [
+): ColumnDef<TransformedVendorTransaction>[] => [
   {
     accessorKey: "vendor.name",
     header: () => <PlainTableHeader label="Vendor" />,
@@ -58,7 +60,6 @@ const baseColumns = (
           style: "currency",
           currency: "INR",
         })}
-        className="min-w-[100px]"
       />
     ),
   },
@@ -87,7 +88,6 @@ const baseColumns = (
       <CommonTableCell
         label={vendorTransactionTypeMap[row.original.transactionType]}
         subLabel={transactionMethodMap[row.original.method]}
-        className="min-w-[130px]"
       />
     ),
   },
@@ -106,13 +106,12 @@ const baseColumns = (
           new Date(row.original.transactionAt),
           "dd MMM yyyy hh:mm a",
         )}
-        className="min-w-[150px]"
       />
     ),
   },
 ];
 
-const editColumns: ColumnDef<VendorTransactionResponse>[] = [
+const editColumns: ColumnDef<TransformedVendorTransaction>[] = [
   {
     accessorKey: "updatedAt",
     header: () => <PlainTableHeader label="Updated / Created" />,
@@ -123,7 +122,6 @@ const editColumns: ColumnDef<VendorTransactionResponse>[] = [
           new Date(row.original.createdAt),
           "dd MMM yyyy hh:mm a",
         )}
-        className="min-w-[150px]"
       />
     ),
   },
@@ -151,7 +149,7 @@ const initialOptions = {
 export type MembersTransactionTableProps = {
   members: MembersSelectResponse;
   vendors: VendorsSelectResponse;
-  handleAction: (select: null | VendorTransactionResponse) => void;
+  handleAction: (select: null | TransformedVendorTransaction) => void;
 };
 
 const VendorsTransactionTable = ({
@@ -160,32 +158,11 @@ const VendorsTransactionTable = ({
   handleAction,
 }: MembersTransactionTableProps) => {
   const [editMode, setEditMode] = useState(true);
-  const [data, setData] = useState<VendorTransactionResponse[]>([]);
-
-  const [isLoading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
   const [options, setOptions] = useState<any>(initialOptions);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const params = new URLSearchParams({
-      page: options.page.toString(),
-      limit: options.limit.toString(),
-      vendorId: options.vendorId.trim(),
-      memberId: options.memberId.trim(),
-      transactionType: options.transactionType.trim(),
-      sortField: options.sortField,
-      sortOrder: options.sortOrder,
-      ...(options?.startDate ? { startDate: options.startDate as any } : {}),
-      ...(options?.endDate ? { endDate: options.endDate as any } : {}),
-    });
-
-    const res = await fetch(`/api/vendor-transactions?${params.toString()}`);
-    const json = await res.json();
-    setData(json.transactions);
-    setTotalPages(json.totalPages);
-    setLoading(false);
-  };
+  const { data, isLoading, isError } = useQuery(
+    fetchVendorTransactions(options),
+  );
 
   const handleOptionsReset = () => {
     setOptions(initialOptions);
@@ -198,11 +175,6 @@ const VendorsTransactionTable = ({
       sortOrder: item.sortOrder === "asc" ? "desc" : "asc",
     }));
   };
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options]);
 
   const columns = useMemo(() => {
     if (!editMode) {
@@ -223,14 +195,14 @@ const VendorsTransactionTable = ({
   }, [editMode]);
 
   const table = useReactTable({
-    data,
+    data: data?.transactions || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
     manualSorting: true,
-    pageCount: totalPages,
+    pageCount: data?.totalPages || 0,
     state: {
       pagination: { pageIndex: options.page - 1, pageSize: 10 },
       sorting: [{ id: options.sortField, desc: options.sortOrder === "desc" }],
@@ -240,53 +212,67 @@ const VendorsTransactionTable = ({
   return (
     <Dialog>
       <div className="w-full">
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-7 w-full mb-4">
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full mb-4">
           <SelectInputGroup
             value={options.vendorId}
-            onChange={(e) => setOptions({ ...options, vendorId: e })}
+            onChange={(e) => setOptions({ ...options, vendorId: e, page: 1 })}
             placeholder="Select VENDOR"
             options={vendors.map((each) => [each.id, each.name])}
           />
 
           <SelectInputGroup
             value={options.memberId}
-            onChange={(e) => setOptions({ ...options, memberId: e })}
+            onChange={(e) => setOptions({ ...options, memberId: e, page: 1 })}
             placeholder="Select MEMBER"
             options={members.map((each) => [each.id, each.name])}
           />
 
           <DatePickerGroup
             selectedDate={options.startDate}
-            onSelectDate={(e) => setOptions({ ...options, startDate: e })}
+            onSelectDate={(e) =>
+              setOptions({ ...options, startDate: e, page: 1 })
+            }
             placeholder={"Date FROM"}
           />
 
           <DatePickerGroup
             selectedDate={options.endDate}
-            onSelectDate={(e) => setOptions({ ...options, endDate: e })}
+            onSelectDate={(e) =>
+              setOptions({ ...options, endDate: e, page: 1 })
+            }
             placeholder={"Date TO"}
           />
 
           <SelectInputGroup
             value={options.transactionType}
-            onChange={(e) => setOptions({ ...options, transactionType: e })}
+            onChange={(e) =>
+              setOptions({ ...options, transactionType: e, page: 1 })
+            }
             placeholder="Select TYPE"
             options={Object.entries(vendorTransactionTypeMap)}
           />
           <PaginationFilters
             limit={Number(options.limit)}
-            onLimitChange={(limit: any) => setOptions({ ...options, limit })}
+            onLimitChange={(limit: any) =>
+              setOptions({ ...options, limit, page: 1 })
+            }
             onReset={handleOptionsReset}
             onToggleChange={setEditMode}
             toggleState={editMode}
           />
         </div>
 
-        <TableLayout table={table} columns={columns} isLoading={isLoading} />
+        <TableLayout
+          table={table}
+          columns={columns}
+          isLoading={isLoading}
+          isError={isError}
+        />
         <PaginationControls
           page={options.page}
-          totalPages={totalPages}
+          totalPages={data?.totalPages || 0}
           isLoading={isLoading}
+          isError={isError}
           setPage={(page) => setOptions({ ...options, page })}
         />
       </div>

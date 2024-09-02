@@ -44,6 +44,7 @@ const transactionMethods = [
   "BANK",
   "CHEQUE",
 ] as const;
+
 const memberTransactionTypes = [
   "PERIODIC_DEPOSIT",
   "OFFSET_DEPOSIT",

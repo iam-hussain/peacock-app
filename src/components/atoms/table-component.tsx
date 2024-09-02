@@ -39,10 +39,16 @@ export const AvatarCell = ({
 
 type TableHeaderProps = {
   label: string;
+  className?: string;
 };
 
-export const PlainTableHeader = ({ label }: TableHeaderProps) => (
-  <div className="text-xs uppercase hover:bg-transparent hover:font-extrabold px-2">
+export const PlainTableHeader = ({ label, className }: TableHeaderProps) => (
+  <div
+    className={cn(
+      "text-xs uppercase hover:bg-transparent hover:font-extrabold px-2",
+      className,
+    )}
+  >
     {label}
   </div>
 );
@@ -51,7 +57,12 @@ export const ActionTableHeader = ({
   label,
   column,
   onClick,
-}: TableHeaderProps & { column: Column<any>; onClick?: (id: any) => void }) => {
+  className,
+}: TableHeaderProps & {
+  column: Column<any>;
+  onClick?: (id: any) => void;
+  className?: string;
+}) => {
   const isSorted = column.getIsSorted();
   const isSortedAsc = isSorted === "asc";
   const isSortedDesc = isSorted === "desc";
@@ -67,7 +78,8 @@ export const ActionTableHeader = ({
       }
       className={cn(
         "uppercase hover:bg-transparent hover:font-extrabold px-2 flex gap-2 justify-center align-middle items-center",
-        isSorted && "text-primary font-bold", // Highlight when sorted
+        isSorted && "text-secondary border rounded-md", // Highlight when sorted
+        className,
       )}
     >
       <span className="">{label}</span>
@@ -103,7 +115,7 @@ export const CommonTableCell = ({
   className,
   greenLabel = false,
 }: CommonTableCellProps) => (
-  <div className={cn("flex flex-col items-start min-w-[120px]", className)}>
+  <div className={cn("flex flex-col items-start", className)}>
     <p
       className={cn("text-foreground font-medium", {
         "text-emerald-500": greenLabel,
@@ -131,6 +143,7 @@ type PaginationControlsProps = {
   page: number;
   totalPages: number;
   isLoading: boolean;
+  isError: boolean;
   setPage: (page: number) => void;
 };
 
@@ -138,12 +151,13 @@ export const PaginationControls = ({
   page,
   totalPages,
   isLoading,
+  isError,
   setPage,
 }: PaginationControlsProps) => (
   <div className="mt-4 flex justify-between align-middle items-center gap-4">
     <Button
       onClick={() => setPage(page - 1)}
-      disabled={page === 1 || isLoading}
+      disabled={page === 1 || isLoading || isError}
       variant={"outline"}
       className="min-w-[100px]"
     >
@@ -154,7 +168,7 @@ export const PaginationControls = ({
     </span>
     <Button
       onClick={() => setPage(page + 1)}
-      disabled={page === totalPages || isLoading}
+      disabled={page === totalPages || isLoading || isError}
       variant={"outline"}
       className="min-w-[100px]"
     >

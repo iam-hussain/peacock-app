@@ -27,20 +27,19 @@ function TableLayout<T>({
   noDataMessage = "No results.",
   className,
 }: TableLayoutProps<T>) {
-
   const itemLength = table.getRowModel().rows.length;
   const isValid = !isError && !isLoading && itemLength > 0;
   const isNoData = !isError && !isLoading && itemLength === 0;
-  const isTrueError = isError && !isLoading
-  const isTrueLoading = !isError && isLoading
+  const isTrueError = isError && !isLoading;
+  const isTrueLoading = !isError && isLoading;
 
   return (
-    <Table className={cn(className)}>
+    <Table className={cn(className, "table-auto w-full")}>
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup: any) => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header: any) => (
-              <TableHead key={header.id}>
+              <TableHead key={header.id} data-table={header.id}>
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext(),
@@ -51,11 +50,16 @@ function TableLayout<T>({
         ))}
       </TableHeader>
       <TableBody>
-        {isTrueError && <TableRow>
-            <TableCell colSpan={columns.length} className="text-center p-6 text-destructive">
+        {isTrueError && (
+          <TableRow>
+            <TableCell
+              colSpan={columns.length}
+              className="text-center p-6 text-destructive"
+            >
               Unexpected error on fetching the data
             </TableCell>
-          </TableRow> }
+          </TableRow>
+        )}
 
         {isTrueLoading && (
           <TableRow>
@@ -65,7 +69,8 @@ function TableLayout<T>({
           </TableRow>
         )}
 
-        {isValid && table.getRowModel().rows.map((row: any) => (
+        {isValid &&
+          table.getRowModel().rows.map((row: any) => (
             <TableRow key={row.id}>
               {row.getVisibleCells().map((cell: any) => (
                 <TableCell key={cell.id} className="px-4">

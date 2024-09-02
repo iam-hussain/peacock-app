@@ -15,7 +15,7 @@ type VendorToTransform = Vendor & {
   } | null;
 };
 
-export type VendorResponse = ReturnType<typeof transformVendorForTable>;
+export type TransformedVendor = ReturnType<typeof transformVendorForTable>;
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, owner, ...vendor } = vendorInput;
@@ -91,6 +91,10 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     vendor: { ...vendor, calcReturns: passbook.calcReturns },
   };
 }
+
+export type GetVendorResponse = {
+  vendors: TransformedVendor[];
+};
 
 export async function GET(request: Request) {
   const vendors = await prisma.vendor.findMany({

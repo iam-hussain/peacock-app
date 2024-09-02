@@ -20,9 +20,11 @@ import { dateFormat } from "@/lib/date";
 import TableLayout from "../../atoms/table-layout";
 import { vendorTypeMap } from "@/lib/config";
 import { FilterBar } from "../../molecules/filter-bar-group";
-import { VendorResponse } from "@/app/api/vendors/route";
+import { TransformedVendor } from "@/app/api/vendors/route";
+import { useQuery } from "@tanstack/react-query";
+import { fetchVendors } from "@/lib/query-options";
 
-const baseColumns: ColumnDef<VendorResponse>[] = [
+const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => <ActionTableHeader label="Name" column={column} />,
@@ -49,13 +51,12 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
             ? dateFormat(new Date(row.original.endAt))
             : undefined
         }
-        className="min-w-[80px]"
       />
     ),
   },
   {
     accessorKey: "nextDueDate",
-    header: ({ column }) => <ActionTableHeader label="Type" column={column} />,
+    header: ({ column }) => <ActionTableHeader label="Due" column={column} />,
     cell: ({ row }) => (
       <CommonTableCell
         label={
@@ -71,7 +72,6 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
               })
             : undefined
         }
-        className="min-w-[50px]"
       />
     ),
   },
@@ -86,7 +86,6 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
             ? `${row.original.currentTerm} / ${row.original.totalTerms} terms`
             : ""
         }
-        className="min-w-[50px]"
       />
     ),
   },
@@ -101,7 +100,6 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
           style: "currency",
           currency: "INR",
         })}
-        className="min-w-[80px]"
       />
     ),
   },
@@ -116,7 +114,6 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
           style: "currency",
           currency: "INR",
         })}
-        className="min-w-[80px]"
       />
     ),
   },
@@ -135,14 +132,13 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
               })
             : " - "
         }
-        className="min-w-[80px]"
         greenLabel={row.original.calcReturns}
       />
     ),
   },
 ];
 
-const editColumns: ColumnDef<VendorResponse>[] = [
+const editColumns: ColumnDef<TransformedVendor>[] = [
   {
     accessorKey: "id",
     header: () => <PlainTableHeader label="ID" />,
@@ -154,27 +150,14 @@ const editColumns: ColumnDef<VendorResponse>[] = [
 
 export type VendorTableProps = {
   handleAction: (
-    select: null | VendorResponse["vendor"],
+    select: null | TransformedVendor["vendor"],
     mode?: string,
   ) => void;
 };
 
 const VendorsTable = ({ handleAction }: VendorTableProps) => {
   const [editMode, setEditMode] = useState(false);
-  const [isLoading, setLoading] = useState(true);
-  const [vendors, setVendors] = useState<VendorResponse[]>([]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    const res = await fetch("/api/vendors");
-    const json = await res.json();
-    setVendors(json.vendors);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data, isLoading, isError } = useQuery(fetchVendors());
 
   const columns = useMemo(() => {
     if (!editMode) {
@@ -184,7 +167,7 @@ const VendorsTable = ({ handleAction }: VendorTableProps) => {
       ...baseColumns,
       ...editColumns,
       {
-        accessorKey: "vendor.id",
+        accessorKey: "action",
         header: () => <PlainTableHeader label="Action" />,
         cell: ({ row }) => (
           <ActionCell onClick={() => handleAction(row.original.vendor)} />
@@ -195,7 +178,7 @@ const VendorsTable = ({ handleAction }: VendorTableProps) => {
   }, [editMode]);
 
   const table = useReactTable({
-    data: vendors,
+    data: data?.vendors || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -221,7 +204,12 @@ const VendorsTable = ({ handleAction }: VendorTableProps) => {
         toggleState={editMode}
         onAddClick={() => handleAction(null)}
       />
-      <TableLayout table={table} columns={columns} isLoading={isLoading} />
+      <TableLayout
+        table={table}
+        columns={columns}
+        isLoading={isLoading}
+        isError={isError}
+      />
     </div>
   );
 };

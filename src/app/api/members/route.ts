@@ -8,7 +8,7 @@ type MemberToTransform = Member & {
   passbook: Passbook;
 };
 
-export type MemberResponse = ReturnType<typeof membersTableTransform>;
+export type TransformedMember = ReturnType<typeof membersTableTransform>;
 
 function membersTableTransform(
   member: MemberToTransform,
@@ -40,6 +40,10 @@ function membersTableTransform(
     member: rawMember,
   };
 }
+
+export type GetMemberResponse = {
+  members: TransformedMember[];
+};
 
 export async function GET(request: Request) {
   const members = await prisma.member.findMany({

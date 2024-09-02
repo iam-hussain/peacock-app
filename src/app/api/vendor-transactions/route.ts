@@ -24,7 +24,7 @@ type VendorTransactionToTransform = VendorTransaction & {
   };
 };
 
-export type VendorTransactionResponse = ReturnType<
+export type TransformedVendorTransaction = ReturnType<
   typeof vendorsTransactionTableTransform
 >;
 
@@ -66,6 +66,13 @@ function vendorsTransactionTableTransform(
     memberId: transaction.memberId,
   };
 }
+
+export type GetVendorTransactionResponse = {
+  transactions: TransformedVendorTransaction[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
 
 // GET: Fetch vendor transactions with pagination
 export async function GET(request: Request) {
