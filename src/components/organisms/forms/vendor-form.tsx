@@ -24,6 +24,7 @@ import Box from "../../ui/box";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { toast } from "sonner";
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { vendorTypeMap } from "@/lib/config";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
@@ -191,10 +192,13 @@ export function VendorForm({
                       <SelectValue placeholder="Select vendor type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="DEFAULT">DEFAULT</SelectItem>
-                      <SelectItem value="CHIT">CHIT</SelectItem>
-                      <SelectItem value="LEND">LEND</SelectItem>
-                      <SelectItem value="BANK">BANK</SelectItem>
+                      {Object.entries(vendorTypeMap).map(
+                        ([key, name]) => (
+                          <SelectItem key={key} value={key}>
+                            {name}
+                          </SelectItem>
+                        ),
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>

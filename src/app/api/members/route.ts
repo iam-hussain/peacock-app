@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Member, Passbook } from "@prisma/client";
 import prisma from "@/db";
-import { dateFormat, monthsDiff } from "@/lib/date";
+import { dateFormat, calculateMonthsDifference } from "@/lib/date";
 import { memberTotalDepositAmount } from "@/lib/club";
 
 type MemberToTransform = Member & {
@@ -23,7 +23,7 @@ function membersTableTransform(
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     username: member.username,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-    joined: monthsDiff(new Date(), new Date(member.joinedAt)),
+    joined: calculateMonthsDifference(new Date(), new Date(member.joinedAt)),
     joinedAt: member.joinedAt.getTime(),
     status: member.active ? "Active" : "Disabled",
     active: member.active,

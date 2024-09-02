@@ -103,11 +103,11 @@ export function calculateDueDates(
   return { nextDueDate, recentDueDate, monthsPassed };
 }
 
-// export function monthsDiff(startDate: Date, now: Date = new Date()) {
+// export function calculateMonthsDifference(startDate: Date, now: Date = new Date()) {
 //   // Calculate the number of months passed since the start date
 //   return Math.abs(differenceInMonths(now, new Date(startDate)));
 // }
 
-export const monthsDiff = (a: Date, b: Date | null = new Date()) => {
+export const calculateMonthsDifference = (a: Date, b: Date | null = new Date()) => {
   return Math.abs(differenceInCalendarMonths(a, b || new Date()));
 };

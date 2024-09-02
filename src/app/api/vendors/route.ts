@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { calculateDueDates, dateFormat, monthsDiff } from "@/lib/date";
+import { calculateDueDates, calculateMonthsDifference } from "@/lib/date";
 import prisma from "@/db";
 import { Passbook, Vendor } from "@prisma/client";
 import { differenceInMonths } from "date-fns";
@@ -15,43 +15,42 @@ type VendorToTransform = Vendor & {
   } | null;
 };
 
-export type VendorResponse = ReturnType<typeof vendorsTableTransform>;
+export type VendorResponse = ReturnType<typeof transformVendorForTable>;
 
-function vendorsTableTransform(vendor: VendorToTransform) {
-  const { passbook, owner, ...rawVendor } = vendor;
-  const memberName = vendor?.owner?.firstName
-    ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
-    : "";
+function transformVendorForTable(vendorInput: VendorToTransform) {
+  const { passbook, owner, ...vendor } = vendorInput;
+  const memberName = owner?.firstName ? `${owner.firstName} ${owner.lastName || ""}` : "";
 
-  const due = {
+  const dueDetails = {
     nextDueDate: 0,
     recentDueDate: 0,
     currentTerm: 0,
     dueAmount: 0,
-    terms: 0,
+    totalTerms: 0,
   };
 
-  if (rawVendor.type === "CHIT" && rawVendor.active) {
+  if (vendor.type === "CHIT" && vendor.active) {
     const dueDates = calculateDueDates(vendor.startAt);
-    due.nextDueDate = dueDates.nextDueDate.getTime();
-    due.recentDueDate = dueDates.recentDueDate.getTime();
-    due.currentTerm = dueDates.monthsPassed;
-    due.terms = monthsDiff(rawVendor.startAt, rawVendor.endAt);
+    dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
+    dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
+    dueDetails.currentTerm = dueDates.monthsPassed;
+    dueDetails.totalTerms = calculateMonthsDifference(vendor.startAt, vendor.endAt);
   }
 
-  if (rawVendor.type === "LEND") {
+  if (vendor.type === "LEND" && vendor.active) {
     const dueDates = calculateDueDates(vendor.startAt);
     const monthlyInterest = calculateMonthlyInterest(passbook.in);
-    const expectedPaid = monthlyInterest * dueDates.monthsPassed;
-
-    due.terms = monthsDiff(rawVendor.startAt, rawVendor.endAt);
-    due.nextDueDate = dueDates.nextDueDate.getTime();
-    due.recentDueDate = dueDates.recentDueDate.getTime();
-    due.currentTerm = dueDates.monthsPassed;
-    due.dueAmount = expectedPaid - passbook.out;
+    const expectedPayment = monthlyInterest * dueDates.monthsPassed;
+    console.log({ monthlyInterest, dueDates, expectedPayment, name: vendor.name, passbook, type: vendor.type, start: vendor.startAt, end: vendor.endAt,  active: vendor.active, calcReturns: passbook.calcReturns   })
+    
+    dueDetails.totalTerms = calculateMonthsDifference(vendor.startAt, vendor.endAt);
+    dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
+    dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
+    dueDetails.currentTerm = dueDates.monthsPassed;
+    dueDetails.dueAmount = expectedPayment - passbook.out;
 
     if (!passbook.calcReturns) {
-      due.dueAmount = expectedPaid - passbook.out;
+      dueDetails.dueAmount = expectedPayment - passbook.out;
     }
   }
 
@@ -63,16 +62,14 @@ function vendorsTableTransform(vendor: VendorToTransform) {
     endAt: vendor.endAt ? vendor.endAt.getTime() : null,
     type: vendor.type,
     memberName,
-    memberAvatar: vendor?.owner?.avatar
-      ? `/image/${vendor.owner.avatar}`
-      : undefined,
+    memberAvatar: owner?.avatar ? `/image/${owner.avatar}` : undefined,
     active: vendor.active,
-    invest: vendor.passbook.in,
-    profit: vendor.passbook.out,
-    returns: vendor.passbook.returns,
+    invest: passbook.in,
+    profit: passbook.out,
+    returns: passbook.returns,
     calcReturns: passbook.calcReturns,
-    ...due,
-    vendor: { ...rawVendor, calcReturns: passbook.calcReturns },
+    ...dueDetails,
+    vendor: { ...vendor, calcReturns: passbook.calcReturns },
   };
 }
 
@@ -92,7 +89,7 @@ export async function GET(request: Request) {
   });
 
   const transformedVendors = vendors
-    .map(vendorsTableTransform)
+    .map(transformVendorForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 

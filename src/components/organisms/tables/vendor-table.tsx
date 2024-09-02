@@ -59,7 +59,7 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
     cell: ({ row }) => (
       <CommonTableCell
         label={
-          row.original.nextDueDate
+          row.original.active && row.original.nextDueDate
             ? dateFormat(new Date(row.original.nextDueDate))
             : "-"
         }
@@ -83,7 +83,7 @@ const baseColumns: ColumnDef<VendorResponse>[] = [
         label={vendorTypeMap[row.original.type]}
         subLabel={
           row.original.nextDueDate
-            ? `${row.original.currentTerm} / ${row.original.terms} terms`
+            ? `${row.original.currentTerm} / ${row.original.totalTerms} terms`
             : ""
         }
         className="min-w-[50px]"
