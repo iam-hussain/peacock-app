@@ -174,10 +174,16 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       });
       setCaptureMode(false);
       const capturedImage = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
+      const newTab = window.open();
+      if (newTab) {
+        newTab.document.write(`<img src="${capturedImage}" alt="Captured Image" />`);
+      } else {
+              const link = document.createElement("a");
       link.download = `peacock_club_${fileDateTime()}.png`;
       link.href = capturedImage;
       link.click();
+      }
+
     }
   };
 
