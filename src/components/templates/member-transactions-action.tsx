@@ -5,18 +5,16 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import MembersTransactionTable from "../organisms/tables/member-transaction-table";
 import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
-import { MembersSelectResponse } from "@/actions/member-select";
 import { MemberTransactionForm } from "../organisms/forms/member-transaction-form";
 import Typography from "../ui/typography";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { MemberTransactionDeleteForm } from "../organisms/forms/member-transaction-delete-form";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMembersSelect } from "@/lib/query-options";
 
-const MemberTransactionsAction = ({
-  members,
-}: {
-  members: MembersSelectResponse;
-}) => {
+const MemberTransactionsAction = () => {
+  const { data: members = [] } = useQuery(fetchMembersSelect())
   const [selected, setSelected] = useState<null | TransformedMemberTransaction>(
     null,
   );
@@ -24,7 +22,6 @@ const MemberTransactionsAction = ({
 
   const handleAction = (
     select: null | TransformedMemberTransaction,
-    mode?: string,
   ) => {
     setSelected(select);
     setIsOpen(!isOpen);

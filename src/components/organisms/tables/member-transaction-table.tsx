@@ -22,93 +22,93 @@ import TableLayout from "../../atoms/table-layout";
 import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { format } from "date-fns";
-import { MembersSelectResponse } from "@/actions/member-select";
 import { SelectInputGroup } from "../../atoms/select-input-group";
 import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMemberTransactions } from "@/lib/query-options";
+import { TransformedMemberSelect } from "@/app/api/members/select/route";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
 ): ColumnDef<TransformedMemberTransaction>[] => [
-  {
-    accessorKey: "from.name",
-    header: () => <PlainTableHeader label="From" />,
-    cell: ({ row }) => (
-      <AvatarCell
-        id={row.original.from.id}
-        avatar={row.original.from.avatar}
-        name={row.original.from.name}
-        active={row.original.from.active}
-      />
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => (
-      <ActionTableHeader
-        column={column}
-        onClick={handleSortClick}
-        label="Amount"
-      />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={row.original.amount.toLocaleString("en-IN", {
-          style: "currency",
-          currency: "INR",
-        })}
-      />
-    ),
-  },
-  {
-    accessorKey: "to.name",
-    header: () => <PlainTableHeader label="To" />,
-    cell: ({ row }) => (
-      <AvatarCell
-        id={row.original.to.id}
-        avatar={row.original.to.avatar}
-        name={row.original.to.name}
-        active={row.original.to.active}
-      />
-    ),
-  },
-  {
-    accessorKey: "transactionType",
-    header: ({ column }) => (
-      <ActionTableHeader
-        column={column}
-        onClick={handleSortClick}
-        label="Type"
-      />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={memberTransactionTypeMap[row.original.transactionType]}
-        subLabel={transactionMethodMap[row.original.method]}
-      />
-    ),
-  },
-  {
-    accessorKey: "transactionAt",
-    header: ({ column }) => (
-      <ActionTableHeader
-        column={column}
-        onClick={handleSortClick}
-        label="Transaction At"
-      />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={format(
-          new Date(row.original.transactionAt),
-          "dd MMM yyyy hh:mm a",
-        )}
-      />
-    ),
-  },
-];
+    {
+      accessorKey: "from.name",
+      header: () => <PlainTableHeader label="From" />,
+      cell: ({ row }) => (
+        <AvatarCell
+          id={row.original.from.id}
+          avatar={row.original.from.avatar}
+          name={row.original.from.name}
+          active={row.original.from.active}
+        />
+      ),
+    },
+    {
+      accessorKey: "amount",
+      header: ({ column }) => (
+        <ActionTableHeader
+          column={column}
+          onClick={handleSortClick}
+          label="Amount"
+        />
+      ),
+      cell: ({ row }) => (
+        <CommonTableCell
+          label={row.original.amount.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+          })}
+        />
+      ),
+    },
+    {
+      accessorKey: "to.name",
+      header: () => <PlainTableHeader label="To" />,
+      cell: ({ row }) => (
+        <AvatarCell
+          id={row.original.to.id}
+          avatar={row.original.to.avatar}
+          name={row.original.to.name}
+          active={row.original.to.active}
+        />
+      ),
+    },
+    {
+      accessorKey: "transactionType",
+      header: ({ column }) => (
+        <ActionTableHeader
+          column={column}
+          onClick={handleSortClick}
+          label="Type"
+        />
+      ),
+      cell: ({ row }) => (
+        <CommonTableCell
+          label={memberTransactionTypeMap[row.original.transactionType]}
+          subLabel={transactionMethodMap[row.original.method]}
+        />
+      ),
+    },
+    {
+      accessorKey: "transactionAt",
+      header: ({ column }) => (
+        <ActionTableHeader
+          column={column}
+          onClick={handleSortClick}
+          label="Transaction At"
+        />
+      ),
+      cell: ({ row }) => (
+        <CommonTableCell
+          label={format(
+            new Date(row.original.transactionAt),
+            "dd MMM yyyy hh:mm a",
+          )}
+        />
+      ),
+    },
+  ];
 
 const editColumns: ColumnDef<TransformedMemberTransaction>[] = [
   {
@@ -144,7 +144,7 @@ const initialOptions = {
 };
 
 export type MembersTransactionTableProps = {
-  members: MembersSelectResponse;
+  members: TransformedMemberSelect[];
   handleAction: (select: null | TransformedMemberTransaction) => void;
 };
 

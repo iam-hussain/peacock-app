@@ -20,96 +20,96 @@ import {
 import TableLayout from "../../atoms/table-layout";
 import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
 import { format } from "date-fns";
-import { MembersSelectResponse } from "@/actions/member-select";
 import { SelectInputGroup } from "../../atoms/select-input-group";
 import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
-import { VendorsSelectResponse } from "@/actions/vendor-select";
 import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
 import { useQuery } from "@tanstack/react-query";
 import { fetchVendorTransactions } from "@/lib/query-options";
+import { TransformedVendorSelect } from "@/app/api/vendors/select/route";
+import { TransformedMemberSelect } from "@/app/api/members/select/route";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
 ): ColumnDef<TransformedVendorTransaction>[] => [
-  {
-    accessorKey: "vendor.name",
-    header: () => <PlainTableHeader label="Vendor" />,
-    cell: ({ row }) => (
-      <AvatarCell
-        id={row.original.vendor.id}
-        avatar={row.original.vendor.memberAvatar}
-        name={row.original.vendor.name}
-        active={row.original.vendor.active}
-        subLabel={row.original.vendor.memberName}
-      />
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => (
-      <ActionTableHeader
-        onClick={handleSortClick}
-        label="Amount"
-        column={column}
-      />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={row.original.amount.toLocaleString("en-IN", {
-          style: "currency",
-          currency: "INR",
-        })}
-      />
-    ),
-  },
-  {
-    accessorKey: "member.name",
-    header: () => <PlainTableHeader label="Member" />,
-    cell: ({ row }) => (
-      <AvatarCell
-        id={row.original.member.id}
-        avatar={row.original.member.avatar}
-        name={row.original.member.name}
-        active={row.original.member.active}
-      />
-    ),
-  },
-  {
-    accessorKey: "transactionType",
-    header: ({ column }) => (
-      <ActionTableHeader
-        onClick={handleSortClick}
-        label="Type"
-        column={column}
-      />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={vendorTransactionTypeMap[row.original.transactionType]}
-        subLabel={transactionMethodMap[row.original.method]}
-      />
-    ),
-  },
-  {
-    accessorKey: "transactionAt",
-    header: ({ column }) => (
-      <ActionTableHeader
-        onClick={handleSortClick}
-        label="Transaction At"
-        column={column}
-      />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={format(
-          new Date(row.original.transactionAt),
-          "dd MMM yyyy hh:mm a",
-        )}
-      />
-    ),
-  },
-];
+    {
+      accessorKey: "vendor.name",
+      header: () => <PlainTableHeader label="Vendor" />,
+      cell: ({ row }) => (
+        <AvatarCell
+          id={row.original.vendor.id}
+          avatar={row.original.vendor.memberAvatar}
+          name={row.original.vendor.name}
+          active={row.original.vendor.active}
+          subLabel={row.original.vendor.memberName}
+        />
+      ),
+    },
+    {
+      accessorKey: "amount",
+      header: ({ column }) => (
+        <ActionTableHeader
+          onClick={handleSortClick}
+          label="Amount"
+          column={column}
+        />
+      ),
+      cell: ({ row }) => (
+        <CommonTableCell
+          label={row.original.amount.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+          })}
+        />
+      ),
+    },
+    {
+      accessorKey: "member.name",
+      header: () => <PlainTableHeader label="Member" />,
+      cell: ({ row }) => (
+        <AvatarCell
+          id={row.original.member.id}
+          avatar={row.original.member.avatar}
+          name={row.original.member.name}
+          active={row.original.member.active}
+        />
+      ),
+    },
+    {
+      accessorKey: "transactionType",
+      header: ({ column }) => (
+        <ActionTableHeader
+          onClick={handleSortClick}
+          label="Type"
+          column={column}
+        />
+      ),
+      cell: ({ row }) => (
+        <CommonTableCell
+          label={vendorTransactionTypeMap[row.original.transactionType]}
+          subLabel={transactionMethodMap[row.original.method]}
+        />
+      ),
+    },
+    {
+      accessorKey: "transactionAt",
+      header: ({ column }) => (
+        <ActionTableHeader
+          onClick={handleSortClick}
+          label="Transaction At"
+          column={column}
+        />
+      ),
+      cell: ({ row }) => (
+        <CommonTableCell
+          label={format(
+            new Date(row.original.transactionAt),
+            "dd MMM yyyy hh:mm a",
+          )}
+        />
+      ),
+    },
+  ];
 
 const editColumns: ColumnDef<TransformedVendorTransaction>[] = [
   {
@@ -147,8 +147,8 @@ const initialOptions = {
 };
 
 export type MembersTransactionTableProps = {
-  members: MembersSelectResponse;
-  vendors: VendorsSelectResponse;
+  members: TransformedMemberSelect[];
+  vendors: TransformedVendorSelect[];
   handleAction: (select: null | TransformedVendorTransaction) => void;
 };
 
@@ -157,7 +157,7 @@ const VendorsTransactionTable = ({
   vendors,
   handleAction,
 }: MembersTransactionTableProps) => {
-  const [editMode, setEditMode] = useState(true);
+  const [editMode, setEditMode] = useState(false);
   const [options, setOptions] = useState<any>(initialOptions);
 
   const { data, isLoading, isError } = useQuery(

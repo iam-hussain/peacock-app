@@ -6,20 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Typography from "../ui/typography";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
-import { VendorsSelectResponse } from "@/actions/vendor-select";
-import { MembersSelectResponse } from "@/actions/member-select";
 import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
 import VendorsTransactionTable from "../organisms/tables/vendor-transaction-table";
 import { VendorTransactionForm } from "../organisms/forms/vendor-transaction-form";
 import { VendorTransactionDeleteForm } from "../organisms/forms/vendor-transaction-delete-form";
+import { useQuery } from "@tanstack/react-query";
+import { fetchMembersSelect, fetchVendorsSelect } from "@/lib/query-options";
 
-const VendorTransactionsAction = ({
-  members,
-  vendors,
-}: {
-  members: MembersSelectResponse;
-  vendors: VendorsSelectResponse;
-}) => {
+const VendorTransactionsAction = () => {
+  const { data: members = [] } = useQuery(fetchMembersSelect())
+  const { data: vendors = [] } = useQuery(fetchVendorsSelect())
   const [selected, setSelected] = useState<null | TransformedVendorTransaction>(
     null,
   );

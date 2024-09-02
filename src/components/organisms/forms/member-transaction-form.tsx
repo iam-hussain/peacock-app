@@ -21,7 +21,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
-import { MembersSelectResponse } from "@/actions/member-select";
 import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import {
@@ -30,9 +29,10 @@ import {
 } from "@/lib/form-schema";
 import Box from "../../ui/box";
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { TransformedMemberSelect } from "@/app/api/members/select/route";
 
 type MemberTransactionFormProps = {
-  members: MembersSelectResponse;
+  members: TransformedMemberSelect[];
   selected: null | TransformedMemberTransaction;
   onSuccess: () => void;
   onCancel?: () => void;
@@ -48,25 +48,25 @@ export function MemberTransactionForm({
     resolver: zodResolver(memberTransactionFormSchema),
     defaultValues: selected
       ? {
-          fromId: selected.fromId,
-          toId: selected.toId || "",
-          transactionType: selected.transactionType as any,
-          method: (selected.method as any) || "ACCOUNT",
-          amount: selected.amount || 0,
-          note: selected.note || "",
-          transactionAt: selected.transactionAt
-            ? new Date(selected.transactionAt)
-            : new Date(),
-        }
+        fromId: selected.fromId,
+        toId: selected.toId || "",
+        transactionType: selected.transactionType as any,
+        method: (selected.method as any) || "ACCOUNT",
+        amount: selected.amount || 0,
+        note: selected.note || "",
+        transactionAt: selected.transactionAt
+          ? new Date(selected.transactionAt)
+          : new Date(),
+      }
       : {
-          fromId: "",
-          toId: "",
-          transactionType: "FUNDS_TRANSFER",
-          method: "ACCOUNT",
-          amount: 0,
-          note: "",
-          transactionAt: new Date(),
-        },
+        fromId: "",
+        toId: "",
+        transactionType: "FUNDS_TRANSFER",
+        method: "ACCOUNT",
+        amount: 0,
+        note: "",
+        transactionAt: new Date(),
+      },
   });
 
   // Handle form submission

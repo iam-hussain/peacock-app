@@ -7,6 +7,9 @@ import {
 } from "@/app/api/member-transactions/route";
 import { GetVendorResponse } from "@/app/api/vendors/route";
 import { GetVendorTransactionResponse } from "@/app/api/vendor-transactions/route";
+import { GetStatisticsResponse } from "@/app/api/statistics/route";
+import { TransformedVendorSelect } from "@/app/api/vendors/select/route";
+import { TransformedMemberSelect } from "@/app/api/members/select/route";
 
 const noRefetchConfigs = {
   refetchOnMount: false,
@@ -45,7 +48,7 @@ export const fetchMemberTransactions = (options: any) => {
     queryKey: ["member-transactions", options],
     queryFn: () =>
       fetcher(
-        `/api/member-transactions?${params.toString()}`,
+        `/api/member-transactions?${params.toString()}`
       ) as unknown as GetMemberTransactionResponse,
     ...noRefetchConfigs,
   });
@@ -68,7 +71,7 @@ export const fetchVendorTransactions = (options: any) => {
     queryKey: ["vendor-transactions", options],
     queryFn: () =>
       fetcher(
-        `/api/vendor-transactions?${params.toString()}`,
+        `/api/vendor-transactions?${params.toString()}`
       ) as unknown as GetVendorTransactionResponse,
     ...noRefetchConfigs,
   });
@@ -77,20 +80,22 @@ export const fetchVendorTransactions = (options: any) => {
 export const fetchMembersSelect = () =>
   queryOptions({
     queryKey: ["members-select"],
-    queryFn: () => fetcher("/api/members/select"),
+    queryFn: () =>
+      fetcher("/api/members/select") as never as TransformedMemberSelect[],
     ...noRefetchConfigs,
   });
 
 export const fetchVendorsSelect = () =>
   queryOptions({
     queryKey: ["vendors-select"],
-    queryFn: () => fetcher("/api/vendors/select"),
+    queryFn: () =>
+      fetcher("/api/vendors/select") as never as TransformedVendorSelect[],
     ...noRefetchConfigs,
   });
 
 export const fetchStatistics = () =>
   queryOptions({
     queryKey: ["statistics"],
-    queryFn: () => fetcher("/api/statistics"),
+    queryFn: () => fetcher("/api/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });

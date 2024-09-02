@@ -16,6 +16,8 @@ function membersSelectTransform(member: MemberToTransform) {
   };
 }
 
+export type TransformedMemberSelect = ReturnType<typeof membersSelectTransform>;
+
 export async function GET(request: Request) {
   const members = await prisma.member.findMany({
     select: {
@@ -26,10 +28,9 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json({
-    success: true,
-    members: members
+  return NextResponse.json(
+    members
       .map(membersSelectTransform)
-      .sort((a, b) => (a.name > b.name ? 1 : -1)),
-  });
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+  );
 }

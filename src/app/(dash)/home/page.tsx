@@ -15,26 +15,27 @@ import { DashboardCard } from "@/components/atoms/dashboard-card";
 import { clubAge } from "@/lib/date";
 import Box from "@/components/ui/box";
 import { useEffect, useState } from "react";
-import { StatisticsResponse } from "@/app/api/statistics/route";
+import { TransformedStatistics } from "@/app/api/statistics/route";
+import { useQuery } from "@tanstack/react-query";
+import { fetchStatistics } from "@/lib/query-options";
 
 export default function HomePage() {
-  const [statistics, setStatistics] = useState<null | StatisticsResponse>(null);
   const club = clubAge();
+  const { data, isLoading, isError } = useQuery(fetchStatistics());
+  const statistics = data?.statistics || null
 
-  const fetchData = async () => {
-    const res = await fetch("/api/statistics");
-    const json = await res.json();
-    setStatistics(json.statistics);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  if (!statistics) {
+  if (isLoading) {
     return (
       <Box>
         <p className="p-8">Loading...</p>
+      </Box>
+    );
+  }
+
+  if (isError || !statistics) {
+    return (
+      <Box>
+        <p className="p-8 text-center w-full text-destructive">Unexpected error on fetching the data</p>
       </Box>
     );
   }

@@ -39,9 +39,9 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         subLabel={
           row.original.clubFund
             ? row.original.clubFund.toLocaleString("en-IN", {
-                style: "currency",
-                currency: "INR",
-              })
+              style: "currency",
+              currency: "INR",
+            })
             : ""
         }
       />
@@ -141,7 +141,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
   const captureRef = useRef<HTMLDivElement>(null);
   const [captureMode, setCaptureMode] = useState(false);
 
-  const [editMode, setEditMode] = useState(true);
+  const [editMode, setEditMode] = useState(false);
 
   const { data, isLoading, isError } = useQuery(fetchMembers());
 

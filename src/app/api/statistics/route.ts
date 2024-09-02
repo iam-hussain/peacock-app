@@ -3,7 +3,7 @@ import { calculateTotalDeposit, clubMonthsFromStart } from "@/lib/club";
 import { Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-export type StatisticsResponse = ReturnType<typeof statisticsTransform>;
+export type TransformedStatistics = ReturnType<typeof statisticsTransform>;
 
 function statisticsTransform(statistics: Passbook, membersCount: number) {
   const currentIn = statistics.in - statistics.out;
@@ -28,6 +28,10 @@ function statisticsTransform(statistics: Passbook, membersCount: number) {
     netValue,
   };
 }
+
+export type GetStatisticsResponse = {
+  statistics: TransformedStatistics;
+};
 
 export async function GET() {
   const statistics = await prisma.passbook.findFirst({

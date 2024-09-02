@@ -22,8 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { VendorsSelectResponse } from "@/actions/vendor-select";
-import { MembersSelectResponse } from "@/actions/member-select";
 import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
@@ -33,10 +31,12 @@ import {
   vendorTransactionFormSchema,
 } from "@/lib/form-schema";
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { TransformedVendorSelect } from "@/app/api/vendors/select/route";
+import { TransformedMemberSelect } from "@/app/api/members/select/route";
 
 type VendorTransactionFormProps = {
-  vendors: VendorsSelectResponse;
-  members: MembersSelectResponse;
+  vendors: TransformedMemberSelect[];
+  members: TransformedVendorSelect[];
   selected: null | TransformedVendorTransaction;
   onSuccess: () => void;
   onCancel?: () => void;
@@ -53,25 +53,25 @@ export function VendorTransactionForm({
     resolver: zodResolver(vendorTransactionFormSchema),
     defaultValues: selected
       ? {
-          vendorId: selected.vendorId,
-          memberId: selected.memberId || "",
-          transactionType: selected.transactionType as any,
-          method: (selected.method as any) || "ACCOUNT",
-          amount: selected.amount || 0,
-          note: selected.note || "",
-          transactionAt: selected.transactionAt
-            ? new Date(selected.transactionAt)
-            : new Date(),
-        }
+        vendorId: selected.vendorId,
+        memberId: selected.memberId || "",
+        transactionType: selected.transactionType as any,
+        method: (selected.method as any) || "ACCOUNT",
+        amount: selected.amount || 0,
+        note: selected.note || "",
+        transactionAt: selected.transactionAt
+          ? new Date(selected.transactionAt)
+          : new Date(),
+      }
       : {
-          vendorId: "",
-          memberId: "",
-          transactionType: "INVEST",
-          method: "ACCOUNT",
-          amount: 0,
-          note: "",
-          transactionAt: new Date(),
-        },
+        vendorId: "",
+        memberId: "",
+        transactionType: "INVEST",
+        method: "ACCOUNT",
+        amount: 0,
+        note: "",
+        transactionAt: new Date(),
+      },
   });
 
   // Handle form submission

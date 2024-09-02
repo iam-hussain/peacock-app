@@ -1,11 +1,9 @@
 import Box from "@/components/ui/box";
 import Typography from "@/components/ui/typography";
 import { CustomLink } from "@/components/ui/link";
-import { membersSelect } from "@/actions/member-select";
 import VendorAction from "@/components/templates/vendor-action";
 
 export default async function Vendors() {
-  const members = await membersSelect();
 
   return (
     <Box preset={"stack-start"}>
@@ -18,7 +16,7 @@ export default async function Vendors() {
         </CustomLink>
       </Box>
       <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-        <VendorAction members={members} />
+        <VendorAction />
       </Box>
     </Box>
   );

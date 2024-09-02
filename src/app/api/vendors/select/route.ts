@@ -15,6 +15,8 @@ function vendorsSelectTransform(vendor: VendorToTransform) {
   };
 }
 
+export type TransformedVendorSelect = ReturnType<typeof vendorsSelectTransform>;
+
 export async function GET(request: Request) {
   const vendors = await prisma.vendor.findMany({
     select: {
@@ -24,10 +26,9 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json({
-    success: true,
-    vendors: vendors
+  return NextResponse.json(
+    vendors
       .map(vendorsSelectTransform)
-      .sort((a, b) => (a.name > b.name ? 1 : -1)),
-  });
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+  );
 }
