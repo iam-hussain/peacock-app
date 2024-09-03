@@ -10,8 +10,14 @@ export async function GET(
 
   const connections = await prisma.vendorProfitShare.findMany({
     where: { memberId },
-    include: {
-      vendor: true,
+    select: {
+      id: true,
+      active: true,
+      vendor: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 

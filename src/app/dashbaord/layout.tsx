@@ -2,44 +2,29 @@
 import SideMenu from "@/components/organisms/side-menu";
 import SideMenuMobile from "@/components/organisms/side-menu-mobile";
 import TopMenu from "@/components/organisms/top-menu";
-import { store } from "@/store";
+import { fetchAuthStatus } from "@/lib/query-options";
 import { setIsLoggedIn } from "@/store/pageSlice";
-import Cookies from "js-cookie";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-export default function HomeLayout({
+export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const dispatch = useDispatch();
+  const { data, isLoading, isError } = useQuery(fetchAuthStatus());
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("/api/auth/status", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+    if (data) {
+      dispatch(setIsLoggedIn(data.isLoggedIn));
+    }
 
-        if (res.ok) {
-          const data = await res.json();
-          dispatch(setIsLoggedIn(data.isLoggedIn));
-        } else {
-          dispatch(setIsLoggedIn(false));
-        }
-      } catch (error) {
-        console.error("Failed to fetch auth status:", error);
-        dispatch(setIsLoggedIn(false));
-      }
-    };
-
-    checkAuth();
-  }, [dispatch]);
+    if (isError) {
+      dispatch(setIsLoggedIn(false));
+    }
+  }, [data, isError, isLoading, dispatch]);
 
   return (
     <div className="main-wrapper">
@@ -48,7 +33,7 @@ export default function HomeLayout({
         <SideMenu />
         <div
           className={
-            "h-full min-h-svh w-full transition-all duration-300 max-w-7xl max-w-[2000px] m-auto mt-0 pt-[61px]"
+            "h-full min-h-svh w-full transition-all duration-300 max-w-[1800px] m-auto mt-0 pt-[61px]"
           }
         >
           <div className="w-full flex h-full px-2 py-8">{children}</div>

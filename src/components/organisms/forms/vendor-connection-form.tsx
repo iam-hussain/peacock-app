@@ -2,17 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
-
-type MemberConnection = {
-  id: string;
-  member: { firstName: string; lastName: string };
-  active: boolean;
-};
+import { useQuery } from "@tanstack/react-query";
+import { fetchVendorConnection } from "@/lib/query-options";
 
 type VendorConnectionsFormProps = {
   vendorId: string;
@@ -26,18 +21,15 @@ export function VendorConnectionsForm({
   onCancel,
 }: VendorConnectionsFormProps) {
   const { control, handleSubmit, reset, formState } = useForm();
-  const [connections, setConnections] = useState<MemberConnection[]>([]);
+  const { data, isLoading, isError } = useQuery(
+    fetchVendorConnection(vendorId),
+  );
 
   useEffect(() => {
-    async function fetchConnections() {
-      const response = await fetch(`/api/vendor/connection/${vendorId}`);
-      const data = await response.json();
-      setConnections(data.connections);
+    if (data && data.connections) {
       reset({ connections: data.connections });
     }
-
-    fetchConnections();
-  }, [vendorId, reset]);
+  }, [data, vendorId, reset]);
 
   const onSubmit = async (data: any) => {
     try {
@@ -60,13 +52,22 @@ export function VendorConnectionsForm({
     }
   };
 
+  if (isLoading) {
+    return <p className="w-full text-center p-6">Loading...</p>;
+  }
+
+  if (isError) {
+    return (
+      <p className="w-full text-center p-6 text-destructive">
+        Unexpected error on fetching the data
+      </p>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="py-2">
-      {connections.length === 0 && (
-        <p className="w-full text-center p-6">Loading...</p>
-      )}
       <Box preset={"grid-split"} className="gap-2">
-        {connections.map((connection, index) => (
+        {data?.connections.map((connection, index) => (
           <div
             key={connection.id}
             className="flex w-full items-center justify-between border border-input px-2 min-h-[36px] py-1 rounded-md"

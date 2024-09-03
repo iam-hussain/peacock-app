@@ -40,12 +40,12 @@ const appMenus: Menu[] = [
   {
     Icon: FaPeopleGroup,
     label: "Members",
-    link: "/member",
+    link: "/dashboard/member",
   },
   {
     Icon: HiBriefcase,
     label: "Vendors",
-    link: "/vendor",
+    link: "/dashboard/vendor",
   },
 ];
 
@@ -53,12 +53,12 @@ const transactionsMenus: Menu[] = [
   {
     Icon: FaPiggyBank,
     label: "Member Transactions",
-    link: "/member/transaction",
+    link: "/dashboard/member/transaction",
   },
   {
     Icon: RiFolderTransferFill,
     label: "Vendor Transactions",
-    link: "/vendor/transaction",
+    link: "/dashboard/vendor/transaction",
   },
 ];
 

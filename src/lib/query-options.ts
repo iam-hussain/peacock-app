@@ -9,10 +9,10 @@ import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
 
 const noRefetchConfigs = {
-  refetchOnMount: false,
-  refetchInactive: true,
-  refetchOnReconnect: true,
-  refetchOnWindowFocus: false,
+  // refetchOnMount: false,
+  // refetchInactive: true,
+  // refetchOnReconnect: true,
+  // refetchOnWindowFocus: false,
 };
 
 export const fetchMembers = () =>
@@ -94,7 +94,8 @@ export const fetchVendorsSelect = () =>
 export const fetchStatistics = () =>
   queryOptions({
     queryKey: ["statistics"],
-    queryFn: () => fetcher("/api/dashboard/statistics") as never as GetStatisticsResponse,
+    queryFn: () =>
+      fetcher("/api/dashboard/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
 
@@ -102,9 +103,15 @@ export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
     queryKey: ["member-connection"],
     queryFn: () =>
-      fetcher(
-        `/api/member/connection/${memberId}`,
-      ) as never as GetStatisticsResponse,
+      fetcher(`/api/member/connection/${memberId}`) as never as {
+        connections: {
+          vendor: {
+            name: string;
+          };
+          id: string;
+          active: boolean;
+        }[];
+      },
     ...noRefetchConfigs,
   });
 
@@ -112,8 +119,23 @@ export const fetchVendorConnection = (vendorId: string) =>
   queryOptions({
     queryKey: ["vendor-connection"],
     queryFn: () =>
-      fetcher(
-        `/api/vendor/connection/${vendorId}`,
-      ) as never as GetStatisticsResponse,
+      fetcher(`/api/vendor/connection/${vendorId}`) as never as {
+        connections: {
+          member: {
+            firstName?: string;
+            lastName?: string;
+          };
+          id: string;
+          active: boolean;
+        }[];
+      },
+    ...noRefetchConfigs,
+  });
+
+export const fetchAuthStatus = () =>
+  queryOptions({
+    queryKey: ["auth"],
+    queryFn: () =>
+      fetcher("/api/auth/status") as never as { isLoggedIn: boolean },
     ...noRefetchConfigs,
   });
