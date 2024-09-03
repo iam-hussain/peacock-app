@@ -33,10 +33,10 @@ export default function DashboardLayout({
         <SideMenu />
         <div
           className={
-            "h-full min-h-svh w-full transition-all duration-300 max-w-[1800px] m-auto mt-0 pt-[61px]"
+            "h-full min-h-svh w-full transition-all duration-300 max-w-[1800px] m-auto mt-0 pt-[48px] lg:pl-[300px]"
           }
         >
-          <div className="w-full flex h-full px-2 py-8">{children}</div>
+          <div className="w-full flex h-full p-6">{children}</div>
         </div>
       </main>
       <SideMenuMobile />

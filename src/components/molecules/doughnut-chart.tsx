@@ -30,7 +30,7 @@ export function DoughnutChart({
 
   return (
     <Card className="shadow-sm flex items-center rounded-lg p-4 flex-col">
-      <h2 className="text-lg font-medium font-serif text-center">
+      <h2 className="text-lg font-medium text-center">
         Fund Overview
       </h2>
       <div className="mx-auto w-4/5 md:w-[350px] bg-background flex justify-center align-middle items-center">

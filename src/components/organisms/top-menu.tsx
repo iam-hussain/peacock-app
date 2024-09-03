@@ -62,7 +62,7 @@ function TopMenu({ className }: { className?: string }) {
   return (
     <motion.nav
       className={clsx(
-        "lg:pl-[350px] w-full h-[60px] align-middle items-center fixed px-4 lg:px-8 flex justify-start lg:justify-center",
+        "w-full h-[48px] align-middle items-center fixed px-4 lg:px-8 flex justify-start lg:justify-center shadow-sm",
         className,
       )}
       initial="show"

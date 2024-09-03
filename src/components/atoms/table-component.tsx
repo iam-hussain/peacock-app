@@ -77,8 +77,8 @@ export const ActionTableHeader = ({
           : column.toggleSorting(column.getIsSorted() === "asc")
       }
       className={cn(
-        "uppercase hover:bg-transparent hover:font-extrabold px-2 flex gap-2 justify-center align-middle items-center",
-        isSorted && "text-secondary border rounded-md", // Highlight when sorted
+        "uppercase hover:bg-transparent hover:font-extrabold px-2 flex gap-2 justify-center align-middle items-center shadow-sm",
+        isSorted && "border rounded-md", // Highlight when sorted
         className,
       )}
     >

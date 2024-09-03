@@ -110,7 +110,7 @@ function MenuItems({
         </Typography>
         <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
       </Box>
-      <Separator className="my-4" />
+      <Separator className="my-2" />
 
       <ScrollArea className="w-full grow">
         <Box preset={"stack-start"} className="gap-4" gap={1}>
@@ -124,7 +124,7 @@ function MenuItems({
               <Icon className="h-5 w-5" /> {each.label}
             </CustomLink>
           ))}
-          <Separator className="my-4" />
+          <Separator className="my-2" />
           {transactionsMenus.map(({ Icon, ...each }, key) => (
             <CustomLink
               key={key}
@@ -138,12 +138,12 @@ function MenuItems({
 
           {isLoggedIn && (
             <>
-              <Separator className="my-4" />
+              <Separator className="my-2" />
               <ActionMenu />
             </>
           )}
 
-          <Separator className="my-4" />
+          <Separator className="my-2" />
 
           {isLoggedIn && (
             <Button

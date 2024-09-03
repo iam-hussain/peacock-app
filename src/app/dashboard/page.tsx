@@ -41,9 +41,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="px-6 md:py-6 space-y-6 w-full">
+    <div className="w-full flex flex-col gap-4">
       {/* Statistics Grid with Icons */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         <DashboardCard
           title="Members / Months"
           value={`${statistics.membersCount} / ${club.inMonth}`}
@@ -54,9 +54,6 @@ export default function DashboardPage() {
           value={clubAge().since}
           icon={<GiHandBandage className="text-3xl text-purple-600" />}
         />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DashboardCard
           title="Members Deposit"
           value={statistics.deposit.toLocaleString("en-IN", {
@@ -73,9 +70,6 @@ export default function DashboardPage() {
           })}
           icon={<FaBalanceScale className="text-3xl text-yellow-600" />}
         />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-2 gap-6">
         <DashboardCard
           title="Offset Deposit"
           value={statistics.offsetIn.toLocaleString("en-IN", {
@@ -92,9 +86,6 @@ export default function DashboardPage() {
           })}
           icon={<FaBalanceScale className="text-3xl text-red-600" />}
         />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-2 gap-6">
         <DashboardCard
           title="Offset Value"
           value={statistics.offset.toLocaleString("en-IN", {
@@ -111,8 +102,6 @@ export default function DashboardPage() {
           })}
           icon={<GiPayMoney className="text-3xl text-purple-600" />}
         />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-2 gap-6">
         <DashboardCard
           title="Liquidity Amount"
           value={statistics.liquidity.toLocaleString("en-IN", {
@@ -146,7 +135,7 @@ export default function DashboardPage() {
           icon={<FaMoneyBillTrendUp className="text-3xl text-teal-600" />}
         />
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <PieChart
           available={statistics.liquidity}
           invested={statistics.invested}

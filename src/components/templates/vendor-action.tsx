@@ -37,7 +37,7 @@ const VendorAction = () => {
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="account">Account</TabsTrigger>
+              <TabsTrigger value="account">Connection</TabsTrigger>
             </TabsList>
             <TabsContent value="details">
               <VendorForm

@@ -10,7 +10,7 @@ export default async function Members() {
         <Typography variant={"h3"} className="">
           Members
         </Typography>
-        <CustomLink href="/members/transactions" variant={"default"}>
+        <CustomLink href="/dashboard/member/transaction" variant={"default"}>
           Member Transactions
         </CustomLink>
       </Box>

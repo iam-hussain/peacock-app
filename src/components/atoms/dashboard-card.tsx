@@ -13,7 +13,7 @@ export function DashboardCard({
 }) {
   return (
     <Card className="shadow-sm flex items-center rounded-lg">
-      <CardContent className="p-6 flex space-x-4">
+      <CardContent className="p-4 flex space-x-4">
         {icon}
         <div>
           <h3 className="text-sm text-gray-500">{title}</h3>

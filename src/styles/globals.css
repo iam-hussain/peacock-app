@@ -12,11 +12,6 @@
   src: url("../../public/Roboto-Regular.ttf");
 }
 
-@font-face {
-  font-family: "Poppins-Regular";
-  src: url("../../public/Poppins-Regular.ttf");
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -65,7 +60,7 @@ body {
 }
 
 .side-menu {
-  height: 100svh;
+  height: 100dvh;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -143,8 +138,3 @@ body {
 [data-table="netValue"] {
   min-width: 120px;
 }
-
-/* [data-table="netValue"] {
-  width: 100px;
-  min-width: 100px;
-} */

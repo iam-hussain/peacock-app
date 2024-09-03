@@ -100,7 +100,7 @@ const config = {
       },
       fontFamily: {
         sans: ["Roboto-Regular", "sans-serif"],
-        serif: ["Poppins-Regular", "sans-serif"],
+        // serif: ["Poppins-Regular", "sans-serif"],
         // mono: ["BlackEcho", "sans-serif"],
         brand: ["BlackEcho", "sans-serif"],
       },
