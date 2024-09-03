@@ -18,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     setSubmitting(true);
 
-    const res = await fetch("/api/login", {
+    const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export default function Login() {
 
     if (res.ok) {
       toast.success("Logged in successfully!");
-      router.push("/home"); // Redirect to the dashboard or any protected route
+      router.push("/dashboard"); // Redirect to the dashboard or any protected route
     } else {
       const { error } = await res.json();
       toast.error(error || "Failed to log in");
@@ -64,7 +64,7 @@ export default function Login() {
           </form>
         </div>
         <div>
-          <CustomLink href={"/home"} variant={"outline"}>
+          <CustomLink href={"/dashboard"} variant={"outline"}>
             Back to club
           </CustomLink>
         </div>

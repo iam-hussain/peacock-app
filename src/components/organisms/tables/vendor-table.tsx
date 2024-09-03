@@ -20,7 +20,7 @@ import { dateFormat } from "@/lib/date";
 import TableLayout from "../../atoms/table-layout";
 import { vendorTypeMap } from "@/lib/config";
 import { FilterBar } from "../../molecules/filter-bar-group";
-import { TransformedVendor } from "@/app/api/vendors/route";
+import { TransformedVendor } from "@/app/api/vendor/route";
 import { useQuery } from "@tanstack/react-query";
 import { fetchVendors } from "@/lib/query-options";
 

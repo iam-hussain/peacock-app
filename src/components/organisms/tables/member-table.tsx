@@ -22,7 +22,7 @@ import { FilterBar } from "../../molecules/filter-bar-group";
 import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils";
 import Typography from "../../ui/typography";
-import { TransformedMember } from "@/app/api/members/route";
+import { TransformedMember } from "@/app/api/member/route";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMembers } from "@/lib/query-options";
 

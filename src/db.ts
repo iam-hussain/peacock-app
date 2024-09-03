@@ -9,7 +9,7 @@ import {
   handleMemberPassbookEntry,
   handleVendorPassbookEntry,
 } from "./passbook/middleware";
-import { calculateReturnsHandler } from "./passbook/returns-middleware";
+import { calculateReturnsHandler } from "./passbook/returns-handler";
 
 export const passbookExtends = Prisma.defineExtension({
   name: "Passbook",

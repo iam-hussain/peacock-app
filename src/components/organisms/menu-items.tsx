@@ -7,7 +7,6 @@ import Box from "../ui/box";
 import { IoClose } from "react-icons/io5";
 import { ScrollArea } from "../ui/scroll-area";
 import { FaPeopleGroup } from "react-icons/fa6";
-import { RiHome5Fill } from "react-icons/ri";
 import Typography from "../ui/typography";
 import { Separator } from "../ui/separator";
 import { clubAge } from "@/lib/date";
@@ -17,12 +16,13 @@ import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "js-cookie";
 import { setIsLoggedIn } from "@/store/pageSlice";
-import BackupAction from "../molecules/backup-action";
+import ActionMenu from "../molecules/action-menu";
 import { HiBriefcase } from "react-icons/hi";
 import { RiFolderTransferFill } from "react-icons/ri";
 import { FaPiggyBank } from "react-icons/fa";
 import { PiSignInBold } from "react-icons/pi";
 import { PiSignOutBold } from "react-icons/pi";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
 
 type Menu = {
   Icon: IconType;
@@ -33,32 +33,32 @@ type Menu = {
 
 const appMenus: Menu[] = [
   {
-    Icon: RiHome5Fill,
-    label: "Home",
-    link: "/home",
+    Icon: TbLayoutDashboardFilled,
+    label: "Dashboard",
+    link: "/dashboard",
   },
   {
     Icon: FaPeopleGroup,
     label: "Members",
-    link: "/members",
+    link: "/member",
   },
   {
     Icon: HiBriefcase,
     label: "Vendors",
-    link: "/vendors",
+    link: "/vendor",
   },
 ];
 
 const transactionsMenus: Menu[] = [
   {
     Icon: FaPiggyBank,
-    label: "Members Transaction",
-    link: "/members/transactions",
+    label: "Member Transactions",
+    link: "/member/transaction",
   },
   {
     Icon: RiFolderTransferFill,
-    label: "Vendors Transaction",
-    link: "/vendors/transactions",
+    label: "Vendor Transactions",
+    link: "/vendor/transaction",
   },
 ];
 
@@ -83,7 +83,7 @@ function MenuItems({
   const handleLogout = async () => {
     dispatch(setIsLoggedIn(false));
     // Clear the token cookie by setting it to expire
-    await fetch("/api/login/logout", {
+    await fetch("/api/auth/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -139,7 +139,7 @@ function MenuItems({
           {isLoggedIn && (
             <>
               <Separator className="my-4" />
-              <BackupAction />
+              <ActionMenu />
             </>
           )}
 

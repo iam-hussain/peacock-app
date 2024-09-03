@@ -1,4 +1,4 @@
-import { calculateReturnsHandler } from "@/passbook/returns-middleware";
+import { calculateReturnsHandler } from "@/passbook/returns-handler";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {

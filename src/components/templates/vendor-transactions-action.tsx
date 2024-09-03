@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import Typography from "../ui/typography";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
-import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
 import VendorsTransactionTable from "../organisms/tables/vendor-transaction-table";
 import { VendorTransactionForm } from "../organisms/forms/vendor-transaction-form";
 import { VendorTransactionDeleteForm } from "../organisms/forms/vendor-transaction-delete-form";

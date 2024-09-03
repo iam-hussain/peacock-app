@@ -18,7 +18,7 @@ export default function HomeLayout({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("/api/login/status", {
+        const res = await fetch("/api/auth/status", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

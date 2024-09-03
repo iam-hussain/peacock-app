@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
 import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
@@ -31,8 +31,8 @@ import {
   vendorTransactionFormSchema,
 } from "@/lib/form-schema";
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { TransformedVendorSelect } from "@/app/api/vendors/select/route";
-import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import { useQueryClient } from "@tanstack/react-query";
 
 type VendorTransactionFormProps = {
@@ -80,7 +80,7 @@ export function VendorTransactionForm({
   // Handle form submission
   async function onSubmit(data: VendorTransactionFormSchema) {
     try {
-      const response = await fetch("/api/vendor-transactions", {
+      const response = await fetch("/api/vendor/transaction", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ export function VendorTransactionForm({
       }
 
       if (selected) {
-        await fetch(`/api/vendor-transactions/${selected.id}`, {
+        await fetch(`/api/vendor/transaction/${selected.id}`, {
           method: "DELETE",
         });
       }
@@ -105,7 +105,7 @@ export function VendorTransactionForm({
       const result = await response.json();
       toast.success("Transaction successfully added!");
       queryClient.invalidateQueries({
-        queryKey: ["vendor-transactions"],
+        queryKey: ["vendor-transaction"],
       });
 
       if (!selected) form.reset(); // Reset form after submission

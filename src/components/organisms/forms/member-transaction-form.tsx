@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
-import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import {
   memberTransactionFormSchema,
@@ -29,7 +29,7 @@ import {
 } from "@/lib/form-schema";
 import Box from "../../ui/box";
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import { useQueryClient } from "@tanstack/react-query";
 
 type MemberTransactionFormProps = {

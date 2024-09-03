@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import seedData from "../public/peacock_backup_old.json" assert { type: "json" };
 import { passbookExtends } from "../src/db";
-import { calculateReturnsHandler } from "../src/passbook/returns-middleware";
+import { calculateReturnsHandler } from "../src/passbook/returns-handler";
 
 const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],

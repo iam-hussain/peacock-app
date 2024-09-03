@@ -1,5 +1,3 @@
-// File: app/api/auth/login/route.ts
-
 import { NextResponse } from "next/server";
 import { sign } from "jsonwebtoken"; // For generating JWTs
 import { serialize } from "cookie"; // To set cookies

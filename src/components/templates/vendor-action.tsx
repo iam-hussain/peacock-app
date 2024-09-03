@@ -5,8 +5,8 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { VendorForm } from "../organisms/forms/vendor-form";
 import VendorsTable from "../organisms/tables/vendor-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { VendorMemberConnectionsForm } from "../organisms/forms/vendor-member-connection-form";
-import { TransformedVendor } from "@/app/api/vendors/route";
+import { VendorConnectionsForm } from "../organisms/forms/vendor-connection-form";
+import { TransformedVendor } from "@/app/api/vendor/route";
 import { fetchMembersSelect } from "@/lib/query-options";
 import { useQuery } from "@tanstack/react-query";
 
@@ -49,7 +49,7 @@ const VendorAction = () => {
             </TabsContent>
 
             <TabsContent value="account">
-              <VendorMemberConnectionsForm
+              <VendorConnectionsForm
                 onSuccess={() => setIsOpen(false)}
                 onCancel={() => setIsOpen(false)}
                 vendorId={selected.id}

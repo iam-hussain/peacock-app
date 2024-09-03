@@ -1,7 +1,7 @@
 "use client";
 import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
-import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 

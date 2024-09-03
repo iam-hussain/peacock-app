@@ -25,7 +25,7 @@ import { GenericModalFooter } from "../../atoms/generic-modal";
 import { toast } from "sonner";
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { vendorTypeMap } from "@/lib/config";
-import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import { useQueryClient } from "@tanstack/react-query";
 
 type VendorFormProps = {
@@ -75,7 +75,7 @@ export function VendorForm({
   async function onSubmit(data: VendorFromSchema) {
     console.log({ data });
     try {
-      const response = await fetch(`/api/vendors`, {
+      const response = await fetch(`/api/vendor`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

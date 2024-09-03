@@ -1,7 +1,7 @@
 "use client";
 import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
-import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -23,7 +23,7 @@ export function VendorTransactionDeleteForm({
     setSubmitting(true);
     try {
       const response = await fetch(
-        `/api/vendor-transactions/${transaction.id}`,
+        `/api/vendor/transaction/${transaction.id}`,
         {
           method: "DELETE",
         },
@@ -41,7 +41,7 @@ export function VendorTransactionDeleteForm({
       toast.success("Vendor transaction deleted successfully");
 
       queryClient.invalidateQueries({
-        queryKey: ["vendor-transactions"],
+        queryKey: ["vendor-transaction"],
       });
 
       if (onSuccess) {

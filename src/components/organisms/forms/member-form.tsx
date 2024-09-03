@@ -57,7 +57,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
 
   async function onSubmit(data: MemberFromSchema) {
     try {
-      const response = await fetch(`/api/members`, {
+      const response = await fetch(`/api/member`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

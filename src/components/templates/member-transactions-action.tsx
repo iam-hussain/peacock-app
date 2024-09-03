@@ -4,7 +4,7 @@ import { GenericModal } from "../atoms/generic-modal";
 import { Dialog } from "@radix-ui/react-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import MembersTransactionTable from "../organisms/tables/member-transaction-table";
-import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import { MemberTransactionForm } from "../organisms/forms/member-transaction-form";
 import Typography from "../ui/typography";
 import Box from "../ui/box";

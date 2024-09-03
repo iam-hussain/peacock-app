@@ -14,12 +14,10 @@ import { DoughnutChart } from "@/components/molecules/doughnut-chart";
 import { DashboardCard } from "@/components/atoms/dashboard-card";
 import { clubAge } from "@/lib/date";
 import Box from "@/components/ui/box";
-import { useEffect, useState } from "react";
-import { TransformedStatistics } from "@/app/api/statistics/route";
 import { useQuery } from "@tanstack/react-query";
 import { fetchStatistics } from "@/lib/query-options";
 
-export default function HomePage() {
+export default function DashboardPage() {
   const club = clubAge();
   const { data, isLoading, isError } = useQuery(fetchStatistics());
   const statistics = data?.statistics || null;

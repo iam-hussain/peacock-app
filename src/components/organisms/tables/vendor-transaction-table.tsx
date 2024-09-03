@@ -23,11 +23,11 @@ import { format } from "date-fns";
 import { SelectInputGroup } from "../../atoms/select-input-group";
 import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
-import { TransformedVendorTransaction } from "@/app/api/vendor-transactions/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
 import { useQuery } from "@tanstack/react-query";
 import { fetchVendorTransactions } from "@/lib/query-options";
-import { TransformedVendorSelect } from "@/app/api/vendors/select/route";
-import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,

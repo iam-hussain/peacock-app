@@ -5,8 +5,8 @@ import { GenericModal } from "../atoms/generic-modal";
 import { Dialog } from "@radix-ui/react-dialog";
 import MembersTable from "../organisms/tables/member-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { MemberVendorConnectionsForm } from "../organisms/forms/member-vendor-connection-form";
-import { TransformedMember } from "@/app/api/members/route";
+import { MemberConnectionsForm } from "../organisms/forms/member-connection-form";
+import { TransformedMember } from "@/app/api/member/route";
 
 const MemberAction = () => {
   const [selected, setSelected] = useState<null | TransformedMember["member"]>(
@@ -44,7 +44,7 @@ const MemberAction = () => {
             </TabsContent>
 
             <TabsContent value="account">
-              <MemberVendorConnectionsForm
+              <MemberConnectionsForm
                 onSuccess={() => setIsOpen(false)}
                 onCancel={() => setIsOpen(false)}
                 memberId={selected.id}

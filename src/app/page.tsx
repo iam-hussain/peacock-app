@@ -16,7 +16,7 @@ export default function Home() {
       </Box>
       <Box preset={"stack-center"}>
         <Typography variant={"brand"}>Peacock Club</Typography>
-        <CustomLink href={"/home"}>Join the club</CustomLink>
+        <CustomLink href={"/dashboard"}>Join the club</CustomLink>
       </Box>
     </Box>
   );

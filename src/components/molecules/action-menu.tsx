@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { FaCalculator } from "react-icons/fa";
 
-const BackupAction = () => {
+const ActionMenu = () => {
   const [isLoading, setLoading] = useState(false);
   const [calculating, setCalculating] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(
@@ -80,4 +80,4 @@ const BackupAction = () => {
   );
 };
 
-export default BackupAction;
+export default ActionMenu;

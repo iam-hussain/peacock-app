@@ -19,7 +19,7 @@ import {
   ActionCell,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
-import { TransformedMemberTransaction } from "@/app/api/member-transactions/route";
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { format } from "date-fns";
 import { SelectInputGroup } from "../../atoms/select-input-group";
@@ -27,7 +27,7 @@ import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMemberTransactions } from "@/lib/query-options";
-import { TransformedMemberSelect } from "@/app/api/members/select/route";
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,

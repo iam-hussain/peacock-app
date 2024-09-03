@@ -94,13 +94,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/api/members/:path*",
-    "/api/member-transactions/:path*",
-    "/api/statistics/:path*",
-    "/api/vendor-profit-share/:path*",
-    "/api/vendor-transactions/:path*",
-    "/api/vendors/:path*",
-    "/api/returns/:path*",
-    "/api/backup/:path*",
+    "/api/action/:path*",
+    "/api/dashboard/:path*",
+    "/api/member/:path*",
+    "/api/vendor/:path*",
   ], // Apply to all API routes
 };
