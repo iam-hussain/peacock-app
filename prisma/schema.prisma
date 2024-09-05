@@ -48,8 +48,7 @@ model Vendor {
   ownerId      String?             @db.ObjectId
   ownerRole    MEMBER_VENDOR_ROLE  @default(DEFAULT)
   transactions VendorTransaction[]
-  profitShares VendorProfitShare[] // Which members are included in the profit share
-  memberId     String?             @db.ObjectId
+  profitShares VendorProfitShare[]
   passbook     Passbook            @relation(fields: [passbookId], references: [id])
   passbookId   String              @unique @db.ObjectId
   createdAt    DateTime            @default(now())

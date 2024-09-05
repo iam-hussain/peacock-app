@@ -5,12 +5,16 @@ type VendorToTransform = {
   id: string;
   name: string;
   active: boolean;
+  owner: {
+    firstName: string;
+    lastName: string | null;
+} | null;
 };
 
 function vendorsSelectTransform(vendor: VendorToTransform) {
   return {
     id: vendor.id,
-    name: vendor.name,
+    name: `${vendor.name}${vendor.owner?.firstName? ` - ${vendor.owner.firstName} ${vendor.owner.lastName || ' '}` : ''}`,
     active: vendor.active,
   };
 }
@@ -23,6 +27,12 @@ export async function GET(request: Request) {
       id: true,
       name: true,
       active: true,
+      owner: {
+        select: {
+          firstName: true,
+          lastName: true
+        }
+      }
     },
   });
 

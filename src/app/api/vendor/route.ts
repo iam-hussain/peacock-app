@@ -47,18 +47,6 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     );
     const monthlyInterest = calculateMonthlyInterest(passbook.in);
     const expectedPayment = monthlyInterest * dueDates.monthsPassed;
-    console.log({
-      monthlyInterest,
-      dueDates,
-      expectedPayment,
-      name: vendor.name,
-      passbook,
-      type: vendor.type,
-      start: vendor.startAt,
-      end: vendor.endAt,
-      active: vendor.active,
-      calcReturns: passbook.calcReturns,
-    });
 
     dueDetails.totalTerms =
       calculateMonthsDifference(vendor.startAt, vendor.endAt) + 1;
@@ -74,7 +62,8 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
 
   return {
     id: vendor.id,
-    name: vendor.name,
+    name: `${vendor.name}${owner?.firstName? ` - ${owner.firstName} ${owner.lastName || ' '}` : ''}`,
+    vendorName: vendor.name,
     searchName: `${vendor.name} ${memberName}`.trim(),
     startAt: vendor.startAt.getTime(),
     endAt: vendor.endAt ? vendor.endAt.getTime() : null,
