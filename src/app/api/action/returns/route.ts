@@ -5,9 +5,9 @@ export async function POST(request: Request) {
   try {
     // Fetch all data from Prisma models
 
-    const returnData = await calculateReturnsHandler();
+    calculateReturnsHandler();
     // Return the file path
-    return NextResponse.json({ success: true, returnData });
+    return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
