@@ -5,7 +5,13 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactNode } from "react";
 
 function QueryProvider({ children }: { children: ReactNode }) {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: Number.MAX_SAFE_INTEGER,
+      },
+    },
+  });
   return (
     <QueryClientProvider client={queryClient}>
       {children}

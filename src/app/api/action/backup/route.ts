@@ -33,16 +33,20 @@ export async function POST() {
       passbooks,
     };
 
-    // Convert to JSON and save in the public directory
-    const backupFilePath = path.join(
-      process.cwd(),
-      "public",
-      "peacock_backup.json"
-    );
+    // Write the backup file to the writable /tmp directory
+    const backupFilePath = path.join("/tmp", "peacock_backup.json");
     fs.writeFileSync(backupFilePath, JSON.stringify(backupData, null, 2));
 
-    // Return the file path
-    return NextResponse.json({ success: true, file: "/peacock_backup.json" });
+    // Read the file and create a downloadable response
+    const fileBuffer = fs.readFileSync(backupFilePath);
+
+    return new NextResponse(fileBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Disposition": `attachment; filename="peacock_backup.json"`,
+      },
+    });
   } catch (error) {
     return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
