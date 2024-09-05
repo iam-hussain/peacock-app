@@ -37,7 +37,7 @@ export async function POST() {
     const backupFilePath = path.join(
       process.cwd(),
       "public",
-      "peacock_backup.json",
+      "peacock_backup.json"
     );
     fs.writeFileSync(backupFilePath, JSON.stringify(backupData, null, 2));
 

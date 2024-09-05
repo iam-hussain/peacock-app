@@ -26,7 +26,7 @@ export function MemberConnectionsForm({
   const queryClient = useQueryClient();
   const { control, handleSubmit, reset, formState } = useForm();
   const { data, isLoading, isError } = useQuery(
-    fetchMemberConnection(memberId),
+    fetchMemberConnection(memberId)
   );
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export function MemberConnectionsForm({
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });

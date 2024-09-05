@@ -97,7 +97,7 @@ function MenuItems({
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });

@@ -15,7 +15,7 @@ import { fetchMembersSelect } from "@/lib/query-options";
 const VendorAction = () => {
   const { data: members = [] } = useQuery(fetchMembersSelect());
   const [selected, setSelected] = useState<null | TransformedVendor["vendor"]>(
-    null,
+    null
   );
   const [isOpen, setIsOpen] = useState(false);
 

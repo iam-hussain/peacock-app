@@ -28,7 +28,7 @@ export default function Login() {
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });

@@ -86,7 +86,7 @@ export function VendorForm({
       toast.success(
         selected
           ? "Vendor updated successfully 🌟"
-          : "Vendor created successfully 🚀",
+          : "Vendor created successfully 🚀"
       );
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
@@ -95,7 +95,7 @@ export function VendorForm({
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });

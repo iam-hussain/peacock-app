@@ -133,10 +133,7 @@ const editColumns: ColumnDef<TransformedMember>[] = [
 ];
 
 export type MemberTableProps = {
-  handleAction: (
-    select: null | TransformedMember["member"],
-    mode?: string,
-  ) => void;
+  handleAction: (select: null | TransformedMember["member"]) => void;
 };
 
 const MembersTable = ({ handleAction }: MemberTableProps) => {
@@ -164,7 +161,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       const newTab = window.open();
       if (newTab) {
         newTab.document.write(
-          `<img src="${capturedImage}" alt="peacock_club_${fileDateTime()}" />`,
+          `<img src="${capturedImage}" alt="peacock_club_${fileDateTime()}" />`
         );
       } else {
         const link = document.createElement("a");
@@ -248,7 +245,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
             "hidden justify-end align-middle items-center flex-col pb-6 gap-2",
             {
               flex: captureMode,
-            },
+            }
           )}
         >
           <Typography variant={"brandMini"} className="text-4xl">

@@ -44,7 +44,7 @@ const linkVariants = cva(
       size: "default",
       animation: "default",
     },
-  },
+  }
 );
 
 type LinkVariantProps = VariantProps<typeof linkVariants>;
@@ -87,7 +87,7 @@ const CustomLink = React.forwardRef<
       children,
       ...props
     },
-    ref,
+    ref
   ) => {
     const Comp = asChild ? Slot : Link;
 
@@ -106,7 +106,7 @@ const CustomLink = React.forwardRef<
         )}
       </Comp>
     );
-  },
+  }
 );
 
 CustomLink.displayName = "CustomLink";

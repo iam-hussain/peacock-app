@@ -18,7 +18,7 @@ import { fetchMembersSelect } from "@/lib/query-options";
 const MemberTransactionsAction = () => {
   const { data: members = [] } = useQuery(fetchMembersSelect());
   const [selected, setSelected] = useState<null | TransformedMemberTransaction>(
-    null,
+    null
   );
   const [isOpen, setIsOpen] = useState(false);
 

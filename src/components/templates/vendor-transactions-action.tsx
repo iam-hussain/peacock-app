@@ -19,7 +19,7 @@ const VendorTransactionsAction = () => {
   const { data: members = [] } = useQuery(fetchMembersSelect());
   const { data: vendors = [] } = useQuery(fetchVendorsSelect());
   const [selected, setSelected] = useState<null | TransformedVendorTransaction>(
-    null,
+    null
   );
   const [isOpen, setIsOpen] = useState(false);
 

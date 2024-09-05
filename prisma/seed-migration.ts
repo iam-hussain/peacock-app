@@ -94,7 +94,7 @@ function createVendorProfitShare(members: MapListType, vendors: MapListType) {
           updatedAt,
         },
       });
-    },
+    }
   );
 }
 

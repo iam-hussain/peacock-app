@@ -152,10 +152,7 @@ const editColumns: ColumnDef<TransformedVendor>[] = [
 ];
 
 export type VendorTableProps = {
-  handleAction: (
-    select: null | TransformedVendor["vendor"],
-    mode?: string,
-  ) => void;
+  handleAction: (select: null | TransformedVendor["vendor"]) => void;
 };
 
 const VendorsTable = ({ handleAction }: VendorTableProps) => {

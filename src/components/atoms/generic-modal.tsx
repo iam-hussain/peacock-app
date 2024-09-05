@@ -58,7 +58,7 @@ export const GenericModalFooter = ({
         onConfirm();
       }
     }, 2000),
-    [onConfirm],
+    [onConfirm]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,7 +68,7 @@ export const GenericModalFooter = ({
         onCancel();
       }
     }, 2000),
-    [onCancel],
+    [onCancel]
   );
 
   return (

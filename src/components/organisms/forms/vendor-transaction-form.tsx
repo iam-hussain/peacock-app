@@ -87,7 +87,7 @@ export function VendorTransactionForm({
     },
     onError: (error) => {
       toast.error(
-        `Error: ${error.message || "Failed to delete member transaction"}`,
+        `Error: ${error.message || "Failed to delete member transaction"}`
       );
     },
   });
@@ -114,7 +114,7 @@ export function VendorTransactionForm({
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });
@@ -211,7 +211,7 @@ export function VendorTransactionForm({
                           <SelectItem key={key} value={key}>
                             {name}
                           </SelectItem>
-                        ),
+                        )
                       )}
                     </SelectContent>
                   </Select>
@@ -242,7 +242,7 @@ export function VendorTransactionForm({
                           <SelectItem key={key} value={key}>
                             {name}
                           </SelectItem>
-                        ),
+                        )
                       )}
                     </SelectContent>
                   </Select>

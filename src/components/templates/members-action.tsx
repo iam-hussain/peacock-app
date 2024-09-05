@@ -12,7 +12,7 @@ import { TransformedMember } from "@/app/api/member/route";
 
 const MemberAction = () => {
   const [selected, setSelected] = useState<null | TransformedMember["member"]>(
-    null,
+    null
   );
   const [isOpen, setIsOpen] = useState(false);
 

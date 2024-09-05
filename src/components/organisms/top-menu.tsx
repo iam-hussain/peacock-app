@@ -48,7 +48,7 @@ function TopMenu({ className }: { className?: string }) {
         setScrollDirection("DOWN");
       }
     },
-    [sideBarOpen],
+    [sideBarOpen]
   );
 
   const shouldHide = useMemo(() => {
@@ -64,7 +64,7 @@ function TopMenu({ className }: { className?: string }) {
     <motion.nav
       className={clsx(
         "w-full h-[48px] align-middle items-center fixed px-4 lg:px-0 lg:pl-[300px] flex justify-start lg:justify-center shadow-sm",
-        className,
+        className
       )}
       initial="show"
       variants={animator}

@@ -57,7 +57,7 @@ export const ActionTableHeader = ({
       className={cn(
         "uppercase hover:bg-transparent hover:font-extrabold px-2 flex gap-2 justify-center align-middle items-center shadow-sm",
         isSorted && "border rounded-md", // Highlight when sorted
-        className,
+        className
       )}
     >
       <span className="">{label}</span>
@@ -65,7 +65,7 @@ export const ActionTableHeader = ({
         data-id="sort_icon"
         className={cn(
           "ml-2 h-auto w-4 transition-transform duration-300 ease-in-out sort_icon",
-          isSorted && "rotate-180", // Rotate when sorted in ascending order
+          isSorted && "rotate-180" // Rotate when sorted in ascending order
         )}
       >
         {isSortedAsc ? (
@@ -176,7 +176,7 @@ export const PlainTableHeader = ({ label, className }: TableHeaderProps) => (
   <div
     className={cn(
       "text-xs uppercase hover:bg-transparent hover:font-extrabold px-2",
-      className,
+      className
     )}
   >
     {label}

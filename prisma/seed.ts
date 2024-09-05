@@ -10,7 +10,7 @@ async function seed() {
   const backupFilePath = path.join(
     process.cwd(),
     "public",
-    "peacock_backup.json",
+    "peacock_backup.json"
   );
   const backupData = JSON.parse(readFileSync(backupFilePath, "utf8"));
 

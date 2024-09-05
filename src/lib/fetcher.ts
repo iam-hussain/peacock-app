@@ -5,7 +5,7 @@ export interface FetcherOptions {
 
 const fetcher = async (
   path: string,
-  options?: FetcherPropsOptions,
+  options?: FetcherPropsOptions
 ): Promise<any> => {
   const { method = "GET", header = {}, body = {}, tags = [] } = options || {};
 

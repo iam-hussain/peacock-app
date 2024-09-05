@@ -46,7 +46,7 @@ async function getProfitSharesVendorsAndClub() {
 function calculateMembersCount({ profitShares }: { profitShares: any[] }) {
   const includedCount = profitShares.filter((e) => e.active).length;
   const excludedCount = profitShares.filter(
-    (e) => !e.active && e.member.active,
+    (e) => !e.active && e.member.active
   ).length;
 
   return { includedCount, excludedCount };
@@ -110,7 +110,7 @@ export async function calculateReturnsHandler() {
   });
 
   const passbooksUpdate = Array.from(toUpdate.entries()).map(([id, data]) =>
-    prisma.passbook.update({ where: { id }, data }),
+    prisma.passbook.update({ where: { id }, data })
   );
 
   console.log(
@@ -121,7 +121,7 @@ export async function calculateReturnsHandler() {
       })),
       totalOffset,
       totalReturns,
-    }),
+    })
   );
 
   if (club?.id) {
@@ -129,7 +129,7 @@ export async function calculateReturnsHandler() {
       prisma.passbook.update({
         where: { id: club.id },
         data: { offset: totalOffset, returns: totalReturns },
-      }),
+      })
     );
   }
 

@@ -66,7 +66,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
   if (vendor.type === "LEND" && vendor.active) {
     const dueDates = calculateDueDates(
       vendor.startAt,
-      vendor?.endAt || new Date(),
+      vendor?.endAt || new Date()
     );
     const monthlyInterest = calculateMonthlyInterest(passbook.in);
     const expectedPayment = monthlyInterest * dueDates.monthsPassed;
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     if (!name && !id) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -194,7 +194,7 @@ export async function POST(request: Request) {
     console.error("Error creating/updating vendor:", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

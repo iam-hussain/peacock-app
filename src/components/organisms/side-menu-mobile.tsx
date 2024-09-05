@@ -43,7 +43,7 @@ function SideMenuMobile({ className }: { className?: string }) {
         variants={variants}
         className={cn(
           "side-menu bg-background p-6 z-50 relative left-0 items-start rounded-tr-xl rounded-br-xl w-[300px] lg:hidden shadow-sm py-10",
-          className,
+          className
         )}
       >
         <MenuItems onItemClick={handleSidebarToggle} hasCloseButton={true} />

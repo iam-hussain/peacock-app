@@ -20,13 +20,13 @@ async function verifyJwt(token: string, secretKey: string) {
     encoder.encode(secretKey),
     { name: "HMAC", hash: "SHA-256" },
     true,
-    ["verify"],
+    ["verify"]
   );
 
   const data = encoder.encode(`${header}.${payload}`);
   const signatureBytes = Uint8Array.from(
     atob(signature.replace(/-/g, "+").replace(/_/g, "/")),
-    (c) => c.charCodeAt(0),
+    (c) => c.charCodeAt(0)
   );
 
   const isValid = await crypto.subtle.verify("HMAC", key, signatureBytes, data);
@@ -69,7 +69,7 @@ export function middleware(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { message: "You need to log in to continue this action." },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -81,7 +81,7 @@ export function middleware(request: NextRequest) {
           message:
             "Invalid login. Please try logging out and then logging in again.",
         },
-        { status: 401 },
+        { status: 401 }
       );
     }
   }

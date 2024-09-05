@@ -69,7 +69,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       toast.success(
         selected
           ? "Member updated successfully 🌟"
-          : "Member created successfully 🚀",
+          : "Member created successfully 🚀"
       );
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
@@ -78,7 +78,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });

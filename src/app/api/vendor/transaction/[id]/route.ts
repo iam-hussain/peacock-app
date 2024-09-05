@@ -4,7 +4,7 @@ import prisma from "@/db";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   const { id } = params;
 
@@ -17,7 +17,7 @@ export async function DELETE(
     if (!transaction) {
       return NextResponse.json(
         { message: "Vendor transaction not found." },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -28,13 +28,13 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "Vendor transaction deleted successfully." },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error deleting vendor transaction:", error);
     return NextResponse.json(
       { message: "Failed to delete vendor transaction." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

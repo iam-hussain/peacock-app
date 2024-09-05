@@ -5,7 +5,7 @@ import prisma from "@/db";
 // GET Request to fetch the member's vendor connections
 export async function GET(
   request: Request,
-  { params }: { params: { memberId: string } },
+  { params }: { params: { memberId: string } }
 ) {
   const { memberId } = params;
 
@@ -28,7 +28,7 @@ export async function GET(
 // PATCH Request to update the member's vendor connections
 export async function POST(
   request: Request,
-  { params }: { params: { memberId: string } },
+  { params }: { params: { memberId: string } }
 ) {
   const { memberId } = params;
   const data = await request.json();
@@ -38,8 +38,8 @@ export async function POST(
       prisma.vendorProfitShare.update({
         where: { id: update.id, memberId },
         data: { active: update.active },
-      }),
-    ),
+      })
+    )
   );
 
   return NextResponse.json({ updates });

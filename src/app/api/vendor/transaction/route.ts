@@ -97,13 +97,13 @@ export async function GET(request: Request) {
     console.error("Error fetching vendor transactions:", error);
     return NextResponse.json(
       { error: "Failed to fetch vendor transactions" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 function vendorsTransactionTableTransform(
-  transaction: VendorTransactionToTransform,
+  transaction: VendorTransactionToTransform
 ) {
   const { vendor, member } = transaction;
   const memberName = vendor?.owner?.firstName
@@ -165,7 +165,7 @@ export async function POST(request: Request) {
     if (!vendorId || !memberId || !amount || !transactionType) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -185,13 +185,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { success: true, vendorTransaction },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     console.error("Failed to create transaction", error);
     return NextResponse.json(
       { error: "Failed to create transaction" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

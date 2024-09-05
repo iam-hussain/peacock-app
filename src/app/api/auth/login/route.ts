@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   if (!password) {
     return NextResponse.json(
       { error: "Email and password are required" },
-      { status: 400 },
+      { status: 400 }
     );
   }
   if (process.env.PASSWORD !== password) {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const token = sign(
     { time: new Date().toDateString() },
     process.env.JWT_SECRET!,
-    { expiresIn: "1h" },
+    { expiresIn: "1h" }
   );
 
   // Set the token in a cookie

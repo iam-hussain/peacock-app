@@ -36,7 +36,7 @@ export function VendorTransactionDeleteForm({
     },
     onError: (error) => {
       toast.error(
-        `Error: ${error.message || "Failed to delete member transaction"}`,
+        `Error: ${error.message || "Failed to delete member transaction"}`
       );
     },
   });

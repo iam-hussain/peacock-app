@@ -26,7 +26,7 @@ export function VendorConnectionsForm({
   const queryClient = useQueryClient();
   const { control, handleSubmit, reset, formState } = useForm();
   const { data, isLoading, isError } = useQuery(
-    fetchVendorConnection(vendorId),
+    fetchVendorConnection(vendorId)
   );
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export function VendorConnectionsForm({
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again.",
+        error.message || "An unexpected error occurred. Please try again."
       );
     },
   });

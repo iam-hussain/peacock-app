@@ -61,7 +61,7 @@ export const memberTransactionFormSchema = z.object({
   }),
   amount: z.preprocess(
     (val) => Number(val),
-    z.number().min(1, { message: "Amount must be greater than 0." }),
+    z.number().min(1, { message: "Amount must be greater than 0." })
   ),
   note: z.string().optional(),
   transactionAt: datePickerFormSchema,
@@ -104,7 +104,7 @@ export const vendorTransactionFormSchema = z.object({
   }),
   amount: z.preprocess(
     (val) => Number(val),
-    z.number().min(0.01, { message: "Amount must be greater than 0." }),
+    z.number().min(0.01, { message: "Amount must be greater than 0." })
   ),
   note: z.string().optional(),
   transactionAt: datePickerFormSchema,

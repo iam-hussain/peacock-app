@@ -31,7 +31,7 @@ import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
 import { fetchMemberTransactions } from "@/lib/query-options";
 
 const baseColumns = (
-  handleSortClick: (id: string) => void,
+  handleSortClick: (id: string) => void
 ): ColumnDef<TransformedMemberTransaction>[] => [
   {
     accessorKey: "from.name",
@@ -104,7 +104,7 @@ const baseColumns = (
       <CommonTableCell
         label={format(
           new Date(row.original.transactionAt),
-          "dd MMM yyyy hh:mm a",
+          "dd MMM yyyy hh:mm a"
         )}
       />
     ),
@@ -120,7 +120,7 @@ const editColumns: ColumnDef<TransformedMemberTransaction>[] = [
         label={format(new Date(row.original.updatedAt), "dd MMM yyyy hh:mm a")}
         subLabel={format(
           new Date(row.original.createdAt),
-          "dd MMM yyyy hh:mm a",
+          "dd MMM yyyy hh:mm a"
         )}
       />
     ),
@@ -157,7 +157,7 @@ const MembersTransactionTable = ({
   const [options, setOptions] = useState<any>(initialOptions);
 
   const { data, isLoading, isError } = useQuery(
-    fetchMemberTransactions(options),
+    fetchMemberTransactions(options)
   );
 
   const handleOptionsReset = () => {

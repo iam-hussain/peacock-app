@@ -32,7 +32,7 @@ import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
 import { fetchVendorTransactions } from "@/lib/query-options";
 
 const baseColumns = (
-  handleSortClick: (id: string) => void,
+  handleSortClick: (id: string) => void
 ): ColumnDef<TransformedVendorTransaction>[] => [
   {
     accessorKey: "vendor.name",
@@ -106,7 +106,7 @@ const baseColumns = (
       <CommonTableCell
         label={format(
           new Date(row.original.transactionAt),
-          "dd MMM yyyy hh:mm a",
+          "dd MMM yyyy hh:mm a"
         )}
       />
     ),
@@ -122,7 +122,7 @@ const editColumns: ColumnDef<TransformedVendorTransaction>[] = [
         label={format(new Date(row.original.updatedAt), "dd MMM yyyy hh:mm a")}
         subLabel={format(
           new Date(row.original.createdAt),
-          "dd MMM yyyy hh:mm a",
+          "dd MMM yyyy hh:mm a"
         )}
       />
     ),
@@ -163,7 +163,7 @@ const VendorsTransactionTable = ({
   const [options, setOptions] = useState<any>(initialOptions);
 
   const { data, isLoading, isError } = useQuery(
-    fetchVendorTransactions(options),
+    fetchVendorTransactions(options)
   );
 
   const handleOptionsReset = () => {
