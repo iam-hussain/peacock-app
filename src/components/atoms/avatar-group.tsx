@@ -11,7 +11,10 @@ export function AvatarGroup({
   name: string;
   active?: boolean;
 }) {
-  const nameArr = name.replace(/[^\w\s]/gi, '').trim().split(" ");
+  const nameArr = name
+    .replace(/[^\w\s]/gi, "")
+    .trim()
+    .split(" ");
   const fallback =
     nameArr.length >= 2
       ? nameArr

@@ -2,13 +2,14 @@ export interface FetcherPropsOptions {
   method?: string;
   header?: any;
   body?: any;
+  tags?: string[];
 }
 
 const fetcher = async (
   path: string,
   options?: FetcherPropsOptions,
 ): Promise<any> => {
-  const { method = "GET", header = {}, body = {} } = options || {};
+  const { method = "GET", header = {}, body = {}, tags = [] } = options || {};
 
   try {
     const response = await fetch(path, {
@@ -18,6 +19,8 @@ const fetcher = async (
         ...header,
       },
       ...(method !== "GET" ? { body: JSON.stringify(body) } : {}),
+      next: { tags },
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -28,6 +31,7 @@ const fetcher = async (
 
     return responseData;
   } catch (err: any) {
+    console.error(err);
     throw new Error(err?.message || err);
   }
 };

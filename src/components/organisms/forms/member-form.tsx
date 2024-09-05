@@ -17,7 +17,8 @@ import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { toast } from "sonner";
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type MemberFormProps = {
   selected?: any;
@@ -55,41 +56,31 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
         },
   });
 
-  async function onSubmit(data: MemberFromSchema) {
-    try {
-      const response = await fetch(`/api/member`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: selected?.id, ...data }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(error.message || "Failed to process request");
-        return;
-      }
-
-      await response.json();
-      toast.success(
-        selected
-          ? "Member updated successfully"
-          : "Member created successfully",
-      );
-
-      queryClient.invalidateQueries({
+  const mutation = useMutation({
+    mutationFn: (body: any) =>
+      fetcher.post("/api/member", { body: { id: selected?.id, ...body } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["members", "members-select"],
       });
 
+      toast.success(
+        selected
+          ? "Member updated successfully 🌟"
+          : "Member created successfully 🚀",
+      );
       if (!selected) form.reset(); // Reset form after submission
-
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
+    },
+    onError: () => {
       toast.error("An unexpected error occurred. Please try again.");
-    }
+    },
+  });
+
+  async function onSubmit(variables: MemberFromSchema) {
+    return await mutation.mutateAsync(variables as any);
   }
 
   return (

@@ -3,6 +3,7 @@ import { Member, Passbook } from "@prisma/client";
 import prisma from "@/db";
 import { dateFormat, calculateMonthsDifference } from "@/lib/date";
 import { memberTotalDepositAmount } from "@/lib/club";
+import { revalidatePath } from "next/cache";
 
 type MemberToTransform = Member & {
   passbook: Passbook;
@@ -53,7 +54,7 @@ export async function GET(request: Request) {
     },
   });
   const memberTotalDeposit = memberTotalDepositAmount();
-  console.log({ memberTotalDeposit });
+
   const transformedMembers = members
     .map((each) => membersTableTransform(each, memberTotalDeposit))
     .sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -88,14 +89,14 @@ export async function POST(request: Request) {
 
     const commonData = {
       firstName: firstName || undefined,
-      lastName: lastName || undefined,
+      lastName: lastName ?? undefined,
       username:
         username || firstName?.toLowerCase().trim().replace(/\s+/g, "_"),
-      phone: phone || undefined,
-      email: email || undefined,
-      avatar: avatar || undefined,
+      phone: phone ?? undefined,
+      email: email ?? undefined,
+      avatar: avatar ?? undefined,
       joinedAt: new Date(joinedAt || new Date()),
-      active: typeof active === "boolean" ? active : true,
+      active: active ?? true,
     };
 
     let member;
@@ -128,6 +129,8 @@ export async function POST(request: Request) {
         },
       });
     }
+
+    revalidatePath("/members");
 
     return NextResponse.json({ member }, { status: 200 });
   } catch (error) {

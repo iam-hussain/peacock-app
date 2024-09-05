@@ -17,7 +17,7 @@ type AvatarCellProps = {
   name: string;
   active?: boolean;
   subLabel?: string;
-  avatarName?: string
+  avatarName?: string;
 };
 
 export const AvatarCell = ({
@@ -29,7 +29,11 @@ export const AvatarCell = ({
   avatarName,
 }: AvatarCellProps) => (
   <div className="flex items-center space-x-2 min-w-[170px]" data-id={id}>
-    <AvatarGroup src={avatar || ""} name={avatarName || name} active={active || false} />
+    <AvatarGroup
+      src={avatar || ""}
+      name={avatarName || name}
+      active={active || false}
+    />
     <div className="flex flex-col">
       <p className="text-foreground font-medium">{name}</p>
       {subLabel && (

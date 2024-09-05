@@ -181,7 +181,7 @@ export async function POST(request: Request) {
         amount: parseFloat(amount),
         transactionType,
         method: method || "ACCOUNT",
-        note: note || undefined,
+        note: note ?? undefined,
         transactionAt: new Date(transactionAt || new Date()),
         createdAt: createdAt || undefined,
       },

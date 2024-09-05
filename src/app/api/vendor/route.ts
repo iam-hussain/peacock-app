@@ -62,7 +62,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
 
   return {
     id: vendor.id,
-    name: `${vendor.name}${owner?.firstName? ` - ${owner.firstName} ${owner.lastName || ' '}` : ''}`,
+    name: `${vendor.name}${owner?.firstName ? ` - ${owner.firstName} ${owner.lastName || " "}` : ""}`,
     vendorName: vendor.name,
     searchName: `${vendor.name} ${memberName}`.trim(),
     startAt: vendor.startAt.getTime(),
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
       termType: termType ?? "MONTH",
       startAt: startAt ? new Date(startAt) : new Date(),
       endAt: endAt ? new Date(endAt) : undefined,
-      active: typeof active === "boolean" ? active : true,
+      active: active ?? true,
     };
 
     let vendor;
