@@ -33,6 +33,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
         id={row.original.id}
         avatar={row.original.memberAvatar}
         name={row.original.vendorName}
+        avatarName={row.original.name}
         active={row.original.active}
         subLabel={row.original.memberName}
       />
