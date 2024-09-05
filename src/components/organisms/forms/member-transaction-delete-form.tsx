@@ -3,7 +3,8 @@ import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type MemberTransactionDeleteFormProps = {
   transaction: TransformedMemberTransaction;
@@ -17,39 +18,30 @@ export function MemberTransactionDeleteForm({
   onCancel,
 }: MemberTransactionDeleteFormProps) {
   const queryClient = useQueryClient();
-  const [isSubmitting, setSubmitting] = useState(false);
 
-  const handleDelete = async () => {
-    setSubmitting(true);
-    try {
-      const response = await fetch(
-        `/api/member-transactions/${transaction.id}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(
-          `Error: ${error.message || "Failed to delete member transaction"}`,
-        );
-        return;
-      }
-
-      const result = await response.json();
-      toast.success("Member transaction deleted successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["member-transactions"],
+  const mutation = useMutation({
+    mutationFn: () =>
+      fetcher.delete(`/api/member/transaction/${transaction.id}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["member-transaction"],
       });
+
+      toast.success("Member transaction deleted successfully");
 
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
-    setSubmitting(false);
+    },
+    onError: (error) => {
+      toast.error(
+        `Error: ${error.message || "Failed to delete member transaction"}`,
+      );
+    },
+  });
+
+  const handleDelete = async () => {
+    return await mutation.mutateAsync();
   };
 
   return (
@@ -80,7 +72,7 @@ export function MemberTransactionDeleteForm({
         actionLabel={"Delete"}
         onCancel={onCancel}
         onConfirm={handleDelete}
-        isSubmitting={isSubmitting}
+        isSubmitting={mutation.isPending}
       />
     </div>
   );

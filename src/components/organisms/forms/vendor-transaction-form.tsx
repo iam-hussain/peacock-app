@@ -2,8 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -33,7 +31,8 @@ import {
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type VendorTransactionFormProps = {
   vendors: TransformedMemberSelect[];
@@ -77,44 +76,49 @@ export function VendorTransactionForm({
         },
   });
 
-  // Handle form submission
-  async function onSubmit(data: VendorTransactionFormSchema) {
-    try {
-      const response = await fetch("/api/vendor/transaction", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ createdAt: selected?.transactionAt, ...data }),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => fetcher.delete(`/api/vendor/transaction/${id}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["vendor-transaction"],
       });
+    },
+    onError: (error) => {
+      toast.error(
+        `Error: ${error.message || "Failed to delete member transaction"}`,
+      );
+    },
+  });
 
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(
-          `Error: ${error.message || "Failed to create transaction"}`,
-        );
-        return;
+  const mutation = useMutation({
+    mutationFn: (body: any) =>
+      fetcher.post("/api/vendor/transaction", {
+        body: { createdAt: selected?.transactionAt, ...body },
+      }),
+    onSuccess: async () => {
+      if (selected && selected?.id) {
+        await deleteMutation.mutateAsync(selected.id);
       }
 
       if (selected) {
-        await fetch(`/api/vendor/transaction/${selected.id}`, {
-          method: "DELETE",
-        });
+        toast.success("Vendor transaction successfully updated!");
+      } else {
+        toast.success("Vendor transaction successfully added!");
       }
-
-      const result = await response.json();
-      toast.success("Transaction successfully added!");
-      queryClient.invalidateQueries({
-        queryKey: ["vendor-transaction"],
-      });
-
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
+  async function onSubmit(variables: VendorTransactionFormSchema) {
+    return await mutation.mutateAsync(variables as any);
   }
 
   return (
@@ -300,7 +304,7 @@ export function VendorTransactionForm({
         <GenericModalFooter
           actionLabel={selected ? "Update" : "Add"}
           onCancel={onCancel}
-          isSubmitting={form.formState.isSubmitting}
+          isSubmitting={mutation.isPending || deleteMutation.isPending}
         />
       </form>
     </Form>

@@ -17,7 +17,7 @@ const noRefetchConfigs = {
 
 export const fetchMembers = () =>
   queryOptions({
-    queryKey: ['member-details', "members"],
+    queryKey: ["member-details", "members", "connections"],
     queryFn: () =>
       fetcher("/api/member", {
         tags: ["members"],
@@ -27,7 +27,7 @@ export const fetchMembers = () =>
 
 export const fetchVendors = () =>
   queryOptions({
-    queryKey: ["vendors"],
+    queryKey: ["vendor-details", "vendors", "connections"],
     queryFn: () =>
       fetcher("/api/vendor", {
         tags: ["vendors"],
@@ -83,7 +83,7 @@ export const fetchVendorTransactions = (options: any) => {
 
 export const fetchMembersSelect = () =>
   queryOptions({
-    queryKey: ['member-details', "members-select"],
+    queryKey: ["member-details", "members-select"],
     queryFn: () =>
       fetcher("/api/member/select", {
         tags: ["members-select"],
@@ -93,7 +93,7 @@ export const fetchMembersSelect = () =>
 
 export const fetchVendorsSelect = () =>
   queryOptions({
-    queryKey: ["vendors-select"],
+    queryKey: ["vendor-details", "vendors-select"],
     queryFn: () =>
       fetcher("/api/vendor/select", {
         tags: ["vendors-select"],
@@ -103,7 +103,7 @@ export const fetchVendorsSelect = () =>
 
 export const fetchStatistics = () =>
   queryOptions({
-    queryKey: ["statistics"],
+    queryKey: ["statistics", "connections"],
     queryFn: () =>
       fetcher("/api/dashboard/statistics", {
         tags: ["statistics"],
@@ -113,7 +113,7 @@ export const fetchStatistics = () =>
 
 export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
-    queryKey: ["member-connection"],
+    queryKey: ["member-connection", "connections"],
     queryFn: () =>
       fetcher(`/api/member/connection/${memberId}`, {
         tags: ["member-connection"],
@@ -131,7 +131,7 @@ export const fetchMemberConnection = (memberId: string) =>
 
 export const fetchVendorConnection = (vendorId: string) =>
   queryOptions({
-    queryKey: ["vendor-connection"],
+    queryKey: ["vendor-connection", "connections"],
     queryFn: () =>
       fetcher(`/api/vendor/connection/${vendorId}`, {
         tags: ["vendor-connection"],
@@ -150,7 +150,7 @@ export const fetchVendorConnection = (vendorId: string) =>
 
 export const fetchAuthStatus = () =>
   queryOptions({
-    queryKey: ["auth"],
+    queryKey: ["auth", "status"],
     queryFn: () =>
       fetcher("/api/auth/status", { tags: ["auth"] }) as never as {
         isLoggedIn: boolean;

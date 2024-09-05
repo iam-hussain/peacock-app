@@ -7,64 +7,70 @@ import { FaDownload } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { FaCalculator } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 const ActionMenu = () => {
-  const [isLoading, setLoading] = useState(false);
-  const [calculating, setCalculating] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(
     "/peacock_backup.json",
   );
 
-  const handleBackup = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/action/backup", {
-        method: "POST",
-      });
-      const result = await response.json();
-      if (result.success) {
-        setDownloadLink(result.file);
-        toast.success("Data backup done successfully, download now.");
-      } else {
-        toast.error("Failed to create backup: " + result.error);
-      }
-    } catch (error) {
-      toast.error("An error occurred while creating the backup.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const backupMutation = useMutation({
+    mutationFn: () => fetcher.post("/api/action/backup"),
+    onSuccess: async () => {
+      toast.success("Data backup done successfully, download now.");
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
 
-  const handleReturns = async () => {
-    setCalculating(true);
-    try {
-      const response = await fetch("/api/action/returns", {
-        method: "POST",
-      });
-      const result = await response.json();
-      if (result.success) {
-        toast.success("Returns are recalculated successfully.");
-      } else {
-        toast.error("Failed to recalculated returns: " + result.error);
-      }
-    } catch (error) {
-      toast.error("An error occurred while recalculated returns.");
-    } finally {
-      setCalculating(false);
-    }
-  };
+  const returnsMutation = useMutation({
+    mutationFn: () => fetcher.post("/api/action/returns"),
+    onSuccess: async () => {
+      toast.success("Returns are recalculated successfully.");
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
+  async function handleBackup(e: React.FormEvent) {
+    e.preventDefault();
+    return await backupMutation.mutateAsync();
+  }
+
+  async function handleReturns(e: React.FormEvent) {
+    e.preventDefault();
+    return await returnsMutation.mutateAsync();
+  }
 
   return (
     <>
-      <Button variant={"menu"} onClick={handleReturns} disabled={isLoading}>
+      <Button
+        variant={"menu"}
+        onClick={handleReturns}
+        disabled={backupMutation.isPending || returnsMutation.isPending}
+      >
         <FaCalculator className="h-5 w-5" />{" "}
-        {calculating ? "Recalculated ..." : "Recalculated Returns"}
+        {returnsMutation.isPending
+          ? "Recalculated ..."
+          : "Recalculated Returns"}
       </Button>
-      <Button variant={"menu"} onClick={handleBackup} disabled={isLoading}>
+      <Button
+        variant={"menu"}
+        onClick={handleBackup}
+        disabled={backupMutation.isPending || returnsMutation.isPending}
+      >
         <BsDatabaseFillCheck className="h-5 w-5" />{" "}
-        {isLoading ? "Backing up..." : "Backup Data"}
+        {backupMutation.isPending ? "Backing up..." : "Backup Data"}
       </Button>
-      {downloadLink && (
+
+      {!backupMutation.isPending && downloadLink ? (
         <a
           href={downloadLink}
           download="peacock_backup.json"
@@ -75,6 +81,8 @@ const ActionMenu = () => {
           <FaDownload className="h-5 w-5" />
           Download Backup
         </a>
+      ) : (
+        <></>
       )}
     </>
   );

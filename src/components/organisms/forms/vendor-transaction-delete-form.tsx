@@ -2,8 +2,8 @@
 import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type VendorTransactionDeleteFormProps = {
   transaction: TransformedVendorTransaction;
@@ -17,40 +17,30 @@ export function VendorTransactionDeleteForm({
   onCancel,
 }: VendorTransactionDeleteFormProps) {
   const queryClient = useQueryClient();
-  const [isSubmitting, setSubmitting] = useState(false);
 
-  const handleDelete = async () => {
-    setSubmitting(true);
-    try {
-      const response = await fetch(
-        `/api/vendor/transaction/${transaction.id}`,
-        {
-          method: "DELETE",
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(
-          `Error: ${error.message || "Failed to delete vendor transaction"}`,
-        );
-        return;
-      }
-
-      const result = await response.json();
-      toast.success("Vendor transaction deleted successfully");
-
-      queryClient.invalidateQueries({
+  const mutation = useMutation({
+    mutationFn: () =>
+      fetcher.delete(`/api/vendor/transaction/${transaction.id}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["vendor-transaction"],
       });
+
+      toast.success("Vendor transaction deleted successfully");
 
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
-    setSubmitting(false);
+    },
+    onError: (error) => {
+      toast.error(
+        `Error: ${error.message || "Failed to delete member transaction"}`,
+      );
+    },
+  });
+
+  const handleDelete = async () => {
+    return await mutation.mutateAsync();
   };
 
   return (
@@ -81,7 +71,7 @@ export function VendorTransactionDeleteForm({
         actionLabel={"Delete"}
         onCancel={onCancel}
         onConfirm={handleDelete}
-        isSubmitting={isSubmitting}
+        isSubmitting={mutation.isPending}
       />
     </div>
   );

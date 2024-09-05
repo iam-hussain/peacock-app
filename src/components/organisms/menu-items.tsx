@@ -23,6 +23,8 @@ import { FaPiggyBank } from "react-icons/fa";
 import { PiSignInBold } from "react-icons/pi";
 import { PiSignOutBold } from "react-icons/pi";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type Menu = {
   Icon: IconType;
@@ -71,6 +73,7 @@ function MenuItems({
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
 
@@ -80,19 +83,26 @@ function MenuItems({
     }
   };
 
+  const mutation = useMutation({
+    mutationFn: () => fetcher.post("/api/auth/logout"),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["auth"],
+      });
+
+      dispatch(setIsLoggedIn(false));
+      toast.success("Logged out successfully!");
+      router.push("/login"); // Redirect to the dashboard or any protected route
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
   const handleLogout = async () => {
-    dispatch(setIsLoggedIn(false));
-    // Clear the token cookie by setting it to expire
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    document.cookie = "token=; Max-Age=0; path=/";
-    Cookies.remove("token");
-    toast.success("Logged out successfully!");
-    router.push("/login"); // Redirect to the login page
+    return await mutation.mutateAsync();
   };
 
   return (

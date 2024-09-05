@@ -1,3 +1,51 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "plugins": ["import", "sort-exports", "unused-imports", "prettier"],
+  "rules": {
+    "prettier/prettier": "error", // Run Prettier as an ESLint rule
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
+    "sort-keys": [
+      "error",
+      "asc",
+      {
+        "caseSensitive": false,
+        "natural": true
+      }
+    ],
+    "sort-exports/sort-exports": [
+      "error",
+      {
+        "sortDir": "asc"
+      }
+    ],
+    "unused-imports/no-unused-imports": "error", // This rule will automatically remove unused imports
+
+    // Optionally remove unused variables
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  }
 }

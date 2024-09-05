@@ -30,7 +30,8 @@ import {
 import Box from "../../ui/box";
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type MemberTransactionFormProps = {
   members: TransformedMemberSelect[];
@@ -71,43 +72,49 @@ export function MemberTransactionForm({
         },
   });
 
-  // Handle form submission
-  async function onSubmit(data: MemberTransactionFormSchema) {
-    try {
-      const response = await fetch("/api/member-transactions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ createdAt: selected?.transactionAt, ...data }),
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => fetcher.delete(`/api/member/transaction/${id}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["member-transaction"],
       });
+    },
+    onError: (error) => {
+      toast.error(
+        `Error: ${error.message || "Failed to delete member transaction"}`,
+      );
+    },
+  });
 
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(
-          `Error: ${error.message || "Failed to create transaction"}`,
-        );
-        return;
+  const mutation = useMutation({
+    mutationFn: (body: any) =>
+      fetcher.post("/api/member/transaction", {
+        body: { createdAt: selected?.transactionAt, ...body },
+      }),
+    onSuccess: async () => {
+      if (selected && selected?.id) {
+        await deleteMutation.mutateAsync(selected.id);
       }
 
       if (selected) {
-        await fetch(`/api/member-transactions/${selected.id}`, {
-          method: "DELETE",
-        });
+        toast.success("Member transaction successfully updated!");
+      } else {
+        toast.success("Member transaction successfully added!");
       }
-      const result = await response.json();
-      toast.success("Transaction successfully added!");
-      queryClient.invalidateQueries({
-        queryKey: ["member-transactions"],
-      });
-
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
+  async function onSubmit(variables: MemberTransactionFormSchema) {
+    return await mutation.mutateAsync(variables as any);
   }
 
   return (

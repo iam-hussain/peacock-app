@@ -8,33 +8,34 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { CustomLink } from "@/components/ui/link";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 export default function Login() {
   const router = useRouter();
   const [password, setPassword] = useState("");
-  const [isSubmitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password }),
-    });
-
-    if (res.ok) {
+  const mutation = useMutation({
+    mutationFn: () => fetcher.post("/api/vendor", { body: { password } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["auth"],
+      });
       toast.success("Logged in successfully!");
       router.push("/dashboard"); // Redirect to the dashboard or any protected route
-    } else {
-      const { error } = await res.json();
-      toast.error(error || "Failed to log in");
-      setSubmitting(false);
-    }
-  };
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    return await mutation.mutateAsync();
+  }
 
   return (
     <Box preset={"stack-center"} className="w-full min-h-svh bg-background">
@@ -50,7 +51,7 @@ export default function Login() {
         <Typography variant={"brand"}>Peacock Club</Typography>
 
         <div className="py-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             <Input
               type="password"
               placeholder="Password"
@@ -58,7 +59,11 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={mutation.isPending}
+            >
               Login
             </Button>
           </form>

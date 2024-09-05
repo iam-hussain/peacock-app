@@ -74,8 +74,10 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
         onSuccess();
       }
     },
-    onError: () => {
-      toast.error("An unexpected error occurred. Please try again.");
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
     },
   });
 

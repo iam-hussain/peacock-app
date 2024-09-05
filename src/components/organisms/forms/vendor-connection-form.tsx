@@ -6,8 +6,9 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchVendorConnection } from "@/lib/query-options";
+import fetcher from "@/lib/fetcher";
 
 type VendorConnectionsFormProps = {
   vendorId: string;
@@ -20,6 +21,7 @@ export function VendorConnectionsForm({
   onSuccess,
   onCancel,
 }: VendorConnectionsFormProps) {
+  const queryClient = useQueryClient();
   const { control, handleSubmit, reset, formState } = useForm();
   const { data, isLoading, isError } = useQuery(
     fetchVendorConnection(vendorId),
@@ -31,26 +33,31 @@ export function VendorConnectionsForm({
     }
   }, [data, vendorId, reset]);
 
-  const onSubmit = async (data: any) => {
-    try {
-      const response = await fetch(`/api/vendor/connection/${vendorId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data.connections),
+  const mutation = useMutation({
+    mutationFn: (data: any) =>
+      fetcher.post(`/api/vendor/connection/${vendorId}`, {
+        body: data.connections,
+      }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["connections"],
       });
-
-      if (!response.ok) throw new Error("Failed to update connections");
 
       toast.success("Connections updated successfully");
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      toast.error("Failed to update connections");
-    }
-  };
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
+  async function onSubmit(data: any) {
+    return await mutation.mutateAsync(data);
+  }
 
   if (isLoading) {
     return <p className="w-full text-center p-6">Loading...</p>;
@@ -90,7 +97,7 @@ export function VendorConnectionsForm({
       <GenericModalFooter
         actionLabel={"Save"}
         onCancel={onCancel}
-        isSubmitting={formState.isSubmitting}
+        isSubmitting={formState.isSubmitting || mutation.isPending}
       />
     </form>
   );

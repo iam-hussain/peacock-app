@@ -26,7 +26,8 @@ import { toast } from "sonner";
 import { DatePickerForm } from "../../atoms/date-picker-form";
 import { vendorTypeMap } from "@/lib/config";
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import fetcher from "@/lib/fetcher";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
@@ -72,41 +73,33 @@ export function VendorForm({
         },
   });
 
-  async function onSubmit(data: VendorFromSchema) {
-    console.log({ data });
-    try {
-      const response = await fetch(`/api/vendor`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: selected?.id, ...data }),
+  const mutation = useMutation({
+    mutationFn: (body: any) =>
+      fetcher.post("/api/vendor", { body: { id: selected?.id, ...body } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["vendor-details"],
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        toast.error(error.message || "Failed to process request");
-        return;
-      }
-
-      const result = await response.json();
       toast.success(
         selected
-          ? "Vendor updated successfully"
-          : "Vendor created successfully",
+          ? "Vendor updated successfully 🌟"
+          : "Vendor created successfully 🚀",
       );
-
-      queryClient.invalidateQueries({
-        queryKey: ["vendors", "vendors-select"],
-      });
-
       if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred. Please try again.");
-    }
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again.",
+      );
+    },
+  });
+
+  async function onSubmit(variables: VendorFromSchema) {
+    return await mutation.mutateAsync(variables as any);
   }
 
   return (
