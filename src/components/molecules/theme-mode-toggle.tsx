@@ -1,6 +1,8 @@
 "use client";
 
+import { MoonIcon, SunIcon } from "lucide-react"; // Assuming shadcn uses Lucide icons
 import { useTheme } from "next-themes";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoonIcon, SunIcon } from "lucide-react"; // Assuming shadcn uses Lucide icons
 
 export function ThemeModeToggle({ className }: { className?: string }) {
   const { setTheme } = useTheme();

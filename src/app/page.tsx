@@ -1,18 +1,16 @@
 import Image from "next/image";
 
+import { ThemeModeToggle } from "@/components/molecules/theme-mode-toggle";
 import Box from "@/components/ui/box";
 import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
-import { ThemeModeToggle } from "@/components/molecules/theme-mode-toggle";
 
 export default function Home() {
   return (
     <Box preset={"stack-center"} className="w-full min-h-svh bg-background">
-     
-     <div className="absolute right-4 top-4">
-
-<ThemeModeToggle />
-</div>
+      <div className="absolute right-4 top-4">
+        <ThemeModeToggle />
+      </div>
       <Box>
         <Image
           src={"/peacock.jpg"}

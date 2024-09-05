@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { ThemeModeToggle } from "@/components/molecules/theme-mode-toggle";
 import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
 import fetcher from "@/lib/fetcher";
-import { ThemeModeToggle } from "@/components/molecules/theme-mode-toggle";
 
 export default function Login() {
   const router = useRouter();
@@ -41,11 +41,9 @@ export default function Login() {
 
   return (
     <Box preset={"stack-center"} className="w-full min-h-svh bg-background">
-      
       <div className="absolute right-4 top-4">
-
-<ThemeModeToggle />
-</div>
+        <ThemeModeToggle />
+      </div>
       <Box>
         <Image
           src={"/peacock.jpg"}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { BsDatabaseFillCheck } from "react-icons/bs";
 import { FaDownload } from "react-icons/fa";
@@ -13,6 +13,7 @@ import fetcher from "@/lib/fetcher";
 import { cn } from "@/lib/utils";
 
 const ActionMenu = () => {
+  const queryClient = useQueryClient();
   const [downloadLink, setDownloadLink] = useState<string | null>(
     "/peacock_backup.json"
   );
@@ -32,6 +33,10 @@ const ActionMenu = () => {
   const returnsMutation = useMutation({
     mutationFn: () => fetcher.post("/api/action/returns"),
     onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["connections"],
+      });
+
       toast.success("Returns are recalculated successfully.");
     },
     onError: (error) => {

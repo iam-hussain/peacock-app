@@ -85,12 +85,10 @@ function TopMenu({ className }: { className?: string }) {
         <CustomLink href={"/"} variant={"transparent"} className="p-0 px-3">
           <Typography variant={"brandMini"}>Peacock Club</Typography>
         </CustomLink>
-     
       </Box>
       <div className="lg:absolute lg:right-4">
-
-<ThemeModeToggle />
-</div>
+        <ThemeModeToggle />
+      </div>
     </motion.nav>
   );
 }
