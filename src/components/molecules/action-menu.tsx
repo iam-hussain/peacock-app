@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { Button } from "../ui/button";
 
+import { fileDateTime } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { cn } from "@/lib/utils";
 
@@ -84,7 +85,7 @@ const ActionMenu = () => {
       {!backupMutation.isPending && downloadLink ? (
         <a
           href={downloadLink}
-          download="peacock_backup.json"
+          download={`peacock_backup_${fileDateTime()}.json`}
           className={cn(
             "h-9 px-4 py-2 inline-flex items-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 no-touch:hover:bg-accent no-touch:hover:text-accent-foreground justify-start gap-4 text-foreground/80 w-full"
           )}

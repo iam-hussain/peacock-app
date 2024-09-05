@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
+import { fileDateTime } from "@/lib/date";
 
 export async function POST() {
   try {
@@ -33,8 +34,10 @@ export async function POST() {
       passbooks,
     };
 
+    const fileName = `peacock_backup_${fileDateTime()}.json`;
+
     // Write the backup file to the writable /tmp directory
-    const backupFilePath = path.join("/tmp", "peacock_backup.json");
+    const backupFilePath = path.join("/tmp", fileName);
     fs.writeFileSync(backupFilePath, JSON.stringify(backupData, null, 2));
 
     // Read the file and create a downloadable response
@@ -44,7 +47,7 @@ export async function POST() {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Content-Disposition": `attachment; filename="peacock_backup.json"`,
+        "Content-Disposition": `attachment; filename="${fileName}"`,
       },
     });
   } catch (error) {
