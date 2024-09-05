@@ -14,13 +14,17 @@ import { cn } from "@/lib/utils";
 
 const ActionMenu = () => {
   const queryClient = useQueryClient();
-  const [downloadLink, setDownloadLink] = useState<string | null>(
-    "/peacock_backup.json"
-  );
+  const [downloadLink, setDownloadLink] = useState<string | null>(null);
 
   const backupMutation = useMutation({
     mutationFn: () => fetcher.post("/api/action/backup"),
-    onSuccess: async () => {
+    onSuccess: async (data: any) => {
+      // Assuming the response contains the JSON file as a buffer
+      const blob = new Blob([JSON.stringify(data)], {
+        type: "application/json",
+      });
+      const downloadUrl = URL.createObjectURL(blob); // Create a downloadable link
+      setDownloadLink(downloadUrl); // Set download link
       toast.success("Data backup done successfully, download now.");
     },
     onError: (error) => {
@@ -34,7 +38,7 @@ const ActionMenu = () => {
     mutationFn: () => fetcher.post("/api/action/returns"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["connections"],
+        queryKey: ["connection", "statistics"],
       });
 
       toast.success("Returns are recalculated successfully.");

@@ -29,7 +29,7 @@ export const fetchAuthStatus = () =>
 
 export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
-    queryKey: ["member-connection", "connections"],
+    queryKey: ["member-connection", "connection"],
     queryFn: () =>
       fetcher(`/api/member/connection/${memberId}`, {
         tags: ["member-connection"],
@@ -70,7 +70,7 @@ export const fetchMemberTransactions = (options: any) => {
 
 export const fetchMembers = () =>
   queryOptions({
-    queryKey: ["member-details", "members", "connections"],
+    queryKey: ["member-details", "members", "connection"],
     queryFn: () =>
       fetcher("/api/member", {
         tags: ["members"],
@@ -90,17 +90,17 @@ export const fetchMembersSelect = () =>
 
 export const fetchStatistics = () =>
   queryOptions({
-    queryKey: ["statistics", "connections"],
+    queryKey: ["statistics", "connection"],
     queryFn: () =>
       fetcher("/api/dashboard/statistics", {
-        tags: ["statistics"],
+        tags: ["statistics", "connection"],
       }) as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
 
 export const fetchVendorConnection = (vendorId: string) =>
   queryOptions({
-    queryKey: ["vendor-connection", "connections"],
+    queryKey: ["vendor-connection", "connection"],
     queryFn: () =>
       fetcher(`/api/vendor/connection/${vendorId}`, {
         tags: ["vendor-connection"],
@@ -142,7 +142,7 @@ export const fetchVendorTransactions = (options: any) => {
 
 export const fetchVendors = () =>
   queryOptions({
-    queryKey: ["vendor-details", "vendors", "connections"],
+    queryKey: ["vendor-details", "vendors", "connection"],
     queryFn: () =>
       fetcher("/api/vendor", {
         tags: ["vendors"],

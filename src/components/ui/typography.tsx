@@ -17,6 +17,7 @@ const typographyStyles = cva("w-auto text-foreground", {
       error: "text-[0.8rem] font-medium mt-1 text-destructive",
       caption: "text-xl font-medium",
       brand: "font-brand text-4xl uppercase tracking-normal sm:text-5xl",
+      brandMedium: "font-brand text-3xl uppercase tracking-normal",
       brandMini: "font-brand text-xl uppercase tracking-normal",
       overline: "text-xs uppercase tracking-wide",
       blockquote: "mt-6 border-l-2 pl-6 italic",

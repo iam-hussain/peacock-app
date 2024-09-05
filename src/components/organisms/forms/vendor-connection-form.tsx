@@ -42,7 +42,7 @@ export function VendorConnectionsForm({
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["connections"],
+        queryKey: ["connection"],
       });
 
       toast.success("Connections updated successfully");

@@ -116,7 +116,7 @@ export async function calculateReturnsHandler() {
   console.log(
     JSON.stringify({
       passbooks: Array.from(toUpdate.entries()).map(([id, data]) => ({
-        where: { id },
+        id,
         data,
       })),
       totalOffset,
@@ -133,7 +133,15 @@ export async function calculateReturnsHandler() {
     );
   }
 
-  await prisma.$transaction(passbooksUpdate);
+  prisma
+    .$transaction(passbooksUpdate)
+    .then(() => {
+      console.log("Returns calculated successfully");
+    })
+    .catch((e) => {
+      console.error("Returns calculation failed");
+      console.error(e);
+    });
 
   return { totalReturns, totalOffset, passbooksData: Array.from(toUpdate) };
 }
