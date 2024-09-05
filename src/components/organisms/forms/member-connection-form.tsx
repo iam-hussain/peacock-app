@@ -34,7 +34,7 @@ export function MemberConnectionsForm({
   const onSubmit = async (data: any) => {
     try {
       const response = await fetch(`/api/member/connection/${memberId}`, {
-        method: "PATCH",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },

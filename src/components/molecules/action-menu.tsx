@@ -18,7 +18,7 @@ const ActionMenu = () => {
   const handleBackup = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/backup", {
+      const response = await fetch("/api/action/backup", {
         method: "POST",
       });
       const result = await response.json();
@@ -38,7 +38,7 @@ const ActionMenu = () => {
   const handleReturns = async () => {
     setCalculating(true);
     try {
-      const response = await fetch("/api/returns", {
+      const response = await fetch("/api/action/returns", {
         method: "POST",
       });
       const result = await response.json();

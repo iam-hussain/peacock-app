@@ -25,7 +25,7 @@ export async function GET(
 }
 
 // PATCH Request to update the member's vendor connections
-export async function PATCH(
+export async function POST(
   request: Request,
   { params }: { params: { memberId: string } },
 ) {
