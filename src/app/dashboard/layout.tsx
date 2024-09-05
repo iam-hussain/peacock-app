@@ -33,7 +33,7 @@ export default function DashboardLayout({
         <SideMenu />
         <div
           className={
-            "h-full min-h-svh w-full transition-all duration-300 max-w-screen-2xl m-auto mt-0 pt-[48px] lg:pl-[300px]"
+            "h-full min-h-svh w-full transition-all duration-300 max-w-screen-3xl m-auto mt-0 pt-[48px] lg:pl-[300px]"
           }
         >
           <div className="w-full flex h-full p-6">{children}</div>
