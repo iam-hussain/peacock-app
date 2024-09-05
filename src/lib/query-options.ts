@@ -17,7 +17,7 @@ const noRefetchConfigs = {
 
 export const fetchMembers = () =>
   queryOptions({
-    queryKey: ["members"],
+    queryKey: ['member-details', "members"],
     queryFn: () =>
       fetcher("/api/member", {
         tags: ["members"],
@@ -83,7 +83,7 @@ export const fetchVendorTransactions = (options: any) => {
 
 export const fetchMembersSelect = () =>
   queryOptions({
-    queryKey: ["members-select"],
+    queryKey: ['member-details', "members-select"],
     queryFn: () =>
       fetcher("/api/member/select", {
         tags: ["members-select"],
