@@ -7,6 +7,7 @@ import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { useWindowScroll } from "react-use";
 
+import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
@@ -63,7 +64,7 @@ function TopMenu({ className }: { className?: string }) {
   return (
     <motion.nav
       className={clsx(
-        "w-full h-[48px] align-middle items-center fixed px-4 lg:px-0 lg:pl-[300px] flex justify-start lg:justify-center shadow-sm",
+        "w-full h-[48px] align-middle items-center fixed px-4 lg:px-0 lg:pl-[300px] flex justify-between lg:justify-center shadow-sm",
         className
       )}
       initial="show"
@@ -84,7 +85,12 @@ function TopMenu({ className }: { className?: string }) {
         <CustomLink href={"/"} variant={"transparent"} className="p-0 px-3">
           <Typography variant={"brandMini"}>Peacock Club</Typography>
         </CustomLink>
+     
       </Box>
+      <div className="lg:absolute lg:right-4">
+
+<ThemeModeToggle />
+</div>
     </motion.nav>
   );
 }
