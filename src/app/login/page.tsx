@@ -19,7 +19,7 @@ export default function Login() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () => fetcher.post("/api/vendor", { body: { password } }),
+    mutationFn: () => fetcher.post("/api/auth/login", { body: { password } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ["auth"],
