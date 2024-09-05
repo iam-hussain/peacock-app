@@ -1,13 +1,14 @@
+import { flexRender } from "@tanstack/react-table";
 import React from "react";
+
 import {
   Table,
-  TableHeader,
-  TableRow,
-  TableHead,
   TableBody,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { flexRender } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 
 type TableLayoutProps<T> = {

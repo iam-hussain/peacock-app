@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
+
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 type SelectInputGroupProps = {

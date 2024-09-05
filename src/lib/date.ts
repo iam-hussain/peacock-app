@@ -1,32 +1,52 @@
 import {
-  format,
-  parse,
-  differenceInYears,
-  differenceInMonths,
+  addMonths,
   differenceInDays,
+  differenceInMonths,
+  differenceInYears,
+  format,
   formatDistance,
   formatRelative,
-  addMonths,
   isAfter,
+  parse,
   subDays,
 } from "date-fns";
+import { differenceInCalendarMonths } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
-import { differenceInCalendarMonths } from "date-fns";
 const timeZone = "Asia/Kolkata";
 
-export const newDate = (input: any = new Date()) => {
-  // Parse the date string as a Date object
-  const parsedDate = parse(input, "MM/dd/yyyy", new Date());
+export function calculateDueDates(
+  startDate: Date,
+  now: Date = new Date(),
+  toleranceDays: number = 5,
+): DueDates {
+  // Calculate the number of months passed since the start date
+  const monthsPassed = differenceInMonths(now, new Date(startDate)) + 1;
 
-  // Convert the parsed date to the specified time zone
-  const zonedDate = toZonedTime(parsedDate, timeZone);
+  // Calculate the next and recent due dates
+  let nextDueDate = addMonths(startDate, monthsPassed);
+  let recentDueDate = addMonths(startDate, monthsPassed);
 
-  return zonedDate;
-};
+  // Adjust the recent due date if the current date is before or within the tolerance
+  if (isAfter(now, subDays(nextDueDate, toleranceDays))) {
+    recentDueDate = nextDueDate;
+    nextDueDate = addMonths(nextDueDate, 1);
+  } else {
+    recentDueDate = addMonths(recentDueDate, -1);
+  }
 
-export const dateFormat = (input: Date) => {
-  return format(new Date(input), "dd MMM yyyy");
+  return { nextDueDate, recentDueDate, monthsPassed };
+}
+
+// export function calculateMonthsDifference(startDate: Date, now: Date = new Date()) {
+//   // Calculate the number of months passed since the start date
+//   return Math.abs(differenceInMonths(now, new Date(startDate)));
+// }
+export const calculateMonthsDifference = (
+  a: Date,
+  b: Date | null = new Date(),
+) => {
+  return Math.abs(differenceInCalendarMonths(a, b || new Date()));
 };
 
 export const clubAge = () => {
@@ -65,12 +85,12 @@ export const clubAge = () => {
   };
 };
 
-export const displayDateTime = (input: Date = new Date()) => {
-  return format(new Date(input), "dd MMM yyyy hh:mm a");
+export const dateFormat = (input: Date) => {
+  return format(new Date(input), "dd MMM yyyy");
 };
 
-export const fileDateTime = (input: Date = new Date()) => {
-  return format(new Date(input), "dd_mm_yy_HH_mm");
+export const displayDateTime = (input: Date = new Date()) => {
+  return format(new Date(input), "dd MMM yyyy hh:mm a");
 };
 
 type DueDates = {
@@ -79,37 +99,16 @@ type DueDates = {
   monthsPassed: number;
 };
 
-export function calculateDueDates(
-  startDate: Date,
-  now: Date = new Date(),
-  toleranceDays: number = 5,
-): DueDates {
-  // Calculate the number of months passed since the start date
-  const monthsPassed = differenceInMonths(now, new Date(startDate)) + 1;
+export const fileDateTime = (input: Date = new Date()) => {
+  return format(new Date(input), "dd_mm_yy_HH_mm");
+};
 
-  // Calculate the next and recent due dates
-  let nextDueDate = addMonths(startDate, monthsPassed);
-  let recentDueDate = addMonths(startDate, monthsPassed);
+export const newDate = (input: any = new Date()) => {
+  // Parse the date string as a Date object
+  const parsedDate = parse(input, "MM/dd/yyyy", new Date());
 
-  // Adjust the recent due date if the current date is before or within the tolerance
-  if (isAfter(now, subDays(nextDueDate, toleranceDays))) {
-    recentDueDate = nextDueDate;
-    nextDueDate = addMonths(nextDueDate, 1);
-  } else {
-    recentDueDate = addMonths(recentDueDate, -1);
-  }
+  // Convert the parsed date to the specified time zone
+  const zonedDate = toZonedTime(parsedDate, timeZone);
 
-  return { nextDueDate, recentDueDate, monthsPassed };
-}
-
-// export function calculateMonthsDifference(startDate: Date, now: Date = new Date()) {
-//   // Calculate the number of months passed since the start date
-//   return Math.abs(differenceInMonths(now, new Date(startDate)));
-// }
-
-export const calculateMonthsDifference = (
-  a: Date,
-  b: Date | null = new Date(),
-) => {
-  return Math.abs(differenceInCalendarMonths(a, b || new Date()));
+  return zonedDate;
 };

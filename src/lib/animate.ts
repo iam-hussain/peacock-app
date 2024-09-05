@@ -1,9 +1,3 @@
-export const animateHover = {
-  initial: { scale: 1 },
-  hover: { scale: 1.1 },
-  pressed: { scale: 0.9 },
-};
-
 export const animateDecorator = {
   hide: {
     opacity: 0,
@@ -15,4 +9,10 @@ export const animateDecorator = {
     zIndex: 40,
     transition: { duration: 0.5, ease: "linear" },
   },
+};
+
+export const animateHover = {
+  initial: { scale: 1 },
+  hover: { scale: 1.1 },
+  pressed: { scale: 0.9 },
 };

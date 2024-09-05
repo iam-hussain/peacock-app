@@ -2,11 +2,13 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+import MenuItems from "./menu-items";
+
+import { animateDecorator } from "@/lib/animate";
+import { cn } from "@/lib/utils";
 import { RootState } from "@/store";
 import { openSideBar } from "@/store/pageSlice";
-import { cn } from "@/lib/utils";
-import { animateDecorator } from "@/lib/animate";
-import MenuItems from "./menu-items";
 
 const variants = {
   initial: { x: -400, transition: { duration: 0.3, ease: "linear" } },

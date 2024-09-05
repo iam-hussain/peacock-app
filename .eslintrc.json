@@ -1,40 +1,38 @@
 {
   "extends": "next/core-web-vitals",
-  "plugins": ["import", "sort-exports", "unused-imports", "prettier"],
+  "plugins": [
+    "import",
+    "sort-exports",
+    "unused-imports",
+    "prettier",
+    "simple-import-sort"
+  ],
   "rules": {
     "prettier/prettier": "error", // Run Prettier as an ESLint rule
-    "import/order": [
+    // Sorting imports in a readable way
+    "simple-import-sort/imports": [
       "error",
       {
         "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index"
-        ],
-        "newlines-between": "always",
-        "alphabetize": {
-          "order": "asc",
-          "caseInsensitive": true
-        }
+          // Node.js built-ins
+          ["^node:"],
+          // Packages (React, Next.js, libraries, etc.)
+          ["^@?\\w"],
+          // Internal imports (your own project paths)
+          ["^(@/|components|lib|utils|hooks|contexts)(/.*|$)"],
+          // Side effect imports
+          ["^\\u0000"],
+          // Parent imports (e.g. ../)
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          // Sibling imports (e.g. ./ and same level files)
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+          // Style imports (CSS, SCSS, etc.)
+          ["^.+\\.s?css$"]
+        ]
       }
     ],
-    "sort-keys": [
-      "error",
-      "asc",
-      {
-        "caseSensitive": false,
-        "natural": true
-      }
-    ],
-    "sort-exports/sort-exports": [
-      "error",
-      {
-        "sortDir": "asc"
-      }
-    ],
+    // Sorting exports
+    "simple-import-sort/exports": "error",
     "unused-imports/no-unused-imports": "error", // This rule will automatically remove unused imports
 
     // Optionally remove unused variables

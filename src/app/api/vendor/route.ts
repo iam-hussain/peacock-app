@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import { calculateDueDates, calculateMonthsDifference } from "@/lib/date";
-import prisma from "@/db";
 import { Passbook, Vendor } from "@prisma/client";
-import { differenceInMonths } from "date-fns";
+import { NextResponse } from "next/server";
+
+import prisma from "@/db";
 import { calculateMonthlyInterest } from "@/lib/club";
+import { calculateDueDates, calculateMonthsDifference } from "@/lib/date";
 
 type VendorToTransform = Vendor & {
   passbook: Passbook;
@@ -15,7 +15,30 @@ type VendorToTransform = Vendor & {
   } | null;
 };
 
-export type TransformedVendor = ReturnType<typeof transformVendorForTable>;
+export async function GET(request: Request) {
+  const vendors = await prisma.vendor.findMany({
+    include: {
+      owner: {
+        select: {
+          id: true,
+          avatar: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      passbook: true,
+    },
+  });
+
+  const transformedVendors = vendors
+    .map(transformVendorForTable)
+    .sort((a, b) => (a.name > b.name ? 1 : -1))
+    .sort((a, b) => (a.active > b.active ? -1 : 1));
+
+  return NextResponse.json({
+    vendors: transformedVendors,
+  });
+}
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, owner, ...vendor } = vendorInput;
@@ -83,31 +106,6 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
 export type GetVendorResponse = {
   vendors: TransformedVendor[];
 };
-
-export async function GET(request: Request) {
-  const vendors = await prisma.vendor.findMany({
-    include: {
-      owner: {
-        select: {
-          id: true,
-          avatar: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
-      passbook: true,
-    },
-  });
-
-  const transformedVendors = vendors
-    .map(transformVendorForTable)
-    .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.active > b.active ? -1 : 1));
-
-  return NextResponse.json({
-    vendors: transformedVendors,
-  });
-}
 
 export async function POST(request: Request) {
   try {
@@ -200,3 +198,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export type TransformedVendor = ReturnType<typeof transformVendorForTable>;

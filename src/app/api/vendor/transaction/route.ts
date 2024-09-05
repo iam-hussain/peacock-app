@@ -1,7 +1,7 @@
-import prisma from "@/db";
-import { dateFormat } from "@/lib/date";
 import { VendorTransaction } from "@prisma/client";
 import { NextResponse } from "next/server";
+
+import prisma from "@/db";
 
 type VendorTransactionToTransform = VendorTransaction & {
   vendor: {
@@ -22,56 +22,6 @@ type VendorTransactionToTransform = VendorTransaction & {
     avatar: string | null;
     active: boolean;
   };
-};
-
-export type TransformedVendorTransaction = ReturnType<
-  typeof vendorsTransactionTableTransform
->;
-
-function vendorsTransactionTableTransform(
-  transaction: VendorTransactionToTransform,
-) {
-  const { vendor, member } = transaction;
-  const memberName = vendor?.owner?.firstName
-    ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
-    : "";
-
-  return {
-    vendor: {
-      id: vendor.id,
-      name: vendor.name,
-      active: vendor.active,
-      memberName,
-      memberAvatar: vendor?.owner?.avatar
-        ? `/image/${vendor.owner.avatar}`
-        : undefined,
-    },
-    member: {
-      id: member.id,
-      name: `${member.firstName}${
-        member.lastName ? ` ${member.lastName}` : ""
-      }`,
-      avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-      active: member.active,
-    },
-    transactionType: transaction.transactionType,
-    transactionAt: transaction.transactionAt,
-    amount: transaction.amount,
-    method: transaction.method,
-    note: transaction.note,
-    updatedAt: transaction.updatedAt,
-    createdAt: transaction.createdAt,
-    id: transaction.id,
-    vendorId: transaction.vendorId,
-    memberId: transaction.memberId,
-  };
-}
-
-export type GetVendorTransactionResponse = {
-  transactions: TransformedVendorTransaction[];
-  total: number;
-  page: number;
-  totalPages: number;
 };
 
 // GET: Fetch vendor transactions with pagination
@@ -152,6 +102,52 @@ export async function GET(request: Request) {
   }
 }
 
+function vendorsTransactionTableTransform(
+  transaction: VendorTransactionToTransform,
+) {
+  const { vendor, member } = transaction;
+  const memberName = vendor?.owner?.firstName
+    ? `${vendor.owner.firstName} ${vendor.owner.lastName || ""}`
+    : "";
+
+  return {
+    vendor: {
+      id: vendor.id,
+      name: vendor.name,
+      active: vendor.active,
+      memberName,
+      memberAvatar: vendor?.owner?.avatar
+        ? `/image/${vendor.owner.avatar}`
+        : undefined,
+    },
+    member: {
+      id: member.id,
+      name: `${member.firstName}${
+        member.lastName ? ` ${member.lastName}` : ""
+      }`,
+      avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+      active: member.active,
+    },
+    transactionType: transaction.transactionType,
+    transactionAt: transaction.transactionAt,
+    amount: transaction.amount,
+    method: transaction.method,
+    note: transaction.note,
+    updatedAt: transaction.updatedAt,
+    createdAt: transaction.createdAt,
+    id: transaction.id,
+    vendorId: transaction.vendorId,
+    memberId: transaction.memberId,
+  };
+}
+
+export type GetVendorTransactionResponse = {
+  transactions: TransformedVendorTransaction[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
 export async function POST(request: Request) {
   try {
     const {
@@ -199,3 +195,7 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export type TransformedVendorTransaction = ReturnType<
+  typeof vendorsTransactionTableTransform
+>;

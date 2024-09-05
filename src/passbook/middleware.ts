@@ -1,12 +1,14 @@
-import prisma from "@/db";
-import { calculateMonthsPaid } from "@/lib/club";
 import { MemberTransaction, Passbook, VendorTransaction } from "@prisma/client";
+
 import {
+  memberTransactionPassbookSettings,
   PassbookConfigAction,
   PassbookConfigActionValue,
-  memberTransactionPassbookSettings,
   vendorTransactionPassbookSettings,
 } from "./settings";
+
+import prisma from "@/db";
+import { calculateMonthsPaid } from "@/lib/club";
 
 type PassbookConfigActionValueObj = {
   [key in PassbookConfigActionValue]: number;

@@ -1,8 +1,6 @@
-export interface FetcherPropsOptions {
-  method?: string;
+export interface FetcherOptions {
   header?: any;
   body?: any;
-  tags?: string[];
 }
 
 const fetcher = async (
@@ -36,21 +34,11 @@ const fetcher = async (
   }
 };
 
-export interface FetcherOptions {
+export interface FetcherPropsOptions {
+  method?: string;
   header?: any;
   body?: any;
-  setError?: (
-    name: any,
-    error: {
-      type: string;
-      message: string;
-    },
-    options?:
-      | {
-          shouldFocus: boolean;
-        }
-      | undefined,
-  ) => void;
+  tags?: string[];
 }
 // Function to fetch data using the GET method
 fetcher.get = (path: string, options: FetcherOptions = {}) => {

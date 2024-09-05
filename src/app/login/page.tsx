@@ -1,14 +1,15 @@
 "use client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Typography from "@/components/ui/typography";
-import Image from "next/image";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { CustomLink } from "@/components/ui/link";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Typography from "@/components/ui/typography";
 import fetcher from "@/lib/fetcher";
 
 export default function Login() {

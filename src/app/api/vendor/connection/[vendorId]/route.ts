@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import prisma from "@/db";
 
 // GET: Fetch all member connections for a vendor
@@ -36,7 +37,7 @@ export async function POST(
   const updates = await Promise.all(
     data.map((update: { id: string; active: boolean }) =>
       prisma.vendorProfitShare.update({
-        where: { id: update.id },
+        where: { id: update.id, vendorId },
         data: { active: update.active },
       }),
     ),

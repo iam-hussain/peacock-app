@@ -2,17 +2,18 @@
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { HiMenuAlt2 } from "react-icons/hi";
+import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { useWindowScroll } from "react-use";
 
-import { RootState } from "@/store";
-import { openSideBar } from "@/store/pageSlice";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
-import { IoClose } from "react-icons/io5";
-import { HiMenuAlt2 } from "react-icons/hi";
-import Typography from "../ui/typography";
 import { CustomLink } from "../ui/link";
+import Typography from "../ui/typography";
+
+import { RootState } from "@/store";
+import { openSideBar } from "@/store/pageSlice";
 ``;
 
 const animator = {

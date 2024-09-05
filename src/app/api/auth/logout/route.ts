@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { serialize } from "cookie"; // To set cookies
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   // Set the token in a cookie

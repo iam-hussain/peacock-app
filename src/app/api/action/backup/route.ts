@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
 import fs from "fs";
+import { NextResponse } from "next/server";
 import path from "path";
+
 import prisma from "@/db";
 
 export async function POST() {

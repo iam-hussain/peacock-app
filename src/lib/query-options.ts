@@ -1,12 +1,14 @@
 import { queryOptions } from "@tanstack/react-query";
+
 import fetcher from "./fetcher";
+
+import { GetStatisticsResponse } from "@/app/api/dashboard/statistics/route";
 import { GetMemberResponse } from "@/app/api/member/route";
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import { GetMemberTransactionResponse } from "@/app/api/member/transaction/route";
 import { GetVendorResponse } from "@/app/api/vendor/route";
-import { GetVendorTransactionResponse } from "@/app/api/vendor/transaction/route";
-import { GetStatisticsResponse } from "@/app/api/dashboard/statistics/route";
 import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { GetVendorTransactionResponse } from "@/app/api/vendor/transaction/route";
 
 const noRefetchConfigs = {
   // refetchOnMount: false,
@@ -15,23 +17,31 @@ const noRefetchConfigs = {
   // refetchOnWindowFocus: false,
 };
 
-export const fetchMembers = () =>
+export const fetchAuthStatus = () =>
   queryOptions({
-    queryKey: ["member-details", "members", "connections"],
+    queryKey: ["auth", "status"],
     queryFn: () =>
-      fetcher("/api/member", {
-        tags: ["members"],
-      }) as unknown as GetMemberResponse,
+      fetcher("/api/auth/status", { tags: ["auth"] }) as never as {
+        isLoggedIn: boolean;
+      },
     ...noRefetchConfigs,
   });
 
-export const fetchVendors = () =>
+export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
-    queryKey: ["vendor-details", "vendors", "connections"],
+    queryKey: ["member-connection", "connections"],
     queryFn: () =>
-      fetcher("/api/vendor", {
-        tags: ["vendors"],
-      }) as unknown as GetVendorResponse,
+      fetcher(`/api/member/connection/${memberId}`, {
+        tags: ["member-connection"],
+      }) as never as {
+        connections: {
+          vendor: {
+            name: string;
+          };
+          id: string;
+          active: boolean;
+        }[];
+      },
     ...noRefetchConfigs,
   });
 
@@ -58,6 +68,55 @@ export const fetchMemberTransactions = (options: any) => {
   });
 };
 
+export const fetchMembers = () =>
+  queryOptions({
+    queryKey: ["member-details", "members", "connections"],
+    queryFn: () =>
+      fetcher("/api/member", {
+        tags: ["members"],
+      }) as unknown as GetMemberResponse,
+    ...noRefetchConfigs,
+  });
+
+export const fetchMembersSelect = () =>
+  queryOptions({
+    queryKey: ["member-details", "members-select"],
+    queryFn: () =>
+      fetcher("/api/member/select", {
+        tags: ["members-select"],
+      }) as never as TransformedMemberSelect[],
+    ...noRefetchConfigs,
+  });
+
+export const fetchStatistics = () =>
+  queryOptions({
+    queryKey: ["statistics", "connections"],
+    queryFn: () =>
+      fetcher("/api/dashboard/statistics", {
+        tags: ["statistics"],
+      }) as never as GetStatisticsResponse,
+    ...noRefetchConfigs,
+  });
+
+export const fetchVendorConnection = (vendorId: string) =>
+  queryOptions({
+    queryKey: ["vendor-connection", "connections"],
+    queryFn: () =>
+      fetcher(`/api/vendor/connection/${vendorId}`, {
+        tags: ["vendor-connection"],
+      }) as never as {
+        connections: {
+          member: {
+            firstName?: string;
+            lastName?: string;
+          };
+          id: string;
+          active: boolean;
+        }[];
+      },
+    ...noRefetchConfigs,
+  });
+
 export const fetchVendorTransactions = (options: any) => {
   const params = new URLSearchParams({
     page: options.page.toString(),
@@ -81,13 +140,13 @@ export const fetchVendorTransactions = (options: any) => {
   });
 };
 
-export const fetchMembersSelect = () =>
+export const fetchVendors = () =>
   queryOptions({
-    queryKey: ["member-details", "members-select"],
+    queryKey: ["vendor-details", "vendors", "connections"],
     queryFn: () =>
-      fetcher("/api/member/select", {
-        tags: ["members-select"],
-      }) as never as TransformedMemberSelect[],
+      fetcher("/api/vendor", {
+        tags: ["vendors"],
+      }) as unknown as GetVendorResponse,
     ...noRefetchConfigs,
   });
 
@@ -98,62 +157,5 @@ export const fetchVendorsSelect = () =>
       fetcher("/api/vendor/select", {
         tags: ["vendors-select"],
       }) as never as TransformedVendorSelect[],
-    ...noRefetchConfigs,
-  });
-
-export const fetchStatistics = () =>
-  queryOptions({
-    queryKey: ["statistics", "connections"],
-    queryFn: () =>
-      fetcher("/api/dashboard/statistics", {
-        tags: ["statistics"],
-      }) as never as GetStatisticsResponse,
-    ...noRefetchConfigs,
-  });
-
-export const fetchMemberConnection = (memberId: string) =>
-  queryOptions({
-    queryKey: ["member-connection", "connections"],
-    queryFn: () =>
-      fetcher(`/api/member/connection/${memberId}`, {
-        tags: ["member-connection"],
-      }) as never as {
-        connections: {
-          vendor: {
-            name: string;
-          };
-          id: string;
-          active: boolean;
-        }[];
-      },
-    ...noRefetchConfigs,
-  });
-
-export const fetchVendorConnection = (vendorId: string) =>
-  queryOptions({
-    queryKey: ["vendor-connection", "connections"],
-    queryFn: () =>
-      fetcher(`/api/vendor/connection/${vendorId}`, {
-        tags: ["vendor-connection"],
-      }) as never as {
-        connections: {
-          member: {
-            firstName?: string;
-            lastName?: string;
-          };
-          id: string;
-          active: boolean;
-        }[];
-      },
-    ...noRefetchConfigs,
-  });
-
-export const fetchAuthStatus = () =>
-  queryOptions({
-    queryKey: ["auth", "status"],
-    queryFn: () =>
-      fetcher("/api/auth/status", { tags: ["auth"] }) as never as {
-        isLoggedIn: boolean;
-      },
     ...noRefetchConfigs,
   });

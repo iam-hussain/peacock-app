@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { sign } from "jsonwebtoken"; // For generating JWTs
 import { serialize } from "cookie"; // To set cookies
+import { sign } from "jsonwebtoken"; // For generating JWTs
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   const { password } = await request.json();

@@ -1,5 +1,3 @@
-import { newDate } from "./date";
-
 type Stage = {
   name: string;
   amount: number;
@@ -27,22 +25,6 @@ export const clubConfig = {
   bravo,
 };
 
-export const transactionMethodMap = {
-  CASH: "Cash",
-  ACCOUNT: "Account",
-  UPI: "UPI",
-  BANK: "Bank",
-  CHEQUE: "Cheque",
-};
-
-// Vendor Type Map
-export const vendorTypeMap = {
-  DEFAULT: "Default",
-  CHIT: "Chit",
-  LEND: "Loan",
-  BANK: "Bank",
-};
-
 // Member Transaction Type Map
 export const memberTransactionTypeMap = {
   PERIODIC_DEPOSIT: "Periodic Deposit",
@@ -50,16 +32,6 @@ export const memberTransactionTypeMap = {
   WITHDRAW: "Withdraw",
   REJOIN: "Rejoin",
   FUNDS_TRANSFER: "Funds Transfer",
-};
-
-// Vendor Transaction Type Map
-export const vendorTransactionTypeMap = {
-  PERIODIC_INVEST: "Periodic Invest",
-  INVEST: "Invest",
-  PERIODIC_RETURN: "Periodic Returns",
-  RETURNS: "Returns",
-  PROFIT: "Profit",
-  // EXPENSE (commented out in the enum, so not included here)
 };
 
 // Member Vendor Role Map
@@ -83,4 +55,30 @@ export const periodMap = {
   WEEK: "Week",
   MONTH: "Month",
   YEAR: "Year",
+};
+
+export const transactionMethodMap = {
+  CASH: "Cash",
+  ACCOUNT: "Account",
+  UPI: "UPI",
+  BANK: "Bank",
+  CHEQUE: "Cheque",
+};
+
+// Vendor Transaction Type Map
+export const vendorTransactionTypeMap = {
+  PERIODIC_INVEST: "Periodic Invest",
+  INVEST: "Invest",
+  PERIODIC_RETURN: "Periodic Returns",
+  RETURNS: "Returns",
+  PROFIT: "Profit",
+  // EXPENSE (commented out in the enum, so not included here)
+};
+
+// Vendor Type Map
+export const vendorTypeMap = {
+  DEFAULT: "Default",
+  CHIT: "Chit",
+  LEND: "Loan",
+  BANK: "Bank",
 };

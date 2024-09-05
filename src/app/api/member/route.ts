@@ -1,15 +1,31 @@
-import { NextResponse } from "next/server";
 import { Member, Passbook } from "@prisma/client";
-import prisma from "@/db";
-import { dateFormat, calculateMonthsDifference } from "@/lib/date";
-import { memberTotalDepositAmount } from "@/lib/club";
 import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
+
+import prisma from "@/db";
+import { memberTotalDepositAmount } from "@/lib/club";
+import { calculateMonthsDifference } from "@/lib/date";
 
 type MemberToTransform = Member & {
   passbook: Passbook;
 };
 
-export type TransformedMember = ReturnType<typeof membersTableTransform>;
+export async function GET(request: Request) {
+  const members = await prisma.member.findMany({
+    include: {
+      passbook: true,
+    },
+  });
+  const memberTotalDeposit = memberTotalDepositAmount();
+
+  const transformedMembers = members
+    .map((each) => membersTableTransform(each, memberTotalDeposit))
+    .sort((a, b) => (a.name > b.name ? 1 : -1));
+
+  return NextResponse.json({
+    members: transformedMembers,
+  });
+}
 
 function membersTableTransform(
   member: MemberToTransform,
@@ -46,23 +62,6 @@ function membersTableTransform(
 export type GetMemberResponse = {
   members: TransformedMember[];
 };
-
-export async function GET(request: Request) {
-  const members = await prisma.member.findMany({
-    include: {
-      passbook: true,
-    },
-  });
-  const memberTotalDeposit = memberTotalDepositAmount();
-
-  const transformedMembers = members
-    .map((each) => membersTableTransform(each, memberTotalDeposit))
-    .sort((a, b) => (a.name > b.name ? 1 : -1));
-
-  return NextResponse.json({
-    members: transformedMembers,
-  });
-}
 
 export async function POST(request: Request) {
   try {
@@ -141,3 +140,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export type TransformedMember = ReturnType<typeof membersTableTransform>;

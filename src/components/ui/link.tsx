@@ -1,9 +1,11 @@
 import { Slot, Slottable } from "@radix-ui/react-slot";
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import Icon, { IconKey } from "./icon";
 import { cva, type VariantProps } from "class-variance-authority";
 import Link, { LinkProps } from "next/link";
+import * as React from "react";
+
+import Icon, { IconKey } from "./icon";
+
+import { cn } from "@/lib/utils";
 
 const linkVariants = cva(
   "inline-flex gap-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -57,6 +59,8 @@ interface IconRefProps {
   iconPlacement?: undefined;
 }
 
+export { CustomLink, linkVariants };
+
 export interface CustomLinkProps
   extends LinkProps,
     // React.AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -66,8 +70,6 @@ export interface CustomLinkProps
   children: any;
   onClick?: () => void;
 }
-
-export type LinkIconProps = IconProps | IconRefProps;
 
 const CustomLink = React.forwardRef<
   HTMLAnchorElement,
@@ -109,4 +111,4 @@ const CustomLink = React.forwardRef<
 
 CustomLink.displayName = "CustomLink";
 
-export { CustomLink, linkVariants };
+export type LinkIconProps = IconProps | IconRefProps;

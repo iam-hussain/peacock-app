@@ -1,30 +1,32 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  useReactTable,
+  ColumnDef,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  ColumnDef,
-  getFilteredRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
+import html2canvas from "html2canvas";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
 import {
-  AvatarCell,
-  PlainTableHeader,
-  ActionTableHeader,
-  CommonTableCell,
   ActionCell,
+  ActionTableHeader,
+  AvatarCell,
+  CommonTableCell,
+  PlainTableHeader,
 } from "../../atoms/table-component";
-import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
-import html2canvas from "html2canvas";
-import { cn } from "@/lib/utils";
 import Typography from "../../ui/typography";
+
 import { TransformedMember } from "@/app/api/member/route";
-import { useQuery } from "@tanstack/react-query";
+import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
+import { cn } from "@/lib/utils";
 
 const baseColumns: ColumnDef<TransformedMember>[] = [
   {

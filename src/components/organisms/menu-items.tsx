@@ -1,30 +1,31 @@
 "use client";
 
-import { IconType } from "react-icons/lib";
-import { Button } from "../ui/button";
-import { CustomLink } from "../ui/link";
-import Box from "../ui/box";
-import { IoClose } from "react-icons/io5";
-import { ScrollArea } from "../ui/scroll-area";
-import { FaPeopleGroup } from "react-icons/fa6";
-import Typography from "../ui/typography";
-import { Separator } from "../ui/separator";
-import { clubAge } from "@/lib/date";
-import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { RootState } from "@/store";
-import { useDispatch, useSelector } from "react-redux";
-import Cookies from "js-cookie";
-import { setIsLoggedIn } from "@/store/pageSlice";
-import ActionMenu from "../molecules/action-menu";
-import { HiBriefcase } from "react-icons/hi";
-import { RiFolderTransferFill } from "react-icons/ri";
 import { FaPiggyBank } from "react-icons/fa";
+import { FaPeopleGroup } from "react-icons/fa6";
+import { HiBriefcase } from "react-icons/hi";
+import { IoClose } from "react-icons/io5";
+import { IconType } from "react-icons/lib";
 import { PiSignInBold } from "react-icons/pi";
 import { PiSignOutBold } from "react-icons/pi";
+import { RiFolderTransferFill } from "react-icons/ri";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+
+import ActionMenu from "../molecules/action-menu";
+import Box from "../ui/box";
+import { Button } from "../ui/button";
+import { CustomLink } from "../ui/link";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
+import Typography from "../ui/typography";
+
+import { clubAge } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
+import { RootState } from "@/store";
+import { setIsLoggedIn } from "@/store/pageSlice";
 
 type Menu = {
   Icon: IconType;

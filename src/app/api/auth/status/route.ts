@@ -1,7 +1,7 @@
 // File: app/api/auth/status/route.ts
 
-import { NextResponse } from "next/server";
 import { verify } from "jsonwebtoken";
+import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {

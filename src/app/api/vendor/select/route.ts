@@ -1,5 +1,6 @@
-import prisma from "@/db";
 import { NextResponse } from "next/server";
+
+import prisma from "@/db";
 
 type VendorToTransform = {
   id: string;
@@ -18,8 +19,6 @@ function vendorsSelectTransform(vendor: VendorToTransform) {
     active: vendor.active,
   };
 }
-
-export type TransformedVendorSelect = ReturnType<typeof vendorsSelectTransform>;
 
 export async function GET(request: Request) {
   const vendors = await prisma.vendor.findMany({
@@ -42,3 +41,5 @@ export async function GET(request: Request) {
       .sort((a, b) => (a.name > b.name ? 1 : -1)),
   );
 }
+
+export type TransformedVendorSelect = ReturnType<typeof vendorsSelectTransform>;

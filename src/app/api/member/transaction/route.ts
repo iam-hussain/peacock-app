@@ -1,6 +1,7 @@
-import prisma from "@/db";
 import { MemberTransaction } from "@prisma/client";
 import { NextResponse } from "next/server";
+
+import prisma from "@/db";
 
 type MemberTransactionToTransform = MemberTransaction & {
   to: {
@@ -19,9 +20,42 @@ type MemberTransactionToTransform = MemberTransaction & {
   };
 };
 
-export type TransformedMemberTransaction = ReturnType<
-  typeof membersTransactionTableTransform
->;
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
+  const { id } = params;
+
+  try {
+    // Check if the transaction exists
+    const transaction = await prisma.memberTransaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return NextResponse.json(
+        { message: "Transaction not found." },
+        { status: 404 },
+      );
+    }
+
+    // Delete the transaction
+    await prisma.memberTransaction.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { message: "Transaction deleted successfully." },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    return NextResponse.json(
+      { message: "Failed to delete transaction." },
+      { status: 500 },
+    );
+  }
+}
 
 function membersTransactionTableTransform(
   transaction: MemberTransactionToTransform,
@@ -52,13 +86,6 @@ function membersTransactionTableTransform(
     toId: transaction.toId,
   };
 }
-
-export type GetMemberTransactionResponse = {
-  transactions: TransformedMemberTransaction[];
-  total: number;
-  page: number;
-  totalPages: number;
-};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -126,6 +153,13 @@ export async function GET(request: Request) {
   });
 }
 
+export type GetMemberTransactionResponse = {
+  transactions: TransformedMemberTransaction[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
 // POST route for adding a member transaction
 export async function POST(request: Request) {
   try {
@@ -173,39 +207,6 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } },
-) {
-  const { id } = params;
-
-  try {
-    // Check if the transaction exists
-    const transaction = await prisma.memberTransaction.findUnique({
-      where: { id },
-    });
-
-    if (!transaction) {
-      return NextResponse.json(
-        { message: "Transaction not found." },
-        { status: 404 },
-      );
-    }
-
-    // Delete the transaction
-    await prisma.memberTransaction.delete({
-      where: { id },
-    });
-
-    return NextResponse.json(
-      { message: "Transaction deleted successfully." },
-      { status: 200 },
-    );
-  } catch (error) {
-    console.error("Error deleting transaction:", error);
-    return NextResponse.json(
-      { message: "Failed to delete transaction." },
-      { status: 500 },
-    );
-  }
-}
+export type TransformedMemberTransaction = ReturnType<
+  typeof membersTransactionTableTransform
+>;

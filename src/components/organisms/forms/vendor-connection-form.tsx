@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Switch } from "@/components/ui/switch";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchVendorConnection } from "@/lib/query-options";
+
+import { Switch } from "@/components/ui/switch";
 import fetcher from "@/lib/fetcher";
+import { fetchVendorConnection } from "@/lib/query-options";
 
 type VendorConnectionsFormProps = {
   vendorId: string;

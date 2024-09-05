@@ -1,41 +1,23 @@
 import { z } from "zod";
 
+export type MemberFromSchema = z.infer<typeof memberFormSchema>;
+
+export type MemberTransactionFormSchema = z.infer<
+  typeof memberTransactionFormSchema
+>;
+
+export type VendorFromSchema = z.infer<typeof vendorFormSchema>;
+
+export type VendorTransactionFormSchema = z.infer<
+  typeof vendorTransactionFormSchema
+>;
+
 export const datePickerFormSchema = z
   .date()
   .optional()
   .refine((date) => !date || date instanceof Date, {
     message: "Invalid date",
   });
-
-export const memberFormSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().optional(),
-  username: z.string().min(1, "Username is required"),
-  phone: z.string().optional(),
-  email: z.union([z.literal(""), z.string().email()]),
-  avatar: z.string().optional(),
-  active: z.boolean().optional(),
-  joinedAt: datePickerFormSchema,
-});
-
-export type MemberFromSchema = z.infer<typeof memberFormSchema>;
-
-export const vendorFormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  slug: z.string().min(1, "Slug is required"),
-  terms: z.number().min(0, "Terms must be a positive number"),
-  type: z.enum(["DEFAULT", "CHIT", "LEND", "BANK"], {
-    required_error: "Please select a vendor type",
-  }),
-  ownerId: z.string().optional(),
-  termType: z.enum(["NONE", "DAY", "WEEK", "MONTH", "YEAR"]).optional(),
-  startAt: datePickerFormSchema,
-  endAt: datePickerFormSchema,
-  active: z.boolean().optional(),
-  calcReturns: z.boolean().optional(),
-});
-
-export type VendorFromSchema = z.infer<typeof vendorFormSchema>;
 
 // Transaction method and type enums
 const transactionMethods = [
@@ -53,6 +35,17 @@ const memberTransactionTypes = [
   "REJOIN",
   "FUNDS_TRANSFER",
 ] as const;
+
+export const memberFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().optional(),
+  username: z.string().min(1, "Username is required"),
+  phone: z.string().optional(),
+  email: z.union([z.literal(""), z.string().email()]),
+  avatar: z.string().optional(),
+  active: z.boolean().optional(),
+  joinedAt: datePickerFormSchema,
+});
 
 // Zod schema definition
 export const memberTransactionFormSchema = z.object({
@@ -74,10 +67,6 @@ export const memberTransactionFormSchema = z.object({
   transactionAt: datePickerFormSchema,
 });
 
-export type MemberTransactionFormSchema = z.infer<
-  typeof memberTransactionFormSchema
->;
-
 const vendorTransactionTypes = [
   "PERIODIC_INVEST",
   "INVEST",
@@ -85,6 +74,21 @@ const vendorTransactionTypes = [
   "RETURNS",
   "PROFIT",
 ] as const;
+
+export const vendorFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  terms: z.number().min(0, "Terms must be a positive number"),
+  type: z.enum(["DEFAULT", "CHIT", "LEND", "BANK"], {
+    required_error: "Please select a vendor type",
+  }),
+  ownerId: z.string().optional(),
+  termType: z.enum(["NONE", "DAY", "WEEK", "MONTH", "YEAR"]).optional(),
+  startAt: datePickerFormSchema,
+  endAt: datePickerFormSchema,
+  active: z.boolean().optional(),
+  calcReturns: z.boolean().optional(),
+});
 
 // Zod schema definition
 export const vendorTransactionFormSchema = z.object({
@@ -105,7 +109,3 @@ export const vendorTransactionFormSchema = z.object({
   note: z.string().optional(),
   transactionAt: datePickerFormSchema,
 });
-
-export type VendorTransactionFormSchema = z.infer<
-  typeof vendorTransactionFormSchema
->;

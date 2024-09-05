@@ -1,15 +1,16 @@
 "use client";
 
-import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { DatePickerForm } from "../../atoms/date-picker-form";
+import { GenericModalFooter } from "../../atoms/generic-modal";
+import Box from "../../ui/box";
+import { Switch } from "../../ui/switch";
+
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import {
   Form,
   FormControl,
@@ -18,16 +19,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Switch } from "../../ui/switch";
-import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
-import Box from "../../ui/box";
-import { GenericModalFooter } from "../../atoms/generic-modal";
-import { toast } from "sonner";
-import { DatePickerForm } from "../../atoms/date-picker-form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { vendorTypeMap } from "@/lib/config";
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import fetcher from "@/lib/fetcher";
+import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
@@ -307,7 +309,7 @@ export function VendorForm({
         <GenericModalFooter
           actionLabel={selected ? "Update Vendor" : "Add Vendor"}
           onCancel={onCancel}
-          isSubmitting={form.formState.isSubmitting}
+          isSubmitting={form.formState.isSubmitting || mutation.isPending}
         />
       </form>
     </Form>

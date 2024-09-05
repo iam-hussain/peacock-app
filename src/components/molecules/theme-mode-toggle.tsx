@@ -1,13 +1,14 @@
 "use client";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
+
 import { Button } from "../ui/button";
 
 export function ThemeModeToggle({ className }: { className?: string }) {

@@ -1,19 +1,14 @@
 import { clubConfig } from "./config";
-import { calculateMonthsDifference, newDate } from "./date";
+import { calculateMonthsDifference } from "./date";
 
-export const memberTotalDepositAmount = () => {
-  const values = clubConfig.stages.map((e) => {
-    const diff = calculateMonthsDifference(
-      e?.endDate ? new Date(e.endDate) : new Date(),
-      new Date(e.startDate),
-    );
-    return diff * e.amount;
-  });
-
-  return values.reduce((a, b) => {
-    return a + Math.abs(b);
-  }, 0);
-};
+export function calculateMonthlyInterest(
+  principal: number,
+  annualRate: number = 12,
+): number {
+  // Convert the annual interest rate to a monthly interest rate
+  const monthlyInterest = (principal * annualRate) / (12 * 100);
+  return monthlyInterest;
+}
 
 // Function to calculate how many months you've paid based on the total paid and paying this month
 export const calculateMonthsPaid = (totalPaid: number): number => {
@@ -57,11 +52,16 @@ export const clubMonthsFromStart = () => {
   return calculateMonthsDifference(new Date(), clubConfig.startedAt) + 1;
 };
 
-export function calculateMonthlyInterest(
-  principal: number,
-  annualRate: number = 12,
-): number {
-  // Convert the annual interest rate to a monthly interest rate
-  const monthlyInterest = (principal * annualRate) / (12 * 100);
-  return monthlyInterest;
-}
+export const memberTotalDepositAmount = () => {
+  const values = clubConfig.stages.map((e) => {
+    const diff = calculateMonthsDifference(
+      e?.endDate ? new Date(e.endDate) : new Date(),
+      new Date(e.startDate),
+    );
+    return diff * e.amount;
+  });
+
+  return values.reduce((a, b) => {
+    return a + Math.abs(b);
+  }, 0);
+};

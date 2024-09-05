@@ -1,14 +1,16 @@
 "use client";
-import React, { useState } from "react";
-import { GenericModal } from "../atoms/generic-modal";
 import { Dialog } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+
+import { GenericModal } from "../atoms/generic-modal";
+import { VendorConnectionsForm } from "../organisms/forms/vendor-connection-form";
 import { VendorForm } from "../organisms/forms/vendor-form";
 import VendorsTable from "../organisms/tables/vendor-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { VendorConnectionsForm } from "../organisms/forms/vendor-connection-form";
+
 import { TransformedVendor } from "@/app/api/vendor/route";
 import { fetchMembersSelect } from "@/lib/query-options";
-import { useQuery } from "@tanstack/react-query";
 
 const VendorAction = () => {
   const { data: members = [] } = useQuery(fetchMembersSelect());
@@ -17,10 +19,7 @@ const VendorAction = () => {
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAction = (
-    select: null | TransformedVendor["vendor"],
-    mode?: string,
-  ) => {
+  const handleAction = (select: null | TransformedVendor["vendor"]) => {
     setSelected(select);
     setIsOpen(true);
   };

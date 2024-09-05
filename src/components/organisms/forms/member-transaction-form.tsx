@@ -1,7 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { DatePickerForm } from "../../atoms/date-picker-form";
+import { GenericModalFooter } from "../../atoms/generic-modal";
+import Box from "../../ui/box";
+
+import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import {
   Form,
   FormControl,
@@ -10,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -17,21 +27,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
-import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
-import { GenericModalFooter } from "../../atoms/generic-modal";
-import {
-  memberTransactionFormSchema,
-  MemberTransactionFormSchema,
-} from "@/lib/form-schema";
-import Box from "../../ui/box";
-import { DatePickerForm } from "../../atoms/date-picker-form";
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import fetcher from "@/lib/fetcher";
+import {
+  MemberTransactionFormSchema,
+  memberTransactionFormSchema,
+} from "@/lib/form-schema";
 
 type MemberTransactionFormProps = {
   members: TransformedMemberSelect[];
@@ -292,7 +294,7 @@ export function MemberTransactionForm({
         <GenericModalFooter
           actionLabel={selected ? "Update" : "Add"}
           onCancel={onCancel}
-          isSubmitting={form.formState.isSubmitting}
+          isSubmitting={form.formState.isSubmitting || mutation.isPending}
         />
       </form>
     </Form>

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+
 import "../styles/globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import StoreProvider from "@/components/providers/store-provider";
+
 import QueryProvider from "@/components/providers/query-provider";
+import StoreProvider from "@/components/providers/store-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Peacock Club",

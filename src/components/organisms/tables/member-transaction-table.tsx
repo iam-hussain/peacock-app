@@ -1,33 +1,34 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  useReactTable,
+  ColumnDef,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  ColumnDef,
+  useReactTable,
 } from "@tanstack/react-table";
+import { format } from "date-fns";
+import React, { useMemo, useState } from "react";
 
-import { Dialog } from "@/components/ui/dialog";
+import { DatePickerGroup } from "../../atoms/date-picker-group";
+import { SelectInputGroup } from "../../atoms/select-input-group";
 import {
+  ActionCell,
+  ActionTableHeader,
   AvatarCell,
-  PlainTableHeader,
   CommonTableCell,
   PaginationControls,
-  ActionTableHeader,
-  ActionCell,
+  PlainTableHeader,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
-import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
-import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
-import { format } from "date-fns";
-import { SelectInputGroup } from "../../atoms/select-input-group";
-import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
-import { useQuery } from "@tanstack/react-query";
-import { fetchMemberTransactions } from "@/lib/query-options";
+
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
+import { Dialog } from "@/components/ui/dialog";
+import { memberTransactionTypeMap, transactionMethodMap } from "@/lib/config";
+import { fetchMemberTransactions } from "@/lib/query-options";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
@@ -251,7 +252,6 @@ const MembersTransactionTable = ({
             onLimitChange={(limit: any) =>
               setOptions({ ...options, limit, page: 1 })
             }
-            onReset={handleOptionsReset}
             onToggleChange={setEditMode}
             toggleState={editMode}
           />

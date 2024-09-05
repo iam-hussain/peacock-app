@@ -1,6 +1,7 @@
+import { FaCircle } from "react-icons/fa";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { FaCircle } from "react-icons/fa";
 
 export function AvatarGroup({
   src,

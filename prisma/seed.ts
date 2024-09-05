@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import path from "path";
 import { readFileSync } from "fs";
+import path from "path";
 
 const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],

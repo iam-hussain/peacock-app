@@ -1,5 +1,6 @@
-import prisma from "@/db";
 import { NextResponse } from "next/server";
+
+import prisma from "@/db";
 
 type MemberToTransform = {
   id: string;
@@ -15,8 +16,6 @@ function membersSelectTransform(member: MemberToTransform) {
     active: member.active,
   };
 }
-
-export type TransformedMemberSelect = ReturnType<typeof membersSelectTransform>;
 
 export async function GET(request: Request) {
   const members = await prisma.member.findMany({
@@ -34,3 +33,5 @@ export async function GET(request: Request) {
       .sort((a, b) => (a.name > b.name ? 1 : -1)),
   );
 }
+
+export type TransformedMemberSelect = ReturnType<typeof membersSelectTransform>;

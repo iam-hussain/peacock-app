@@ -1,11 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import { MemberForm } from "../organisms/forms/member-form";
-import { GenericModal } from "../atoms/generic-modal";
 import { Dialog } from "@radix-ui/react-dialog";
+import React, { useState } from "react";
+
+import { GenericModal } from "../atoms/generic-modal";
+import { MemberConnectionsForm } from "../organisms/forms/member-connection-form";
+import { MemberForm } from "../organisms/forms/member-form";
 import MembersTable from "../organisms/tables/member-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { MemberConnectionsForm } from "../organisms/forms/member-connection-form";
+
 import { TransformedMember } from "@/app/api/member/route";
 
 const MemberAction = () => {
@@ -14,10 +16,7 @@ const MemberAction = () => {
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAction = (
-    select: null | TransformedMember["member"],
-    mode?: string,
-  ) => {
+  const handleAction = (select: null | TransformedMember["member"]) => {
     setSelected(select);
     setIsOpen(!isOpen);
   };

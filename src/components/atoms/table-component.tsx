@@ -1,15 +1,15 @@
 // TableComponents.tsx
 "use client";
 
-import React from "react";
-import { Button } from "@/components/ui/button";
-
 import { Column } from "@tanstack/react-table";
-import { cn } from "@/lib/utils";
+import React from "react";
+import { FaSortAmountDown, FaSortAmountDownAlt } from "react-icons/fa";
 import { LuClipboardEdit } from "react-icons/lu";
 
 import { AvatarGroup } from "./avatar-group";
-import { FaSortAmountDown, FaSortAmountDownAlt } from "react-icons/fa";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type AvatarCellProps = {
   id: string;
@@ -20,44 +20,16 @@ type AvatarCellProps = {
   avatarName?: string;
 };
 
-export const AvatarCell = ({
-  id,
-  avatar,
-  name,
-  active,
-  subLabel,
-  avatarName,
-}: AvatarCellProps) => (
-  <div className="flex items-center space-x-2 min-w-[170px]" data-id={id}>
-    <AvatarGroup
-      src={avatar || ""}
-      name={avatarName || name}
-      active={active || false}
-    />
-    <div className="flex flex-col">
-      <p className="text-foreground font-medium">{name}</p>
-      {subLabel && (
-        <p className="text-[0.7rem] text-foreground/70">{subLabel}</p>
-      )}
-    </div>
-  </div>
+export const ActionCell = ({ onClick }: ActionCellProps) => (
+  <Button variant={"ghost"} className="px-3 py-1" onClick={onClick}>
+    <LuClipboardEdit className="h-4 w-4" />
+  </Button>
 );
 
 type TableHeaderProps = {
   label: string;
   className?: string;
 };
-
-export const PlainTableHeader = ({ label, className }: TableHeaderProps) => (
-  <div
-    className={cn(
-      "text-xs uppercase hover:bg-transparent hover:font-extrabold px-2",
-      className,
-    )}
-  >
-    {label}
-  </div>
-);
 
 export const ActionTableHeader = ({
   label,
@@ -66,7 +38,7 @@ export const ActionTableHeader = ({
   className,
 }: TableHeaderProps & {
   column: Column<any>;
-  onClick?: (id: any) => void;
+  onClick?: (id: string) => void;
   className?: string;
 }) => {
   const isSorted = column.getIsSorted();
@@ -108,6 +80,29 @@ export const ActionTableHeader = ({
   );
 };
 
+export const AvatarCell = ({
+  id,
+  avatar,
+  name,
+  active,
+  subLabel,
+  avatarName,
+}: AvatarCellProps) => (
+  <div className="flex items-center space-x-2 min-w-[170px]" data-id={id}>
+    <AvatarGroup
+      src={avatar || ""}
+      name={avatarName || name}
+      active={active || false}
+    />
+    <div className="flex flex-col">
+      <p className="text-foreground font-medium">{name}</p>
+      {subLabel && (
+        <p className="text-[0.7rem] text-foreground/70">{subLabel}</p>
+      )}
+    </div>
+  </div>
+);
+
 type CommonTableCellProps = {
   label: string;
   subLabel?: string;
@@ -139,20 +134,6 @@ type ActionCellProps = {
   onClick: () => void;
 };
 
-export const ActionCell = ({ onClick }: ActionCellProps) => (
-  <Button variant={"ghost"} className="px-3 py-1" onClick={onClick}>
-    <LuClipboardEdit className="h-4 w-4" />
-  </Button>
-);
-
-type PaginationControlsProps = {
-  page: number;
-  totalPages: number;
-  isLoading: boolean;
-  isError: boolean;
-  setPage: (page: number) => void;
-};
-
 export const PaginationControls = ({
   page,
   totalPages,
@@ -180,5 +161,24 @@ export const PaginationControls = ({
     >
       Next
     </Button>
+  </div>
+);
+
+type PaginationControlsProps = {
+  page: number;
+  totalPages: number;
+  isLoading: boolean;
+  isError: boolean;
+  setPage: (page: number) => void;
+};
+
+export const PlainTableHeader = ({ label, className }: TableHeaderProps) => (
+  <div
+    className={cn(
+      "text-xs uppercase hover:bg-transparent hover:font-extrabold px-2",
+      className,
+    )}
+  >
+    {label}
   </div>
 );

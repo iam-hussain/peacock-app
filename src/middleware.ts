@@ -1,7 +1,6 @@
 // File: middleware.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { verify } from "jsonwebtoken";
 
 const allowedOrigins = [
   "http://localhost:3000/",
@@ -38,6 +37,15 @@ async function verifyJwt(token: string, secretKey: string) {
 
   return JSON.parse(atob(payload));
 }
+
+export const config = {
+  matcher: [
+    "/api/action/:path*",
+    "/api/dashboard/:path*",
+    "/api/member/:path*",
+    "/api/vendor/:path*",
+  ], // Apply to all API routes
+};
 
 export function middleware(request: NextRequest) {
   // CORS Handling
@@ -91,12 +99,3 @@ export function middleware(request: NextRequest) {
 
   return response;
 }
-
-export const config = {
-  matcher: [
-    "/api/action/:path*",
-    "/api/dashboard/:path*",
-    "/api/member/:path*",
-    "/api/vendor/:path*",
-  ], // Apply to all API routes
-};

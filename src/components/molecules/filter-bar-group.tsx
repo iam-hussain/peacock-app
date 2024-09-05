@@ -1,16 +1,17 @@
 "use client";
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Toggle } from "@/components/ui/toggle";
-import { Button } from "@/components/ui/button";
-import Box from "@/components/ui/box";
-import { TiUserAdd } from "react-icons/ti";
-import { DialogTrigger } from "@/components/ui/dialog";
-import { IconType } from "react-icons/lib";
-import { PiColumnsFill } from "react-icons/pi";
 import { HiMiniViewColumns } from "react-icons/hi2";
 import { IoCamera } from "react-icons/io5";
+import { IconType } from "react-icons/lib";
+import { PiColumnsFill } from "react-icons/pi";
+import { TiUserAdd } from "react-icons/ti";
+
+import Box from "@/components/ui/box";
+import { Button } from "@/components/ui/button";
+import { DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Toggle } from "@/components/ui/toggle";
 
 type FilterBarProps = {
   searchValue: string;

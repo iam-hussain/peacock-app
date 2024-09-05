@@ -1,7 +1,8 @@
+import Image from "next/image";
+
 import Box from "@/components/ui/box";
 import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
-import Image from "next/image";
 
 export default function Home() {
   return (

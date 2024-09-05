@@ -4,16 +4,22 @@ import {
   VENDOR_TRANSACTION_TYPE,
 } from "@prisma/client";
 
-export type PassbookConfigActionValue = "amount" | "term";
+export type MemberPassbookConfig = {
+  [key in MEMBER_TRANSACTION_TYPE]: {
+    [key in "FROM" | "TO" | "CLUB"]: PassbookConfigAction;
+  };
+};
 export type PassbookConfigAction = {
   [key in "ADD" | "SUB"]?: {
     [key in keyof Passbook]?: PassbookConfigActionValue;
   };
 };
 
-export type MemberPassbookConfig = {
-  [key in MEMBER_TRANSACTION_TYPE]: {
-    [key in "FROM" | "TO" | "CLUB"]: PassbookConfigAction;
+export type PassbookConfigActionValue = "amount" | "term";
+
+export type VendorPassbookConfig = {
+  [key in VENDOR_TRANSACTION_TYPE]: {
+    [key in "MEMBER" | "VENDOR" | "CLUB"]: PassbookConfigAction;
   };
 };
 
@@ -96,12 +102,6 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
     },
     CLUB: {},
   },
-};
-
-export type VendorPassbookConfig = {
-  [key in VENDOR_TRANSACTION_TYPE]: {
-    [key in "MEMBER" | "VENDOR" | "CLUB"]: PassbookConfigAction;
-  };
 };
 
 export const vendorTransactionPassbookSettings: VendorPassbookConfig = {

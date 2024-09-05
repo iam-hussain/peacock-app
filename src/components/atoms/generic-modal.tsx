@@ -1,16 +1,16 @@
 "use client";
 
+import { throttle } from "lodash";
 import React, { ReactNode, useCallback } from "react";
+
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "../ui/scroll-area";
-import { throttle } from "lodash";
 
 type GenericModalFooterProps = {
   actionLabel: string;
@@ -18,6 +18,30 @@ type GenericModalFooterProps = {
   onConfirm?: () => void;
   isDelete?: boolean;
   isSubmitting?: boolean;
+};
+
+export const GenericModal = ({
+  title,
+  description,
+  children,
+}: GenericModalProps) => {
+  return (
+    <DialogContent className="h-auto max-h-svh flex flex-col overflow-auto">
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+        {description && <DialogDescription>{description}</DialogDescription>}
+      </DialogHeader>
+      <div className="h-auto py-2">{children}</div>
+    </DialogContent>
+  );
+};
+
+type GenericModalProps = {
+  title: string;
+  description?: string;
+  disabled?: boolean;
+  children: ReactNode;
+  isDelete?: boolean;
 };
 
 export const GenericModalFooter = ({
@@ -67,29 +91,5 @@ export const GenericModalFooter = ({
         {isSubmitting ? "Saving..." : actionLabel}
       </Button>
     </DialogFooter>
-  );
-};
-
-type GenericModalProps = {
-  title: string;
-  description?: string;
-  disabled?: boolean;
-  children: ReactNode;
-  isDelete?: boolean;
-};
-
-export const GenericModal = ({
-  title,
-  description,
-  children,
-}: GenericModalProps) => {
-  return (
-    <DialogContent className="h-auto max-h-svh flex flex-col overflow-auto">
-      <DialogHeader>
-        <DialogTitle>{title}</DialogTitle>
-        {description && <DialogDescription>{description}</DialogDescription>}
-      </DialogHeader>
-      <div className="h-auto py-2">{children}</div>
-    </DialogContent>
   );
 };

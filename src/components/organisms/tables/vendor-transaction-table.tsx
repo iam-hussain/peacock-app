@@ -1,33 +1,35 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  useReactTable,
+  ColumnDef,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  ColumnDef,
+  useReactTable,
 } from "@tanstack/react-table";
-import { Dialog } from "@/components/ui/dialog";
+import { format } from "date-fns";
+import React, { useMemo, useState } from "react";
+
+import { DatePickerGroup } from "../../atoms/date-picker-group";
+import { SelectInputGroup } from "../../atoms/select-input-group";
 import {
-  AvatarCell,
-  PlainTableHeader,
+  ActionCell,
   ActionTableHeader,
+  AvatarCell,
   CommonTableCell,
   PaginationControls,
-  ActionCell,
+  PlainTableHeader,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
-import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
-import { format } from "date-fns";
-import { SelectInputGroup } from "../../atoms/select-input-group";
-import { DatePickerGroup } from "../../atoms/date-picker-group";
 import { PaginationFilters } from "../../molecules/pagination-filters";
-import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
-import { useQuery } from "@tanstack/react-query";
-import { fetchVendorTransactions } from "@/lib/query-options";
-import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
+
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
+import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
+import { Dialog } from "@/components/ui/dialog";
+import { transactionMethodMap, vendorTransactionTypeMap } from "@/lib/config";
+import { fetchVendorTransactions } from "@/lib/query-options";
 
 const baseColumns = (
   handleSortClick: (id: string) => void,
@@ -256,7 +258,6 @@ const VendorsTransactionTable = ({
             onLimitChange={(limit: any) =>
               setOptions({ ...options, limit, page: 1 })
             }
-            onReset={handleOptionsReset}
             onToggleChange={setEditMode}
             toggleState={editMode}
           />

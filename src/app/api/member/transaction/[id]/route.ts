@@ -1,5 +1,6 @@
-import prisma from "@/db";
 import { NextResponse } from "next/server";
+
+import prisma from "@/db";
 
 export async function DELETE(
   request: Request,

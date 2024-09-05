@@ -1,16 +1,18 @@
 "use client";
-import React, { useState } from "react";
-import { GenericModal } from "../atoms/generic-modal";
 import { Dialog } from "@radix-ui/react-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import Typography from "../ui/typography";
+import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+
+import { GenericModal } from "../atoms/generic-modal";
+import { VendorTransactionDeleteForm } from "../organisms/forms/vendor-transaction-delete-form";
+import { VendorTransactionForm } from "../organisms/forms/vendor-transaction-form";
+import VendorsTransactionTable from "../organisms/tables/vendor-transaction-table";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import Typography from "../ui/typography";
+
 import { TransformedVendorTransaction } from "@/app/api/vendor/transaction/route";
-import VendorsTransactionTable from "../organisms/tables/vendor-transaction-table";
-import { VendorTransactionForm } from "../organisms/forms/vendor-transaction-form";
-import { VendorTransactionDeleteForm } from "../organisms/forms/vendor-transaction-delete-form";
-import { useQuery } from "@tanstack/react-query";
 import { fetchMembersSelect, fetchVendorsSelect } from "@/lib/query-options";
 
 const VendorTransactionsAction = () => {
@@ -21,10 +23,7 @@ const VendorTransactionsAction = () => {
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAction = (
-    select: null | TransformedVendorTransaction,
-    mode?: string,
-  ) => {
+  const handleAction = (select: null | TransformedVendorTransaction) => {
     setSelected(select);
     setIsOpen(!isOpen);
   };

@@ -1,9 +1,10 @@
 "use client";
-import { toast } from "sonner";
-import { GenericModalFooter } from "../../atoms/generic-modal";
-import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
-import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { GenericModalFooter } from "../../atoms/generic-modal";
+
+import { TransformedMemberTransaction } from "@/app/api/member/transaction/route";
 import fetcher from "@/lib/fetcher";
 
 type MemberTransactionDeleteFormProps = {
