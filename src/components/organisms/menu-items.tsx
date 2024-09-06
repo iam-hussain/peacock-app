@@ -1,6 +1,6 @@
 "use client";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPiggyBank } from "react-icons/fa";
 import { FaPeopleGroup } from "react-icons/fa6";
@@ -116,6 +116,12 @@ function MenuItems({
         </Box>
       )}
       <Box preset={"stack-center"} className="gap-0 pr-4 pb-2">
+        <Image
+          src={"/peacock.svg"}
+          alt={"Peacock Club"}
+          width={60}
+          height={60}
+        />
         <Typography variant={"brandMini"} className="w-full text-center">
           Peacock Club
         </Typography>

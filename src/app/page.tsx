@@ -13,11 +13,10 @@ export default function Home() {
       </div>
       <Box>
         <Image
-          src={"/peacock.jpg"}
+          src={"/peacock.svg"}
           alt={"Peacock Club"}
           width={200}
           height={200}
-          className="rounded-xl"
         />
       </Box>
       <Box preset={"stack-center"}>
