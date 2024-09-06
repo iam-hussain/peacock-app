@@ -64,7 +64,7 @@ export const ActionTableHeader = ({
       <span
         data-id="sort_icon"
         className={cn(
-          "ml-2 h-auto w-4 transition-transform duration-300 ease-in-out sort_icon",
+          "ml-2 h-auto w-4 transition-transform duration-300 ease-in-out sort_icon"
         )}
       >
         {isSortedAsc ? (
