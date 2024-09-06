@@ -46,7 +46,7 @@ export default function Login() {
       </div>
       <Box>
         <Image
-          src={"/peacock.jpg"}
+          src={"/peacock.svg"}
           alt={"Peacock Club"}
           width={200}
           height={200}
@@ -55,7 +55,7 @@ export default function Login() {
       <Box preset={"stack-center"}>
         <Typography variant={"brand"}>Peacock Club</Typography>
 
-        <div className="py-6">
+        <div className="py-4">
           <form onSubmit={onSubmit} className="space-y-4">
             <Input
               type="password"
@@ -73,11 +73,8 @@ export default function Login() {
             </Button>
           </form>
         </div>
-        <div>
-          <CustomLink href={"/dashboard"} variant={"outline"}>
-            Back to club
-          </CustomLink>
-        </div>
+
+        <CustomLink href={"/dashboard"}>Back to club</CustomLink>
       </Box>
     </Box>
   );
