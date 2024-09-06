@@ -65,7 +65,6 @@ export const ActionTableHeader = ({
         data-id="sort_icon"
         className={cn(
           "ml-2 h-auto w-4 transition-transform duration-300 ease-in-out sort_icon",
-          isSorted && "rotate-180" // Rotate when sorted in ascending order
         )}
       >
         {isSortedAsc ? (
