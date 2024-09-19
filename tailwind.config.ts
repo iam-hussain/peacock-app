@@ -37,7 +37,7 @@ const config = {
       "5xl": "3200px",
       // => @media (min-width: 3200px) { ... }
       // 5X large devices (5K resolution, 3200px and up)
-      "no-touch": { raw: "(hover: hover) and (pointer: fine)" },
+      // "no-touch": { raw: "(hover: hover) and (pointer: fine)" },
     },
     extend: {
       colors: {
