@@ -2,8 +2,12 @@ import { Passbook, Vendor } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { calculateMonthlyInterest } from "@/lib/club";
-import { calculateDueDates, calculateMonthsDifference } from "@/lib/date";
+import {
+  chitCalculator,
+  loanCalculator,
+  loanCalculatorLegacy,
+} from "@/lib/calc";
+import { clubConfig } from "@/lib/config";
 
 type VendorToTransform = Vendor & {
   passbook: Passbook;
@@ -46,41 +50,42 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     ? `${owner.firstName} ${owner.lastName || ""}`
     : "";
 
-  const dueDetails = {
-    nextDueDate: 0,
-    recentDueDate: 0,
-    currentTerm: 0,
-    dueAmount: 0,
-    totalTerms: 0,
+  const statusData: {
+    nextDueDate: Date | null;
+    balanceAmount: number;
+    period: string | null;
+  } = {
+    nextDueDate: null,
+    balanceAmount: 0,
+    period: null,
   };
 
   if (vendor.type === "CHIT" && vendor.active) {
-    const dueDates = calculateDueDates(vendor.startAt);
-    dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
-    dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
-    dueDetails.currentTerm = dueDates.monthsPassed;
-    dueDetails.totalTerms =
-      calculateMonthsDifference(vendor.startAt, vendor.endAt) + 1;
+    const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
+    statusData.nextDueDate = chitData.nextDueDate;
+    statusData.period = chitData.period;
   }
 
-  if (vendor.type === "LEND" && vendor.active) {
-    const dueDates = calculateDueDates(
-      vendor.startAt,
-      vendor?.endAt || new Date()
-    );
-    const monthlyInterest = calculateMonthlyInterest(passbook.in);
-    const expectedPayment = monthlyInterest * dueDates.monthsPassed;
-
-    dueDetails.totalTerms =
-      calculateMonthsDifference(vendor.startAt, vendor.endAt) + 1;
-    dueDetails.nextDueDate = dueDates.nextDueDate.getTime();
-    dueDetails.recentDueDate = dueDates.recentDueDate.getTime();
-    dueDetails.currentTerm = dueDates.monthsPassed;
-    dueDetails.dueAmount = expectedPayment - passbook.out;
-
-    if (!passbook.calcReturns) {
-      dueDetails.dueAmount = expectedPayment - passbook.out;
+  if (vendor.type === "LEND") {
+    let loanData = loanCalculator(passbook.in, vendor.startAt, vendor?.endAt);
+    if (
+      new Date(vendor.startAt).getTime() <
+      new Date(clubConfig.dayInterestFrom).getTime()
+    ) {
+      loanData = loanCalculatorLegacy(
+        passbook.in,
+        vendor.startAt,
+        vendor?.endAt
+      );
     }
+
+    const paidAmount = !vendor.active
+      ? passbook.out - passbook.in
+      : passbook.out;
+
+    statusData.nextDueDate = loanData.nextDueDate;
+    statusData.period = loanData.period;
+    statusData.balanceAmount = loanData.totalAmount - paidAmount;
   }
 
   return {
@@ -98,7 +103,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     profit: passbook.out,
     returns: passbook.returns,
     calcReturns: passbook.calcReturns,
-    ...dueDetails,
+    ...statusData,
     vendor: { ...vendor, calcReturns: passbook.calcReturns },
   };
 }

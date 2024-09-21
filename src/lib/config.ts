@@ -23,6 +23,7 @@ export const clubConfig = {
   stages: [alpha, bravo],
   alpha,
   bravo,
+  dayInterestFrom: new Date("06/01/2024"),
 };
 
 // Member Transaction Type Map

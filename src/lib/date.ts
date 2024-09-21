@@ -6,42 +6,13 @@ import {
   format,
   formatDistance,
   formatRelative,
-  isAfter,
   parse,
-  subDays,
 } from "date-fns";
 import { differenceInCalendarMonths } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 const timeZone = "Asia/Kolkata";
 
-export function calculateDueDates(
-  startDate: Date,
-  now: Date = new Date(),
-  toleranceDays: number = 5
-): DueDates {
-  // Calculate the number of months passed since the start date
-  const monthsPassed = differenceInMonths(now, new Date(startDate)) + 1;
-
-  // Calculate the next and recent due dates
-  let nextDueDate = addMonths(startDate, monthsPassed);
-  let recentDueDate = addMonths(startDate, monthsPassed);
-
-  // Adjust the recent due date if the current date is before or within the tolerance
-  if (isAfter(now, subDays(nextDueDate, toleranceDays))) {
-    recentDueDate = nextDueDate;
-    nextDueDate = addMonths(nextDueDate, 1);
-  } else {
-    recentDueDate = addMonths(recentDueDate, -1);
-  }
-
-  return { nextDueDate, recentDueDate, monthsPassed };
-}
-
-// export function calculateMonthsDifference(startDate: Date, now: Date = new Date()) {
-//   // Calculate the number of months passed since the start date
-//   return Math.abs(differenceInMonths(now, new Date(startDate)));
-// }
 export const calculateMonthsDifference = (
   a: Date,
   b: Date | null = new Date()

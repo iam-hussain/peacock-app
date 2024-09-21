@@ -68,12 +68,12 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
             : "-"
         }
         subLabel={
-          row.original.dueAmount
-            ? row.original.dueAmount.toLocaleString("en-IN", {
-                style: "currency",
-                currency: "INR",
-              })
-            : undefined
+          row.original.balanceAmount
+            ? row.original.balanceAmount.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+            })
+            : ""
         }
       />
     ),
@@ -84,11 +84,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     cell: ({ row }) => (
       <CommonTableCell
         label={vendorTypeMap[row.original.type]}
-        subLabel={
-          row.original.nextDueDate
-            ? `${row.original.currentTerm} / ${row.original.totalTerms} terms`
-            : ""
-        }
+        subLabel={row.original.period || ""}
       />
     ),
   },
@@ -130,9 +126,9 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
         label={
           row.original.calcReturns || row.original.type === "LEND"
             ? row.original.returns.toLocaleString("en-IN", {
-                style: "currency",
-                currency: "INR",
-              })
+              style: "currency",
+              currency: "INR",
+            })
             : " - "
         }
         greenLabel={row.original.calcReturns}
