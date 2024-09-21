@@ -2,12 +2,7 @@ import { Passbook, Vendor } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import {
-  chitCalculator,
-  loanCalculator,
-  loanCalculatorLegacy,
-} from "@/lib/calc";
-import { clubConfig } from "@/lib/config";
+import { chitCalculator, loanCalculator } from "@/lib/calc";
 
 type VendorToTransform = Vendor & {
   passbook: Passbook;
@@ -19,7 +14,7 @@ type VendorToTransform = Vendor & {
   } | null;
 };
 
-export async function GET(request: Request) {
+export async function GET() {
   const vendors = await prisma.vendor.findMany({
     include: {
       owner: {
@@ -68,18 +63,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
   }
 
   if (vendor.type === "LEND") {
-    let loanData = loanCalculator(passbook.in, vendor.startAt, vendor?.endAt);
-    if (
-      new Date(vendor.startAt).getTime() <
-      new Date(clubConfig.dayInterestFrom).getTime()
-    ) {
-      loanData = loanCalculatorLegacy(
-        passbook.in,
-        vendor.startAt,
-        vendor?.endAt
-      );
-    }
-
+    const loanData = loanCalculator(passbook.in, vendor.startAt, vendor?.endAt);
     const paidAmount = !vendor.active
       ? passbook.out - passbook.in
       : passbook.out;

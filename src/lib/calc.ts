@@ -6,6 +6,8 @@ import {
   isBefore,
 } from "date-fns";
 
+import { clubConfig } from "./config";
+
 const getPeriodString = (months: number, days: number) => {
   return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;
 };
@@ -49,7 +51,7 @@ const getNextDueDate = (start: string | Date, end?: string | Date | null) => {
   return nextDueDate;
 };
 
-export const loanCalculator = (
+export const newLoanCalculator = (
   amount: number,
   start: string | Date,
   end?: string | Date | null,
@@ -97,7 +99,7 @@ export const loanCalculator = (
   };
 };
 
-export const loanCalculatorLegacy = (
+export const legacyLoanCalculator = (
   amount: number,
   start: string | Date,
   end?: string | Date | null,
@@ -120,6 +122,20 @@ export const loanCalculatorLegacy = (
     nextDueDate: getNextDueDate(start, end),
     period: getPeriodString(monthsPassed, daysPassed),
   };
+};
+
+export const loanCalculator = (
+  amount: number,
+  start: string | Date,
+  end?: string | Date | null,
+  interestRate: number = 0.01
+) => {
+  if (
+    new Date(start).getTime() < new Date(clubConfig.dayInterestFrom).getTime()
+  ) {
+    return legacyLoanCalculator(amount, start, end, interestRate);
+  }
+  return newLoanCalculator(amount, start, end, interestRate);
 };
 
 export const chitCalculator = (

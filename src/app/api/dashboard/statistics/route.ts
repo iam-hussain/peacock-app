@@ -2,9 +2,8 @@ import { Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { loanCalculator, loanCalculatorLegacy } from "@/lib/calc";
+import { loanCalculator } from "@/lib/calc";
 import { calculateTotalDeposit, clubMonthsFromStart } from "@/lib/club";
-import { clubConfig } from "@/lib/config";
 
 export async function GET() {
   const statistics = await prisma.passbook.findMany({
@@ -63,32 +62,13 @@ function statisticsTransform(
       if (!vendor) {
         return 0;
       }
-      let totalAmount = 0;
+      const { totalAmount } = loanCalculator(
+        passbook.in,
+        vendor.startAt,
+        vendor?.endAt
+      );
 
-      if (
-        new Date(vendor.startAt).getTime() <
-        new Date(clubConfig.dayInterestFrom).getTime()
-      ) {
-        const loanData = loanCalculatorLegacy(
-          passbook.in,
-          vendor.startAt,
-          vendor?.endAt
-        );
-        totalAmount = loanData.totalAmount;
-      } else {
-        const loanData = loanCalculator(
-          passbook.in,
-          vendor.startAt,
-          vendor?.endAt
-        );
-        totalAmount = loanData.totalAmount;
-      }
-
-      if (totalAmount <= 0) {
-        return 0;
-      }
-
-      return totalAmount - passbook.out;
+      return totalAmount > 0 ? totalAmount - passbook.out : 0;
     })
     .reduce((a, b) => a + b, 0);
 
