@@ -436,13 +436,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2023-08-08T07:22:52.000Z",
-      "endAt": null,
+      "endAt": "2023-10-05T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106a6",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de89ff85b6e7c1106cb",
       "createdAt": "2023-08-08T07:23:04.287Z",
-      "updatedAt": "2024-09-05T19:33:59.570Z"
+      "updatedAt": "2024-09-21T11:31:34.895Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106ce",
@@ -468,13 +468,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2024-03-08T14:06:35.000Z",
-      "endAt": null,
-      "active": true,
+      "endAt": "2024-08-13T18:30:00.000Z",
+      "active": false,
       "ownerId": "66d95de69ff85b6e7c11069a",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de89ff85b6e7c1106cf",
       "createdAt": "2024-03-10T14:08:06.707Z",
-      "updatedAt": "2024-09-05T19:32:47.518Z"
+      "updatedAt": "2024-09-21T11:35:58.818Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d2",
@@ -484,13 +484,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2023-08-26T13:23:24.000Z",
-      "endAt": null,
+      "endAt": "2024-02-04T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106b0",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106d1",
       "createdAt": "2023-08-26T13:23:40.774Z",
-      "updatedAt": "2024-09-05T19:34:08.428Z"
+      "updatedAt": "2024-09-21T11:27:25.593Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d4",
@@ -500,13 +500,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2023-10-10T14:27:50.000Z",
-      "endAt": null,
+      "endAt": "2024-03-10T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106b6",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106d3",
       "createdAt": "2023-10-18T14:28:21.588Z",
-      "updatedAt": "2024-09-05T19:33:03.903Z"
+      "updatedAt": "2024-09-21T11:32:44.425Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d6",
@@ -532,13 +532,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2024-04-11T06:09:33.000Z",
-      "endAt": null,
+      "endAt": "2024-06-30T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de89ff85b6e7c1106be",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106d7",
       "createdAt": "2024-05-06T06:10:31.708Z",
-      "updatedAt": "2024-09-05T19:32:02.250Z"
+      "updatedAt": "2024-09-21T11:33:13.812Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106da",
@@ -548,13 +548,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2023-10-07T14:18:41.000Z",
-      "endAt": null,
+      "endAt": "2024-03-06T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de89ff85b6e7c1106bc",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106d9",
       "createdAt": "2023-10-18T14:18:52.750Z",
-      "updatedAt": "2024-09-05T19:31:51.422Z"
+      "updatedAt": "2024-09-21T11:34:22.730Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106dc",
@@ -611,14 +611,14 @@
       "type": "LEND",
       "terms": 0,
       "termType": "NONE",
-      "startAt": "2024-01-25T04:59:12.000Z",
-      "endAt": null,
+      "startAt": "2024-01-24T18:30:00.000Z",
+      "endAt": "2024-06-25T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106a8",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106e1",
       "createdAt": "2024-02-07T05:00:18.907Z",
-      "updatedAt": "2024-09-05T19:33:45.123Z"
+      "updatedAt": "2024-09-21T11:31:11.046Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e4",
@@ -628,13 +628,13 @@
       "terms": 0,
       "termType": "NONE",
       "startAt": "2024-02-05T05:00:51.000Z",
-      "endAt": null,
+      "endAt": "2024-06-02T18:30:00.000Z",
       "active": false,
       "ownerId": "66d95de89ff85b6e7c1106c0",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106e3",
       "createdAt": "2024-02-07T05:01:40.401Z",
-      "updatedAt": "2024-09-05T19:31:06.137Z"
+      "updatedAt": "2024-09-21T11:26:13.675Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e6",
@@ -17102,7 +17102,7 @@
       "balance": 203800,
       "fund": 200000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:34:00.339Z"
+      "updatedAt": "2024-09-21T11:31:35.670Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cd",
@@ -17136,7 +17136,7 @@
       "balance": 4000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:32:48.279Z"
+      "updatedAt": "2024-09-21T11:35:59.580Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d1",
@@ -17153,7 +17153,7 @@
       "balance": 210000,
       "fund": 200000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:34:09.189Z"
+      "updatedAt": "2024-09-21T11:27:26.355Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d3",
@@ -17170,7 +17170,7 @@
       "balance": 157500,
       "fund": 150000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:33:04.664Z"
+      "updatedAt": "2024-09-21T11:32:45.188Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d5",
@@ -17204,7 +17204,7 @@
       "balance": 103000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:32:04.550Z"
+      "updatedAt": "2024-09-21T11:33:14.584Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d9",
@@ -17221,7 +17221,7 @@
       "balance": 52500,
       "fund": 50000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:31:52.181Z"
+      "updatedAt": "2024-09-21T11:34:23.492Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106db",
@@ -17289,7 +17289,7 @@
       "balance": 105000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:33:45.885Z"
+      "updatedAt": "2024-09-21T11:31:11.808Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e3",
@@ -17306,7 +17306,7 @@
       "balance": 104000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:31:06.921Z"
+      "updatedAt": "2024-09-21T11:26:16.021Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e5",

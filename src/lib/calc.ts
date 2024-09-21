@@ -58,8 +58,13 @@ export const loanCalculator = (
   // Input values
   const startDate = new Date(start);
   const endDate = end ? new Date(end) : new Date();
+  const nextDueDate = getNextDueDate(start, end);
+  const actualPassed = getTimePassed(startDate, endDate);
 
-  const { monthsPassed, daysPassed } = getTimePassed(startDate, endDate);
+  const { monthsPassed, daysPassed } = getTimePassed(
+    startDate,
+    nextDueDate || new Date()
+  );
 
   // Calculate interest for full months
   const interestForMonths = monthsPassed * amount * interestRate;
@@ -68,14 +73,27 @@ export const loanCalculator = (
   const interestForDays = (daysPassed / 30) * amount * interestRate;
 
   // Total interest
-  const totalAmount = interestForMonths + interestForDays;
+  let totalAmount = interestForMonths + interestForDays;
+
+  // If end is near 20 days calculate fully
+  if (end && nextDueDate && differenceInDays(nextDueDate, endDate) >= 20) {
+    // Calculate interest for full months
+    const interestForMonths = actualPassed.monthsPassed * amount * interestRate;
+
+    // Calculate interest for remaining days (assuming 30 days in a month)
+    const interestForDays =
+      (actualPassed.daysPassed / 30) * amount * interestRate;
+
+    // Total interest
+    totalAmount = interestForMonths + interestForDays;
+  }
 
   return {
     monthsPassed,
     daysPassed,
     totalAmount,
     nextDueDate: getNextDueDate(start, end),
-    period: getPeriodString(monthsPassed, daysPassed),
+    period: getPeriodString(actualPassed.monthsPassed, actualPassed.daysPassed),
   };
 };
 
@@ -91,8 +109,9 @@ export const loanCalculatorLegacy = (
 
   const { monthsPassed, daysPassed } = getTimePassed(startDate, endDate);
 
+  const monthsCount = daysPassed > 15 ? monthsPassed + 1 : monthsPassed;
   // Calculate interest for full months
-  const totalAmount = monthsPassed * amount * interestRate;
+  const totalAmount = monthsCount * amount * interestRate;
 
   return {
     monthsPassed,

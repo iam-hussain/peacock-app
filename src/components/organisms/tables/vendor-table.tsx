@@ -143,6 +143,7 @@ const editColumns: ColumnDef<TransformedVendor>[] = [
 ];
 
 export type VendorTableProps = {
+  // eslint-disable-next-line unused-imports/no-unused-vars
   handleAction: (select: null | TransformedVendor["vendor"]) => void;
 };
 

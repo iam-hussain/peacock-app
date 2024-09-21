@@ -60,9 +60,9 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     period: null,
   };
 
-  if (vendor.type === "CHIT" && vendor.active) {
+  if (vendor.type === "CHIT") {
     const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
-    statusData.nextDueDate = chitData.nextDueDate;
+    statusData.nextDueDate = vendor.active ? chitData.nextDueDate : null;
     statusData.period = chitData.period;
   }
 
