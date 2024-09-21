@@ -46,7 +46,7 @@ export const DatePickerGroup = ({
         mode="single"
         selected={selectedDate}
         onSelect={onSelectDate}
-        initialFocus={true}
+        initialFocus={false}
         defaultMonth={selectedDate}
       />
     </PopoverContent>
