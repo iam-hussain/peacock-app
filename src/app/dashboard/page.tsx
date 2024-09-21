@@ -50,8 +50,11 @@ export default function DashboardPage() {
           icon={<FaUsers className="text-3xl text-blue-600" />}
         />
         <DashboardCard
-          title="Since"
-          value={clubAge().since}
+          title="Loan Balance"
+          value={statistics.loadBalance.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+          })}
           icon={<GiHandBandage className="text-3xl text-purple-600" />}
         />
         <DashboardCard
