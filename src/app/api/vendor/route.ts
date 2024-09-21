@@ -37,6 +37,7 @@ export async function GET(request: Request) {
   const transformedVendors = vendors
     .map(transformVendorForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
+    .sort((a, b) => (a.type > b.type ? -1 : 1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
   return NextResponse.json({
