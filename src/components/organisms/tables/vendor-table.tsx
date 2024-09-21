@@ -25,6 +25,7 @@ import { TransformedVendor } from "@/app/api/vendor/route";
 import { vendorTypeMap } from "@/lib/config";
 import { dateFormat } from "@/lib/date";
 import { fetchVendors } from "@/lib/query-options";
+import { moneyFormat } from "@/lib/utils";
 
 const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
@@ -69,10 +70,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
         }
         subLabel={
           row.original.balanceAmount
-            ? row.original.balanceAmount.toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })
+            ? moneyFormat(row.original.balanceAmount)
             : ""
         }
       />
@@ -125,10 +123,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
       <CommonTableCell
         label={
           row.original.calcReturns || row.original.type === "LEND"
-            ? row.original.returns.toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })
+            ? moneyFormat(row.original.returns)
             : " - "
         }
         greenLabel={row.original.calcReturns}
