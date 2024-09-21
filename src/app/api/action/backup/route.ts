@@ -8,17 +8,8 @@ import { fileDateTime } from "@/lib/date";
 export async function POST() {
   try {
     // Fetch all data from Prisma models
-    const members = await prisma.member.findMany({
-      include: {
-        vendors: true,
-        passbook: true,
-        transactionFrom: true,
-        transactionTo: true,
-      },
-    });
-    const vendors = await prisma.vendor.findMany({
-      include: { transactions: true, profitShares: true, passbook: true },
-    });
+    const members = await prisma.member.findMany();
+    const vendors = await prisma.vendor.findMany();
     const memberTransactions = await prisma.memberTransaction.findMany();
     const vendorTransactions = await prisma.vendorTransaction.findMany();
     const vendorProfitShares = await prisma.vendorProfitShare.findMany();

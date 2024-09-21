@@ -28,7 +28,7 @@ model Member {
   transactionFrom   MemberTransaction[] @relation("from")
   transactionTo     MemberTransaction[] @relation("to")
   vendorTransaction VendorTransaction[]
-  passbook          Passbook            @relation(fields: [passbookId], references: [id])
+  passbook          Passbook            @relation(fields: [passbookId], references: [id], onDelete: Cascade)
   passbookId        String              @unique @db.ObjectId
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -44,12 +44,12 @@ model Vendor {
   startAt      DateTime            @default(now())
   endAt        DateTime?
   active       Boolean             @default(true)
-  owner        Member?             @relation("OwnerVendors", fields: [ownerId], references: [id])
+  owner        Member?             @relation("OwnerVendors", fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId      String?             @db.ObjectId
   ownerRole    MEMBER_VENDOR_ROLE  @default(DEFAULT)
   transactions VendorTransaction[]
   profitShares VendorProfitShare[]
-  passbook     Passbook            @relation(fields: [passbookId], references: [id])
+  passbook     Passbook            @relation(fields: [passbookId], references: [id], onDelete: Cascade)
   passbookId   String              @unique @db.ObjectId
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
@@ -61,9 +61,9 @@ model MemberTransaction {
   transactionType MEMBER_TRANSACTION_TYPE @default(PERIODIC_DEPOSIT)
   transactionAt   DateTime                @default(now())
   method          TRANSACTION_METHOD      @default(ACCOUNT)
-  from            Member                  @relation("from", fields: [fromId], references: [id])
+  from            Member                  @relation("from", fields: [fromId], references: [id], onDelete: Cascade)
   fromId          String                  @db.ObjectId
-  to              Member                  @relation("to", fields: [toId], references: [id])
+  to              Member                  @relation("to", fields: [toId], references: [id], onDelete: Cascade)
   toId            String                  @db.ObjectId
   note            String?
   createdAt       DateTime                @default(now())
@@ -76,9 +76,9 @@ model VendorTransaction {
   transactionType VENDOR_TRANSACTION_TYPE @default(INVEST)
   transactionAt   DateTime                @default(now())
   method          TRANSACTION_METHOD      @default(ACCOUNT)
-  vendor          Vendor                  @relation(fields: [vendorId], references: [id])
+  vendor          Vendor                  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   vendorId        String                  @db.ObjectId
-  member          Member                  @relation(fields: [memberId], references: [id])
+  member          Member                  @relation(fields: [memberId], references: [id], onDelete: Cascade)
   memberId        String                  @db.ObjectId
   note            String?
   createdAt       DateTime                @default(now())
@@ -88,9 +88,9 @@ model VendorTransaction {
 // This model tracks which members share in the profits of a vendor.
 model VendorProfitShare {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  vendor    Vendor   @relation(fields: [vendorId], references: [id])
+  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   vendorId  String   @db.ObjectId
-  member    Member   @relation(fields: [memberId], references: [id])
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   memberId  String   @db.ObjectId
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -102,10 +102,6 @@ model Passbook {
   type        PASSBOOK_TYPE @default(CLUB)
   periodIn    Float         @default(0)
   offsetIn    Float         @default(0)
-  // returnsIn   Float         @default(0)
-  // periodOut    Float         @default(0)
-  // offsetOut    Float         @default(0)
-  // returnsOut   Float         @default(0)
   in          Float         @default(0)
   out         Float         @default(0)
   offset      Float         @default(0)

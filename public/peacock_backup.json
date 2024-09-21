@@ -12,7 +12,7 @@
       "active": true,
       "passbookId": "66d95de59ff85b6e7c11068d",
       "createdAt": "2023-06-29T12:34:59.265Z",
-      "updatedAt": "2024-09-05T16:43:16.344Z",
+      "updatedAt": "2024-09-05T17:24:32.125Z",
       "vendors": [],
       "passbook": {
         "id": "66d95de59ff85b6e7c11068d",
@@ -8113,7 +8113,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106d0",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_kamalesh__st_kamalesh_4",
           "type": "LEND",
           "terms": 0,
@@ -8123,10 +8123,9 @@
           "active": true,
           "ownerId": "66d95de69ff85b6e7c11069a",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de89ff85b6e7c1106cf",
           "createdAt": "2024-03-10T14:08:06.707Z",
-          "updatedAt": "2024-09-05T11:07:18.289Z"
+          "updatedAt": "2024-09-05T19:32:47.518Z"
         }
       ],
       "passbook": {
@@ -8779,7 +8778,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106e0",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_kishore__10",
           "type": "LEND",
           "terms": 0,
@@ -8789,10 +8788,9 @@
           "active": true,
           "ownerId": "66d95de69ff85b6e7c11069e",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106df",
           "createdAt": "2024-08-31T07:39:28.988Z",
-          "updatedAt": "2024-09-05T11:00:57.403Z"
+          "updatedAt": "2024-09-05T19:32:56.479Z"
         }
       ],
       "passbook": {
@@ -9600,7 +9598,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106e6",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_mukesh__st__8",
           "type": "LEND",
           "terms": 0,
@@ -9610,10 +9608,9 @@
           "active": true,
           "ownerId": "66d95de69ff85b6e7c1106a2",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106e5",
           "createdAt": "2024-06-26T05:55:54.607Z",
-          "updatedAt": "2024-09-05T11:04:40.305Z"
+          "updatedAt": "2024-09-05T19:33:10.683Z"
         }
       ],
       "passbook": {
@@ -10829,7 +10826,7 @@
       "vendors": [
         {
           "id": "66d95de89ff85b6e7c1106cc",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_prabha____interest_7",
           "type": "LEND",
           "terms": 0,
@@ -10839,14 +10836,13 @@
           "active": false,
           "ownerId": "66d95de79ff85b6e7c1106a6",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de89ff85b6e7c1106cb",
           "createdAt": "2023-08-08T07:23:04.287Z",
-          "updatedAt": "2024-09-05T11:05:55.482Z"
+          "updatedAt": "2024-09-05T19:33:59.570Z"
         },
         {
           "id": "66d95de99ff85b6e7c1106de",
-          "name": "Loan 2nd",
+          "name": "Loan - 2nd",
           "slug": "loan_to_praba__nd__10",
           "type": "LEND",
           "terms": 0,
@@ -10856,27 +10852,9 @@
           "active": true,
           "ownerId": "66d95de79ff85b6e7c1106a6",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106dd",
           "createdAt": "2024-06-26T05:58:58.873Z",
-          "updatedAt": "2024-09-05T11:05:14.556Z"
-        },
-        {
-          "id": "66d95de99ff85b6e7c1106e2",
-          "name": "Loan 1st",
-          "slug": "prabhu__l__st__6",
-          "type": "LEND",
-          "terms": 0,
-          "termType": "NONE",
-          "startAt": "2024-01-25T04:59:12.000Z",
-          "endAt": null,
-          "active": false,
-          "ownerId": "66d95de79ff85b6e7c1106a6",
-          "ownerRole": "DEFAULT",
-          "memberId": null,
-          "passbookId": "66d95de99ff85b6e7c1106e1",
-          "createdAt": "2024-02-07T05:00:18.907Z",
-          "updatedAt": "2024-09-05T11:02:17.959Z"
+          "updatedAt": "2024-09-05T19:34:29.668Z"
         }
       ],
       "passbook": {
@@ -11417,7 +11395,24 @@
       "passbookId": "66d95de79ff85b6e7c1106a7",
       "createdAt": "2023-06-29T12:34:59.329Z",
       "updatedAt": "2023-09-04T14:37:24.726Z",
-      "vendors": [],
+      "vendors": [
+        {
+          "id": "66d95de99ff85b6e7c1106e2",
+          "name": "Loan - 1st",
+          "slug": "prabhu__l__st__6",
+          "type": "LEND",
+          "terms": 0,
+          "termType": "NONE",
+          "startAt": "2024-01-25T04:59:12.000Z",
+          "endAt": null,
+          "active": false,
+          "ownerId": "66d95de79ff85b6e7c1106a8",
+          "ownerRole": "DEFAULT",
+          "passbookId": "66d95de99ff85b6e7c1106e1",
+          "createdAt": "2024-02-07T05:00:18.907Z",
+          "updatedAt": "2024-09-05T19:33:45.123Z"
+        }
+      ],
       "passbook": {
         "id": "66d95de79ff85b6e7c1106a7",
         "type": "MEMBER",
@@ -12990,7 +12985,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106d2",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_swathish_____inrst__9",
           "type": "LEND",
           "terms": 0,
@@ -13000,10 +12995,9 @@
           "active": false,
           "ownerId": "66d95de79ff85b6e7c1106b0",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106d1",
           "createdAt": "2023-08-26T13:23:40.774Z",
-          "updatedAt": "2024-09-05T11:02:00.708Z"
+          "updatedAt": "2024-09-05T19:34:08.428Z"
         }
       ],
       "passbook": {
@@ -19774,7 +19768,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106d4",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "kiruba_anna____l__5",
           "type": "LEND",
           "terms": 0,
@@ -19784,14 +19778,13 @@
           "active": false,
           "ownerId": "66d95de79ff85b6e7c1106b6",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106d3",
           "createdAt": "2023-10-18T14:28:21.588Z",
-          "updatedAt": "2024-09-05T11:07:02.160Z"
+          "updatedAt": "2024-09-05T19:33:03.903Z"
         },
         {
           "id": "66d95de99ff85b6e7c1106d6",
-          "name": "Loan 2nd",
+          "name": "Loan - 2nd",
           "slug": "loan_to_kiruba_anna__nd__7",
           "type": "LEND",
           "terms": 0,
@@ -19801,10 +19794,9 @@
           "active": true,
           "ownerId": "66d95de79ff85b6e7c1106b6",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106d5",
           "createdAt": "2024-07-13T17:08:00.309Z",
-          "updatedAt": "2024-09-05T11:04:53.175Z"
+          "updatedAt": "2024-09-05T19:34:22.592Z"
         }
       ],
       "passbook": {
@@ -21139,7 +21131,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106da",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "deepak___k__3",
           "type": "LEND",
           "terms": 0,
@@ -21149,14 +21141,13 @@
           "active": false,
           "ownerId": "66d95de89ff85b6e7c1106bc",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106d9",
           "createdAt": "2023-10-18T14:18:52.750Z",
-          "updatedAt": "2024-09-05T11:06:18.541Z"
+          "updatedAt": "2024-09-05T19:31:51.422Z"
         },
         {
           "id": "66d95de99ff85b6e7c1106dc",
-          "name": "Loan 2nd",
+          "name": "Loan - 2nd",
           "slug": "loan_to_deepak__nd__2",
           "type": "LEND",
           "terms": 0,
@@ -21166,10 +21157,9 @@
           "active": true,
           "ownerId": "66d95de89ff85b6e7c1106bc",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106db",
           "createdAt": "2024-06-26T05:58:02.766Z",
-          "updatedAt": "2024-09-05T10:58:47.363Z"
+          "updatedAt": "2024-09-05T19:34:15.531Z"
         }
       ],
       "passbook": {
@@ -21761,7 +21751,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106d8",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_karthiban__st_karthiban_7",
           "type": "LEND",
           "terms": 0,
@@ -21771,10 +21761,9 @@
           "active": false,
           "ownerId": "66d95de89ff85b6e7c1106be",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106d7",
           "createdAt": "2024-05-06T06:10:31.708Z",
-          "updatedAt": "2024-09-05T11:01:26.988Z"
+          "updatedAt": "2024-09-05T19:32:02.250Z"
         }
       ],
       "passbook": {
@@ -22150,7 +22139,7 @@
       "vendors": [
         {
           "id": "66d95de99ff85b6e7c1106e4",
-          "name": "Loan 1st",
+          "name": "Loan - 1st",
           "slug": "loan_to_zakir__l__st__5",
           "type": "LEND",
           "terms": 0,
@@ -22160,10 +22149,9 @@
           "active": false,
           "ownerId": "66d95de89ff85b6e7c1106c0",
           "ownerRole": "DEFAULT",
-          "memberId": null,
           "passbookId": "66d95de99ff85b6e7c1106e3",
           "createdAt": "2024-02-07T05:01:40.401Z",
-          "updatedAt": "2024-09-05T11:01:45.106Z"
+          "updatedAt": "2024-09-05T19:31:06.137Z"
         }
       ],
       "passbook": {
@@ -23055,7 +23043,7 @@
   "vendors": [
     {
       "id": "66d95de89ff85b6e7c1106c6",
-      "name": "5L Chit 2nd",
+      "name": "5L Chit - 2nd",
       "slug": "chit_5_2nd",
       "type": "CHIT",
       "terms": 0,
@@ -23065,10 +23053,9 @@
       "active": true,
       "ownerId": null,
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de89ff85b6e7c1106c5",
       "createdAt": "2023-07-04T17:05:09.480Z",
-      "updatedAt": "2024-09-05T10:59:51.714Z",
+      "updatedAt": "2024-09-05T19:32:15.602Z",
       "transactions": [
         {
           "id": "66d95fc59ff85b6e7c110bec",
@@ -23484,12 +23471,12 @@
         "balance": 0,
         "fund": 343850,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T10:59:54.038Z"
+        "updatedAt": "2024-09-05T19:32:16.365Z"
       }
     },
     {
       "id": "66d95de89ff85b6e7c1106c8",
-      "name": "3L Chit",
+      "name": "3L Chit - 1st",
       "slug": "chit_3_1st",
       "type": "CHIT",
       "terms": 0,
@@ -23499,10 +23486,9 @@
       "active": true,
       "ownerId": null,
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de89ff85b6e7c1106c7",
       "createdAt": "2023-07-04T17:05:20.637Z",
-      "updatedAt": "2024-09-05T10:58:17.727Z",
+      "updatedAt": "2024-09-05T19:32:39.135Z",
       "transactions": [
         {
           "id": "66d95fb19ff85b6e7c110bc9",
@@ -23918,12 +23904,12 @@
         "balance": 0,
         "fund": 185600,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T10:58:18.491Z"
+        "updatedAt": "2024-09-05T19:32:39.896Z"
       }
     },
     {
       "id": "66d95de89ff85b6e7c1106ca",
-      "name": "5L Chit 1st",
+      "name": "5L Chit - 1st",
       "slug": "chit_20_1st",
       "type": "CHIT",
       "terms": 0,
@@ -23933,10 +23919,9 @@
       "active": false,
       "ownerId": null,
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de89ff85b6e7c1106c9",
       "createdAt": "2023-06-29T12:34:59.362Z",
-      "updatedAt": "2024-09-05T11:05:23.984Z",
+      "updatedAt": "2024-09-05T19:32:26.509Z",
       "transactions": [
         {
           "id": "66d95f049ff85b6e7c110a9a",
@@ -24424,12 +24409,12 @@
         "balance": 485000,
         "fund": 460375,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:32:27.272Z"
       }
     },
     {
       "id": "66d95de89ff85b6e7c1106cc",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_prabha____interest_7",
       "type": "LEND",
       "terms": 0,
@@ -24439,10 +24424,9 @@
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106a6",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de89ff85b6e7c1106cb",
       "createdAt": "2023-08-08T07:23:04.287Z",
-      "updatedAt": "2024-09-05T11:05:55.482Z",
+      "updatedAt": "2024-09-05T19:33:59.570Z",
       "transactions": [
         {
           "id": "66d95faf9ff85b6e7c110bc6",
@@ -24726,12 +24710,12 @@
         "balance": 203800,
         "fund": 200000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:34:00.339Z"
       }
     },
     {
       "id": "66d95de89ff85b6e7c1106ce",
-      "name": "Bank Interest 1st",
+      "name": "Bank Interest - 1st",
       "slug": "bank_interest",
       "type": "BANK",
       "terms": 0,
@@ -24741,10 +24725,9 @@
       "active": false,
       "ownerId": null,
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de89ff85b6e7c1106cd",
       "createdAt": "2023-06-29T12:34:59.365Z",
-      "updatedAt": "2024-09-05T11:05:31.665Z",
+      "updatedAt": "2024-09-05T19:31:41.400Z",
       "transactions": [
         {
           "id": "66d95f0d9ff85b6e7c110aa9",
@@ -25004,12 +24987,12 @@
         "balance": 1440,
         "fund": 0,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:31:43.701Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106d0",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_kamalesh__st_kamalesh_4",
       "type": "LEND",
       "terms": 0,
@@ -25019,10 +25002,9 @@
       "active": true,
       "ownerId": "66d95de69ff85b6e7c11069a",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de89ff85b6e7c1106cf",
       "createdAt": "2024-03-10T14:08:06.707Z",
-      "updatedAt": "2024-09-05T11:07:18.289Z",
+      "updatedAt": "2024-09-05T19:32:47.518Z",
       "transactions": [
         {
           "id": "66d960099ff85b6e7c110c61",
@@ -25318,12 +25300,12 @@
         "balance": 4000,
         "fund": 100000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:32:48.279Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106d2",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_swathish_____inrst__9",
       "type": "LEND",
       "terms": 0,
@@ -25333,10 +25315,9 @@
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106b0",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106d1",
       "createdAt": "2023-08-26T13:23:40.774Z",
-      "updatedAt": "2024-09-05T11:02:00.708Z",
+      "updatedAt": "2024-09-05T19:34:08.428Z",
       "transactions": [
         {
           "id": "66d95fb49ff85b6e7c110bcd",
@@ -25644,12 +25625,12 @@
         "balance": 210000,
         "fund": 200000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:34:09.189Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106d4",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "kiruba_anna____l__5",
       "type": "LEND",
       "terms": 0,
@@ -25659,10 +25640,9 @@
       "active": false,
       "ownerId": "66d95de79ff85b6e7c1106b6",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106d3",
       "createdAt": "2023-10-18T14:28:21.588Z",
-      "updatedAt": "2024-09-05T11:07:02.160Z",
+      "updatedAt": "2024-09-05T19:33:03.903Z",
       "transactions": [
         {
           "id": "66d95fcb9ff85b6e7c110bf5",
@@ -25982,12 +25962,12 @@
         "balance": 157500,
         "fund": 150000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:33:04.664Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106d6",
-      "name": "Loan 2nd",
+      "name": "Loan - 2nd",
       "slug": "loan_to_kiruba_anna__nd__7",
       "type": "LEND",
       "terms": 0,
@@ -25997,10 +25977,9 @@
       "active": true,
       "ownerId": "66d95de79ff85b6e7c1106b6",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106d5",
       "createdAt": "2024-07-13T17:08:00.309Z",
-      "updatedAt": "2024-09-05T11:04:53.175Z",
+      "updatedAt": "2024-09-05T19:34:22.592Z",
       "transactions": [
         {
           "id": "66d960359ff85b6e7c110cae",
@@ -26260,12 +26239,12 @@
         "balance": 1000,
         "fund": 100000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:34:23.353Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106d8",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_karthiban__st_karthiban_7",
       "type": "LEND",
       "terms": 0,
@@ -26275,10 +26254,9 @@
       "active": false,
       "ownerId": "66d95de89ff85b6e7c1106be",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106d7",
       "createdAt": "2024-05-06T06:10:31.708Z",
-      "updatedAt": "2024-09-05T11:01:26.988Z",
+      "updatedAt": "2024-09-05T19:32:02.250Z",
       "transactions": [
         {
           "id": "66d960129ff85b6e7c110c71",
@@ -26574,12 +26552,12 @@
         "balance": 103000,
         "fund": 100000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:32:04.550Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106da",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "deepak___k__3",
       "type": "LEND",
       "terms": 0,
@@ -26589,10 +26567,9 @@
       "active": false,
       "ownerId": "66d95de89ff85b6e7c1106bc",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106d9",
       "createdAt": "2023-10-18T14:18:52.750Z",
-      "updatedAt": "2024-09-05T11:06:18.541Z",
+      "updatedAt": "2024-09-05T19:31:51.422Z",
       "transactions": [
         {
           "id": "66d95fca9ff85b6e7c110bf4",
@@ -26912,12 +26889,12 @@
         "balance": 52500,
         "fund": 50000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:31:52.181Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106dc",
-      "name": "Loan 2nd",
+      "name": "Loan - 2nd",
       "slug": "loan_to_deepak__nd__2",
       "type": "LEND",
       "terms": 0,
@@ -26927,10 +26904,9 @@
       "active": true,
       "ownerId": "66d95de89ff85b6e7c1106bc",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106db",
       "createdAt": "2024-06-26T05:58:02.766Z",
-      "updatedAt": "2024-09-05T10:58:47.363Z",
+      "updatedAt": "2024-09-05T19:34:15.531Z",
       "transactions": [
         {
           "id": "66d9602c9ff85b6e7c110c9e",
@@ -27202,12 +27178,12 @@
         "balance": 1000,
         "fund": 50000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:34:16.293Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106de",
-      "name": "Loan 2nd",
+      "name": "Loan - 2nd",
       "slug": "loan_to_praba__nd__10",
       "type": "LEND",
       "terms": 0,
@@ -27217,10 +27193,9 @@
       "active": true,
       "ownerId": "66d95de79ff85b6e7c1106a6",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106dd",
       "createdAt": "2024-06-26T05:58:58.873Z",
-      "updatedAt": "2024-09-05T11:05:14.556Z",
+      "updatedAt": "2024-09-05T19:34:29.668Z",
       "transactions": [
         {
           "id": "66d9602c9ff85b6e7c110c9f",
@@ -27480,12 +27455,12 @@
         "balance": 500,
         "fund": 50000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:34:30.431Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106e0",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_kishore__10",
       "type": "LEND",
       "terms": 0,
@@ -27495,10 +27470,9 @@
       "active": true,
       "ownerId": "66d95de69ff85b6e7c11069e",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106df",
       "createdAt": "2024-08-31T07:39:28.988Z",
-      "updatedAt": "2024-09-05T11:00:57.403Z",
+      "updatedAt": "2024-09-05T19:32:56.479Z",
       "transactions": [],
       "profitShares": [
         {
@@ -27733,12 +27707,12 @@
         "balance": 0,
         "fund": 0,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:32:57.241Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106e2",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "prabhu__l__st__6",
       "type": "LEND",
       "terms": 0,
@@ -27746,12 +27720,11 @@
       "startAt": "2024-01-25T04:59:12.000Z",
       "endAt": null,
       "active": false,
-      "ownerId": "66d95de79ff85b6e7c1106a6",
+      "ownerId": "66d95de79ff85b6e7c1106a8",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106e1",
       "createdAt": "2024-02-07T05:00:18.907Z",
-      "updatedAt": "2024-09-05T11:02:17.959Z",
+      "updatedAt": "2024-09-05T19:33:45.123Z",
       "transactions": [
         {
           "id": "66d95ff69ff85b6e7c110c41",
@@ -28047,12 +28020,12 @@
         "balance": 105000,
         "fund": 100000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:33:45.885Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106e4",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_zakir__l__st__5",
       "type": "LEND",
       "terms": 0,
@@ -28062,10 +28035,9 @@
       "active": false,
       "ownerId": "66d95de89ff85b6e7c1106c0",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106e3",
       "createdAt": "2024-02-07T05:01:40.401Z",
-      "updatedAt": "2024-09-05T11:01:45.106Z",
+      "updatedAt": "2024-09-05T19:31:06.137Z",
       "transactions": [
         {
           "id": "66d95ff79ff85b6e7c110c43",
@@ -28373,12 +28345,12 @@
         "balance": 104000,
         "fund": 100000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:31:06.921Z"
       }
     },
     {
       "id": "66d95de99ff85b6e7c1106e6",
-      "name": "Loan 1st",
+      "name": "Loan - 1st",
       "slug": "loan_to_mukesh__st__8",
       "type": "LEND",
       "terms": 0,
@@ -28388,10 +28360,9 @@
       "active": true,
       "ownerId": "66d95de69ff85b6e7c1106a2",
       "ownerRole": "DEFAULT",
-      "memberId": null,
       "passbookId": "66d95de99ff85b6e7c1106e5",
       "createdAt": "2024-06-26T05:55:54.607Z",
-      "updatedAt": "2024-09-05T11:04:40.305Z",
+      "updatedAt": "2024-09-05T19:33:10.683Z",
       "transactions": [
         {
           "id": "66d960259ff85b6e7c110c93",
@@ -28663,7 +28634,7 @@
         "balance": 2000,
         "fund": 100000,
         "createdAt": "2024-09-05T07:29:41.721Z",
-        "updatedAt": "2024-09-05T11:33:18.395Z"
+        "updatedAt": "2024-09-05T19:33:11.453Z"
       }
     }
   ],
@@ -45065,7 +45036,7 @@
       "balance": 0,
       "fund": 343850,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T10:59:54.038Z"
+      "updatedAt": "2024-09-05T19:32:16.365Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c7",
@@ -45082,7 +45053,7 @@
       "balance": 0,
       "fund": 185600,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T10:58:18.491Z"
+      "updatedAt": "2024-09-05T19:32:39.896Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c9",
@@ -45099,7 +45070,7 @@
       "balance": 485000,
       "fund": 460375,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:32:27.272Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cb",
@@ -45116,7 +45087,7 @@
       "balance": 203800,
       "fund": 200000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:34:00.339Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cd",
@@ -45133,7 +45104,7 @@
       "balance": 1440,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:31:43.701Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cf",
@@ -45150,7 +45121,7 @@
       "balance": 4000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:32:48.279Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d1",
@@ -45167,7 +45138,7 @@
       "balance": 210000,
       "fund": 200000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:34:09.189Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d3",
@@ -45184,7 +45155,7 @@
       "balance": 157500,
       "fund": 150000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:33:04.664Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d5",
@@ -45201,7 +45172,7 @@
       "balance": 1000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:34:23.353Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d7",
@@ -45218,7 +45189,7 @@
       "balance": 103000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:32:04.550Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106d9",
@@ -45235,7 +45206,7 @@
       "balance": 52500,
       "fund": 50000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:31:52.181Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106db",
@@ -45252,7 +45223,7 @@
       "balance": 1000,
       "fund": 50000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:34:16.293Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106dd",
@@ -45269,7 +45240,7 @@
       "balance": 500,
       "fund": 50000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:34:30.431Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106df",
@@ -45286,7 +45257,7 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:32:57.241Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e1",
@@ -45303,7 +45274,7 @@
       "balance": 105000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:33:45.885Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e3",
@@ -45320,7 +45291,7 @@
       "balance": 104000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:31:06.921Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e5",
@@ -45337,7 +45308,7 @@
       "balance": 2000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-09-05T19:33:11.453Z"
     },
     {
       "id": "66d95dea9ff85b6e7c1106e7",
