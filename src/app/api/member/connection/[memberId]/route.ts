@@ -17,6 +17,12 @@ export async function GET(
       vendor: {
         select: {
           name: true,
+          owner: {
+            select: {
+              firstName: true,
+              lastName: true
+            }
+          }
         },
       },
     },

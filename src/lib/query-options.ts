@@ -37,6 +37,10 @@ export const fetchMemberConnection = (memberId: string) =>
         connections: {
           vendor: {
             name: string;
+            owner: {
+              firstName: string;
+              lastName: string | null;
+            } | null;          
           };
           id: string;
           active: boolean;

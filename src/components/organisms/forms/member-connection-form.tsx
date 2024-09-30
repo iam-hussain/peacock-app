@@ -83,6 +83,7 @@ export function MemberConnectionsForm({
           >
             <span className="truncate text-[14px] pr-1">
               {connection.vendor.name}
+              {connection.vendor.owner?.firstName ? ` - ${connection.vendor.owner?.firstName}${connection.vendor.owner?.lastName ? ` ${connection.vendor.owner?.lastName}`: ''}` : ''}
             </span>
             <Controller
               name={`connections.${index}.active`}
