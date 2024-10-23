@@ -10,7 +10,7 @@ type MemberToTransform = Member & {
   passbook: Passbook;
 };
 
-export async function GET(request: Request) {
+export async function GET() {
   const members = await prisma.member.findMany({
     include: {
       passbook: true,
@@ -31,7 +31,6 @@ function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number
 ) {
-  const { passbook, ...rawMember } = member;
   const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
   const periodBalance =
     memberTotalDeposit - (member.passbook.periodIn - member.passbook.out);
@@ -55,7 +54,7 @@ function membersTableTransform(
     clubFund: member.passbook.fund,
     netValue:
       member.passbook.in + member.passbook.returns - member.passbook.out,
-    member: rawMember,
+    member: { ...member, passbook: null },
   };
 }
 

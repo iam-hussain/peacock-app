@@ -17,7 +17,7 @@ function membersSelectTransform(member: MemberToTransform) {
   };
 }
 
-export async function GET(request: Request) {
+export async function GET() {
   const members = await prisma.member.findMany({
     select: {
       id: true,

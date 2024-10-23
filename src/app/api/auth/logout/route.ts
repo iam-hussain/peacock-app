@@ -1,7 +1,7 @@
 import { serialize } from "cookie"; // To set cookies
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST() {
   // Set the token in a cookie
   const cookie = serialize("token", "", {
     httpOnly: true,

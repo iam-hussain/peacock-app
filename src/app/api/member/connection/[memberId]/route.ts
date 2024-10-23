@@ -2,6 +2,46 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 
+function transformConnectionMemberVendor(input: {
+  vendor: {
+    name: string;
+    active: boolean;
+    owner: {
+      firstName: string;
+      lastName: string | null;
+      avatar: string | null;
+    } | null;
+  };
+  id: string;
+  active: boolean;
+}) {
+  const {
+    vendor: { owner, name, active },
+    ...props
+  } = input;
+  const memberName = owner?.firstName
+    ? `${owner.firstName} ${owner.lastName || ""}`
+    : "";
+
+  return {
+    id: props.id,
+    name: `${name}${owner?.firstName ? ` - ${owner.firstName} ${owner.lastName || " "}` : ""}`,
+    vendorName: name,
+    memberName,
+    memberAvatar: owner?.avatar ? `/image/${owner.avatar}` : undefined,
+    vendorActive: active,
+    active: props.active,
+  };
+}
+
+export type ConnectionMemberVendor = ReturnType<
+  typeof transformConnectionMemberVendor
+>;
+
+export type GetConnectionMemberVendor = {
+  connections: ConnectionMemberVendor[];
+};
+
 // GET Request to fetch the member's vendor connections
 export async function GET(
   request: Request,
@@ -17,18 +57,22 @@ export async function GET(
       vendor: {
         select: {
           name: true,
+          active: true,
           owner: {
             select: {
               firstName: true,
-              lastName: true
-            }
-          }
+              lastName: true,
+              avatar: true,
+            },
+          },
         },
       },
     },
   });
 
-  return NextResponse.json({ connections });
+  return NextResponse.json({
+    connections: connections.map(transformConnectionMemberVendor),
+  });
 }
 
 // PATCH Request to update the member's vendor connections

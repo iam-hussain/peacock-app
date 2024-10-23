@@ -7,10 +7,12 @@ export function AvatarGroup({
   src,
   name,
   active,
+  isSmall = false,
 }: {
   src: string;
   name: string;
   active?: boolean;
+  isSmall?: boolean;
 }) {
   const nameArr = name
     .replace(/[^\w\s]/gi, "")
@@ -25,9 +27,11 @@ export function AvatarGroup({
       : name.slice(0, 2);
   return (
     <div className="relative">
-      <Avatar>
+      <Avatar className={cn({ "h-6 w-6": isSmall })}>
         <AvatarImage src={src} alt={name} />
-        <AvatarFallback>{fallback}</AvatarFallback>
+        <AvatarFallback className={cn({ "text-[0.6rem]": isSmall })}>
+          {fallback}
+        </AvatarFallback>
       </Avatar>
       {active !== undefined && (
         <FaCircle

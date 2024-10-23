@@ -111,22 +111,42 @@ const baseColumns = (
       />
     ),
   },
-];
-
-const editColumns: ColumnDef<TransformedVendorTransaction>[] = [
   {
-    accessorKey: "updatedAt",
-    header: () => <PlainTableHeader label="Updated / Created" />,
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <ActionTableHeader
+        column={column}
+        onClick={handleSortClick}
+        label="Created / Updated"
+      />
+    ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={format(new Date(row.original.updatedAt), "dd MMM yyyy hh:mm a")}
-        subLabel={format(
-          new Date(row.original.createdAt),
-          "dd MMM yyyy hh:mm a"
-        )}
+        label={format(new Date(row.original.createdAt), "dd MMM yyyy hh:mm a")}
+        subLabel={
+          row.original.updatedAt !== row.original.createdAt
+            ? format(new Date(row.original.updatedAt), "dd MMM yyyy hh:mm a")
+            : undefined
+        }
       />
     ),
   },
+];
+
+const editColumns: ColumnDef<TransformedVendorTransaction>[] = [
+  // {
+  //   accessorKey: "updatedAt",
+  //   header: () => <PlainTableHeader label="Updated / Created" />,
+  //   cell: ({ row }) => (
+  //     <CommonTableCell
+  //       label={format(new Date(row.original.updatedAt), "dd MMM yyyy hh:mm a")}
+  //       subLabel={format(
+  //         new Date(row.original.createdAt),
+  //         "dd MMM yyyy hh:mm a"
+  //       )}
+  //     />
+  //   ),
+  // },
   {
     accessorKey: "id",
     header: () => <PlainTableHeader label="ID" />,

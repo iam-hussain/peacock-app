@@ -18,6 +18,8 @@ type AvatarCellProps = {
   active?: boolean;
   subLabel?: string;
   avatarName?: string;
+  className?: string;
+  isSmall?: boolean;
 };
 
 export const ActionCell = ({ onClick }: ActionCellProps) => (
@@ -86,15 +88,27 @@ export const AvatarCell = ({
   active,
   subLabel,
   avatarName,
+  className,
+  isSmall = false,
 }: AvatarCellProps) => (
-  <div className="flex items-center space-x-2 min-w-[170px]" data-id={id}>
+  <div
+    className={cn("flex items-center space-x-2 min-w-[170px]", className)}
+    data-id={id}
+  >
     <AvatarGroup
       src={avatar || ""}
       name={avatarName || name}
       active={active || false}
+      isSmall={isSmall}
     />
     <div className="flex flex-col">
-      <p className="text-foreground font-medium">{name}</p>
+      <p
+        className={cn("text-foreground font-medium", {
+          "text-[0.8rem]": isSmall,
+        })}
+      >
+        {name}
+      </p>
       {subLabel && (
         <p className="text-[0.7rem] text-foreground/70">{subLabel}</p>
       )}

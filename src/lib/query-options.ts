@@ -3,9 +3,11 @@ import { queryOptions } from "@tanstack/react-query";
 import fetcher from "./fetcher";
 
 import { GetStatisticsResponse } from "@/app/api/dashboard/statistics/route";
+import { GetConnectionMemberVendor } from "@/app/api/member/connection/[memberId]/route";
 import { GetMemberResponse } from "@/app/api/member/route";
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import { GetMemberTransactionResponse } from "@/app/api/member/transaction/route";
+import { GetConnectionVendorMember } from "@/app/api/vendor/connection/[vendorId]/route";
 import { GetVendorResponse } from "@/app/api/vendor/route";
 import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
 import { GetVendorTransactionResponse } from "@/app/api/vendor/transaction/route";
@@ -33,19 +35,7 @@ export const fetchMemberConnection = (memberId: string) =>
     queryFn: () =>
       fetcher(`/api/member/connection/${memberId}`, {
         tags: ["member-connection"],
-      }) as never as {
-        connections: {
-          vendor: {
-            name: string;
-            owner: {
-              firstName: string;
-              lastName: string | null;
-            } | null;          
-          };
-          id: string;
-          active: boolean;
-        }[];
-      },
+      }) as never as GetConnectionMemberVendor,
     ...noRefetchConfigs,
   });
 
@@ -108,16 +98,7 @@ export const fetchVendorConnection = (vendorId: string) =>
     queryFn: () =>
       fetcher(`/api/vendor/connection/${vendorId}`, {
         tags: ["vendor-connection"],
-      }) as never as {
-        connections: {
-          member: {
-            firstName?: string;
-            lastName?: string;
-          };
-          id: string;
-          active: boolean;
-        }[];
-      },
+      }) as never as GetConnectionVendorMember,
     ...noRefetchConfigs,
   });
 

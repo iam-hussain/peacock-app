@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
 
+import { AvatarCell } from "@/components/atoms/table-component";
 import { Switch } from "@/components/ui/switch";
 import fetcher from "@/lib/fetcher";
 import { fetchVendorConnection } from "@/lib/query-options";
@@ -75,13 +76,21 @@ export function VendorConnectionsForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="py-2">
-      <Box preset={"grid-split"} className="gap-2">
+      <Box preset={"row-start"} className="gap-2 flex-wrap">
         {data?.connections.map((connection, index) => (
           <div
             key={connection.id}
-            className="flex w-full items-center justify-between border border-input px-2 min-h-[36px] py-1 rounded-md"
+            className="flex items-center justify-between border border-input px-2 min-h-[36px] py-1 rounded-md w-full sm:max-w-[225px]"
           >
-            <span className="truncate text-[14px] pr-1">{`${connection.member.firstName} ${connection.member.lastName}`}</span>
+            <AvatarCell
+              id={connection.id}
+              avatar={connection.avatar}
+              name={connection.name}
+              avatarName={connection.name}
+              active={connection.memberActive}
+              className="min-w-min"
+              isSmall={true}
+            />
             <Controller
               name={`connections.${index}.active`}
               control={control}

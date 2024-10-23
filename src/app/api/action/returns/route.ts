@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { calculateReturnsHandler } from "@/passbook/returns-handler";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     // Fetch all data from Prisma models
 
