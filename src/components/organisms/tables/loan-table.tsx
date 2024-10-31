@@ -44,7 +44,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
   {
     accessorKey: "account",
     header: ({ column }) => (
-      <ActionTableHeader label="Holding" column={column} />
+      <ActionTableHeader label="Account" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
@@ -83,7 +83,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     cell: ({ row }) => (
       <CommonTableCell
         label={moneyFormat(row.original.returns || 0)}
-        // greenLabel={row.original.returns > 0}
+      // greenLabel={row.original.returns > 0}
       />
     ),
   },
