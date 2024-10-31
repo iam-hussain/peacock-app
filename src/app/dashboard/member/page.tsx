@@ -10,8 +10,8 @@ export default async function Members() {
         <Typography variant={"h3"} className="">
           Members
         </Typography>
-        <CustomLink href="/dashboard/member/transaction" variant={"default"}>
-          Member Transactions
+        <CustomLink href="/dashboard/transaction" variant={"default"}>
+          Transactions
         </CustomLink>
       </Box>
       <Box className="bg-background p-4 md:p-6 rounded-md width-avl">

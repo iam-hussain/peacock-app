@@ -1,12 +1,8 @@
-import {
-  MEMBER_TRANSACTION_TYPE,
-  Passbook,
-  VENDOR_TRANSACTION_TYPE,
-} from "@prisma/client";
+import { Passbook, TRANSACTION_TYPE } from "@prisma/client";
 
-export type MemberPassbookConfig = {
-  [key in MEMBER_TRANSACTION_TYPE]: {
-    [key in "FROM" | "TO" | "CLUB"]: PassbookConfigAction;
+export type TransactionPassbookConfig = {
+  [key in TRANSACTION_TYPE]: {
+    [key in "MEMBER" | "VENDOR" | "CLUB"]: PassbookConfigAction;
   };
 };
 export type PassbookConfigAction = {
@@ -17,15 +13,9 @@ export type PassbookConfigAction = {
 
 export type PassbookConfigActionValue = "amount" | "term";
 
-export type VendorPassbookConfig = {
-  [key in VENDOR_TRANSACTION_TYPE]: {
-    [key in "MEMBER" | "VENDOR" | "CLUB"]: PassbookConfigAction;
-  };
-};
-
-export const memberTransactionPassbookSettings: MemberPassbookConfig = {
+export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
-    FROM: {
+    MEMBER: {
       ADD: {
         periodIn: "amount",
         in: "amount",
@@ -33,7 +23,7 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
         currentTerm: "term",
       },
     },
-    TO: { ADD: { fund: "amount" } },
+    VENDOR: { ADD: { fund: "amount" } },
     CLUB: {
       ADD: {
         periodIn: "amount",
@@ -44,10 +34,10 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
     },
   },
   OFFSET_DEPOSIT: {
-    FROM: {
+    MEMBER: {
       ADD: { offsetIn: "amount", in: "amount", balance: "amount" },
     },
-    TO: { ADD: { fund: "amount" } },
+    VENDOR: { ADD: { fund: "amount" } },
     CLUB: {
       ADD: {
         offsetIn: "amount",
@@ -58,8 +48,8 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
     },
   },
   WITHDRAW: {
-    FROM: { SUB: { fund: "amount" } },
-    TO: {
+    VENDOR: { SUB: { fund: "amount" } },
+    MEMBER: {
       ADD: { out: "amount" },
       SUB: {
         balance: "amount",
@@ -74,13 +64,13 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
     },
   },
   REJOIN: {
-    FROM: {
+    MEMBER: {
       SUB: { out: "amount" },
       ADD: {
         balance: "amount",
       },
     },
-    TO: { ADD: { fund: "amount", balance: "amount" } },
+    VENDOR: { ADD: { fund: "amount", balance: "amount" } },
     CLUB: {
       ADD: {
         balance: "amount",
@@ -90,22 +80,6 @@ export const memberTransactionPassbookSettings: MemberPassbookConfig = {
     },
   },
   FUNDS_TRANSFER: {
-    FROM: {
-      SUB: {
-        fund: "amount",
-      },
-    },
-    TO: {
-      ADD: {
-        fund: "amount",
-      },
-    },
-    CLUB: {},
-  },
-};
-
-export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
-  PERIODIC_INVEST: {
     MEMBER: {
       SUB: {
         fund: "amount",
@@ -113,20 +87,10 @@ export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
     },
     VENDOR: {
       ADD: {
-        currentTerm: "term",
-        periodIn: "amount",
-        in: "amount",
         fund: "amount",
       },
-      SUB: {
-        returns: "amount",
-      },
     },
-    CLUB: {
-      SUB: {
-        balance: "amount",
-      },
-    },
+    CLUB: {},
   },
   INVEST: {
     MEMBER: {
@@ -145,27 +109,6 @@ export const vendorTransactionPassbookSettings: VendorPassbookConfig = {
     },
     CLUB: {
       SUB: {
-        balance: "amount",
-      },
-    },
-  },
-  PERIODIC_RETURN: {
-    MEMBER: {
-      ADD: {
-        fund: "amount",
-      },
-    },
-    VENDOR: {
-      ADD: {
-        currentTerm: "term",
-        offsetIn: "amount",
-        out: "amount",
-        balance: "amount",
-        returns: "amount",
-      },
-    },
-    CLUB: {
-      ADD: {
         balance: "amount",
       },
     },

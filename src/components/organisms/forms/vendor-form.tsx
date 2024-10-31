@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { vendorTypeMap } from "@/lib/config";
+import { vendorCreateTypeMap } from "@/lib/config";
 import fetcher from "@/lib/fetcher";
 import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
 
@@ -196,11 +196,13 @@ export function VendorForm({
                       <SelectValue placeholder="Select vendor type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(vendorTypeMap).map(([key, name]) => (
-                        <SelectItem key={key} value={key}>
-                          {name}
-                        </SelectItem>
-                      ))}
+                      {Object.entries(vendorCreateTypeMap).map(
+                        ([key, name]) => (
+                          <SelectItem key={key} value={key}>
+                            {name}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>

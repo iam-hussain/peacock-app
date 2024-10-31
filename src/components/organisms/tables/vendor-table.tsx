@@ -81,7 +81,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     header: ({ column }) => <ActionTableHeader label="Type" column={column} />,
     cell: ({ row }) => (
       <CommonTableCell
-        label={vendorTypeMap[row.original.type]}
+        label={vendorTypeMap[row.original.type.toString()]}
         subLabel={row.original.period || ""}
       />
     ),
@@ -103,7 +103,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
     accessorKey: "profit",
     header: ({ column }) => (
-      <ActionTableHeader label="Profit" column={column} />
+      <ActionTableHeader label="Return" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
@@ -117,7 +117,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
     accessorKey: "returns",
     header: ({ column }) => (
-      <ActionTableHeader label="Return" column={column} />
+      <ActionTableHeader label="Profit" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
@@ -151,21 +151,19 @@ const VendorsTable = ({ handleAction }: VendorTableProps) => {
   const [editMode, setEditMode] = useState(false);
   const { data, isLoading, isError } = useQuery(fetchVendors());
 
+  const actionColumn = {
+    accessorKey: "action",
+    header: () => <PlainTableHeader label="Action" />,
+    cell: ({ row }: any) => (
+      <ActionCell onClick={() => handleAction(row.original.vendor)} />
+    ),
+  };
+
   const columns = useMemo(() => {
     if (!editMode) {
-      return baseColumns;
+      return [...baseColumns, actionColumn];
     }
-    return [
-      ...baseColumns,
-      ...editColumns,
-      {
-        accessorKey: "action",
-        header: () => <PlainTableHeader label="Action" />,
-        cell: ({ row }) => (
-          <ActionCell onClick={() => handleAction(row.original.vendor)} />
-        ),
-      },
-    ];
+    return [...baseColumns, ...editColumns, actionColumn];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode]);
 

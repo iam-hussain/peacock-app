@@ -1,3 +1,4 @@
+import { $Enums } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
@@ -5,6 +6,7 @@ import prisma from "@/db";
 type VendorToTransform = {
   id: string;
   name: string;
+  type: $Enums.VENDOR_TYPE;
   active: boolean;
   owner: {
     firstName: string;
@@ -13,19 +15,40 @@ type VendorToTransform = {
 };
 
 function vendorsSelectTransform(vendor: VendorToTransform) {
+  const connectedName = vendor.owner?.firstName
+    ? ` - ${vendor.owner.firstName} ${vendor.owner.lastName || " "}`
+    : "";
+  let name = `${vendor.name}${connectedName}`;
+
+  if (vendor.type === "HOLD") {
+    name = `Hold${connectedName}`;
+  }
+
   return {
     id: vendor.id,
-    name: `${vendor.name}${vendor.owner?.firstName ? ` - ${vendor.owner.firstName} ${vendor.owner.lastName || " "}` : ""}`,
+    name,
     active: vendor.active,
   };
 }
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const type = searchParams.get("type");
   const vendors = await prisma.vendor.findMany({
+    where: {
+      ...(type
+        ? {
+            type: {
+              in: (type?.split("-") as any) || [],
+            },
+          }
+        : {}),
+    },
     select: {
       id: true,
       name: true,
       active: true,
+      type: true,
       owner: {
         select: {
           firstName: true,

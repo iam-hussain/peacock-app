@@ -34,6 +34,11 @@ async function getProfitSharesVendorsAndClub() {
           },
         },
       },
+      where: {
+        type: {
+          notIn: ["HOLD", "LEND"],
+        },
+      },
     }),
     prisma.passbook.findFirst({
       where: { type: "CLUB" },
@@ -111,17 +116,6 @@ export async function calculateReturnsHandler() {
 
   const passbooksUpdate = Array.from(toUpdate.entries()).map(([id, data]) =>
     prisma.passbook.update({ where: { id }, data })
-  );
-
-  console.log(
-    JSON.stringify({
-      passbooks: Array.from(toUpdate.entries()).map(([id, data]) => ({
-        id,
-        data,
-      })),
-      totalOffset,
-      totalReturns,
-    })
   );
 
   if (club?.id) {

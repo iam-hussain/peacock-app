@@ -50,21 +50,17 @@ const appMenus: Menu[] = [
     label: "Vendors",
     link: "/dashboard/vendor",
   },
-];
-
-const transactionsMenus: Menu[] = [
-  {
-    Icon: FaPiggyBank,
-    label: "Member Transactions",
-    link: "/dashboard/member/transaction",
-  },
   {
     Icon: RiFolderTransferFill,
-    label: "Vendor Transactions",
-    link: "/dashboard/vendor/transaction",
+    label: "Loans",
+    link: "/dashboard/loan",
+  },
+  {
+    Icon: FaPiggyBank,
+    label: "Transactions",
+    link: "/dashboard/transaction",
   },
 ];
-
 function MenuItems({
   onItemClick,
   hasCloseButton = false,
@@ -132,17 +128,6 @@ function MenuItems({
       <ScrollArea className="w-full grow">
         <Box preset={"stack-start"} className="gap-4" gap={1}>
           {appMenus.map(({ Icon, ...each }, key) => (
-            <CustomLink
-              key={key}
-              variant={"menu"}
-              href={each.link as any}
-              onClick={() => handleOnItemClick()}
-            >
-              <Icon className="h-5 w-5" /> {each.label}
-            </CustomLink>
-          ))}
-          <Separator className="my-2" />
-          {transactionsMenus.map(({ Icon, ...each }, key) => (
             <CustomLink
               key={key}
               variant={"menu"}

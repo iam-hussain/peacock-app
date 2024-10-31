@@ -23,6 +23,7 @@ const boxStyles = cva("w-full", {
       "grid-top-center": "grid justify-start items-center",
       "grid-cols-12": "grid grid-cols-12",
       "grid-split": "grid grid-cols-2",
+      "grid-split-3": "grid grid-cols-3",
     },
     gap: {
       0: "gap-0",

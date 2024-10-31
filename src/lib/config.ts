@@ -1,3 +1,5 @@
+import { TRANSACTION_TYPE } from "@prisma/client";
+
 type Stage = {
   name: string;
   amount: number;
@@ -66,20 +68,47 @@ export const transactionMethodMap = {
   CHEQUE: "Cheque",
 };
 
-// Vendor Transaction Type Map
-export const vendorTransactionTypeMap = {
-  PERIODIC_INVEST: "Periodic Invest",
-  INVEST: "Invest",
-  PERIODIC_RETURN: "Periodic Returns",
-  RETURNS: "Returns",
-  PROFIT: "Profit",
-  // EXPENSE (commented out in the enum, so not included here)
-};
-
 // Vendor Type Map
-export const vendorTypeMap = {
+export const vendorTypeMap: any = {
   DEFAULT: "Default",
   CHIT: "Chit",
   LEND: "Loan",
   BANK: "Bank",
+};
+
+// Vendor Type Map
+export const vendorCreateTypeMap = {
+  DEFAULT: "Default",
+  CHIT: "Chit",
+  BANK: "Bank",
+};
+
+// Vendor Type Map
+export const vendorTypeTransactionMap = {
+  DEFAULT: "Default/Chit",
+  LEND: "Member Loan",
+};
+
+// Transaction Type Map
+export const transactionTypeMap: { [key in TRANSACTION_TYPE]: string } = {
+  PERIODIC_DEPOSIT: "Members Deposit",
+  OFFSET_DEPOSIT: "Offset Deposit",
+  WITHDRAW: "Members Withdraw",
+  REJOIN: "Members Rejoin Deposit",
+  FUNDS_TRANSFER: "Club Funds Transfer",
+  INVEST: "Investment/Loan",
+  RETURNS: "Return/Repayment",
+  PROFIT: "Profit/Interest",
+};
+
+// Transaction Type Map
+export const transactionTypeHumanMap: { [key in TRANSACTION_TYPE]: string } = {
+  PERIODIC_DEPOSIT: "Member's Monthly Deposit",
+  OFFSET_DEPOSIT: "Member's Offset Deposit",
+  WITHDRAW: "Member's Withdrawal",
+  REJOIN: "Member's Rejoin Deposit",
+  FUNDS_TRANSFER: "Club Funds Transfer Between Members",
+  INVEST: "Investment/Loan to Vendor or Member",
+  RETURNS: "Return/Repayment from Vendor or Member",
+  PROFIT: "Profit/Interest Received from Vendor or Member",
 };

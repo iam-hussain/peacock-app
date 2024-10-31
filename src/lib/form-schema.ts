@@ -2,15 +2,9 @@ import { z } from "zod";
 
 export type MemberFromSchema = z.infer<typeof memberFormSchema>;
 
-export type MemberTransactionFormSchema = z.infer<
-  typeof memberTransactionFormSchema
->;
-
 export type VendorFromSchema = z.infer<typeof vendorFormSchema>;
 
-export type VendorTransactionFormSchema = z.infer<
-  typeof vendorTransactionFormSchema
->;
+export type TransactionFormSchema = z.infer<typeof transactionFormSchema>;
 
 export const datePickerFormSchema = z
   .date()
@@ -47,34 +41,6 @@ export const memberFormSchema = z.object({
   joinedAt: datePickerFormSchema,
 });
 
-// Zod schema definition
-export const memberTransactionFormSchema = z.object({
-  fromId: z.string().min(1, { message: "Please select a 'from' member." }),
-  toId: z.string().min(1, { message: "Please select a 'to' member." }),
-  transactionType: z.enum(memberTransactionTypes, {
-    required_error: "Please select a transaction type.",
-    invalid_type_error: "Please select a transaction type.",
-  }),
-  method: z.enum(transactionMethods, {
-    required_error: "Please select a transaction method.",
-    invalid_type_error: "Please select a transaction method.",
-  }),
-  amount: z.preprocess(
-    (val) => Number(val),
-    z.number().min(1, { message: "Amount must be greater than 0." })
-  ),
-  note: z.string().optional(),
-  transactionAt: datePickerFormSchema,
-});
-
-const vendorTransactionTypes = [
-  "PERIODIC_INVEST",
-  "INVEST",
-  "PERIODIC_RETURN",
-  "RETURNS",
-  "PROFIT",
-] as const;
-
 export const vendorFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),
@@ -90,13 +56,31 @@ export const vendorFormSchema = z.object({
   calcReturns: z.boolean().optional(),
 });
 
+const transactionTypes = [
+  "PERIODIC_DEPOSIT",
+  "OFFSET_DEPOSIT",
+  "PERIODIC_RETURN",
+  "WITHDRAW",
+  "REJOIN",
+  "FUNDS_TRANSFER",
+  "INVEST",
+  "RETURNS",
+  "PROFIT",
+] as const;
+
+const vendorType = ["DEFAULT", "LEND"] as const;
+
 // Zod schema definition
-export const vendorTransactionFormSchema = z.object({
-  vendorId: z.string().min(1, { message: "Please select a vendor." }),
-  memberId: z.string().min(1, { message: "Please select a member." }),
-  transactionType: z.enum(vendorTransactionTypes, {
+export const transactionFormSchema = z.object({
+  fromId: z.string().min(1, { message: "Please select a valid input." }),
+  toId: z.string().min(1, { message: "Please select a valid input." }),
+  transactionType: z.enum(transactionTypes, {
     required_error: "Please select a transaction type.",
     invalid_type_error: "Please select a transaction type.",
+  }),
+  vendorType: z.enum(vendorType, {
+    required_error: "Please select a transaction vendor type.",
+    invalid_type_error: "Please select a transaction vendor type.",
   }),
   method: z.enum(transactionMethods, {
     required_error: "Please select a transaction method.",

@@ -10,8 +10,7 @@ export async function POST() {
     // Fetch all data from Prisma models
     const members = await prisma.member.findMany();
     const vendors = await prisma.vendor.findMany();
-    const memberTransactions = await prisma.memberTransaction.findMany();
-    const vendorTransactions = await prisma.vendorTransaction.findMany();
+    const transaction = await prisma.transaction.findMany();
     const vendorProfitShares = await prisma.vendorProfitShare.findMany();
     const passbooks = await prisma.passbook.findMany();
 
@@ -19,8 +18,7 @@ export async function POST() {
     const backupData = {
       members,
       vendors,
-      memberTransactions,
-      vendorTransactions,
+      transaction,
       vendorProfitShares,
       passbooks,
     };

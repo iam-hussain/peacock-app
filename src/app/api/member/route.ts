@@ -109,12 +109,24 @@ export async function POST(request: Request) {
       const vendors = await prisma.vendor.findMany({
         select: { id: true, active: true },
       });
+      await prisma.vendor.findMany({
+        select: { id: true, active: true },
+      });
       // Create a new member
       member = await prisma.member.create({
         data: {
           ...commonData,
           passbook: {
-            create: { type: "MEMBER" },
+            create: {
+              type: "MEMBER",
+              vendor: {
+                create: {
+                  name: "",
+                  slug: "",
+                  type: "HOLD",
+                },
+              },
+            },
           },
           profitShares: {
             createMany: {

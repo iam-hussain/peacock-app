@@ -10,8 +10,8 @@ export default async function Vendors() {
         <Typography variant={"h3"} className="">
           Vendors
         </Typography>
-        <CustomLink href="/dashboard/vendor/transaction" variant={"default"}>
-          Vendor Transactions
+        <CustomLink href="/dashboard/transaction" variant={"default"}>
+          Transactions
         </CustomLink>
       </Box>
       <Box className="bg-background p-4 md:p-6 rounded-md width-avl">

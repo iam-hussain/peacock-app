@@ -3,14 +3,14 @@ import { queryOptions } from "@tanstack/react-query";
 import fetcher from "./fetcher";
 
 import { GetStatisticsResponse } from "@/app/api/dashboard/statistics/route";
+import { GetLoanResponse } from "@/app/api/loan/route";
 import { GetConnectionMemberVendor } from "@/app/api/member/connection/[memberId]/route";
 import { GetMemberResponse } from "@/app/api/member/route";
 import { TransformedMemberSelect } from "@/app/api/member/select/route";
-import { GetMemberTransactionResponse } from "@/app/api/member/transaction/route";
+import { GetTransactionResponse } from "@/app/api/transaction/route";
 import { GetConnectionVendorMember } from "@/app/api/vendor/connection/[vendorId]/route";
 import { GetVendorResponse } from "@/app/api/vendor/route";
 import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
-import { GetVendorTransactionResponse } from "@/app/api/vendor/transaction/route";
 
 const noRefetchConfigs = {
   // refetchOnMount: false,
@@ -38,29 +38,6 @@ export const fetchMemberConnection = (memberId: string) =>
       }) as never as GetConnectionMemberVendor,
     ...noRefetchConfigs,
   });
-
-export const fetchMemberTransactions = (options: any) => {
-  const params = new URLSearchParams({
-    page: options.page.toString(),
-    limit: options.limit.toString(),
-    fromId: options.fromId.trim(),
-    toId: options.toId.trim(),
-    transactionType: options.transactionType.trim(),
-    sortField: options.sortField,
-    sortOrder: options.sortOrder,
-    ...(options?.startDate ? { startDate: options.startDate as any } : {}),
-    ...(options?.endDate ? { endDate: options.endDate as any } : {}),
-  });
-
-  return queryOptions({
-    queryKey: ["member-transaction", options],
-    queryFn: () =>
-      fetcher(`/api/member/transaction?${params.toString()}`, {
-        tags: ["member-transaction"],
-      }) as unknown as GetMemberTransactionResponse,
-    ...noRefetchConfigs,
-  });
-};
 
 export const fetchMembers = () =>
   queryOptions({
@@ -102,7 +79,7 @@ export const fetchVendorConnection = (vendorId: string) =>
     ...noRefetchConfigs,
   });
 
-export const fetchVendorTransactions = (options: any) => {
+export const fetchTransactions = (options: any) => {
   const params = new URLSearchParams({
     page: options.page.toString(),
     limit: options.limit.toString(),
@@ -116,11 +93,11 @@ export const fetchVendorTransactions = (options: any) => {
   });
 
   return queryOptions({
-    queryKey: ["vendor-transaction", options],
+    queryKey: ["transaction", options],
     queryFn: () =>
-      fetcher(`/api/vendor/transaction?${params.toString()}`, {
-        tags: ["vendor-transaction"],
-      }) as unknown as GetVendorTransactionResponse,
+      fetcher(`/api/transaction?${params.toString()}`, {
+        tags: ["fetch-transaction", "all-transaction"],
+      }) as unknown as GetTransactionResponse,
     ...noRefetchConfigs,
   });
 };
@@ -135,12 +112,42 @@ export const fetchVendors = () =>
     ...noRefetchConfigs,
   });
 
-export const fetchVendorsSelect = () =>
+export const fetchAllVendorsSelect = () =>
   queryOptions({
     queryKey: ["vendor-details", "vendors-select"],
     queryFn: () =>
       fetcher("/api/vendor/select", {
         tags: ["vendors-select"],
       }) as never as TransformedVendorSelect[],
+    ...noRefetchConfigs,
+  });
+
+export const fetchLoanSelect = () =>
+  queryOptions({
+    queryKey: ["vendor-details", "vendors-select", "loan-vendors-select"],
+    queryFn: () =>
+      fetcher("/api/vendor/select?type=LEND", {
+        tags: ["vendors-select"],
+      }) as never as TransformedVendorSelect[],
+    ...noRefetchConfigs,
+  });
+
+export const fetchVendorSelect = () =>
+  queryOptions({
+    queryKey: ["vendor-details", "vendors-select", "chit-vendors-select"],
+    queryFn: () =>
+      fetcher("/api/vendor/select?type=DEFAULT-CHIT-BANK", {
+        tags: ["vendors-select"],
+      }) as never as TransformedVendorSelect[],
+    ...noRefetchConfigs,
+  });
+
+export const fetchLoans = () =>
+  queryOptions({
+    queryKey: ["loan-details", "loans"],
+    queryFn: () =>
+      fetcher("/api/loan", {
+        tags: ["vendors"],
+      }) as unknown as GetLoanResponse,
     ...noRefetchConfigs,
   });

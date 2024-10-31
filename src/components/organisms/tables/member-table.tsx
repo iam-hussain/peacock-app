@@ -188,21 +188,19 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
     return data.members.filter((e) => e.active);
   }, [editMode, data]);
 
+  const actionColumn = {
+    accessorKey: "action",
+    header: () => <PlainTableHeader label="Action" />,
+    cell: ({ row }: any) => (
+      <ActionCell onClick={() => handleAction(row.original.member)} />
+    ),
+  };
+
   const columns = useMemo(() => {
     if (!editMode) {
-      return baseColumns;
+      return [...baseColumns, actionColumn];
     }
-    return [
-      ...baseColumns,
-      ...editColumns,
-      {
-        accessorKey: "action",
-        header: () => <PlainTableHeader label="Action" />,
-        cell: ({ row }) => (
-          <ActionCell onClick={() => handleAction(row.original.member)} />
-        ),
-      },
-    ];
+    return [...baseColumns, ...editColumns, actionColumn];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode]);
 

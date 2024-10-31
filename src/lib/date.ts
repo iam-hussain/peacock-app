@@ -83,3 +83,18 @@ export const newDate = (input: any = new Date()) => {
 
   return zonedDate;
 };
+
+export const calculateTimePassed = (startDate: Date, endDate: Date) => {
+  // Calculate total months
+  const monthsPassed = differenceInMonths(endDate, startDate);
+
+  // Calculate remaining days
+  const dateAfterFullMonths = addMonths(startDate, monthsPassed);
+  const daysPassed = differenceInDays(endDate, dateAfterFullMonths);
+
+  return {
+    monthsPassed: Math.abs(monthsPassed),
+    daysPassed: Math.abs(daysPassed),
+    dateAfterFullMonths,
+  };
+};

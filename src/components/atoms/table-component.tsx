@@ -121,6 +121,7 @@ type CommonTableCellProps = {
   subLabel?: string;
   className?: string;
   greenLabel?: boolean;
+  redLabel?: boolean;
 };
 
 export const CommonTableCell = ({
@@ -128,11 +129,13 @@ export const CommonTableCell = ({
   subLabel,
   className,
   greenLabel = false,
+  redLabel = false,
 }: CommonTableCellProps) => (
   <div className={cn("flex flex-col items-start", className)}>
     <p
       className={cn("text-foreground font-medium", {
         "text-emerald-500": greenLabel,
+        "text-rose-500": redLabel,
       })}
     >
       {label}

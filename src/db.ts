@@ -1,50 +1,29 @@
 import {
-  MemberTransaction,
   Prisma,
   PrismaClient,
-  VENDOR_TRANSACTION_TYPE,
-  VendorTransaction,
+  Transaction,
+  TRANSACTION_TYPE,
 } from "@prisma/client";
 
-import {
-  handleMemberPassbookEntry,
-  handleVendorPassbookEntry,
-} from "./passbook/middleware";
+import { handlePassbookEntry } from "./passbook/middleware";
 import { calculateReturnsHandler } from "./passbook/returns-handler";
 
 export const passbookExtends = Prisma.defineExtension({
   name: "Passbook",
   query: {
-    memberTransaction: {
+    transaction: {
       async create({ args, query }) {
         // Execute the original create query
         const created = await query(args);
-        await handleMemberPassbookEntry(created as MemberTransaction);
+        await handlePassbookEntry(created as Transaction);
         return created;
       },
 
       async delete({ args, query }) {
-        const transaction = await prisma.memberTransaction.findUnique(args);
+        const transaction = await prisma.transaction.findUnique(args);
         // Execute the original update query
         const deleted = await query(args);
-        await handleMemberPassbookEntry(transaction as MemberTransaction, true);
-
-        return deleted;
-      },
-    },
-    vendorTransaction: {
-      async create({ args, query }) {
-        // Execute the original create query
-        const created = await query(args);
-        await handleVendorPassbookEntry(created as VendorTransaction);
-        return created;
-      },
-
-      async delete({ args, query }) {
-        const transaction = await prisma.vendorTransaction.findUnique(args);
-        // Execute the original update query
-        const deleted = await query(args);
-        await handleVendorPassbookEntry(transaction as VendorTransaction, true);
+        await handlePassbookEntry(transaction as Transaction, true);
 
         return deleted;
       },
@@ -87,16 +66,14 @@ export const returnsCalculatorExtends = Prisma.defineExtension({
         return deleted;
       },
     },
-    vendorTransaction: {
+    transaction: {
       async create({ args, query }) {
         // Execute the original create query
         const created = await query(args);
         if (
-          [
-            VENDOR_TRANSACTION_TYPE.PERIODIC_RETURN,
-            VENDOR_TRANSACTION_TYPE.RETURNS,
-            VENDOR_TRANSACTION_TYPE.PROFIT,
-          ].includes((created?.transactionType as any) || "")
+          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
+            (created?.transactionType as any) || ""
+          )
         ) {
           await calculateReturnsHandler();
         }
@@ -106,21 +83,17 @@ export const returnsCalculatorExtends = Prisma.defineExtension({
 
       async update({ args, query }) {
         // Execute the original update query
-        const transaction = (await prisma.vendorTransaction.findUnique({
+        const transaction = (await prisma.transaction.findUnique({
           where: args.where,
         })) as any;
         const updated = (await query(args)) as any;
         if (
-          [
-            VENDOR_TRANSACTION_TYPE.PERIODIC_RETURN,
-            VENDOR_TRANSACTION_TYPE.RETURNS,
-            VENDOR_TRANSACTION_TYPE.PROFIT,
-          ].includes(updated?.transactionType || "") ||
-          [
-            VENDOR_TRANSACTION_TYPE.PERIODIC_RETURN,
-            VENDOR_TRANSACTION_TYPE.RETURNS,
-            VENDOR_TRANSACTION_TYPE.PROFIT,
-          ].includes(transaction?.transactionType || "")
+          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
+            updated?.transactionType || ""
+          ) ||
+          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
+            transaction?.transactionType || ""
+          )
         ) {
           await calculateReturnsHandler();
         }
@@ -130,16 +103,14 @@ export const returnsCalculatorExtends = Prisma.defineExtension({
 
       async delete({ args, query }) {
         // Execute the original update query
-        const transaction = (await prisma.vendorTransaction.findUnique({
+        const transaction = (await prisma.transaction.findUnique({
           where: args.where,
         })) as any;
         const deleted = await query(args);
         if (
-          [
-            VENDOR_TRANSACTION_TYPE.PERIODIC_RETURN,
-            VENDOR_TRANSACTION_TYPE.RETURNS,
-            VENDOR_TRANSACTION_TYPE.PROFIT,
-          ].includes(transaction?.transactionType || "")
+          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
+            transaction?.transactionType || ""
+          )
         ) {
           await calculateReturnsHandler();
         }
