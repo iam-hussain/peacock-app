@@ -83,7 +83,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     cell: ({ row }) => (
       <CommonTableCell
         label={moneyFormat(row.original.returns || 0)}
-      // greenLabel={row.original.returns > 0}
+        // greenLabel={row.original.returns > 0}
       />
     ),
   },
