@@ -7,7 +7,6 @@ import {
 } from "./settings";
 
 import prisma from "@/db";
-import { calculateMonthsPaid } from "@/lib/club";
 
 type PassbookConfigActionValueObj = {
   [key in PassbookConfigActionValue]: number;
@@ -39,89 +38,40 @@ function getPassbookUpdateQuery(
   };
 }
 
-const getTractionPassbook = async ({ memberId, vendorId }: Transaction) => {
-  const passbooks = await prisma.passbook.findMany({
-    where: {
-      OR: [
-        {
-          member: {
-            id: memberId,
-          },
-        },
-        {
-          vendor: {
-            id: vendorId,
-          },
-        },
-        { type: "CLUB" },
-      ],
-    },
-    include: {
-      member: {
-        select: {
-          id: true,
-        },
-      },
-      vendor: {
-        select: {
-          id: true,
-        },
-      },
-    },
-  });
+type PassbookToUpdate = Map<
+  string,
+  Parameters<typeof prisma.passbook.update>[0]
+>;
 
-  const result = {
-    MEMBER: passbooks.find((e) => e?.member?.id === memberId) as Passbook,
-    VENDOR: passbooks.find((e) => e?.vendor?.id === vendorId) as Passbook,
-    CLUB: passbooks.find((e) => e.type === "CLUB") as Passbook,
-  };
-
-  // Check if all values exist, otherwise return false
-  if (result.MEMBER && result.VENDOR && result.CLUB) {
-    return result;
-  } else {
-    return false;
-  }
-};
-
-export const handlePassbookEntry = async (
+export const transactionMiddleware = async (
+  passbookToUpdate: PassbookToUpdate,
   transaction: Transaction,
+  transactionPassbooks: { MEMBER: Passbook; VENDOR: Passbook; CLUB: Passbook },
   isRevert: Boolean = false
 ) => {
-  const passbookToUpdate: Parameters<typeof prisma.passbook.update>[0][] = [];
-
-  const passbooks = await getTractionPassbook(transaction);
-  if (!passbooks) {
-    return;
-  }
-
   const values: PassbookConfigActionValueObj = {
     amount: transaction.amount,
     term: 1,
   };
-
-  if (transaction.transactionType === "PERIODIC_DEPOSIT") {
-    values.term =
-      calculateMonthsPaid(passbooks.MEMBER.balance + transaction.amount) -
-      passbooks.MEMBER.currentTerm;
-  }
 
   Object.entries(transactionPassbookSettings).forEach(
     ([transactionType, passbooksOf]) => {
       if (transaction.transactionType === transactionType) {
         Object.entries(passbooksOf).forEach(([passbookOf, action]: any[]) => {
           const currentPassbook =
-            passbooks[passbookOf as "MEMBER" | "VENDOR" | "CLUB"];
+            transactionPassbooks[passbookOf as "MEMBER" | "VENDOR" | "CLUB"];
           if (currentPassbook) {
             if (isRevert) {
-              passbookToUpdate.push(
+              passbookToUpdate.set(
+                currentPassbook.id,
                 getPassbookUpdateQuery(currentPassbook, values, {
                   ADD: action.SUB || {},
                   SUB: action.ADD || {},
                 } as PassbookConfigAction)
               );
             } else {
-              passbookToUpdate.push(
+              passbookToUpdate.set(
+                currentPassbook.id,
                 getPassbookUpdateQuery(
                   currentPassbook,
                   values,
@@ -135,5 +85,5 @@ export const handlePassbookEntry = async (
     }
   );
 
-  await prisma.$transaction(passbookToUpdate.map(prisma.passbook.update));
+  return passbookToUpdate;
 };

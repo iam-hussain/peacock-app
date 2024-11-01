@@ -40,6 +40,8 @@ export type ConnectionMemberVendor = ReturnType<
 
 export type GetConnectionMemberVendor = {
   connections: ConnectionMemberVendor[];
+  loanOffset: number;
+  loanPassbookId: string;
 };
 
 // GET Request to fetch the member's vendor connections
@@ -49,29 +51,45 @@ export async function GET(
 ) {
   const { memberId } = params;
 
-  const connections = await prisma.vendorProfitShare.findMany({
-    where: { memberId },
-    select: {
-      id: true,
-      active: true,
-      vendor: {
-        select: {
-          name: true,
-          active: true,
-          owner: {
-            select: {
-              firstName: true,
-              lastName: true,
-              avatar: true,
+  const [connections, passbook] = await Promise.all([
+    prisma.vendorProfitShare.findMany({
+      where: { memberId },
+      select: {
+        id: true,
+        active: true,
+        vendor: {
+          select: {
+            name: true,
+            active: true,
+            owner: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatar: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.passbook.findFirst({
+      where: {
+        member: {
+          id: memberId,
+        },
+        type: "MEMBER",
+      },
+      select: {
+        loanOffset: true,
+        id: true,
+      },
+    }),
+  ]);
 
   return NextResponse.json({
     connections: connections.map(transformConnectionMemberVendor),
+    loanOffset: passbook?.loanOffset || 0,
+    loanPassbookId: passbook?.id,
   });
 }
 
@@ -81,16 +99,38 @@ export async function POST(
   { params }: { params: { memberId: string } }
 ) {
   const { memberId } = params;
-  const data = await request.json();
+  const { connections, current, loanOffset, loanPassbookId } =
+    await request.json();
 
-  const updates = await Promise.all(
-    data.map((update: { id: string; active: boolean }) =>
+  if (
+    !connections ||
+    !current ||
+    loanOffset ||
+    loanPassbookId ||
+    !Array.isArray(connections)
+  ) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  const updates = await prisma.$transaction([
+    prisma.passbook.update({
+      where: {
+        id: loanPassbookId,
+      },
+      data: {
+        loanOffset,
+      },
+    }),
+    ...connections.map((update: { id: string; active: boolean }) =>
       prisma.vendorProfitShare.update({
         where: { id: update.id, memberId },
         data: { active: update.active },
       })
-    )
-  );
+    ),
+  ]);
 
   return NextResponse.json({ updates });
 }

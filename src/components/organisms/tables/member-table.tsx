@@ -79,6 +79,8 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
           style: "currency",
           currency: "INR",
         })}
+        greenLabel={row.original.balance <= 0}
+        redLabel={row.original.balance > 0}
         subLabel={
           row.original.offsetBalance !== 0
             ? `${row.original.periodBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`

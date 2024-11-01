@@ -82,6 +82,7 @@ model Passbook {
   offsetIn    Float         @default(0)
   in          Float         @default(0)
   out         Float         @default(0)
+  loanOffset  Float         @default(0)
   offset      Float         @default(0)
   returns     Float         @default(0)
   terms       Float         @default(0)

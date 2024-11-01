@@ -56,7 +56,7 @@ export const clubAge = () => {
   };
 };
 
-export const dateFormat = (input: Date) => {
+export const dateFormat = (input: Date | number) => {
   return format(new Date(input), "dd MMM yyyy");
 };
 
@@ -89,12 +89,18 @@ export const calculateTimePassed = (startDate: Date, endDate: Date) => {
   const monthsPassed = differenceInMonths(endDate, startDate);
 
   // Calculate remaining days
-  const dateAfterFullMonths = addMonths(startDate, monthsPassed);
-  const daysPassed = differenceInDays(endDate, dateAfterFullMonths);
+  const recentStartDate = addMonths(startDate, monthsPassed);
+  const daysPassed = differenceInDays(endDate, recentStartDate);
+  const nextStartDate = addMonths(startDate, monthsPassed + 1);
 
   return {
     monthsPassed: Math.abs(monthsPassed),
     daysPassed: Math.abs(daysPassed),
-    dateAfterFullMonths,
+    recentStartDate,
+    nextStartDate,
   };
+};
+
+export const getMonthsPassedString = (months: number, days: number) => {
+  return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;
 };

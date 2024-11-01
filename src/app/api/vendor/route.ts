@@ -2,7 +2,7 @@ import { Passbook, Vendor } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { chitCalculator } from "@/lib/calc";
+import { chitCalculator } from "@/lib/helper";
 
 type VendorToTransform = Vendor & {
   passbook: Passbook;
@@ -52,19 +52,19 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     : "";
 
   const statusData: {
-    nextDueDate: Date | null;
+    nextDueDate: number | null;
     balanceAmount: number;
-    period: string | null;
+    monthsPassedString: string | null;
   } = {
     nextDueDate: null,
     balanceAmount: 0,
-    period: null,
+    monthsPassedString: null,
   };
 
   if (vendor.type === "CHIT") {
     const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
     statusData.nextDueDate = vendor.active ? chitData.nextDueDate : null;
-    statusData.period = chitData.period;
+    statusData.monthsPassedString = chitData.monthsPassedString;
   }
 
   return {

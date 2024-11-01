@@ -152,7 +152,7 @@ export function TransactionForm({
     }
 
     return [members, members];
-  }, [transactionType, vendorType]);
+  }, [transactionType, vendorType, members, vendors]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => fetcher.delete(`/api/transaction/${id}`),

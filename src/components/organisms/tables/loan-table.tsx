@@ -103,13 +103,13 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
 
   {
     accessorKey: "current",
-    header: ({ column }) => (
-      <ActionTableHeader label="Today Balance" column={column} />
-    ),
+    header: ({ column }) => <ActionTableHeader label="Today" column={column} />,
     cell: ({ row }) => (
       <CommonTableCell
         label={moneyFormat(row.original.current)}
-        subLabel={row.original.account > 0 ? dateFormat(new Date()) : undefined}
+        subLabel={
+          row.original.account > 0 ? row.original.monthsPassedString : undefined
+        }
       />
     ),
   },

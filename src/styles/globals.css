@@ -202,10 +202,10 @@ body {
   min-width: 215px;
 }
 
+[data-table="current"],
 [data-table="balance"],
 [data-table="account"],
 [data-table="expected"],
-[data-table="current"],
 [data-table="amount"],
 [data-table="deposit"],
 [data-table="balance"],

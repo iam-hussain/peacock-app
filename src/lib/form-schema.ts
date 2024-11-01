@@ -93,3 +93,19 @@ export const transactionFormSchema = z.object({
   note: z.string().optional(),
   transactionAt: datePickerFormSchema,
 });
+
+// Zod schema definition
+export const memberConnectionFormSchema = z.object({
+  loanOffset: z.preprocess(
+    (val) => Number(val),
+    z
+      .number()
+      .min(0.01, { message: "Reduce profit amount must be greater than 0." })
+  ),
+  connections: z.array(
+    z.object({
+      id: z.string(),
+      active: z.boolean(),
+    })
+  ),
+});

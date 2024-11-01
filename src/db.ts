@@ -1,21 +1,34 @@
+import { Prisma, PrismaClient, Transaction, Vendor } from "@prisma/client";
+
+import { bulkPassbookUpdate } from "./lib/helper";
+import { connectionMiddleware } from "./logic/connection-middleware";
 import {
-  Prisma,
-  PrismaClient,
-  Transaction,
-  TRANSACTION_TYPE,
-} from "@prisma/client";
+  seedTransactionMiddlewareHandler,
+  transactionMiddlewareHandler,
+} from "./logic/middleware";
 
-import { handlePassbookEntry } from "./passbook/middleware";
-import { calculateReturnsHandler } from "./passbook/returns-handler";
-
-export const passbookExtends = Prisma.defineExtension({
-  name: "Passbook",
+export const seedTransactionExtends = Prisma.defineExtension({
+  name: "seedTransactionHandler",
   query: {
     transaction: {
       async create({ args, query }) {
         // Execute the original create query
         const created = await query(args);
-        await handlePassbookEntry(created as Transaction);
+        await seedTransactionMiddlewareHandler(created as Transaction);
+        return created;
+      },
+    },
+  },
+});
+
+export const transactionExtends = Prisma.defineExtension({
+  name: "transactionHandler",
+  query: {
+    transaction: {
+      async create({ args, query }) {
+        // Execute the original create query
+        const created = await query(args);
+        await transactionMiddlewareHandler(created as Transaction);
         return created;
       },
 
@@ -23,7 +36,7 @@ export const passbookExtends = Prisma.defineExtension({
         const transaction = await prisma.transaction.findUnique(args);
         // Execute the original update query
         const deleted = await query(args);
-        await handlePassbookEntry(transaction as Transaction, true);
+        await transactionMiddlewareHandler(transaction as Transaction, true);
 
         return deleted;
       },
@@ -31,105 +44,50 @@ export const passbookExtends = Prisma.defineExtension({
   },
 });
 
-export const returnsCalculatorExtends = Prisma.defineExtension({
-  name: "returnsCalculator",
+export const connectionExtends = Prisma.defineExtension({
+  name: "connectionHandler",
   query: {
+    vendorProfitShare: {
+      async update({ args, query }) {
+        // Execute the original create query
+        const created = await query(args);
+        const passbookToUpdate = await connectionMiddleware();
+        await bulkPassbookUpdate(passbookToUpdate);
+        return created;
+      },
+    },
     member: {
       async create({ args, query }) {
         // Execute the original create query
         const created = await query(args);
-        await calculateReturnsHandler();
+        const passbookToUpdate = await connectionMiddleware();
+        await bulkPassbookUpdate(passbookToUpdate);
         return created;
-      },
-
-      async delete({ args, query }) {
-        // Execute the original update query
-        const deleted = await query(args);
-        await calculateReturnsHandler();
-
-        return deleted;
       },
     },
     vendor: {
       async create({ args, query }) {
         // Execute the original create query
-        const created = await query(args);
-        await calculateReturnsHandler();
-        return created;
-      },
+        const created = (await query(args)) as Vendor;
 
-      async delete({ args, query }) {
-        // Execute the original update query
-        const deleted = await query(args);
-        await calculateReturnsHandler();
-
-        return deleted;
-      },
-    },
-    transaction: {
-      async create({ args, query }) {
-        // Execute the original create query
-        const created = await query(args);
-        if (
-          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
-            (created?.transactionType as any) || ""
-          )
-        ) {
-          await calculateReturnsHandler();
+        if (["DEFAULT", "CHIT", "BANK"].includes(created?.type || "")) {
+          const passbookToUpdate = await connectionMiddleware();
+          await bulkPassbookUpdate(passbookToUpdate);
         }
 
         return created;
       },
 
-      async update({ args, query }) {
-        // Execute the original update query
-        const transaction = (await prisma.transaction.findUnique({
-          where: args.where,
-        })) as any;
-        const updated = (await query(args)) as any;
-        if (
-          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
-            updated?.transactionType || ""
-          ) ||
-          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
-            transaction?.transactionType || ""
-          )
-        ) {
-          await calculateReturnsHandler();
-        }
-
-        return updated;
-      },
-
       async delete({ args, query }) {
-        // Execute the original update query
-        const transaction = (await prisma.transaction.findUnique({
-          where: args.where,
-        })) as any;
-        const deleted = await query(args);
-        if (
-          [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
-            transaction?.transactionType || ""
-          )
-        ) {
-          await calculateReturnsHandler();
-        }
+        const vendor = await prisma.vendor.findUnique(args);
 
-        return deleted;
-      },
-    },
-    vendorProfitShare: {
-      async update({ args, query }) {
-        // Execute the original create query
-        const created = await query(args);
-        await calculateReturnsHandler();
-        return created;
-      },
-      async delete({ args, query }) {
         // Execute the original update query
         const deleted = await query(args);
-        await calculateReturnsHandler();
 
+        if (["DEFAULT", "CHIT", "BANK"].includes(vendor?.type || "")) {
+          const passbookToUpdate = await connectionMiddleware();
+          await bulkPassbookUpdate(passbookToUpdate);
+        }
         return deleted;
       },
     },
@@ -140,8 +98,8 @@ const prismaClientSingleton = () => {
   return new PrismaClient({
     log: ["error"],
   })
-    .$extends(passbookExtends)
-    .$extends(returnsCalculatorExtends);
+    .$extends(transactionExtends)
+    .$extends(connectionExtends);
 };
 
 declare const globalThis: {

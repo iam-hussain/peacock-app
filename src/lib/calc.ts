@@ -7,23 +7,10 @@ import {
 } from "date-fns";
 
 import { clubConfig } from "./config";
+import { calculateTimePassed } from "./date";
 
 const getPeriodString = (months: number, days: number) => {
   return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;
-};
-
-const calculateTimePassed = (startDate: Date, endDate: Date) => {
-  // Calculate total months
-  const monthsPassed = differenceInMonths(endDate, startDate);
-
-  // Calculate remaining days
-  const dateAfterFullMonths = addMonths(startDate, monthsPassed);
-  const daysPassed = differenceInDays(endDate, dateAfterFullMonths);
-
-  return {
-    monthsPassed,
-    daysPassed,
-  };
 };
 
 const getNextDueDate = (start: string | Date, end?: string | Date | null) => {

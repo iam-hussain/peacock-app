@@ -1,10 +1,12 @@
-import { PrismaClient } from "@prisma/client";
+import { Passbook, PrismaClient } from "@prisma/client";
 import { readFileSync } from "fs";
 import path from "path";
 
+import { seedTransactionExtends } from "@/db";
+
 const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],
-});
+}).$extends(seedTransactionExtends);
 
 async function seed() {
   const backupFilePath = path.join(
@@ -43,7 +45,19 @@ async function seed() {
   await prisma.vendor.createMany({ data: [...vendorToCreate, ...loadVendor] });
 
   await prisma.passbook.createMany({
-    data: backupData.passbooks.filter((e: any) => !dupPass.includes(e.id)),
+    data: backupData.passbooks
+      .filter((e: any) => !dupPass.includes(e.id))
+      .map((e: Passbook) => ({
+        id: e.id,
+        type: e.type,
+        calcReturns: e.calcReturns,
+      })),
+  });
+
+  await prisma.vendorProfitShare.createMany({
+    data: backupData.vendorProfitShares.filter(
+      (e: any) => !skipVendors.includes(e.vendorId)
+    ),
   });
 
   const holdingVendors: any = {};
@@ -105,6 +119,10 @@ async function seed() {
         ...ids,
       },
     });
+    // await seedTransactionMiddlewareHandler({
+    //   ...other,
+    //   ...ids,
+    // });
   }
 
   const vendorTrans = backupData.vendorTransactions.map((e: any) => {
@@ -129,14 +147,10 @@ async function seed() {
     return e;
   });
 
-  await prisma.transaction.createMany({
-    data: vendorTrans,
-  });
-  await prisma.vendorProfitShare.createMany({
-    data: backupData.vendorProfitShares.filter(
-      (e: any) => !skipVendors.includes(e.vendorId)
-    ),
-  });
+  for (const trans of vendorTrans) {
+    await prisma.transaction.create(trans.map(({ id, ...e }: any) => e));
+    // await seedTransactionMiddlewareHandler(trans);
+  }
 }
 
 seed()

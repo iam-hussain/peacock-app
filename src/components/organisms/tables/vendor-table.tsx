@@ -65,7 +65,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
       <CommonTableCell
         label={
           row.original.active && row.original.nextDueDate
-            ? dateFormat(new Date(row.original.nextDueDate))
+            ? dateFormat(row.original.nextDueDate)
             : "-"
         }
         subLabel={
@@ -82,7 +82,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     cell: ({ row }) => (
       <CommonTableCell
         label={vendorTypeMap[row.original.type.toString()]}
-        subLabel={row.original.period || ""}
+        subLabel={row.original.monthsPassedString || ""}
       />
     ),
   },

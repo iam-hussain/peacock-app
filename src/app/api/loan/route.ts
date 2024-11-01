@@ -2,7 +2,7 @@ import { Passbook, Vendor } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { calculateTimePassed } from "@/lib/date";
+import { calculateTimePassed, getMonthsPassedString } from "@/lib/date";
 
 type LoanToTransform = Vendor & {
   passbook: Passbook;
@@ -50,7 +50,7 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
   const recentDate = passbook?.date ? new Date(passbook?.date) : undefined;
   const memberName = `${owner?.firstName} ${owner?.lastName || " "}`.trim();
 
-  const addon: any = {
+  const loanData: any = {
     nextDueDate: null,
     invest: passbook.in,
     profit: passbook.out,
@@ -59,21 +59,28 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     expected: passbook.fund || 0,
     expectedMonth: null,
     current: 0,
+    monthsPassedString: "",
   };
 
   if (passbook.offset > 0 && recentDate) {
-    const { monthsPassed, daysPassed, dateAfterFullMonths } =
-      calculateTimePassed(new Date(recentDate), new Date());
+    const { monthsPassed, daysPassed, recentStartDate } = calculateTimePassed(
+      new Date(recentDate),
+      new Date()
+    );
 
     // Interest for months and days
     const interestForMonths = passbook.offset * ONE_MONTH_RATE * monthsPassed;
     const interestForDays =
       passbook.offset * ONE_MONTH_RATE * (daysPassed / 30);
 
-    addon.expected = passbook.fund + interestForMonths;
-    addon.current =
-      passbook.fund + interestForMonths + interestForDays - addon.returns;
-    addon.expectedMonth = dateAfterFullMonths.getTime();
+    loanData.expected = passbook.fund + interestForMonths;
+    loanData.current =
+      passbook.fund + interestForMonths + interestForDays - loanData.returns;
+    loanData.expectedMonth = recentStartDate.getTime();
+    loanData.monthsPassedString = getMonthsPassedString(
+      monthsPassed,
+      daysPassed
+    );
   }
 
   return {
@@ -86,8 +93,8 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     memberAvatar: owner?.avatar ? `/image/${owner.avatar}` : undefined,
     startAt: recentDate ? recentDate.getTime() : undefined,
     active: passbook.offset > 0,
-    balance: addon.expected - passbook.returns,
-    ...addon,
+    balance: loanData.expected - passbook.returns,
+    ...loanData,
     vendor: { ...vendor, calcReturns: passbook.calcReturns },
     details: passbook.addon || [],
   };

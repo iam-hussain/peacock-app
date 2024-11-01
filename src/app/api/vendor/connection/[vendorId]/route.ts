@@ -66,7 +66,7 @@ export async function POST(
   const { vendorId } = params;
   const data = await request.json();
 
-  const updates = await Promise.all(
+  const updates = await prisma.$transaction(
     data.map((update: { id: string; active: boolean }) =>
       prisma.vendorProfitShare.update({
         where: { id: update.id, vendorId },
