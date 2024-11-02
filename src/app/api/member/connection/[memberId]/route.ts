@@ -115,15 +115,16 @@ export async function POST(
     );
   }
 
-  const { _sum } =  await prisma.passbook.aggregate({
-    _sum: {
-      loanOffset: true,
-    },
-    where: {
-      type: "MEMBER",
-      id: { not: loanPassbookId }
-    },
-  }) || {}
+  const { _sum } =
+    (await prisma.passbook.aggregate({
+      _sum: {
+        loanOffset: true,
+      },
+      where: {
+        type: "MEMBER",
+        id: { not: loanPassbookId },
+      },
+    })) || {};
 
   await prisma.$transaction([
     prisma.passbook.update({
@@ -142,12 +143,12 @@ export async function POST(
     ),
     prisma.passbook.updateMany({
       where: {
-        type: "CLUB"
+        type: "CLUB",
       },
       data: {
-        loanOffset: Number(_sum?.loanOffset || 0) + loanOffset
-      }
-    })
+        loanOffset: Number(_sum?.loanOffset || 0) + loanOffset,
+      },
+    }),
   ]);
 
   return NextResponse.json({ connections, loanOffset });
