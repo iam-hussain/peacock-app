@@ -138,8 +138,7 @@ async function getTotalTransactions(filters: any) {
 function transactionTableTransform(transaction: TransactionToTransform) {
   const { vendor, member } = transaction;
   const transformed = createTransformedTransaction(vendor, member, transaction);
-  applySpecialCases(transformed, vendor, transaction);
-  return transformed;
+  return applySpecialCases(transformed, vendor, transaction);
 }
 
 function createTransformedTransaction(
@@ -149,6 +148,13 @@ function createTransformedTransaction(
 ) {
   return {
     from: {
+      id: member.id,
+      name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
+      active: member.active,
+      sub: "",
+      avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+    },
+    to: {
       id: vendor.id,
       name: vendor.name,
       active: vendor.active,
@@ -158,13 +164,6 @@ function createTransformedTransaction(
       avatar: vendor.owner?.avatar
         ? `/image/${vendor.owner.avatar}`
         : undefined,
-    },
-    to: {
-      id: member.id,
-      name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-      active: member.active,
-      sub: "",
-      avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     },
     transactionType: transaction.transactionType,
     transactionAt: transaction.transactionAt,
@@ -176,7 +175,7 @@ function createTransformedTransaction(
     id: transaction.id,
     fromId: transaction.vendorId,
     toId: transaction.memberId,
-    vendorType: vendor.type,
+    vendorType: "DEFAULT",
     original: {
       vendorId: transaction.vendorId,
       vendorMemberId: vendor.owner?.id || null,
@@ -192,47 +191,37 @@ function applySpecialCases(
 ) {
   const { transactionType } = transaction;
   if (vendor.type === "HOLD") {
-    Object.assign(transformed.from, clubData);
+    Object.assign(transformed.to, clubData);
   }
   if (
-    ["RETURNS", "PROFIT", "FUNDS_TRANSFER", "INVEST"].includes(transactionType)
+    ["FUNDS_TRANSFER", "RETURNS", "PROFIT", "INVEST"].includes(transactionType)
   ) {
-    Object.assign(transformed.to, clubData, { sub: transformed.to.name });
+    Object.assign(transformed.from, clubData, { sub: transformed.from.name });
   }
   if (
-    ["PERIODIC_DEPOSIT", "OFFSET_DEPOSIT", "REJOIN", "INVEST"].includes(
-      transactionType
-    )
-  ) {
-    [transformed.from, transformed.to] = [transformed.to, transformed.from];
-  }
-  if (
-    ["PERIODIC_DEPOSIT", "OFFSET_DEPOSIT", "WITHDRAW", "REJOIN"].includes(
-      transactionType
-    ) &&
+    [
+      "PERIODIC_DEPOSIT",
+      "OFFSET_DEPOSIT",
+      "WITHDRAW",
+      "REJOIN",
+      "FUNDS_TRANSFER",
+    ].includes(transactionType) &&
     vendor.owner?.id
   ) {
     transformed.fromId = transaction.memberId;
     transformed.toId = vendor.owner.id;
   }
-  if (
-    (vendor.type === "LEND" || transactionType === "FUNDS_TRANSFER") &&
-    vendor.owner?.id
-  ) {
+  if (["WITHDRAW", "RETURNS", "PROFIT", "INVEST"].includes(transactionType)) {
+    [transformed.from, transformed.to] = [transformed.to, transformed.from];
+  }
+  if (vendor.type === "LEND" && vendor.owner?.id) {
     transformed.fromId = vendor.owner.id;
     transformed.toId = transaction.memberId;
   }
   if (vendor.type === "LEND") {
     transformed.vendorType = "LEND";
   }
-  if (
-    transactionType === "INVEST" &&
-    !["HOLD", "LEND"].includes(vendor.type) &&
-    vendor.owner?.id
-  ) {
-    transformed.toId = vendor.owner.id;
-    transformed.fromId = vendor.owner.id;
-  }
+  return transformed;
 }
 
 export type GetTransactionResponse = {
