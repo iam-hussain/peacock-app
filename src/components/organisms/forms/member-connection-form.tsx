@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -59,7 +60,7 @@ export function MemberConnectionsForm({
   useEffect(() => {
     if (data && data.connections) {
       reset({
-        loanOffset: 0,
+        loanOffset: data.loanOffset || 0,
         connections: data.connections.map((connection) => ({
           id: connection.id,
           active: connection.active,
@@ -78,8 +79,9 @@ export function MemberConnectionsForm({
           loanPassbookId: data?.loanPassbookId,
         },
       }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["connection"] });
+    onSuccess: async (response) => {
+      reset(response);
+      await queryClient.invalidateQueries({ queryKey: ["member-connection"] });
       toast.success("Connections updated successfully");
       onSuccess();
     },
@@ -116,12 +118,12 @@ export function MemberConnectionsForm({
               control={control}
               name="loanOffset"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reduce profit amount</FormLabel>
+                <FormItem className="w-full">
+                  <FormLabel>Amount to reduce loan profit</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Reduce profit amount"
+                      placeholder="Enter amount to reduce loan profit"
                       {...field}
                     />
                   </FormControl>
@@ -130,11 +132,12 @@ export function MemberConnectionsForm({
               )}
             />
           </Box>
-          <Box preset={"row-start"} className="gap-2 flex-wrap">
+          <Separator />
+          <Box preset={"row-center"} className="gap-2 flex-wrap w-full">
             {data?.connections.map((connection, index) => (
               <div
                 key={connection.id}
-                className="flex items-center justify-between border border-input px-2 min-h-[46px] py-1 rounded-md w-full max-w-[225px]"
+                className="flex items-center justify-between border border-input px-2 min-h-[46px] py-1 rounded-md w-full sm:max-w-[225px]"
               >
                 <AvatarCell
                   id={connection.id}

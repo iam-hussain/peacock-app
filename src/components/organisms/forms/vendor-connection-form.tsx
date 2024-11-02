@@ -39,11 +39,12 @@ export function VendorConnectionsForm({
   const mutation = useMutation({
     mutationFn: (data: any) =>
       fetcher.post(`/api/vendor/connection/${vendorId}`, {
-        body: data.connections,
+        body: { connections: data.connections },
       }),
-    onSuccess: async () => {
+    onSuccess: async (response) => {
+      reset(response);
       await queryClient.invalidateQueries({
-        queryKey: ["connection"],
+        queryKey: ["vendor-connection"],
       });
 
       toast.success("Connections updated successfully");

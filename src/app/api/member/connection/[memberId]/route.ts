@@ -104,10 +104,10 @@ export async function POST(
 
   if (
     !connections ||
-    !current ||
-    loanOffset ||
-    loanPassbookId ||
-    !Array.isArray(connections)
+    !loanPassbookId ||
+    !Array.isArray(connections) ||
+    !(typeof loanOffset === "number" && loanOffset >= 0) ||
+    !(typeof current === "number" && current >= 0)
   ) {
     return NextResponse.json(
       { error: "Missing required fields" },
@@ -115,7 +115,7 @@ export async function POST(
     );
   }
 
-  const updates = await prisma.$transaction([
+  await prisma.$transaction([
     prisma.passbook.update({
       where: {
         id: loanPassbookId,
@@ -132,5 +132,5 @@ export async function POST(
     ),
   ]);
 
-  return NextResponse.json({ updates });
+  return NextResponse.json({ connections, loanOffset });
 }

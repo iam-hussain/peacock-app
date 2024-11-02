@@ -64,10 +64,10 @@ export async function POST(
   { params }: { params: { vendorId: string } }
 ) {
   const { vendorId } = params;
-  const data = await request.json();
+  const { connections } = await request.json();
 
   const updates = await prisma.$transaction(
-    data.map((update: { id: string; active: boolean }) =>
+    connections.map((update: { id: string; active: boolean }) =>
       prisma.vendorProfitShare.update({
         where: { id: update.id, vendorId },
         data: { active: update.active },
@@ -75,5 +75,5 @@ export async function POST(
     )
   );
 
-  return NextResponse.json({ updates });
+  return NextResponse.json({ connections });
 }

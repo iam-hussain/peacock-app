@@ -148,7 +148,7 @@ async function seed() {
   });
 
   for (const trans of vendorTrans) {
-    await prisma.transaction.create(trans.map(({ id, ...e }: any) => e));
+    await prisma.transaction.create({ data: trans });
     // await seedTransactionMiddlewareHandler(trans);
   }
 }

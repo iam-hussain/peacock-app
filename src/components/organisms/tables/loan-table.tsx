@@ -60,53 +60,57 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
       />
     ),
   },
-  {
-    accessorKey: "expected",
-    header: ({ column }) => (
-      <ActionTableHeader label="Expected" column={column} />
-    ),
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={moneyFormat(row.original.expected)}
-        subLabel={
-          row.original.expectedMonth
-            ? dateFormat(new Date(row.original.expectedMonth))
-            : undefined
-        }
-      />
-    ),
-  },
+  // {
+  //   accessorKey: "expected",
+  //   header: ({ column }) => (
+  //     <ActionTableHeader label="Expected" column={column} />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <CommonTableCell
+  //       label={moneyFormat(row.original.expected)}
+  //       subLabel={
+  //         row.original.expectedMonth
+  //           ? dateFormat(new Date(row.original.expectedMonth))
+  //           : undefined
+  //       }
+  //     />
+  //   ),
+  // },
+
+  // {
+  //   accessorKey: "returns",
+  //   header: ({ column }) => <ActionTableHeader label="Paid" column={column} />,
+  //   cell: ({ row }) => (
+  //     <CommonTableCell
+  //       label={moneyFormat(row.original.returns || 0)}
+  //       // greenLabel={row.original.returns > 0}
+  //     />
+  //   ),
+  // },
+  // {
+  //   accessorKey: "balance",
+  //   header: ({ column }) => (
+  //     <ActionTableHeader label="Balance" column={column} />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <CommonTableCell
+  //       label={moneyFormat(row.original.balance)}
+  //       greenLabel={row.original.balance <= 0}
+  //       redLabel={row.original.balance > 0}
+  //     />
+  //   ),
+  // },
 
   {
-    accessorKey: "returns",
-    header: ({ column }) => <ActionTableHeader label="Paid" column={column} />,
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={moneyFormat(row.original.returns || 0)}
-        // greenLabel={row.original.returns > 0}
-      />
-    ),
-  },
-  {
-    accessorKey: "balance",
+    accessorKey: "current",
     header: ({ column }) => (
       <ActionTableHeader label="Balance" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={moneyFormat(row.original.balance)}
-        greenLabel={row.original.balance <= 0}
-        redLabel={row.original.balance > 0}
-      />
-    ),
-  },
-
-  {
-    accessorKey: "current",
-    header: ({ column }) => <ActionTableHeader label="Today" column={column} />,
-    cell: ({ row }) => (
-      <CommonTableCell
         label={moneyFormat(row.original.current)}
+        greenLabel={row.original.current <= 0}
+        redLabel={row.original.current > 0}
         subLabel={
           row.original.account > 0 ? row.original.monthsPassedString : undefined
         }
