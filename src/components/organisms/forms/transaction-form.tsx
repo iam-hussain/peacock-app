@@ -62,8 +62,8 @@ export function TransactionForm({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: selected
       ? {
-          fromId: selected.fromId || "",
-          toId: selected.toId || "",
+          fromId: selected?.fromId || "",
+          toId: selected?.toId || "",
           transactionType: selected.transactionType as any,
           vendorType: (selected?.vendorType as any) || "DEFAULT",
           method: (selected.method as any) || "ACCOUNT",
@@ -92,63 +92,46 @@ export function TransactionForm({
     if (["INVEST", "PROFIT", "RETURNS"].includes(transactionType)) {
       return true;
     }
+    form.setValue("vendorType", "DEFAULT");
     return false;
   }, [transactionType]);
 
   const formToLabels = useMemo(() => {
-    if (
-      ["PERIODIC_DEPOSIT", "OFFSET_DEPOSIT", "REJOIN", "WITHDRAW"].includes(
-        transactionType
-      )
-    ) {
-      return ["Member", "Club"];
+    if (transactionType === "WITHDRAW") {
+      return ["Club - FROM", "Member - TO"];
     }
     if (["FUNDS_TRANSFER"].includes(transactionType)) {
-      return ["Club Sender", "Club Receiver"];
+      return ["Club - FROM", "Club - TO"];
     }
 
-    if (
-      ["INVEST", "PROFIT", "RETURNS"].includes(transactionType) &&
-      vendorType === "DEFAULT"
-    ) {
-      return ["Vendor", "Club"];
+    if (["PROFIT", "RETURNS"].includes(transactionType)) {
+      if (vendorType === "LEND") {
+        return ["Loan - FROM", "Club - TO"];
+      }
+      return ["Vendor - FROM", "Club - TO"];
     }
 
-    if (
-      ["INVEST", "PROFIT", "RETURNS"].includes(transactionType) &&
-      vendorType === "LEND"
-    ) {
-      return ["Loan", "Club"];
+    if (transactionType === "INVEST") {
+      if (vendorType === "LEND") {
+        return ["Club - FROM", "Loan - TO"];
+      }
+
+      return ["Club - FROM", "Vendor - TO"];
     }
 
-    return ["Member", "Club"];
+    return ["Member - FROM", "Club - TO"];
   }, [transactionType, vendorType]);
 
   const formToValues = useMemo(() => {
     if (
-      [
-        "PERIODIC_DEPOSIT",
-        "OFFSET_DEPOSIT",
-        "REJOIN",
-        "WITHDRAW",
-        "FUNDS_TRANSFER",
-      ].includes(transactionType)
-    ) {
-      return [members, members];
-    }
-
-    if (
-      ["INVEST", "PROFIT", "RETURNS"].includes(transactionType) &&
+      ["PROFIT", "RETURNS"].includes(transactionType) &&
       vendorType === "DEFAULT"
     ) {
       return [vendors, members];
     }
 
-    if (
-      ["INVEST", "PROFIT", "RETURNS"].includes(transactionType) &&
-      vendorType === "LEND"
-    ) {
-      return [members, members];
+    if (transactionType === "INVEST" && vendorType === "DEFAULT") {
+      return [members, vendors];
     }
 
     return [members, members];

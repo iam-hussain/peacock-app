@@ -34,7 +34,8 @@ export function calculateInterest(
   let invested = 0;
   let returned = 0;
   let account = 0;
-  let lastTransactionDate: any;
+  let recentInvest: any;
+  let recentReturns: any;
   let paid = 0;
   let interest = 0;
   let balance = 0;
@@ -48,13 +49,14 @@ export function calculateInterest(
       invested += amount;
       account += amount;
 
-      if (!lastTransactionDate) {
-        lastTransactionDate = date.toISOString().split("T")[0];
+      if (!recentReturns) {
+        recentReturns = date.toISOString().split("T")[0];
       }
+      recentInvest = date.toISOString().split("T")[0];
     }
     if (transactionType === "RETURNS") {
       const { monthsPassed, daysPassed } = calculateTimePassed(
-        new Date(lastTransactionDate),
+        new Date(recentReturns),
         date
       );
 
@@ -68,20 +70,21 @@ export function calculateInterest(
       detailsList.push({
         active: false,
         amount: account,
-        startDate: lastTransactionDate,
+        startDate: recentReturns,
+        investDate: recentInvest,
         endDate: date.toISOString().split("T")[0],
         interestAmount,
         monthsPassed,
         daysPassed,
       });
 
-      lastTransactionDate = date.toISOString().split("T")[0];
+      recentReturns = date.toISOString().split("T")[0];
 
       account -= amount;
       returned += amount;
 
       if (returned === invested) {
-        lastTransactionDate = null;
+        recentReturns = null;
       }
     }
 
@@ -90,9 +93,9 @@ export function calculateInterest(
     }
   });
 
-  if (account > 0 && lastTransactionDate) {
+  if (account > 0 && recentReturns) {
     const { monthsPassed, daysPassed } = calculateTimePassed(
-      new Date(lastTransactionDate),
+      new Date(recentReturns),
       new Date()
     );
     // Interest for months and days
@@ -102,7 +105,8 @@ export function calculateInterest(
     detailsList.push({
       active: true,
       amount: account,
-      startDate: lastTransactionDate,
+      startDate: recentReturns,
+      investDate: recentInvest,
       interestAmount: interestAmount,
       monthsPassed,
       daysPassed,
@@ -117,7 +121,8 @@ export function calculateInterest(
     paid,
     account: Math.abs(account),
     balance,
-    lastTransactionDate,
+    recentReturns,
+    recentInvest,
     interest,
     detailsList,
   };
@@ -126,7 +131,7 @@ export function calculateInterest(
 function handleCalculateInterestMap(
   transactions: Awaited<ReturnType<typeof fetchLoanTransaction>>,
   passbookId: string
-) {
+): Parameters<typeof prisma.passbook.update>[0] {
   const interestData = calculateInterest(transactions);
 
   return {
@@ -137,8 +142,11 @@ function handleCalculateInterestMap(
       returns: interestData.paid,
       offset: interestData.account,
       balance: interestData.balance,
-      date: interestData.lastTransactionDate
-        ? new Date(interestData.lastTransactionDate)
+      recentDate: interestData.recentReturns
+        ? new Date(interestData.recentReturns)
+        : undefined,
+      lastDate: interestData.recentInvest
+        ? new Date(interestData.recentInvest)
         : undefined,
       addon: interestData.detailsList,
       fund: interestData.interest || 0,

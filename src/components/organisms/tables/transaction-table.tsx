@@ -245,14 +245,18 @@ const TransactionTable = ({
         <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full mb-4">
           <SelectInputGroup
             value={options.vendorId}
-            onChange={(e) => setOptions({ ...options, vendorId: e, page: 1 })}
+            onChange={(e) =>
+              setOptions({ ...options, vendorId: e, page: 1, memberId: "" })
+            }
             placeholder="Select VENDOR"
             options={vendors.map((each) => [each.id, each.name])}
           />
 
           <SelectInputGroup
             value={options.memberId}
-            onChange={(e) => setOptions({ ...options, memberId: e, page: 1 })}
+            onChange={(e) =>
+              setOptions({ ...options, memberId: e, page: 1, vendorId: "" })
+            }
             placeholder="Select MEMBER"
             options={members.map((each) => [each.id, each.name])}
           />

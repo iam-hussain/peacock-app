@@ -90,7 +90,8 @@ model Passbook {
   calcReturns Boolean       @default(true)
   balance     Float         @default(0)
   fund        Float         @default(0)
-  date        DateTime?
+  recentDate  DateTime?
+  lastDate    DateTime?
   addon       Json?
   member      Member?
   vendor      Vendor?

@@ -15,13 +15,15 @@ type PassbookConfigActionValueObj = {
 function getPassbookUpdateQuery(
   passbook: Passbook,
   values: PassbookConfigActionValueObj,
-  action: PassbookConfigAction
+  action: PassbookConfigAction,
+  addonData: Parameters<typeof prisma.passbook.update>[0]["data"] = {}
 ): Parameters<typeof prisma.passbook.update>[0] {
   return {
     where: {
       id: passbook.id,
     },
     data: {
+      ...addonData,
       ...Object.fromEntries(
         Object.entries(action.ADD || {}).map(([key, value]) => [
           key,
@@ -61,13 +63,22 @@ export const transactionMiddleware = async (
           const currentPassbook =
             transactionPassbooks[passbookOf as "MEMBER" | "VENDOR" | "CLUB"];
           if (currentPassbook) {
+            const passbookData = passbookToUpdate.get(currentPassbook.id) || {
+              where: { id: currentPassbook.id },
+              data: {},
+            };
             if (isRevert) {
               passbookToUpdate.set(
                 currentPassbook.id,
-                getPassbookUpdateQuery(currentPassbook, values, {
-                  ADD: action.SUB || {},
-                  SUB: action.ADD || {},
-                } as PassbookConfigAction)
+                getPassbookUpdateQuery(
+                  currentPassbook,
+                  values,
+                  {
+                    ADD: action.SUB || {},
+                    SUB: action.ADD || {},
+                  } as PassbookConfigAction,
+                  passbookData.data
+                )
               );
             } else {
               passbookToUpdate.set(
@@ -75,7 +86,8 @@ export const transactionMiddleware = async (
                 getPassbookUpdateQuery(
                   currentPassbook,
                   values,
-                  action as PassbookConfigAction
+                  action as PassbookConfigAction,
+                  passbookData.data
                 )
               );
             }

@@ -42,6 +42,22 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     ),
   },
   {
+    accessorKey: "recentInvest",
+    header: ({ column }) => (
+      <ActionTableHeader label="Invested" column={column} />
+    ),
+    cell: ({ row }) => (
+      <CommonTableCell
+        label={row.original.account > 0 ? row.original.recentInvest : "-"}
+        subLabel={
+          row.original.account > 0
+            ? dateFormat(new Date(row.original.investAt))
+            : undefined
+        }
+      />
+    ),
+  },
+  {
     accessorKey: "account",
     header: ({ column }) => (
       <ActionTableHeader label="Account" column={column} />
@@ -102,17 +118,17 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
   // },
 
   {
-    accessorKey: "current",
+    accessorKey: "balance",
     header: ({ column }) => (
       <ActionTableHeader label="Balance" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={moneyFormat(row.original.current)}
-        greenLabel={row.original.current <= 0}
-        redLabel={row.original.current > 0}
+        label={moneyFormat(row.original.balance)}
+        greenLabel={row.original.balance <= 0}
+        redLabel={row.original.balance > 0}
         subLabel={
-          row.original.account > 0 ? row.original.monthsPassedString : undefined
+          row.original.account > 0 ? row.original.recentReturns : undefined
         }
       />
     ),

@@ -29,7 +29,9 @@ const VendorAction = () => {
       <GenericModal
         title={selected ? "Update Vendor" : "Add Vendor"}
         description={
-          selected ? `Vendor ID: ${selected.name} [${selected.id}]` : undefined
+          selected
+            ? `Vendor ID: ${selected.name} - [${selected.id}]`
+            : undefined
         }
       >
         {selected && selected.id ? (

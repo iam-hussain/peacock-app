@@ -186,7 +186,10 @@ body {
   min-width: 200px;
 }
 
-[data-table="nextDueDate"] [data-table="startAt"] [data-table="amount"] {
+[data-table="recentInvest"],
+[data-table="nextDueDate"],
+[data-table="startAt"],
+[data-table="amount"] {
   min-width: 140px;
 }
 

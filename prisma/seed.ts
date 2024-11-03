@@ -5,7 +5,7 @@ import path from "path";
 import { seedTransactionExtends } from "@/db";
 
 const prisma = new PrismaClient({
-  log: ["query", "info", "warn", "error"],
+  log: ["error"],
 }).$extends(seedTransactionExtends);
 
 async function seed() {
@@ -65,8 +65,8 @@ async function seed() {
   for (const memberTrans of backupData.memberTransactions) {
     const { fromId, toId, ...other } = memberTrans;
     const ids = {
-      vendorId: toId,
       memberId: fromId,
+      vendorId: toId,
     };
 
     if (["WITHDRAW"].includes(other.transactionType)) {

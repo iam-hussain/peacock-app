@@ -31,7 +31,10 @@ function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number
 ) {
-  const offsetBalance = member.passbook.offset - member.passbook.offsetIn;
+  const offsetBalance =
+    member.passbook.offset +
+    member.passbook.loanOffset -
+    member.passbook.offsetIn;
   const periodBalance =
     memberTotalDeposit - (member.passbook.periodIn - member.passbook.out);
   const deposit = member.passbook.periodIn + member.passbook.offsetIn;

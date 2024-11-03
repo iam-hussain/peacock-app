@@ -2,8 +2,8 @@ import { Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { loanCalculator } from "@/lib/calc";
 import { calculateTotalDeposit, clubMonthsFromStart } from "@/lib/club";
+import { calculateTimePassed } from "@/lib/date";
 
 export async function GET() {
   const statistics = await prisma.passbook.findMany({
@@ -13,9 +13,9 @@ export async function GET() {
           type: "CLUB",
         },
         {
+          type: "VENDOR",
           vendor: {
             type: "LEND",
-            active: true,
           },
         },
       ],
@@ -36,45 +36,53 @@ export async function GET() {
     },
   });
   const club = statistics.find((e) => e.type === "CLUB");
-  const vendors = statistics.filter((e) => e.type !== "CLUB" && e.vendor);
+  const loans = statistics.filter((e) => e.type !== "CLUB" && e.vendor);
   if (!club) {
     throw new Error("Invalid club statistics");
   }
 
   return NextResponse.json({
     success: true,
-    statistics: statisticsTransform(club, membersCount, vendors),
+    statistics: statisticsTransform(club, membersCount, loans),
   });
 }
+
+const ONE_MONTH_RATE = 0.01;
 
 function statisticsTransform(
   statistics: Passbook,
   membersCount: number,
-  vendors: ({
+  loans: ({
     vendor: {
       startAt: Date;
       endAt: Date | null;
     } | null;
   } & Passbook)[]
 ) {
-  const loadBalance = vendors
-    .map(({ vendor, ...passbook }) => {
-      if (!vendor) {
-        return 0;
-      }
-      const { totalAmount } = loanCalculator(
-        passbook.in,
-        vendor.startAt,
-        vendor?.endAt
-      );
+  const loadBalance = loans
+    .map((passbook) => {
+      if (passbook.offset > 0 && passbook.recentDate) {
+        const { monthsPassed, daysPassed } = calculateTimePassed(
+          new Date(passbook.recentDate),
+          new Date()
+        );
+        const interestForMonths =
+          passbook.offset * ONE_MONTH_RATE * monthsPassed;
+        const interestForDays =
+          passbook.offset * ONE_MONTH_RATE * (daysPassed / 30);
 
-      return totalAmount > 0 ? totalAmount - passbook.out : 0;
+        return (
+          passbook.fund + interestForMonths + interestForDays - passbook.returns
+        );
+      }
+      return passbook.fund - passbook.returns;
     })
     .reduce((a, b) => a + b, 0);
 
   const currentIn = statistics.in - statistics.out;
   const totalDeposit = calculateTotalDeposit(membersCount) + 36000;
-  const offsetBalance = statistics.offset - statistics.offsetIn;
+  const offsetBalance =
+    statistics.offset + statistics.loanOffset - statistics.offsetIn;
   const netAmount = currentIn + statistics.returns;
   const netValue =
     totalDeposit + statistics.returns + statistics.offset + loadBalance;

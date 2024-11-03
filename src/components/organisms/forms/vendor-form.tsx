@@ -126,63 +126,6 @@ export function VendorForm({
             )}
           />
 
-          {/* Slug */}
-          <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Slug</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Vendor slug" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Box>
-        <Box preset={"grid-split"}>
-          {/* Terms */}
-          {/* <FormField
-                        control={form.control}
-                        name="terms"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Terms</FormLabel>
-                                <FormControl>
-                                    <Input type="number" {...field} placeholder="Terms" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    /> */}
-
-          {/* Owner */}
-          <FormField
-            control={form.control}
-            name="ownerId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Owner</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select owner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {members.map((member) => (
-                        <SelectItem key={member.id} value={member.id}>
-                          {member.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* Type */}
           <FormField
             control={form.control}
@@ -210,7 +153,64 @@ export function VendorForm({
               </FormItem>
             )}
           />
-          {/* Term Type
+        </Box>
+        {/* <Box preset={"grid-split"}>
+          Terms 
+          <FormField
+                        control={form.control}
+                        name="terms"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Terms</FormLabel>
+                                <FormControl>
+                                    <Input type="number" {...field} placeholder="Terms" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+          Owner 
+          <FormField
+            control={form.control}
+            name="ownerId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Owner</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select owner" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {members.map((member) => (
+                        <SelectItem key={member.id} value={member.id}>
+                          {member.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          Slug 
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Vendor slug" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          Term Type 
                     <FormField
                         control={form.control}
                         name="termType"
@@ -234,8 +234,8 @@ export function VendorForm({
                                 <FormMessage />
                             </FormItem>
                         )}
-                    /> */}
-        </Box>
+                    />
+        </Box> */}
 
         <Box preset={"grid-split"}>
           {/* Start Date */}

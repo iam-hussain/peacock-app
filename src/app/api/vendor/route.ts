@@ -1,4 +1,5 @@
 import { Passbook, Vendor } from "@prisma/client";
+import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
@@ -118,7 +119,7 @@ export async function POST(request: Request) {
 
     const commonData = {
       name,
-      slug: slug || name.toLowerCase().trim().replace(" ", "_"),
+      slug: nanoid(8) || slug || name.toLowerCase().trim().replace(" ", "_"),
       terms: terms ?? 0,
       type: type ?? "DEFAULT",
       ownerId: ownerId || undefined,

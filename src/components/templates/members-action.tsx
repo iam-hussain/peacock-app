@@ -26,7 +26,11 @@ const MemberAction = () => {
       <MembersTable handleAction={handleAction} />
       <GenericModal
         title={selected ? "Update Member" : "Add Member"}
-        description={selected ? `Member ID: ${selected.id}` : undefined}
+        description={
+          selected
+            ? `Member ID: ${selected.firstName} ${selected?.lastName || ""} - [${selected.id}]`.trim()
+            : undefined
+        }
       >
         {selected && selected.id ? (
           <Tabs defaultValue="details" className="w-full">
