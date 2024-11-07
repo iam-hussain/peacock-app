@@ -27,13 +27,13 @@ function getPassbookUpdateQuery(
       ...Object.fromEntries(
         Object.entries(action.ADD || {}).map(([key, value]) => [
           key,
-          Number(passbook[key as keyof Passbook]) + values[value],
+          Number(passbook[key as keyof Passbook] || 0) + values[value],
         ])
       ),
       ...Object.fromEntries(
         Object.entries(action.SUB || {}).map(([key, value]) => [
           key,
-          Number(passbook[key as keyof Passbook]) - values[value],
+          Number(passbook[key as keyof Passbook] || 0) - values[value],
         ])
       ),
     },

@@ -15,6 +15,7 @@ export async function GET() {
     // Return the file path
     return NextResponse.json({ success: true, data: passbookToUpdate });
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ success: false, error: error }, { status: 500 });
   }
 }

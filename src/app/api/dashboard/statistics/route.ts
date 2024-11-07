@@ -91,7 +91,7 @@ function statisticsTransform(
     membersCount,
     totalMonths: clubMonthsFromStart(),
     deposit: currentIn - statistics.offsetIn,
-    balance: totalDeposit - currentIn + offsetBalance,
+    balance: (totalDeposit - currentIn) + offsetBalance,
     offset: statistics.offset,
     offsetIn: statistics.offsetIn,
     offsetBalance,
