@@ -1,292 +1,168 @@
-import { Passbook, TRANSACTION_TYPE } from "@prisma/client";
+import { ClubPassbookData, MemberPassbookData, VendorPassbookData } from "@/lib/type";
+import { TRANSACTION_TYPE } from "@prisma/client";
 
 export type TransactionPassbookConfig = {
-  [key in TRANSACTION_TYPE]: {
-    [key in "MEMBER" | "VENDOR" | "CLUB"]: PassbookConfigAction;
-  };
+  [key in TRANSACTION_TYPE]: PassbookConfigAction;
 };
+
 export type PassbookConfigAction = {
-  [key in "ADD" | "SUB"]?: {
-    [key in keyof Passbook]?: PassbookConfigActionValue;
-  };
-};
+  "FROM" : {
+    [key in "ADD" | "SUB"]?: {
+      [key in keyof MemberPassbookData | keyof VendorPassbookData]?: PassbookConfigActionValue
+    }
+  },
+  "TO" : {
+    [key in "ADD" | "SUB"]?: {
+      [key in keyof MemberPassbookData | keyof VendorPassbookData]?: PassbookConfigActionValue
+    }
+  },
+  "CLUB" : {
+    [key in "ADD" | "SUB"]?: {
+      [key in keyof ClubPassbookData]?: PassbookConfigActionValue
+    }
+  }
+}
 
-export type PassbookConfigActionValue = "amount" | "term";
+export type PassbookConfigActionValue = "AMOUNT" | "TERM" | "PROFIT";
+
 
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
-    MEMBER: {
+    FROM: {
       ADD: {
-        periodIn: "amount",
-        in: "amount",
-        balance: "amount",
-        currentTerm: "term",
+        periodicDepositAmount: "AMOUNT",
+        totalDepositAmount: "AMOUNT",
+        accountBalance: "AMOUNT",
       },
     },
-    VENDOR: { ADD: { fund: "amount" } },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
       ADD: {
-        periodIn: "amount",
-        in: "amount",
-        balance: "amount",
-        fund: "amount",
+        totalMemberPeriodicDeposits: "AMOUNT",
+        currentClubBalance: "AMOUNT",
+        netClubBalance: "AMOUNT",
       },
     },
   },
   OFFSET_DEPOSIT: {
-    MEMBER: {
-      ADD: { offsetIn: "amount", in: "amount", balance: "amount" },
+    FROM: {
+      ADD: { 
+        offsetDepositAmount: "AMOUNT", 
+        totalDepositAmount: "AMOUNT", 
+        accountBalance: "AMOUNT" },
     },
-    VENDOR: { ADD: { fund: "amount" } },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
       ADD: {
-        offsetIn: "amount",
-        in: "amount",
-        balance: "amount",
-        fund: "amount",
+        totalMemberOffsetDeposits: "AMOUNT",
+        currentClubBalance: "AMOUNT",
+        netClubBalance: "AMOUNT",
       },
     },
   },
   WITHDRAW: {
-    VENDOR: { SUB: { fund: "amount" } },
-    MEMBER: {
-      ADD: { out: "amount" },
+    FROM: { SUB: { clubHeldAmount: "AMOUNT" } },
+    TO: {
+      ADD: { withdrawalAmount: "AMOUNT" },
       SUB: {
-        balance: "amount",
+        accountBalance: "AMOUNT",
       },
     },
     CLUB: {
-      ADD: { out: "amount" },
+      ADD: { totalMemberWithdrawals: "AMOUNT" },
       SUB: {
-        balance: "amount",
-        fund: "amount",
+        currentClubBalance: "AMOUNT",
+        netClubBalance: "AMOUNT",
       },
     },
   },
   REJOIN: {
-    MEMBER: {
-      SUB: { out: "amount" },
+    FROM: {
+      SUB: { withdrawalAmount: "AMOUNT" },
       ADD: {
-        balance: "amount",
+        accountBalance: "AMOUNT",
       },
     },
-    VENDOR: { ADD: { fund: "amount", balance: "amount" } },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
       ADD: {
-        balance: "amount",
-        fund: "amount",
+        currentClubBalance: "AMOUNT",
+        netClubBalance: "AMOUNT",
       },
-      SUB: { out: "amount" },
+      SUB: { totalMemberWithdrawals: "AMOUNT" },
     },
   },
   FUNDS_TRANSFER: {
-    MEMBER: {
+    FROM: {
       SUB: {
-        fund: "amount",
+        clubHeldAmount: "AMOUNT",
       },
     },
-    VENDOR: {
+    TO: {
       ADD: {
-        fund: "amount",
+        clubHeldAmount: "AMOUNT",
       },
     },
     CLUB: {},
   },
   INVEST: {
-    MEMBER: {
+    FROM: {
       SUB: {
-        fund: "amount",
+        clubHeldAmount: "AMOUNT",
       },
     },
-    VENDOR: {
+    TO: {
       ADD: {
-        in: "amount",
-        fund: "amount",
-      },
-      SUB: {
-        returns: "amount",
+        totalInvestment: "AMOUNT",
+        accountBalance: "AMOUNT",
       },
     },
     CLUB: {
+      ADD: {
+        totalInvestment: "AMOUNT",
+      },
       SUB: {
-        balance: "amount",
+        currentClubBalance: "AMOUNT",
       },
     },
   },
   RETURNS: {
-    MEMBER: {
+    FROM: {
       ADD: {
-        fund: "amount",
+        totalReturns: "AMOUNT",
       },
+      SUB: {
+        accountBalance: "AMOUNT",
+      }
     },
-    VENDOR: {
+    TO: {
       ADD: {
-        out: "amount",
-        balance: "amount",
-        returns: "amount",
+        clubHeldAmount: "AMOUNT",
       },
     },
     CLUB: {
       ADD: {
-        balance: "amount",
+        currentClubBalance: "AMOUNT",
+        totalReturns: "AMOUNT"
       },
     },
   },
   PROFIT: {
-    MEMBER: {
+    FROM: {
       ADD: {
-        fund: "amount",
+        profitEarned: "AMOUNT",
       },
     },
-    VENDOR: {
+    TO: {
       ADD: {
-        out: "amount",
-        balance: "amount",
+        clubHeldAmount: "AMOUNT",
       },
     },
     CLUB: {
       ADD: {
-        balance: "amount",
-      },
-    },
-  },
-};
-
-
-
-export const transactionPassbookSettings: TransactionPassbookConfig = {
-  PERIODIC_DEPOSIT: {
-    MEMBER: {
-      ADD: {
-        deposit: "amount",
-        totalDeposit: "amount",
-        currentBalance: "amount",
-      },
-    },
-    VENDOR: { ADD: { clubFund: "amount" } },
-    CLUB: {
-      ADD: {
-        periodIn: "amount",
-        in: "amount",
-        balance: "amount",
-        fund: "amount",
-      },
-    },
-  },
-  OFFSET_DEPOSIT: {
-    MEMBER: {
-      ADD: { offsetIn: "amount", in: "amount", balance: "amount" },
-    },
-    VENDOR: { ADD: { fund: "amount" } },
-    CLUB: {
-      ADD: {
-        offsetIn: "amount",
-        in: "amount",
-        balance: "amount",
-        fund: "amount",
-      },
-    },
-  },
-  WITHDRAW: {
-    VENDOR: { SUB: { fund: "amount" } },
-    MEMBER: {
-      ADD: { out: "amount" },
-      SUB: {
-        balance: "amount",
-      },
-    },
-    CLUB: {
-      ADD: { out: "amount" },
-      SUB: {
-        balance: "amount",
-        fund: "amount",
-      },
-    },
-  },
-  REJOIN: {
-    MEMBER: {
-      SUB: { out: "amount" },
-      ADD: {
-        balance: "amount",
-      },
-    },
-    VENDOR: { ADD: { fund: "amount", balance: "amount" } },
-    CLUB: {
-      ADD: {
-        balance: "amount",
-        fund: "amount",
-      },
-      SUB: { out: "amount" },
-    },
-  },
-  FUNDS_TRANSFER: {
-    MEMBER: {
-      SUB: {
-        fund: "amount",
-      },
-    },
-    VENDOR: {
-      ADD: {
-        fund: "amount",
-      },
-    },
-    CLUB: {},
-  },
-  INVEST: {
-    MEMBER: {
-      SUB: {
-        fund: "amount",
-      },
-    },
-    VENDOR: {
-      ADD: {
-        in: "amount",
-        fund: "amount",
-      },
-      SUB: {
-        returns: "amount",
-      },
-    },
-    CLUB: {
-      SUB: {
-        balance: "amount",
-      },
-    },
-  },
-  RETURNS: {
-    MEMBER: {
-      ADD: {
-        fund: "amount",
-      },
-    },
-    VENDOR: {
-      ADD: {
-        out: "amount",
-        balance: "amount",
-        returns: "amount",
-      },
-    },
-    CLUB: {
-      ADD: {
-        balance: "amount",
-      },
-    },
-  },
-  PROFIT: {
-    MEMBER: {
-      ADD: {
-        fund: "amount",
-      },
-    },
-    VENDOR: {
-      ADD: {
-        out: "amount",
-        balance: "amount",
-      },
-    },
-    CLUB: {
-      ADD: {
-        balance: "amount",
+        totalProfit: "AMOUNT",
+        currentClubBalance: "AMOUNT",
+        netClubBalance: "AMOUNT",
       },
     },
   },

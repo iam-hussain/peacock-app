@@ -8,14 +8,14 @@ import {
 
 import prisma from "@/db";
 
-type PassbookConfigActionValueObj = {
+type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
 };
 
 function getPassbookUpdateQuery(
   passbook: Passbook,
-  values: PassbookConfigActionValueObj,
-  action: PassbookConfigAction,
+  values: PassbookConfigActionValueMap,
+  action: PassbookConfigAction['CLUB'] | PassbookConfigAction['FROM'] | PassbookConfigAction['TO'],
   addonData: Parameters<typeof prisma.passbook.update>[0]["data"] = {}
 ): Parameters<typeof prisma.passbook.update>[0] {
   return {
@@ -51,9 +51,11 @@ export const transactionMiddleware = async (
   transactionPassbooks: { MEMBER: Passbook; VENDOR: Passbook; CLUB: Passbook },
   isRevert: Boolean = false
 ) => {
-  const values: PassbookConfigActionValueObj = {
-    amount: transaction.amount,
-    term: 1,
+
+  const values: PassbookConfigActionValueMap = {
+    AMOUNT: transaction.amount,
+    TERM: 1,
+    PROFIT: 0
   };
 
   Object.entries(transactionPassbookSettings).forEach(
@@ -74,9 +76,9 @@ export const transactionMiddleware = async (
                   currentPassbook,
                   values,
                   {
-                    ADD: action.SUB || {},
-                    SUB: action.ADD || {},
-                  } as PassbookConfigAction,
+                    ADD: action.SUB,
+                    SUB: action.ADD,
+                  },
                   passbookData.data
                 )
               );
@@ -86,7 +88,7 @@ export const transactionMiddleware = async (
                 getPassbookUpdateQuery(
                   currentPassbook,
                   values,
-                  action as PassbookConfigAction,
+                  action,
                   passbookData.data
                 )
               );
