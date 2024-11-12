@@ -1,30 +1,52 @@
-import { ClubPassbookData, MemberPassbookData, VendorPassbookData } from "@/lib/type";
+/* eslint-disable unused-imports/no-unused-vars */
 import { TRANSACTION_TYPE } from "@prisma/client";
+
+import {
+  ClubPassbookData,
+  MemberPassbookData,
+  VendorPassbookData,
+} from "@/lib/type";
 
 export type TransactionPassbookConfig = {
   [key in TRANSACTION_TYPE]: PassbookConfigAction;
 };
 
 export type PassbookConfigAction = {
-  "FROM" : {
-    [key in "ADD" | "SUB"]?: {
-      [key in keyof MemberPassbookData | keyof VendorPassbookData]?: PassbookConfigActionValue
-    }
-  },
-  "TO" : {
-    [key in "ADD" | "SUB"]?: {
-      [key in keyof MemberPassbookData | keyof VendorPassbookData]?: PassbookConfigActionValue
-    }
-  },
-  "CLUB" : {
-    [key in "ADD" | "SUB"]?: {
-      [key in keyof ClubPassbookData]?: PassbookConfigActionValue
-    }
-  }
-}
+  FROM?: {
+    ADD?: Partial<
+      Record<
+        keyof MemberPassbookData | keyof VendorPassbookData,
+        PassbookConfigActionValue
+      >
+    >;
+    SUB?: Partial<
+      Record<
+        keyof MemberPassbookData | keyof VendorPassbookData,
+        PassbookConfigActionValue
+      >
+    >;
+  };
+  TO?: {
+    ADD?: Partial<
+      Record<
+        keyof MemberPassbookData | keyof VendorPassbookData,
+        PassbookConfigActionValue
+      >
+    >;
+    SUB?: Partial<
+      Record<
+        keyof MemberPassbookData | keyof VendorPassbookData,
+        PassbookConfigActionValue
+      >
+    >;
+  };
+  CLUB?: {
+    ADD?: Partial<Record<keyof ClubPassbookData, PassbookConfigActionValue>>;
+    SUB?: Partial<Record<keyof ClubPassbookData, PassbookConfigActionValue>>;
+  };
+};
 
-export type PassbookConfigActionValue = "AMOUNT" | "TERM" | "PROFIT";
-
+export type PassbookConfigActionValue = "AMOUNT" | "LOAN_BALANCE" | "PROFIT";
 
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
@@ -46,10 +68,11 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
   },
   OFFSET_DEPOSIT: {
     FROM: {
-      ADD: { 
-        offsetDepositAmount: "AMOUNT", 
-        totalDepositAmount: "AMOUNT", 
-        accountBalance: "AMOUNT" },
+      ADD: {
+        offsetDepositAmount: "AMOUNT",
+        totalDepositAmount: "AMOUNT",
+        accountBalance: "AMOUNT",
+      },
     },
     TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
@@ -105,7 +128,7 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     },
     CLUB: {},
   },
-  INVEST: {
+  VENDOR_INVEST: {
     FROM: {
       SUB: {
         clubHeldAmount: "AMOUNT",
@@ -126,14 +149,14 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
       },
     },
   },
-  RETURNS: {
+  VENDOR_RETURNS: {
     FROM: {
       ADD: {
         totalReturns: "AMOUNT",
       },
       SUB: {
         accountBalance: "AMOUNT",
-      }
+      },
     },
     TO: {
       ADD: {
@@ -143,14 +166,38 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     CLUB: {
       ADD: {
         currentClubBalance: "AMOUNT",
-        totalReturns: "AMOUNT"
+        totalReturns: "AMOUNT",
       },
     },
   },
-  PROFIT: {
+  LOAN_TAKEN: {
+    FROM: {
+      SUB: {
+        clubHeldAmount: "AMOUNT",
+      },
+    },
+    TO: {
+      ADD: {
+        totalLoanBalance: "AMOUNT",
+        totalLoanTaken: "AMOUNT",
+      },
+    },
+    CLUB: {
+      ADD: {
+        totalLoanTaken: "AMOUNT",
+      },
+      SUB: {
+        currentClubBalance: "AMOUNT",
+      },
+    },
+  },
+  LOAN_REPAY: {
     FROM: {
       ADD: {
-        profitEarned: "AMOUNT",
+        totalLoanRepay: "AMOUNT",
+      },
+      SUB: {
+        totalLoanBalance: "AMOUNT",
       },
     },
     TO: {
@@ -160,9 +207,26 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     },
     CLUB: {
       ADD: {
-        totalProfit: "AMOUNT",
+        totalLoanRepay: "AMOUNT",
         currentClubBalance: "AMOUNT",
-        netClubBalance: "AMOUNT",
+      },
+    },
+  },
+  LOAN_INTEREST: {
+    FROM: {
+      ADD: {
+        totalInterestPaid: "AMOUNT",
+      },
+    },
+    TO: {
+      ADD: {
+        clubHeldAmount: "AMOUNT",
+      },
+    },
+    CLUB: {
+      ADD: {
+        totalInterestPaid: "AMOUNT",
+        currentClubBalance: "AMOUNT",
       },
     },
   },

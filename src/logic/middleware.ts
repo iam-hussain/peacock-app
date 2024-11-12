@@ -15,46 +15,36 @@ type PassbookToUpdate = Map<
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
-const getTractionPassbook = async ({ memberId, vendorId }: Transaction) => {
+const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
   const passbooks = await prisma.passbook.findMany({
     where: {
       OR: [
         {
-          member: {
-            id: memberId,
-          },
-        },
-        {
-          vendor: {
-            id: vendorId,
+          account: {
+            id: { in: [fromId, toId] },
           },
         },
         { type: "CLUB" },
       ],
     },
     include: {
-      member: {
+      account: {
         select: {
           id: true,
-        },
-      },
-      vendor: {
-        select: {
-          id: true,
-          type: true,
+          isMember: true,
         },
       },
     },
   });
 
   const result = {
-    MEMBER: passbooks.find((e) => e?.member?.id === memberId),
-    VENDOR: passbooks.find((e) => e?.vendor?.id === vendorId),
+    FROM: passbooks.find((e) => e?.account?.id === fromId),
+    TO: passbooks.find((e) => e?.account?.id === toId),
     CLUB: passbooks.find((e) => e.type === "CLUB"),
   };
 
   // Check if all values exist, otherwise return false
-  if (result.MEMBER && result.VENDOR && result.CLUB) {
+  if (result.FROM && result.TO && result.CLUB) {
     return result;
   } else {
     return false;
@@ -78,26 +68,26 @@ export async function transactionMiddlewareHandler(
     isDelete
   );
 
-  if (
-    created.transactionType &&
-    [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
-      created?.transactionType as any
-    )
-  ) {
-    const vendors = await fetchProfitSharesVendors();
-    passbookToUpdate = await transactionConnectionMiddleware(
-      passbookToUpdate,
-      vendors,
-      transactionPassbooks.CLUB as Passbook
-    );
-  }
+  // if (
+  //   created.transactionType &&
+  //   [TRANSACTION_TYPE.RETURNS, TRANSACTION_TYPE.PROFIT].includes(
+  //     created?.transactionType as any
+  //   )
+  // ) {
+  //   const vendors = await fetchProfitSharesVendors();
+  //   passbookToUpdate = await transactionConnectionMiddleware(
+  //     passbookToUpdate,
+  //     vendors,
+  //     transactionPassbooks.CLUB as Passbook
+  //   );
+  // }
 
-  if (transactionPassbooks.VENDOR?.vendor?.type === "LEND") {
-    passbookToUpdate = await updateLoanMiddleware(
-      passbookToUpdate,
-      transactionPassbooks.VENDOR?.vendor.id
-    );
-  }
+  // if (transactionPassbooks.VENDOR?.vendor?.type === "LEND") {
+  //   passbookToUpdate = await updateLoanMiddleware(
+  //     passbookToUpdate,
+  //     transactionPassbooks.VENDOR?.vendor.id
+  //   );
+  // }
 
   return bulkPassbookUpdate(passbookToUpdate);
 }

@@ -15,7 +15,10 @@ type PassbookConfigActionValueMap = {
 function getPassbookUpdateQuery(
   passbook: Passbook,
   values: PassbookConfigActionValueMap,
-  action: PassbookConfigAction['CLUB'] | PassbookConfigAction['FROM'] | PassbookConfigAction['TO'],
+  action:
+    | PassbookConfigAction["CLUB"]
+    | PassbookConfigAction["FROM"]
+    | PassbookConfigAction["TO"],
   addonData: Parameters<typeof prisma.passbook.update>[0]["data"] = {}
 ): Parameters<typeof prisma.passbook.update>[0] {
   return {
@@ -51,11 +54,10 @@ export const transactionMiddleware = async (
   transactionPassbooks: { MEMBER: Passbook; VENDOR: Passbook; CLUB: Passbook },
   isRevert: Boolean = false
 ) => {
-
   const values: PassbookConfigActionValueMap = {
     AMOUNT: transaction.amount,
     TERM: 1,
-    PROFIT: 0
+    PROFIT: 0,
   };
 
   Object.entries(transactionPassbookSettings).forEach(

@@ -9,44 +9,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Member {
-  id           String              @id @default(auto()) @map("_id") @db.ObjectId
-  firstName    String
-  lastName     String?
-  username     String              @unique
-  phone        String?
-  email        String?
-  avatar       String?
-  joinedAt     DateTime            @default(now())
-  active       Boolean             @default(true)
-  vendors      Vendor[]            @relation("OwnerVendors")
-  profitShares VendorProfitShare[]
-  passbook     Passbook            @relation(fields: [passbookId], references: [id], onDelete: Cascade)
-  passbookId   String              @unique @db.ObjectId
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  transactions Transaction[]
-}
-
-model Vendor {
-  id           String              @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  slug         String              @unique
-  type         VENDOR_TYPE         @default(DEFAULT)
-  terms        Float               @default(0)
-  termType     PERIOD              @default(NONE)
-  startAt      DateTime            @default(now())
-  endAt        DateTime?
-  active       Boolean             @default(true)
-  owner        Member?             @relation("OwnerVendors", fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId      String?             @db.ObjectId
-  ownerRole    MEMBER_VENDOR_ROLE  @default(DEFAULT)
-  profitShares VendorProfitShare[]
-  passbook     Passbook            @relation(fields: [passbookId], references: [id], onDelete: Cascade)
-  passbookId   String              @unique @db.ObjectId
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  transactions Transaction[]
+model Account {
+  id                String        @id @default(auto()) @map("_id") @db.ObjectId
+  firstName         String
+  lastName          String?
+  phone             String?
+  email             String?
+  avatar            String?
+  startAt           DateTime      @default(now())
+  endAt             DateTime?
+  active            Boolean       @default(true)
+  isMember          Boolean       @default(true)
+  passbook          Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
+  passbookId        String        @unique @db.ObjectId
+  memberProfitShare ProfitShare[] @relation("Member")
+  vendorProfitShare ProfitShare[] @relation("Vendor")
+  fromTransaction   Transaction[] @relation("FromAccount")
+  toTransaction     Transaction[] @relation("ToAccount")
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 model Transaction {
@@ -55,20 +36,20 @@ model Transaction {
   transactionType TRANSACTION_TYPE   @default(PERIODIC_DEPOSIT)
   transactionAt   DateTime           @default(now())
   method          TRANSACTION_METHOD @default(ACCOUNT)
-  vendor          Vendor             @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  vendorId        String             @db.ObjectId
-  member          Member             @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  memberId        String             @db.ObjectId
+  from            Account            @relation("FromAccount", fields: [fromId], references: [id], onDelete: Cascade)
+  fromId          String             @db.ObjectId
+  to              Account            @relation("ToAccount", fields: [toId], references: [id], onDelete: Cascade)
+  toId            String             @db.ObjectId
   note            String?
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
 }
 
-model VendorProfitShare {
+model ProfitShare {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  vendor    Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendor    Account  @relation("Vendor", fields: [vendorId], references: [id], onDelete: Cascade)
   vendorId  String   @db.ObjectId
-  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member    Account  @relation("Member", fields: [memberId], references: [id], onDelete: Cascade)
   memberId  String   @db.ObjectId
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -76,35 +57,13 @@ model VendorProfitShare {
 }
 
 model Passbook {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  type        PASSBOOK_TYPE @default(VENDOR)
-  periodIn    Float         @default(0)
-  offsetIn    Float         @default(0)
-  in          Float         @default(0)
-  out         Float         @default(0)
-  loanOffset  Float         @default(0)
-  offset      Float         @default(0)
-  returns     Float         @default(0)
-  terms       Float         @default(0)
-  currentTerm Float         @default(0)
-  calcReturns Boolean       @default(true)
-  balance     Float         @default(0)
-  fund        Float         @default(0)
-  recentDate  DateTime?
-  lastDate    DateTime?
-  addon       Json?
-  member      Member?
-  vendor      Vendor?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-}
-
-enum VENDOR_TYPE {
-  DEFAULT
-  HOLD
-  CHIT
-  LEND
-  BANK
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  type      PASSBOOK_TYPE @default(VENDOR)
+  data      Json          @default("{}")
+  account   Account?
+  isChit    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 enum TRANSACTION_METHOD {
@@ -121,27 +80,15 @@ enum TRANSACTION_TYPE {
   WITHDRAW
   REJOIN
   FUNDS_TRANSFER
-  INVEST
-  RETURNS
-  PROFIT
-}
-
-enum MEMBER_VENDOR_ROLE {
-  DEFAULT
-  MEDIATOR
-  SELF
+  VENDOR_INVEST
+  VENDOR_RETURNS
+  LOAN_TAKEN
+  LOAN_REPAY
+  LOAN_INTEREST
 }
 
 enum PASSBOOK_TYPE {
   MEMBER
   VENDOR
   CLUB
-}
-
-enum PERIOD {
-  NONE
-  DAY
-  WEEK
-  MONTH
-  YEAR
 }

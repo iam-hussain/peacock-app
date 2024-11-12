@@ -581,12 +581,12 @@
       "termType": "NONE",
       "startAt": "2024-06-26T05:58:16.000Z",
       "endAt": null,
-      "active": true,
+      "active": false,
       "ownerId": "66d95de79ff85b6e7c1106a6",
       "ownerRole": "DEFAULT",
       "passbookId": "66d95de99ff85b6e7c1106dd",
       "createdAt": "2024-06-26T05:58:58.873Z",
-      "updatedAt": "2024-09-05T19:34:29.668Z"
+      "updatedAt": "2024-10-25T14:18:19.814Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106e0",
@@ -11753,6 +11753,198 @@
       "note": "",
       "createdAt": "2024-09-05T18:30:00.000Z",
       "updatedAt": "2024-10-18T15:38:13.407Z"
+    },
+    {
+      "id": "67273e000c4f21c52e2d2ae5",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-09-30T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-03T09:10:24.225Z",
+      "updatedAt": "2024-11-03T09:10:24.225Z"
+    },
+    {
+      "id": "6729d33bc3efaa378c3d0fe2",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-09-14T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:11:39.835Z",
+      "updatedAt": "2024-11-05T08:11:39.835Z"
+    },
+    {
+      "id": "6729d58bc3efaa378c3d0fe6",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-24T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069a",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:21:31.741Z",
+      "updatedAt": "2024-11-05T08:21:31.741Z"
+    },
+    {
+      "id": "6729d5c0c3efaa378c3d0fe7",
+      "amount": 15000,
+      "transactionType": "FUNDS_TRANSFER",
+      "transactionAt": "2024-10-24T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069a",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:22:24.711Z",
+      "updatedAt": "2024-11-05T08:22:24.711Z"
+    },
+    {
+      "id": "6729d5e0c3efaa378c3d0fe8",
+      "amount": 35000,
+      "transactionType": "FUNDS_TRANSFER",
+      "transactionAt": "2024-10-24T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069a",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2024-11-05T08:22:56.348Z",
+      "updatedAt": "2024-11-05T08:22:56.348Z"
+    },
+    {
+      "id": "6729d6a6c3efaa378c3d0fea",
+      "amount": 6000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-27T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a6",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:26:14.101Z",
+      "updatedAt": "2024-11-05T08:26:14.101Z"
+    },
+    {
+      "id": "6729d774c3efaa378c3d0fed",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-28T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106bc",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:29:40.569Z",
+      "updatedAt": "2024-11-05T08:29:40.569Z"
+    },
+    {
+      "id": "6729da12fc79defd8db1b046",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-31T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c1106a2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:40:50.495Z",
+      "updatedAt": "2024-11-05T08:40:50.495Z"
+    },
+    {
+      "id": "6729dae5c3efaa378c3d0fee",
+      "amount": 16000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-31T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106be",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:44:21.528Z",
+      "updatedAt": "2024-11-05T08:44:21.528Z"
+    },
+    {
+      "id": "6729db11c3efaa378c3d0fef",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-11-01T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:45:05.170Z",
+      "updatedAt": "2024-11-05T08:45:05.170Z"
+    },
+    {
+      "id": "6729db42c3efaa378c3d0ff0",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-31T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:45:54.175Z",
+      "updatedAt": "2024-11-05T08:45:54.175Z"
+    },
+    {
+      "id": "6729dc67fc79defd8db1b049",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-11-01T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:50:47.541Z",
+      "updatedAt": "2024-11-05T08:50:47.541Z"
+    },
+    {
+      "id": "6729dcb2fc79defd8db1b04a",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-11-03T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106c0",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2024-11-05T08:52:02.119Z",
+      "updatedAt": "2024-11-05T08:52:02.119Z"
+    },
+    {
+      "id": "6729dccffc79defd8db1b04b",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-11-03T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106aa",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2024-11-05T08:52:31.143Z",
+      "updatedAt": "2024-11-05T08:52:31.143Z"
+    },
+    {
+      "id": "6729dce9c3efaa378c3d0ff1",
+      "amount": 5000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-11-03T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110698",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2024-11-05T08:52:57.322Z",
+      "updatedAt": "2024-11-05T08:52:57.322Z"
+    },
+    {
+      "id": "6729e134c3efaa378c3d0ff2",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-31T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11068e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-10-31T18:30:00.000Z",
+      "updatedAt": "2024-11-05T09:11:16.978Z"
     }
   ],
   "vendorTransactions": [
@@ -13135,6 +13327,78 @@
       "note": "",
       "createdAt": "2024-10-18T15:30:30.617Z",
       "updatedAt": "2024-10-18T15:30:30.617Z"
+    },
+    {
+      "id": "6729d3c7c3efaa378c3d0fe3",
+      "amount": 13900,
+      "transactionType": "PERIODIC_INVEST",
+      "transactionAt": "2024-09-09T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "vendorId": "66d95de89ff85b6e7c1106c8",
+      "memberId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:13:59.890Z",
+      "updatedAt": "2024-11-05T08:13:59.890Z"
+    },
+    {
+      "id": "6729d473c3efaa378c3d0fe5",
+      "amount": 477500,
+      "transactionType": "RETURNS",
+      "transactionAt": "2024-10-23T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "vendorId": "66d95de89ff85b6e7c1106c6",
+      "memberId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:16:51.285Z",
+      "updatedAt": "2024-11-05T08:16:51.285Z"
+    },
+    {
+      "id": "6729d660c3efaa378c3d0fe9",
+      "amount": 14000,
+      "transactionType": "PERIODIC_INVEST",
+      "transactionAt": "2024-10-27T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "vendorId": "66d95de89ff85b6e7c1106c8",
+      "memberId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-10-09T18:30:00.000Z",
+      "updatedAt": "2024-11-05T08:25:04.232Z"
+    },
+    {
+      "id": "6729d6e3c3efaa378c3d0feb",
+      "amount": 700,
+      "transactionType": "PROFIT",
+      "transactionAt": "2024-10-27T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "vendorId": "66d95de99ff85b6e7c1106de",
+      "memberId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:27:15.472Z",
+      "updatedAt": "2024-11-05T08:27:15.472Z"
+    },
+    {
+      "id": "6729d713c3efaa378c3d0fec",
+      "amount": 500,
+      "transactionType": "PROFIT",
+      "transactionAt": "2024-10-28T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "vendorId": "66d95de99ff85b6e7c1106dc",
+      "memberId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:28:03.021Z",
+      "updatedAt": "2024-11-05T08:28:03.021Z"
+    },
+    {
+      "id": "6729da42fc79defd8db1b047",
+      "amount": 1000,
+      "transactionType": "PROFIT",
+      "transactionAt": "2024-10-31T18:30:00.000Z",
+      "method": "ACCOUNT",
+      "vendorId": "66d95de99ff85b6e7c1106e6",
+      "memberId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2024-11-05T08:41:38.147Z",
+      "updatedAt": "2024-11-05T08:41:38.147Z"
     }
   ],
   "vendorProfitShares": [
@@ -13176,7 +13440,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2023-09-14T08:29:27.995Z"
+      "updatedAt": "2024-11-05T08:37:20.449Z"
     },
     {
       "id": "66d95dec9ff85b6e7c110708",
@@ -13288,7 +13552,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-29T14:34:11.335Z"
+      "updatedAt": "2024-11-05T08:36:47.951Z"
     },
     {
       "id": "66d95dec9ff85b6e7c110716",
@@ -13496,7 +13760,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-29T14:34:11.344Z"
+      "updatedAt": "2024-11-05T08:36:47.952Z"
     },
     {
       "id": "66d95dee9ff85b6e7c110730",
@@ -13624,7 +13888,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-05T11:13:20.128Z"
+      "updatedAt": "2024-11-05T08:37:20.449Z"
     },
     {
       "id": "66d95def9ff85b6e7c110740",
@@ -13704,7 +13968,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-29T14:34:11.344Z"
+      "updatedAt": "2024-11-05T08:36:47.951Z"
     },
     {
       "id": "66d95def9ff85b6e7c11074a",
@@ -13808,7 +14072,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-29T14:34:11.344Z"
+      "updatedAt": "2024-11-05T08:36:47.952Z"
     },
     {
       "id": "66d95df09ff85b6e7c110757",
@@ -13872,7 +14136,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-10-18T14:18:52.750Z",
-      "updatedAt": "2023-10-18T14:55:24.472Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df09ff85b6e7c11075f",
@@ -13984,7 +14248,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2023-10-25T17:38:55.158Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df19ff85b6e7c11076d",
@@ -14184,7 +14448,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-29T14:34:11.344Z"
+      "updatedAt": "2024-11-05T08:36:47.952Z"
     },
     {
       "id": "66d95df39ff85b6e7c110786",
@@ -14272,7 +14536,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2023-10-25T17:38:49.202Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df39ff85b6e7c110791",
@@ -14296,7 +14560,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2023-11-01T05:52:05.089Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df39ff85b6e7c110794",
@@ -14392,7 +14656,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2024-09-29T14:34:11.345Z"
+      "updatedAt": "2024-11-05T08:36:47.952Z"
     },
     {
       "id": "66d95df49ff85b6e7c1107a0",
@@ -14544,7 +14808,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2023-10-18T14:28:21.588Z",
-      "updatedAt": "2024-09-29T14:34:11.345Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95df59ff85b6e7c1107b3",
@@ -14648,7 +14912,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2023-10-18T14:18:52.750Z",
-      "updatedAt": "2024-09-29T14:34:11.345Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95df69ff85b6e7c1107c0",
@@ -14720,7 +14984,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2023-09-04T14:37:39.727Z",
-      "updatedAt": "2023-10-25T17:38:58.911Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df69ff85b6e7c1107c9",
@@ -14736,7 +15000,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-02-07T05:00:18.907Z",
-      "updatedAt": "2024-05-31T07:35:07.650Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df69ff85b6e7c1107cb",
@@ -14832,7 +15096,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": false,
       "createdAt": "2023-10-18T14:28:21.588Z",
-      "updatedAt": "2023-11-01T05:51:49.377Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df79ff85b6e7c1107d7",
@@ -15080,7 +15344,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-02-07T05:01:40.401Z",
-      "updatedAt": "2024-02-07T05:32:32.297Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95df99ff85b6e7c1107f6",
@@ -15192,7 +15456,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2024-02-07T05:00:18.907Z",
-      "updatedAt": "2024-09-29T14:34:11.345Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95df99ff85b6e7c110804",
@@ -15232,7 +15496,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2024-02-07T05:01:40.401Z",
-      "updatedAt": "2024-09-29T14:34:11.345Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95dfa9ff85b6e7c110809",
@@ -15336,7 +15600,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-06-26T05:55:54.607Z",
-      "updatedAt": "2024-06-26T06:26:36.325Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95dfa9ff85b6e7c110816",
@@ -15440,7 +15704,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2024-06-26T05:55:54.607Z",
-      "updatedAt": "2024-09-29T14:34:11.345Z"
+      "updatedAt": "2024-11-05T08:36:47.954Z"
     },
     {
       "id": "66d95dfb9ff85b6e7c110823",
@@ -15536,7 +15800,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-05-06T06:10:31.708Z",
-      "updatedAt": "2024-06-26T06:27:20.142Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95dfc9ff85b6e7c11082f",
@@ -15632,7 +15896,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2024-05-06T06:10:31.708Z",
-      "updatedAt": "2024-09-29T14:34:11.346Z"
+      "updatedAt": "2024-11-05T08:36:47.952Z"
     },
     {
       "id": "66d95dfd9ff85b6e7c11083b",
@@ -15736,7 +16000,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-03-10T14:08:06.707Z",
-      "updatedAt": "2024-06-26T06:26:59.972Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95dfd9ff85b6e7c110848",
@@ -15840,7 +16104,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2024-03-10T14:08:06.707Z",
-      "updatedAt": "2024-09-29T14:34:11.346Z"
+      "updatedAt": "2024-11-05T08:36:47.952Z"
     },
     {
       "id": "66d95dfe9ff85b6e7c110855",
@@ -15944,7 +16208,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-06-26T05:58:02.766Z",
-      "updatedAt": "2024-06-26T06:27:12.989Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95dff9ff85b6e7c110862",
@@ -16080,7 +16344,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-06-26T05:58:58.873Z",
-      "updatedAt": "2024-06-26T06:26:23.501Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95e009ff85b6e7c110873",
@@ -16184,7 +16448,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": false,
       "createdAt": "2024-06-26T05:58:58.873Z",
-      "updatedAt": "2024-09-29T14:34:11.346Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95e009ff85b6e7c110880",
@@ -16310,9 +16574,9 @@
       "id": "66d95e019ff85b6e7c11088f",
       "vendorId": "66d95de99ff85b6e7c1106dc",
       "memberId": "66d95de79ff85b6e7c1106b4",
-      "active": false,
+      "active": true,
       "createdAt": "2024-06-26T05:58:02.766Z",
-      "updatedAt": "2024-09-29T14:34:11.346Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95e019ff85b6e7c110890",
@@ -16432,7 +16696,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-07-13T17:08:00.309Z",
-      "updatedAt": "2024-07-13T17:26:26.354Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95e029ff85b6e7c11089f",
@@ -16536,7 +16800,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2024-07-13T17:08:00.309Z",
-      "updatedAt": "2024-09-29T14:34:11.346Z"
+      "updatedAt": "2024-11-05T08:36:47.953Z"
     },
     {
       "id": "66d95e039ff85b6e7c1108ac",
@@ -16648,7 +16912,7 @@
       "memberId": "66d95de69ff85b6e7c11069a",
       "active": true,
       "createdAt": "2024-08-31T07:39:28.988Z",
-      "updatedAt": "2024-08-31T07:44:11.873Z"
+      "updatedAt": "2024-11-05T08:37:20.450Z"
     },
     {
       "id": "66d95e039ff85b6e7c1108ba",
@@ -16752,7 +17016,7 @@
       "memberId": "66d95de79ff85b6e7c1106b4",
       "active": true,
       "createdAt": "2024-08-31T07:39:28.988Z",
-      "updatedAt": "2024-09-29T14:34:11.347Z"
+      "updatedAt": "2024-11-05T08:36:47.954Z"
     },
     {
       "id": "66d95e049ff85b6e7c1108c7",
@@ -16820,14 +17084,14 @@
       "in": 62000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
       "currentTerm": 49,
       "calcReturns": true,
       "balance": 62000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-05T09:11:21.438Z"
     },
     {
       "id": "66d95de69ff85b6e7c11068f",
@@ -16836,7 +17100,7 @@
       "offsetIn": 0,
       "in": 13000,
       "out": 13000,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 0,
@@ -16844,7 +17108,7 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de69ff85b6e7c110691",
@@ -16854,14 +17118,14 @@
       "in": 62000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
       "currentTerm": 49,
       "calcReturns": true,
       "balance": 62000,
-      "fund": 77000,
+      "fund": 125000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:24:30.367Z"
+      "updatedAt": "2024-11-05T08:52:58.289Z"
     },
     {
       "id": "66d95de69ff85b6e7c110693",
@@ -16870,7 +17134,7 @@
       "offsetIn": 0,
       "in": 0,
       "out": 0,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 0,
@@ -16878,7 +17142,7 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de69ff85b6e7c110695",
@@ -16887,7 +17151,7 @@
       "offsetIn": 0,
       "in": 28000,
       "out": 28000,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 28,
@@ -16895,41 +17159,41 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de69ff85b6e7c110697",
       "type": "MEMBER",
-      "periodIn": 58000,
+      "periodIn": 63000,
       "offsetIn": 0,
-      "in": 58000,
+      "in": 63000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 47,
+      "currentTerm": 50,
       "calcReturns": true,
-      "balance": 58000,
+      "balance": 63000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-05T08:52:58.289Z"
     },
     {
       "id": "66d95de69ff85b6e7c110699",
       "type": "MEMBER",
-      "periodIn": 54176,
+      "periodIn": 64176,
       "offsetIn": 265,
-      "in": 54441,
+      "in": 64441,
       "out": 0,
-      "offset": 441,
-      "returns": 3769,
+      "offset": 0,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 45,
+      "currentTerm": 50,
       "calcReturns": true,
-      "balance": 54441,
-      "fund": 50000,
+      "balance": 64441,
+      "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-05T08:22:57.296Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069b",
@@ -16938,7 +17202,7 @@
       "offsetIn": 0,
       "in": 10000,
       "out": 10000,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 10,
@@ -16946,7 +17210,7 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069d",
@@ -16956,14 +17220,14 @@
       "in": 64000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
       "currentTerm": 50,
       "calcReturns": true,
       "balance": 64000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:31:48.618Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069f",
@@ -16972,7 +17236,7 @@
       "offsetIn": 0,
       "in": 21000,
       "out": 21000,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 21,
@@ -16980,58 +17244,58 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de69ff85b6e7c1106a1",
+      "type": "MEMBER",
+      "periodIn": 66000,
+      "offsetIn": 0,
+      "in": 66000,
+      "out": 0,
+      "offset": 0,
+      "returns": 1629,
+      "terms": 0,
+      "currentTerm": 51,
+      "calcReturns": true,
+      "balance": 66000,
+      "fund": 0,
+      "createdAt": "2024-09-05T07:29:41.721Z",
+      "updatedAt": "2024-11-05T08:40:51.455Z"
+    },
+    {
+      "id": "66d95de79ff85b6e7c1106a3",
       "type": "MEMBER",
       "periodIn": 64000,
       "offsetIn": 0,
       "in": 64000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 52,
+      "currentTerm": 50,
       "calcReturns": true,
       "balance": 64000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:38:17.852Z"
+      "updatedAt": "2024-11-05T08:50:48.492Z"
     },
     {
-      "id": "66d95de79ff85b6e7c1106a3",
+      "id": "66d95de79ff85b6e7c1106a5",
       "type": "MEMBER",
       "periodIn": 62000,
       "offsetIn": 0,
       "in": 62000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
       "currentTerm": 49,
       "calcReturns": true,
       "balance": 62000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
-    },
-    {
-      "id": "66d95de79ff85b6e7c1106a5",
-      "type": "MEMBER",
-      "periodIn": 56000,
-      "offsetIn": 0,
-      "in": 56000,
-      "out": 0,
-      "offset": 0,
-      "returns": 4210,
-      "terms": 0,
-      "currentTerm": 46,
-      "calcReturns": true,
-      "balance": 56000,
-      "fund": 0,
-      "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-05T08:26:15.048Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a7",
@@ -17041,31 +17305,31 @@
       "in": 60000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
       "currentTerm": 48,
       "calcReturns": true,
       "balance": 60000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:25:12.436Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a9",
       "type": "MEMBER",
-      "periodIn": 64000,
+      "periodIn": 68000,
       "offsetIn": 0,
-      "in": 64000,
+      "in": 68000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 50,
+      "currentTerm": 52,
       "calcReturns": true,
-      "balance": 64000,
+      "balance": 68000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:38:14.371Z"
+      "updatedAt": "2024-11-05T08:52:32.081Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ab",
@@ -17074,7 +17338,7 @@
       "offsetIn": 0,
       "in": 16000,
       "out": 16000,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 16,
@@ -17082,7 +17346,7 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ad",
@@ -17091,7 +17355,7 @@
       "offsetIn": 0,
       "in": 20000,
       "out": 20000,
-      "offset": 4210,
+      "offset": 1629,
       "returns": 0,
       "terms": 0,
       "currentTerm": 20,
@@ -17099,7 +17363,7 @@
       "balance": 0,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106af",
@@ -17109,48 +17373,48 @@
       "in": 54000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
       "currentTerm": 45,
       "calcReturns": true,
       "balance": 54000,
-      "fund": 117348,
+      "fund": 630148,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:38:17.852Z"
+      "updatedAt": "2024-11-05T09:11:21.438Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b1",
       "type": "MEMBER",
-      "periodIn": 64000,
+      "periodIn": 66000,
       "offsetIn": 0,
-      "in": 64000,
+      "in": 66000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 50,
+      "currentTerm": 51,
       "calcReturns": true,
-      "balance": 64000,
+      "balance": 66000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:28:25.092Z"
+      "updatedAt": "2024-11-05T08:45:06.136Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b3",
       "type": "MEMBER",
-      "periodIn": 63363,
+      "periodIn": 69363,
       "offsetIn": 0,
-      "in": 63363,
+      "in": 69363,
       "out": 0,
-      "offset": 3363,
-      "returns": 847,
+      "offset": 1629,
+      "returns": 0,
       "terms": 0,
-      "currentTerm": 50,
+      "currentTerm": 53,
       "calcReturns": true,
-      "balance": 63363,
+      "balance": 69363,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-05T08:45:55.131Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b5",
@@ -17160,14 +17424,14 @@
       "in": 67629,
       "out": 0,
       "offset": 1629,
-      "returns": 2581,
+      "returns": 0,
       "terms": 0,
       "currentTerm": 52,
       "calcReturns": true,
       "balance": 67629,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:32:30.263Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b7",
@@ -17177,14 +17441,14 @@
       "in": 53629,
       "out": 0,
       "offset": 1629,
-      "returns": 2581,
+      "returns": 0,
       "terms": 0,
       "currentTerm": 45,
       "calcReturns": true,
       "balance": 53629,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106b9",
@@ -17193,7 +17457,7 @@
       "offsetIn": 0,
       "in": 33000,
       "out": 34629,
-      "offset": 2581,
+      "offset": 0,
       "returns": 1629,
       "terms": 0,
       "currentTerm": 33,
@@ -17201,58 +17465,58 @@
       "balance": -1629,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bb",
       "type": "MEMBER",
-      "periodIn": 64000,
+      "periodIn": 66000,
       "offsetIn": 0,
-      "in": 64000,
+      "in": 66000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 50,
+      "currentTerm": 51,
       "calcReturns": true,
-      "balance": 64000,
+      "balance": 66000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:25:50.172Z"
+      "updatedAt": "2024-11-05T08:29:41.525Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bd",
       "type": "MEMBER",
-      "periodIn": 53629,
+      "periodIn": 69629,
       "offsetIn": 0,
-      "in": 53629,
+      "in": 69629,
       "out": 0,
       "offset": 1629,
-      "returns": 2581,
+      "returns": 0,
       "terms": 0,
-      "currentTerm": 45,
+      "currentTerm": 53,
       "calcReturns": true,
-      "balance": 53629,
+      "balance": 69629,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-05T08:44:22.493Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bf",
       "type": "MEMBER",
-      "periodIn": 62000,
+      "periodIn": 66000,
       "offsetIn": 0,
-      "in": 62000,
+      "in": 66000,
       "out": 0,
       "offset": 0,
-      "returns": 4210,
+      "returns": 1629,
       "terms": 0,
-      "currentTerm": 49,
+      "currentTerm": 51,
       "calcReturns": true,
-      "balance": 62000,
+      "balance": 66000,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:28:59.203Z"
+      "updatedAt": "2024-11-05T08:52:03.057Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c1",
@@ -17261,7 +17525,7 @@
       "offsetIn": 0,
       "in": 19000,
       "out": 20629,
-      "offset": 2581,
+      "offset": 0,
       "returns": 1629,
       "terms": 0,
       "currentTerm": 19,
@@ -17269,7 +17533,7 @@
       "balance": -1629,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T11:33:18.395Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c3",
@@ -17294,33 +17558,33 @@
       "periodIn": 343850,
       "offsetIn": 0,
       "in": 343850,
-      "out": 0,
+      "out": 477500,
       "offset": 0,
-      "returns": 343850,
+      "returns": 821350,
       "terms": 0,
       "currentTerm": 15,
       "calcReturns": false,
-      "balance": 0,
+      "balance": 477500,
       "fund": 343850,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:32:16.365Z"
+      "updatedAt": "2024-11-05T08:16:53.893Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c7",
       "type": "VENDOR",
-      "periodIn": 55200,
+      "periodIn": 83100,
       "offsetIn": 0,
-      "in": 185600,
+      "in": 213500,
       "out": 0,
       "offset": 0,
-      "returns": 185600,
+      "returns": 157700,
       "terms": 0,
-      "currentTerm": 4,
+      "currentTerm": 6,
       "calcReturns": false,
       "balance": 0,
-      "fund": 185600,
+      "fund": 213500,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-29T14:28:38.457Z"
+      "updatedAt": "2024-11-05T08:25:09.395Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c9",
@@ -17337,7 +17601,7 @@
       "balance": 485000,
       "fund": 460375,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-21T11:56:43.973Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cb",
@@ -17371,7 +17635,7 @@
       "balance": 1440,
       "fund": 0,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-09-05T19:31:43.701Z"
+      "updatedAt": "2024-11-03T20:12:13.040Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cf",
@@ -17481,16 +17745,16 @@
       "periodIn": 0,
       "offsetIn": 1000,
       "in": 50000,
-      "out": 1500,
+      "out": 2000,
       "offset": 59,
       "returns": 1000,
       "terms": 0,
       "currentTerm": 2,
       "calcReturns": false,
-      "balance": 1500,
+      "balance": 2000,
       "fund": 50000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:26:37.526Z"
+      "updatedAt": "2024-11-05T08:28:05.501Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106dd",
@@ -17498,16 +17762,16 @@
       "periodIn": 0,
       "offsetIn": 500,
       "in": 50000,
-      "out": 16000,
+      "out": 16700,
       "offset": 29,
       "returns": 15500,
       "terms": 0,
       "currentTerm": 1,
-      "calcReturns": false,
-      "balance": 16000,
+      "calcReturns": true,
+      "balance": 16700,
       "fund": 50000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:18:20.506Z"
+      "updatedAt": "2024-11-05T08:27:17.966Z"
     },
     {
       "id": "66d95de99ff85b6e7c1106df",
@@ -17566,33 +17830,33 @@
       "periodIn": 0,
       "offsetIn": 2000,
       "in": 100000,
-      "out": 4000,
+      "out": 5000,
       "offset": 118,
       "returns": 2000,
       "terms": 0,
       "currentTerm": 2,
       "calcReturns": false,
-      "balance": 4000,
+      "balance": 5000,
       "fund": 100000,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:30:34.113Z"
+      "updatedAt": "2024-11-05T08:41:41.587Z"
     },
     {
       "id": "66d95dea9ff85b6e7c1106e7",
       "type": "CLUB",
-      "periodIn": 1245168,
+      "periodIn": 1304168,
       "offsetIn": 3523,
-      "in": 1248691,
+      "in": 1307691,
       "out": 163258,
-      "offset": 8691,
-      "returns": 70365,
+      "offset": 6516,
+      "returns": 26065,
       "terms": 0,
       "currentTerm": 0,
       "calcReturns": true,
-      "balance": 244348,
-      "fund": 1085433,
+      "balance": 755148,
+      "fund": 1144433,
       "createdAt": "2024-09-05T07:29:41.721Z",
-      "updatedAt": "2024-10-18T15:38:17.852Z"
+      "updatedAt": "2024-11-05T09:11:21.438Z"
     }
   ]
 }
