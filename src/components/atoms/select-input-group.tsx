@@ -28,7 +28,7 @@ export const SelectInputGroup = ({
   noPlaceHolderValue = false,
 }: SelectInputGroupProps) => (
   <Select
-    value={value.toString()}
+    value={(value || '').toString()}
     onValueChange={(e) => onChange(e)}
     defaultValue={defaultValue}
   >
@@ -42,7 +42,7 @@ export const SelectInputGroup = ({
         </SelectItem>
       )}
       {options.map(([value, label]) => (
-        <SelectItem key={value} value={value.toString()}>
+        <SelectItem key={value} value={(value || '').toString()}>
           {label}
         </SelectItem>
       ))}

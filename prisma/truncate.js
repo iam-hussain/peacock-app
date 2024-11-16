@@ -6,11 +6,10 @@ const prisma = new PrismaClient({
 
 async function truncate() {
   // Truncate all tables
-  await prisma.vendorProfitShare.deleteMany();
+  await prisma.profitShare.deleteMany();
   await prisma.transaction.deleteMany();
   await prisma.passbook.deleteMany();
-  await prisma.member.deleteMany();
-  await prisma.vendor.deleteMany();
+  await prisma.account.deleteMany();
 
   console.log("All records have been deleted");
 }

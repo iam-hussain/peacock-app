@@ -24,11 +24,10 @@ import {
 import TableLayout from "../../atoms/table-layout";
 import { PaginationFilters } from "../../molecules/pagination-filters";
 
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
 import { Dialog } from "@/components/ui/dialog";
-import { transactionMethodMap, transactionTypeMap } from "@/lib/config";
+import { transactionTypeMap } from "@/lib/config";
 import { fetchTransactions } from "@/lib/query-options";
 
 const baseColumns = (
@@ -90,7 +89,7 @@ const baseColumns = (
     cell: ({ row }) => (
       <CommonTableCell
         label={transactionTypeMap[row.original.transactionType]}
-        subLabel={transactionMethodMap[row.original.method]}
+        // subLabel={transactionMethodMap[row.original.method]}
       />
     ),
   },
@@ -177,14 +176,12 @@ const initialOptions = {
 };
 
 export type MembersTransactionTableProps = {
-  members: TransformedMemberSelect[];
-  vendors: TransformedVendorSelect[];
+  accounts: TransformedAccountSelect[];
   handleAction: (select: null | TransformedTransaction) => void;
 };
 
 const TransactionTable = ({
-  members,
-  vendors,
+  accounts,
   handleAction,
 }: MembersTransactionTableProps) => {
   const [editMode, setEditMode] = useState(false);
@@ -242,23 +239,21 @@ const TransactionTable = ({
   return (
     <Dialog>
       <div className="w-full">
-        <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full mb-4">
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-5 w-full mb-4">
           <SelectInputGroup
-            value={options.vendorId}
-            onChange={(e) =>
-              setOptions({ ...options, vendorId: e, page: 1, memberId: "" })
-            }
-            placeholder="Select VENDOR"
-            options={vendors.map((each) => [each.id, each.name])}
+            value={options.accountId || ''}
+            onChange={(e) => setOptions({ ...options, accountId: e, page: 1 })}
+            placeholder="Select ACCOUNT"
+            options={accounts.map((each) => [each.id, each.name])}
           />
 
           <SelectInputGroup
-            value={options.memberId}
+            value={options.transactionType}
             onChange={(e) =>
-              setOptions({ ...options, memberId: e, page: 1, vendorId: "" })
+              setOptions({ ...options, transactionType: e, page: 1 })
             }
-            placeholder="Select MEMBER"
-            options={members.map((each) => [each.id, each.name])}
+            placeholder="Select TYPE"
+            options={Object.entries(transactionTypeMap)}
           />
 
           <DatePickerGroup
@@ -275,15 +270,6 @@ const TransactionTable = ({
               setOptions({ ...options, endDate: e, page: 1 })
             }
             placeholder={"Date TO"}
-          />
-
-          <SelectInputGroup
-            value={options.transactionType}
-            onChange={(e) =>
-              setOptions({ ...options, transactionType: e, page: 1 })
-            }
-            placeholder="Select TYPE"
-            options={Object.entries(transactionTypeMap)}
           />
           <PaginationFilters
             limit={Number(options.limit)}

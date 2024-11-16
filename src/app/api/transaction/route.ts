@@ -1,32 +1,20 @@
-import { $Enums, Transaction, VENDOR_TYPE } from "@prisma/client";
+import { Transaction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 
 type TransactionToTransform = Transaction & {
-  vendor: VendorDetails;
-  member: MemberDetails;
+  from: AccountDetails;
+  to: AccountDetails;
 };
 
-type VendorDetails = {
-  id: string;
-  name: string;
-  active: boolean;
-  type: $Enums.VENDOR_TYPE;
-  owner: {
-    id: string;
-    firstName: string;
-    lastName: string | null;
-    avatar: string | null;
-  } | null;
-};
-
-type MemberDetails = {
+type AccountDetails = {
   id: string;
   firstName: string;
   lastName: string | null;
   avatar: string | null;
   active: boolean;
+  isMember: boolean;
 };
 
 export async function GET(request: Request) {
@@ -63,8 +51,7 @@ function getQueryParams(url: string) {
   return {
     page: parseInt(searchParams.get("page") || "1"),
     limit: parseInt(searchParams.get("limit") || "10"),
-    memberId: searchParams.get("memberId"),
-    vendorId: searchParams.get("vendorId"),
+    accountId: searchParams.get("accountId"),
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),
     endDate: searchParams.get("endDate"),
@@ -74,15 +61,23 @@ function getQueryParams(url: string) {
 }
 
 function createFilters({
-  memberId,
-  vendorId,
+  accountId,
   transactionType,
   startDate,
   endDate,
 }: any) {
   const filters: Record<string, any> = {};
-  if (memberId) filters.memberId = memberId;
-  if (vendorId) filters.vendorId = vendorId;
+  if (accountId)
+    filters.OR = {
+      OR: [
+        {
+          fromId: accountId,
+        },
+        {
+          toId: accountId,
+        },
+      ],
+    };
   if (transactionType) filters.transactionType = transactionType;
   if (startDate && endDate)
     filters.transactionAt = {
@@ -99,30 +94,31 @@ async function fetchTransactions(
   sortField: string,
   sortOrder: string
 ) {
+  console.log({ filters });
   return await prisma.transaction.findMany({
     where: filters,
     skip: (page - 1) * limit,
     take: limit,
     orderBy: { [sortField]: sortOrder },
     include: {
-      vendor: {
+      from: {
         select: {
           id: true,
-          name: true,
-          active: true,
-          type: true,
-          owner: {
-            select: { id: true, avatar: true, firstName: true, lastName: true },
-          },
-        },
-      },
-      member: {
-        select: {
-          id: true,
-          avatar: true,
           firstName: true,
           lastName: true,
+          avatar: true,
           active: true,
+          isMember: true,
+        },
+      },
+      to: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          avatar: true,
+          active: true,
+          isMember: true,
         },
       },
     },
@@ -132,158 +128,66 @@ async function fetchTransactions(
 async function getTotalTransactions(filters: any) {
   return await prisma.transaction.count({ where: filters });
 }
+const clubData = { sub: "Peacock Club", avatar: "/peacock_cash.png" };
 
 function transactionTableTransform(transaction: TransactionToTransform) {
-  const transformed = createTransformedTransaction(
-    transaction.member,
-    transaction.vendor,
-    transaction
-  );
-  const { from, to } = determineFromAndTo(
-    transformed.member,
-    transformed.vendor,
-    transformed
-  );
-  return {
-    ...transformed,
-    from,
-    to,
-    fromId: from.id as string,
-    toId: to.id as string,
-  };
-}
+  const fromName = `${transaction.from.firstName || ""} ${transaction.from.lastName || ""}`;
+  const toName = `${transaction.to.firstName || ""} ${transaction.to.lastName || ""}`;
 
-function determineFromAndTo(
-  member: ReturnType<typeof createTransformedTransaction>["member"],
-  vendor: ReturnType<typeof createTransformedTransaction>["vendor"],
-  transaction: ReturnType<typeof createTransformedTransaction>
-) {
-  let from:
-    | ReturnType<typeof createTransformedTransaction>["member"]
-    | ReturnType<typeof createTransformedTransaction>["vendor"];
-  let to:
-    | ReturnType<typeof createTransformedTransaction>["member"]
-    | ReturnType<typeof createTransformedTransaction>["vendor"];
-
-  const memberToVendorTypes = [
-    "PERIODIC_DEPOSIT",
-    "OFFSET_DEPOSIT",
-    "REJOIN",
-    "FUNDS_TRANSFER",
-  ];
-  const vendorToMemberTypes = ["WITHDRAW"];
-
-  // Reverse mapping logic based on transaction type and vendor type
-  if (memberToVendorTypes.includes(transaction.transactionType)) {
-    // Transactions where the member is sending to the vendor
-    from = member;
-    to = vendor;
-  } else if (vendorToMemberTypes.includes(transaction.transactionType)) {
-    // Transactions where the vendor is sending to the member
-    from = vendor;
-    to = member;
-  } else if (transaction.transactionType === "INVEST") {
-    // INVEST - member to vendor
-    from = member;
-    to = vendor;
-  } else if (["RETURNS", "PROFIT"].includes(transaction.transactionType)) {
-    // RETURNS/PROFIT - vendor to member
-    from = vendor;
-    to = member;
-  }
-
-  return {
-    from,
-    to,
-  };
-}
-
-const clubData = { sub: "Peacock Club", avatar: "/peacock_cash.png" };
-const loanData = { sub: "Loan Account" };
-
-function createTransformedTransaction(
-  member: MemberDetails,
-  vendor: VendorDetails,
-  transaction: TransactionToTransform
-) {
-  const vendorOwnerData = vendor.owner
-    ? {
-        id: vendor.owner.id || vendor.id,
-        name: `${vendor.owner.firstName || ""} ${vendor.owner.lastName || ""}`,
-        avatar: vendor.owner.avatar
-          ? `/image/${vendor.owner.avatar}`
-          : undefined,
-      }
-    : {};
-
-  // Base data structures for member and vendor with default values
-  let memberData: any = {};
-  let vendorData: any = {};
-
-  const isLendType = vendor.type === "LEND";
-
-  // Set memberData and vendorData based on transaction type
-  switch (transaction.transactionType) {
-    case "FUNDS_TRANSFER":
-      memberData = clubData;
-      vendorData = { ...vendorOwnerData, ...clubData };
-      break;
-
-    case "PERIODIC_DEPOSIT":
-    case "OFFSET_DEPOSIT":
-    case "WITHDRAW":
-    case "REJOIN":
-      if (vendor.owner) {
-        vendorData = { ...vendorOwnerData, ...clubData };
-      }
-      break;
-
-    case "RETURNS":
-    case "PROFIT":
-      vendorData = isLendType
-        ? { ...vendorOwnerData, ...loanData }
-        : vendorOwnerData;
-      memberData = clubData;
-      break;
-
-    case "INVEST":
-      memberData = clubData;
-      if (isLendType) {
-        vendorData = { ...vendorOwnerData, ...loanData };
-      }
-      break;
-  }
-
-  // Construct the final transformed object
-  return {
-    member: {
-      id: member.id,
-      name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-      active: member.active,
-      sub: "Member",
-      avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-      ...memberData,
-    },
-    vendor: {
-      id: vendor.id,
-      name: vendor.name,
-      active: vendor.active,
+  const updated = {
+    from: {
+      ...transaction.from,
+      name: fromName,
       sub: "",
-      type: vendor.type,
-      avatar: undefined,
-      ...vendorData,
+      avatar: transaction.from.avatar
+        ? `/image/${transaction.from.avatar}`
+        : undefined,
     },
-    memberId: member.id,
-    vendorId: vendor.id,
-    transactionType: transaction.transactionType,
-    transactionAt: transaction.transactionAt,
-    amount: transaction.amount,
-    method: transaction.method,
-    note: transaction.note,
-    updatedAt: transaction.updatedAt,
-    createdAt: transaction.createdAt,
-    id: transaction.id,
-    vendorType: isLendType ? "LEND" : "DEFAULT",
+    to: {
+      ...transaction.to,
+      name: toName,
+      sub: "",
+      avatar: transaction.to.avatar
+        ? `/image/${transaction.to.avatar}`
+        : undefined,
+    },
+  };
+
+  if (["LOAN_TAKEN"].includes(transaction.transactionType)) {
+    updated.to.sub = "Loan";
+  }
+
+  if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.transactionType)) {
+    updated.from.sub = "Loan";
+    updated.to.sub = "Club Account";
+  }
+
+  if (
+    ["WITHDRAW", "LOAN_TAKEN", "VENDOR_INVEST", "FUNDS_TRANSFER"].includes(
+      transaction.transactionType
+    )
+  ) {
+    updated.from.sub = "Club Account";
+    updated.from.avatar = clubData.avatar;
+  }
+
+  if (
+    [
+      "PERIODIC_DEPOSIT",
+      "VENDOR_RETURNS",
+      "OFFSET_DEPOSIT",
+      "LOAN_REPAY",
+      "LOAN_INTEREST",
+      "FUNDS_TRANSFER",
+    ].includes(transaction.transactionType)
+  ) {
+    updated.to.sub = clubData.sub;
+    updated.to.avatar = clubData.avatar;
+  }
+
+  return {
+    ...transaction,
+    ...updated,
   };
 }
 
@@ -305,19 +209,11 @@ export async function POST(request: Request) {
       transactionType,
       method,
       note,
-      vendorType,
     } = await request.json();
 
-    const { vendorId, memberId } = await determineVendorAndMemberIds({
+    const transaction = await createTransaction({
       fromId,
       toId,
-      transactionType,
-      vendorType,
-    });
-
-    const transaction = await createTransaction({
-      vendorId,
-      memberId,
       amount,
       transactionType,
       method,
@@ -335,89 +231,9 @@ export async function POST(request: Request) {
   }
 }
 
-async function determineVendorAndMemberIds({
+async function createTransaction({
   fromId,
   toId,
-  transactionType,
-  vendorType,
-}: {
-  fromId: string;
-  toId: string;
-  transactionType: string;
-  vendorType: string;
-}) {
-  let vendorId = toId;
-  let memberId = fromId;
-
-  // Transaction types that determine vendor and member roles
-  const memberToVendorTypes = [
-    "PERIODIC_DEPOSIT",
-    "OFFSET_DEPOSIT",
-    "REJOIN",
-    "FUNDS_TRANSFER",
-  ];
-  const vendorToMemberTypes = ["WITHDRAW"];
-
-  // Check if vendor needs to be created for specific types
-  if (vendorType === "LEND" || vendorType === "HOLD") {
-    vendorId = await findOrCreateVendor(toId, vendorType);
-  }
-
-  if (memberToVendorTypes.includes(transactionType)) {
-    memberId = fromId;
-    vendorId = await findOrCreateVendor(toId, "HOLD");
-  } else if (vendorToMemberTypes.includes(transactionType)) {
-    memberId = toId;
-    vendorId = await findOrCreateVendor(fromId, "HOLD");
-  } else if (["INVEST"].includes(transactionType)) {
-    // INVEST from member to vendor
-    memberId = fromId;
-    vendorId =
-      vendorType === "LEND" ? await findOrCreateVendor(fromId, "LEND") : toId;
-  } else if (["RETURNS", "PROFIT"].includes(transactionType)) {
-    // RETURNS or PROFIT from vendor to member
-    vendorId = fromId;
-    memberId =
-      vendorType === "LEND" ? await findOrCreateVendor(fromId, "LEND") : toId;
-  }
-
-  return { vendorId, memberId };
-}
-
-async function findOrCreateVendor(ownerId: string, type: VENDOR_TYPE) {
-  const existingVendor = await prisma.vendor.findFirst({
-    where: { ownerId, type },
-    select: { id: true },
-  });
-  if (existingVendor) return existingVendor.id;
-
-  const passbookConnection: any =
-    type === "LEND"
-      ? { create: { type: "VENDOR" } }
-      : { connect: { id: await getPassbookId(ownerId) } };
-  const newVendor = await prisma.vendor.create({
-    data: {
-      owner: { connect: { id: ownerId } },
-      name: ownerId,
-      slug: `${ownerId}-${type}`,
-      passbook: passbookConnection,
-      type,
-    },
-  });
-  return newVendor.id;
-}
-
-async function getPassbookId(memberId: string) {
-  const memberData = await prisma.member.findFirstOrThrow({
-    where: { id: memberId },
-    select: { passbookId: true },
-  });
-  return memberData.passbookId;
-}
-
-async function createTransaction({
-  vendorId,
-  memberId,
   amount,
   transactionType,
   method,
@@ -427,8 +243,8 @@ async function createTransaction({
 }: Transaction | any) {
   return await prisma.transaction.create({
     data: {
-      vendorId,
-      memberId,
+      fromId,
+      toId,
       amount: amount,
       transactionType,
       method: method || "ACCOUNT",

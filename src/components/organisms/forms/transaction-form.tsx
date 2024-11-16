@@ -65,7 +65,7 @@ export function TransactionForm({
           fromId: selected?.fromId || "",
           toId: selected?.toId || "",
           transactionType: selected.transactionType as any,
-          vendorType: (selected?.vendorType as any) || "DEFAULT",
+          // vendorType: (selected?.vendorType as any) || "DEFAULT",
           method: (selected.method as any) || "ACCOUNT",
           amount: selected.amount || 0,
           note: selected.note || "",
@@ -94,7 +94,7 @@ export function TransactionForm({
     }
     form.setValue("vendorType", "DEFAULT");
     return false;
-  }, [transactionType]);
+  }, [form, transactionType]);
 
   const formToLabels = useMemo(() => {
     if (transactionType === "WITHDRAW") {

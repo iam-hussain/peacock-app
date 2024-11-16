@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import { TRANSACTION_TYPE } from "@prisma/client";
 
 type Stage = {
@@ -96,9 +97,11 @@ export const transactionTypeMap: { [key in TRANSACTION_TYPE]: string } = {
   WITHDRAW: "Members Withdraw",
   REJOIN: "Members Rejoin Deposit",
   FUNDS_TRANSFER: "Club Funds Transfer",
-  INVEST: "Investment/Loan",
-  RETURNS: "Return/Repayment",
-  PROFIT: "Profit/Interest",
+  VENDOR_INVEST: "Investment",
+  VENDOR_RETURNS: "Return",
+  LOAN_TAKEN: "Loan Taken",
+  LOAN_REPAY: "Loan Repayment",
+  LOAN_INTEREST: "Profit/Interest",
 };
 
 // Transaction Type Map
@@ -108,7 +111,9 @@ export const transactionTypeHumanMap: { [key in TRANSACTION_TYPE]: string } = {
   WITHDRAW: "Member's Withdrawal",
   REJOIN: "Member's Rejoin Deposit",
   FUNDS_TRANSFER: "Club Funds Transfer Between Members",
-  INVEST: "Investment/Loan to Vendor or Member",
-  RETURNS: "Return/Repayment from Vendor or Member",
-  PROFIT: "Profit/Interest Received from Vendor or Member",
+  VENDOR_INVEST: "Investment to Vendor or Member",
+  VENDOR_RETURNS: "Return from Vendor or Member",
+  LOAN_TAKEN: "Loan to members",
+  LOAN_REPAY: "Collect loan Repayment from members ",
+  LOAN_INTEREST: "Profit/Interest Received from Vendor or Member",
 };

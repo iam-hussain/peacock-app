@@ -2,11 +2,12 @@ import { PrismaClient } from "@prisma/client";
 
 import backupData from "../public/peacock_backup.json";
 
-import { seedTransactionExtends } from "@/db";
+// import { seedTransactionExtends } from "@/db";
 
 const prisma = new PrismaClient({
   log: ["error"],
-}).$extends(seedTransactionExtends);
+});
+// .$extends(seedTransactionExtends);
 
 async function seed() {
   // const backupFilePath = path.join(
@@ -33,13 +34,24 @@ async function seed() {
     })),
   });
 
-  const chitIds = backupData.vendors
+  console.log(JSON.stringify({ membersCreated }));
+
+  const chitPassbookIds = backupData.vendors
     .filter((e) => e.type === "CHIT")
-    .map((e) => e.id);
+    .map((e) => e.passbookId);
 
   const loanIds: string[] = [];
   const loanIdsMapMember: any = {};
   const skipPassbooks: string[] = [];
+
+  console.log(
+    JSON.stringify({
+      chitPassbookIds,
+      loanIds,
+      loanIdsMapMember,
+      skipPassbooks,
+    })
+  );
 
   backupData.vendors
     .filter((e) => e.type === "LEND")
@@ -65,141 +77,88 @@ async function seed() {
       })),
   });
 
-  // const memberLoad: any = {};
-  // const loadVendor: any[] = [];
-  // const loanMemberMap: any = {};
-  // const dupPass: any[] = [];
-  // const skipVendors: string[] = [];
+  console.log(JSON.stringify({ vendorsCreated }));
 
-  // const vendorToCreate = backupData.vendors
-  //   .map((e: any) => {
-  //     if (e.type === "LEND") {
-  //       skipVendors.push(e.id);
-  //       if (!memberLoad[e.ownerId]) {
-  //         memberLoad[e.ownerId] = e;
-  //         loadVendor.push({ ...e, name: "Loan" });
-  //       } else {
-  //         dupPass.push(e.passbookId);
-  //       }
-  //       loanMemberMap[e.id] = memberLoad[e.ownerId];
-  //       return null;
-  //     }
+  const passbookCreated = await prisma.passbook.createMany({
+    data: backupData.passbooks
+      .filter((e: any) => !skipPassbooks.includes(e.id))
+      .map((e) => ({
+        id: e.id,
+        type: e.type as any,
+        isChit: chitPassbookIds.includes(e.id),
+      })),
+  });
 
-  //     return e;
-  //   })
-  //   .filter(Boolean);
+  console.log(JSON.stringify({ passbookCreated }));
 
-  // // Insert the data into Prisma models
-  // await prisma.member.createMany({ data: backupData.members });
-  // await prisma.vendor.createMany({ data: [...vendorToCreate, ...loadVendor] });
+  const profitShareCreated = await prisma.profitShare.createMany({
+    data: backupData.vendorProfitShares.filter(
+      (e: any) => !loanIds.includes(e.vendorId)
+    ),
+  });
 
-  // await prisma.passbook.createMany({
-  //   data: backupData.passbooks
-  //     .filter((e: any) => !dupPass.includes(e.id))
-  //     .map((e: Passbook) => ({
-  //       id: e.id,
-  //       type: e.type,
-  //       calcReturns: e.calcReturns,
-  //     })),
-  // });
+  console.log(JSON.stringify({ profitShareCreated }));
 
-  // await prisma.vendorProfitShare.createMany({
-  //   data: backupData.vendorProfitShares.filter(
-  //     (e: any) => !skipVendors.includes(e.vendorId)
-  //   ),
-  // });
+  const memberTransactionsCreated = await prisma.transaction.createMany({
+    data: backupData.memberTransactions as any[],
+  });
 
-  // const holdingVendors: any = {};
+  console.log(JSON.stringify({ memberTransactionsCreated }));
 
-  // for (const memberTrans of backupData.memberTransactions) {
-  //   const { fromId, toId, ...other } = memberTrans;
-  //   const ids = {
-  //     memberId: fromId,
-  //     vendorId: toId,
-  //   };
+  const vendorTransactionsCreated = await prisma.transaction.createMany({
+    data: backupData.vendorTransactions.map((each) => {
+      const { vendorId, memberId, transactionType, ...other } = each;
 
-  //   if (["WITHDRAW"].includes(other.transactionType)) {
-  //     ids.vendorId = fromId;
-  //     ids.memberId = toId;
-  //   }
+      const updated = {
+        fromId: vendorId,
+        toId: memberId,
+        transactionType,
+      };
 
-  //   if (other.transactionType === "PERIODIC_INVEST") {
-  //     other.transactionType = "INVEST";
-  //   }
+      if (loanIds.includes(vendorId)) {
+        const accountId = loanIdsMapMember[vendorId] || "";
 
-  //   if (other.transactionType === "PERIODIC_RETURN") {
-  //     other.transactionType = "RETURNS";
-  //   }
+        if (
+          ["RETURNS", "PERIODIC_RETURN"].includes(transactionType) &&
+          each.amount <= 8000
+        ) {
+          updated.fromId = accountId;
+          updated.transactionType = "PROFIT";
+        }
 
-  //   if (
-  //     ["RETURNS", "PERIODIC_RETURN"].includes(other.transactionType) &&
-  //     other.amount <= 8000
-  //   ) {
-  //     other.transactionType = "PROFIT";
-  //   }
+        if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
+          updated.toId = accountId;
+          updated.transactionType = "LOAN_TAKEN";
+        }
+        if (["PERIODIC_RETURN", "RETURNS"].includes(transactionType)) {
+          updated.fromId = accountId;
+          updated.transactionType = "LOAN_REPAY";
+        }
+        if (["PROFIT"].includes(transactionType)) {
+          updated.fromId = accountId;
+          updated.transactionType = "LOAN_INTEREST";
+        }
+      } else {
+        if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
+          updated.fromId = memberId;
+          updated.toId = vendorId;
+          updated.transactionType = "VENDOR_INVEST";
+        }
+        if (
+          ["PERIODIC_RETURN", "RETURNS", "PROFIT"].includes(transactionType)
+        ) {
+          updated.transactionType = "VENDOR_RETURNS";
+        }
+      }
 
-  //   if (!holdingVendors[ids.vendorId]) {
-  //     const vendor = backupData.members.find((e: any) => e.id === ids.vendorId);
-  //     const hold = await prisma.vendor.create({
-  //       data: {
-  //         owner: {
-  //           connect: {
-  //             id: ids.vendorId,
-  //           },
-  //         },
-  //         name: ids.vendorId,
-  //         slug: ids.vendorId,
-  //         passbook: {
-  //           connect: {
-  //             id: vendor.passbookId,
-  //           },
-  //         },
-  //         type: "HOLD",
-  //       },
-  //     });
-  //     holdingVendors[toId] = hold.id;
-  //   }
+      return {
+        ...other,
+        ...updated,
+      } as any;
+    }),
+  });
 
-  //   ids.vendorId = holdingVendors[ids.vendorId];
-
-  //   await prisma.transaction.create({
-  //     data: {
-  //       ...other,
-  //       ...ids,
-  //     },
-  //   });
-  //   // await seedTransactionMiddlewareHandler({
-  //   //   ...other,
-  //   //   ...ids,
-  //   // });
-  // }
-
-  // const vendorTrans = backupData.vendorTransactions.map((e: any) => {
-  //   if (loanMemberMap[e.vendorId]) {
-  //     e.vendorId = loanMemberMap[e.vendorId].id;
-  //   }
-  //   if (e.transactionType === "PERIODIC_INVEST") {
-  //     e.transactionType = "INVEST";
-  //   }
-
-  //   if (e.transactionType === "PERIODIC_RETURN") {
-  //     e.transactionType = "RETURNS";
-  //   }
-
-  //   if (
-  //     ["RETURNS", "PERIODIC_RETURN"].includes(e.transactionType) &&
-  //     e.amount <= 8000
-  //   ) {
-  //     e.transactionType = "PROFIT";
-  //   }
-
-  //   return e;
-  // });
-
-  // for (const trans of vendorTrans) {
-  //   await prisma.transaction.create({ data: trans });
-  //   // await seedTransactionMiddlewareHandler(trans);
-  // }
+  console.log(JSON.stringify({ vendorTransactionsCreated }));
 }
 
 seed()

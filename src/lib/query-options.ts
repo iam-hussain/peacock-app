@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 import fetcher from "./fetcher";
 
+import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { GetStatisticsResponse } from "@/app/api/dashboard/statistics/route";
 import { GetLoanResponse } from "@/app/api/loan/route";
 import { GetConnectionMemberVendor } from "@/app/api/member/connection/[memberId]/route";
@@ -29,6 +30,14 @@ export const fetchAuthStatus = () =>
     ...noRefetchConfigs,
   });
 
+export const fetchAccountSelect = () =>
+  queryOptions({
+    queryKey: ["account-details", "account-select"],
+    queryFn: () =>
+      fetcher("/api/account/select") as never as TransformedAccountSelect[],
+    ...noRefetchConfigs,
+  });
+
 export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
     queryKey: ["member-connection", "connection"],
@@ -53,7 +62,7 @@ export const fetchMembersSelect = () =>
   queryOptions({
     queryKey: ["member-details", "members-select"],
     queryFn: () =>
-      fetcher("/api/member/select", {
+      fetcher("/api/account/select", {
         tags: ["members-select"],
       }) as never as TransformedMemberSelect[],
     ...noRefetchConfigs,
@@ -116,7 +125,7 @@ export const fetchAllVendorsSelect = () =>
   queryOptions({
     queryKey: ["vendor-details", "vendors-select"],
     queryFn: () =>
-      fetcher("/api/vendor/select", {
+      fetcher("/api/account/select", {
         tags: ["vendors-select"],
       }) as never as TransformedVendorSelect[],
     ...noRefetchConfigs,
@@ -126,7 +135,7 @@ export const fetchLoanSelect = () =>
   queryOptions({
     queryKey: ["vendor-details", "vendors-select", "loan-vendors-select"],
     queryFn: () =>
-      fetcher("/api/vendor/select?type=LEND", {
+      fetcher("/api/account/select?type=LEND", {
         tags: ["vendors-select"],
       }) as never as TransformedVendorSelect[],
     ...noRefetchConfigs,
@@ -136,7 +145,7 @@ export const fetchVendorSelect = () =>
   queryOptions({
     queryKey: ["vendor-details", "vendors-select", "chit-vendors-select"],
     queryFn: () =>
-      fetcher("/api/vendor/select?type=DEFAULT-CHIT-BANK", {
+      fetcher("/api/account/select?type=DEFAULT-CHIT-BANK", {
         tags: ["vendors-select"],
       }) as never as TransformedVendorSelect[],
     ...noRefetchConfigs,

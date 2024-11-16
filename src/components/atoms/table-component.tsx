@@ -13,11 +13,11 @@ import { cn } from "@/lib/utils";
 
 type AvatarCellProps = {
   id: string;
-  avatar?: string;
+  avatar?: string | null;
   name: string;
   active?: boolean;
-  subLabel?: string;
-  avatarName?: string;
+  subLabel?: string | null;
+  avatarName?: string | null;
   className?: string;
   isSmall?: boolean;
 };
