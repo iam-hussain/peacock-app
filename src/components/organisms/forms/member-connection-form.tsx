@@ -33,7 +33,7 @@ type MemberConnectionsFormProps = {
 
 // Define the types based on Zod schema for better type inference
 type MemberConnectionsFormData = {
-  loanOffset: number;
+  loanOffsetAmount: number;
   connections: { id: string; active: boolean }[];
 };
 
@@ -46,7 +46,7 @@ export function MemberConnectionsForm({
   const form = useForm<MemberConnectionsFormData>({
     resolver: zodResolver(memberConnectionFormSchema),
     defaultValues: {
-      loanOffset: 0,
+      loanOffsetAmount: 0,
       connections: [],
     },
   });
@@ -60,7 +60,7 @@ export function MemberConnectionsForm({
   useEffect(() => {
     if (data && data.connections) {
       reset({
-        loanOffset: data.loanOffset || 0,
+        loanOffsetAmount: data.loanOffsetAmount || 0,
         connections: data.connections.map((connection) => ({
           id: connection.id,
           active: connection.active,
@@ -74,9 +74,9 @@ export function MemberConnectionsForm({
       fetcher.post(`/api/member/connection/${memberId}`, {
         body: {
           connections: input.connections,
-          current: data?.loanOffset || 0,
-          loanOffset: input.loanOffset,
-          loanPassbookId: data?.loanPassbookId,
+          current: data?.loanOffsetAmount || 0,
+          loanOffsetAmount: input.loanOffsetAmount,
+          passbookId: data?.passbookId,
         },
       }),
     onSuccess: async (response) => {
@@ -116,7 +116,7 @@ export function MemberConnectionsForm({
             {/* Amount Input */}
             <FormField
               control={control}
-              name="loanOffset"
+              name="loanOffsetAmount"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel>Amount to reduce loan profit</FormLabel>
@@ -141,11 +141,10 @@ export function MemberConnectionsForm({
               >
                 <AvatarCell
                   id={connection.id}
-                  avatar={connection.memberAvatar}
-                  name={connection.vendorName}
+                  avatar={connection.avatar}
+                  name={connection.name}
                   avatarName={connection.name}
-                  active={connection.vendorActive}
-                  subLabel={connection.memberName}
+                  active={connection.active}
                   className="min-w-min"
                   isSmall={true}
                 />

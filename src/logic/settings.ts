@@ -11,6 +11,11 @@ export type TransactionPassbookConfig = {
   [key in TRANSACTION_TYPE]: PassbookConfigAction;
 };
 
+export type PassbookRecord =
+  | keyof MemberPassbookData
+  | keyof VendorPassbookData
+  | keyof ClubPassbookData;
+
 export type PassbookConfigAction = {
   FROM?: {
     ADD?: Partial<
@@ -46,7 +51,7 @@ export type PassbookConfigAction = {
   };
 };
 
-export type PassbookConfigActionValue = "AMOUNT" | "LOAN_BALANCE" | "PROFIT";
+export type PassbookConfigActionValue = "AMOUNT";
 
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {

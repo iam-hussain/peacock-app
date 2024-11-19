@@ -1,4 +1,4 @@
-import { Passbook, Transaction } from "@prisma/client";
+import { Transaction } from "@prisma/client";
 
 import {
   PassbookConfigAction,
@@ -7,40 +7,36 @@ import {
 } from "./settings";
 
 import prisma from "@/db";
+import { setPassbookUpdateQuery } from "@/lib/helper";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
 };
 
 function getPassbookUpdateQuery(
-  passbook: Passbook,
+  passbook: Parameters<typeof prisma.passbook.update>[0],
   values: PassbookConfigActionValueMap,
   action:
     | PassbookConfigAction["CLUB"]
     | PassbookConfigAction["FROM"]
-    | PassbookConfigAction["TO"],
-  addonData: Parameters<typeof prisma.passbook.update>[0]["data"] = {}
+    | PassbookConfigAction["TO"]
 ): Parameters<typeof prisma.passbook.update>[0] {
-  return {
-    where: {
-      id: passbook.id,
-    },
-    data: {
-      ...addonData,
-      ...Object.fromEntries(
-        Object.entries(action.ADD || {}).map(([key, value]) => [
-          key,
-          Number(passbook[key as keyof Passbook] || 0) + values[value],
-        ])
-      ),
-      ...Object.fromEntries(
-        Object.entries(action.SUB || {}).map(([key, value]) => [
-          key,
-          Number(passbook[key as keyof Passbook] || 0) - values[value],
-        ])
-      ),
-    },
-  };
+  const data: any = passbook.data.data || {};
+
+  return setPassbookUpdateQuery(passbook, {
+    ...Object.fromEntries(
+      Object.entries(action?.ADD || {}).map(([key, value]) => [
+        key,
+        Number(data[key as string] || 0) + values[value],
+      ])
+    ),
+    ...Object.fromEntries(
+      Object.entries(action?.SUB || {}).map(([key, value]) => [
+        key,
+        Number(data[key as string] || 0) - values[value],
+      ])
+    ),
+  });
 }
 
 type PassbookToUpdate = Map<
@@ -48,53 +44,40 @@ type PassbookToUpdate = Map<
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
-export const transactionMiddleware = async (
+export const transactionMiddleware = (
   passbookToUpdate: PassbookToUpdate,
   transaction: Transaction,
-  transactionPassbooks: { MEMBER: Passbook; VENDOR: Passbook; CLUB: Passbook },
   isRevert: Boolean = false
 ) => {
   const values: PassbookConfigActionValueMap = {
     AMOUNT: transaction.amount,
-    TERM: 1,
-    PROFIT: 0,
+  };
+
+  const transactionPassbooks: any = {
+    FROM: transaction.fromId,
+    TO: transaction.toId,
+    CLUB: "CLUB",
   };
 
   Object.entries(transactionPassbookSettings).forEach(
     ([transactionType, passbooksOf]) => {
       if (transaction.transactionType === transactionType) {
         Object.entries(passbooksOf).forEach(([passbookOf, action]: any[]) => {
-          const currentPassbook =
-            transactionPassbooks[passbookOf as "MEMBER" | "VENDOR" | "CLUB"];
+          const currentPassbook = passbookToUpdate.get(
+            transactionPassbooks[passbookOf]
+          );
           if (currentPassbook) {
-            const passbookData = passbookToUpdate.get(currentPassbook.id) || {
-              where: { id: currentPassbook.id },
-              data: {},
-            };
+            let currentAction = action;
             if (isRevert) {
-              passbookToUpdate.set(
-                currentPassbook.id,
-                getPassbookUpdateQuery(
-                  currentPassbook,
-                  values,
-                  {
-                    ADD: action.SUB,
-                    SUB: action.ADD,
-                  },
-                  passbookData.data
-                )
-              );
-            } else {
-              passbookToUpdate.set(
-                currentPassbook.id,
-                getPassbookUpdateQuery(
-                  currentPassbook,
-                  values,
-                  action,
-                  passbookData.data
-                )
-              );
+              currentAction = {
+                ADD: action.SUB,
+                SUB: action.ADD,
+              };
             }
+            passbookToUpdate.set(
+              transactionPassbooks[passbookOf],
+              getPassbookUpdateQuery(currentPassbook, values, currentAction)
+            );
           }
         });
       }

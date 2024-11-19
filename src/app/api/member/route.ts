@@ -1,26 +1,48 @@
-import { Member, Passbook } from "@prisma/client";
-import { revalidatePath } from "next/cache";
+import { Account, Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { memberTotalDepositAmount } from "@/lib/club";
 import { calculateMonthsDifference } from "@/lib/date";
+import { ClubPassbookData, MemberPassbookData } from "@/lib/type";
 
-type MemberToTransform = Member & {
+type MemberToTransform = Account & {
   passbook: Passbook;
 };
 
 export async function GET() {
-  const members = await prisma.member.findMany({
-    include: {
-      passbook: true,
-    },
-  });
-  const memberTotalDeposit = memberTotalDepositAmount();
+  const [members, club] = await Promise.all([
+    prisma.account.findMany({
+      where: {
+        isMember: true,
+      },
+      include: {
+        passbook: true,
+      },
+    }),
+    prisma.passbook.findFirstOrThrow({
+      where: {
+        type: "CLUB",
+      },
+      select: {
+        data: true,
+      },
+    }),
+  ]);
 
+  const memberTotalDeposit = memberTotalDepositAmount();
+  const activeMembersCount = members.filter((e) => e.active).length;
   const transformedMembers = members
-    .map((each) => membersTableTransform(each, memberTotalDeposit))
-    .sort((a, b) => (a.name > b.name ? 1 : -1));
+    .map((each) =>
+      membersTableTransform(
+        each,
+        memberTotalDeposit,
+        club.data as ClubPassbookData,
+        activeMembersCount
+      )
+    )
+    .sort((a, b) => (a.name > b.name ? 1 : -1))
+    .sort((a, b) => (a.active > b.active ? -1 : 1));
 
   return NextResponse.json({
     members: transformedMembers,
@@ -29,34 +51,59 @@ export async function GET() {
 
 function membersTableTransform(
   member: MemberToTransform,
-  memberTotalDeposit: number
+  memberTotalDeposit: number,
+  clubData: ClubPassbookData,
+  activeMembersCount: number
 ) {
-  const offsetBalance =
-    member.passbook.offset +
-    member.passbook.loanOffset -
-    member.passbook.offsetIn;
-  const periodBalance =
-    memberTotalDeposit - (member.passbook.periodIn - member.passbook.out);
-  const deposit = member.passbook.periodIn + member.passbook.offsetIn;
+  const {
+    periodicDepositAmount = 0,
+    offsetDepositAmount = 0,
+    totalDepositAmount = 0,
+    withdrawalAmount = 0,
+    accountBalance = 0,
+    clubHeldAmount = 0,
+    totalVendorOffsetAmount = 0,
+    totalLoanOffsetAmount = 0,
+    // totalLoanTaken,
+    // totalLoanRepay,
+    // totalLoanBalance,
+    // totalInterestPaid,
+  } = member.passbook.data as unknown as MemberPassbookData;
+
+  const totalOffsetAmount = totalVendorOffsetAmount + totalLoanOffsetAmount;
+  const totalBalanceAmount =
+    memberTotalDeposit + totalOffsetAmount - accountBalance;
+  const totalPeriodBalanceAmount =
+    totalBalanceAmount > memberTotalDeposit
+      ? memberTotalDeposit - accountBalance
+      : 0;
+  const offsetBalanceAmount =
+    accountBalance - (memberTotalDeposit + totalOffsetAmount);
+
+  const totalOffsetBalanceAmount =
+    totalPeriodBalanceAmount > 0 ? totalOffsetAmount : offsetBalanceAmount;
+
+  const totalReturnAmount =
+    (clubData.totalLoanProfit + clubData.totalVendorProfit) /
+    activeMembersCount;
+
   return {
     id: member.id,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    username: member.username,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-    joined: calculateMonthsDifference(new Date(), new Date(member.joinedAt)),
-    joinedAt: member.joinedAt.getTime(),
+    joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
+    startAt: member.startAt.getTime(),
     status: member.active ? "Active" : "Disabled",
     active: member.active,
-    deposit: deposit - member.passbook.out,
-    periodIn: member.passbook.periodIn,
-    offsetDeposit: member.passbook.offsetIn,
-    offsetBalance,
-    periodBalance,
-    balance: periodBalance + offsetBalance,
-    returns: member.passbook.returns || 0,
-    clubFund: member.passbook.fund,
-    netValue:
-      member.passbook.in + member.passbook.returns - member.passbook.out,
+    totalDepositAmount: totalDepositAmount - withdrawalAmount,
+    periodicDepositAmount,
+    offsetDepositAmount,
+    totalOffsetBalanceAmount,
+    totalPeriodBalanceAmount,
+    totalBalanceAmount,
+    totalReturnAmount: totalReturnAmount || 0,
+    clubHeldAmount,
+    netValue: accountBalance + (totalReturnAmount || 0),
     member: { ...member, passbook: null },
   };
 }
@@ -64,95 +111,5 @@ function membersTableTransform(
 export type GetMemberResponse = {
   members: TransformedMember[];
 };
-
-export async function POST(request: Request) {
-  try {
-    const data = await request.json();
-    const {
-      id,
-      firstName,
-      lastName,
-      username,
-      phone,
-      email,
-      avatar,
-      active,
-      joinedAt,
-    } = data;
-
-    // Validate required fields
-    if (!firstName && !id) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const commonData = {
-      firstName: firstName || undefined,
-      lastName: lastName ?? undefined,
-      username:
-        username || firstName?.toLowerCase().trim().replace(/\s+/g, "_"),
-      phone: phone ?? undefined,
-      email: email ?? undefined,
-      avatar: avatar ?? undefined,
-      joinedAt: new Date(joinedAt || new Date()),
-      active: active ?? true,
-    };
-
-    let member;
-
-    if (id) {
-      // Update existing member
-      member = await prisma.member.update({
-        where: { id },
-        data: commonData,
-      });
-    } else {
-      const vendors = await prisma.vendor.findMany({
-        select: { id: true, active: true },
-      });
-      await prisma.vendor.findMany({
-        select: { id: true, active: true },
-      });
-      // Create a new member
-      member = await prisma.member.create({
-        data: {
-          ...commonData,
-          passbook: {
-            create: {
-              type: "MEMBER",
-              vendor: {
-                create: {
-                  name: "",
-                  slug: "",
-                  type: "HOLD",
-                },
-              },
-            },
-          },
-          profitShares: {
-            createMany: {
-              data: vendors.map((e) => ({
-                vendorId: e.id,
-                active: e.active,
-              })),
-            },
-          },
-        },
-      });
-    }
-
-    revalidatePath("/members");
-
-    return NextResponse.json({ member }, { status: 200 });
-  } catch (error) {
-    console.error("Error creating/updating member:", error);
-    return NextResponse.json(
-      { error: "Failed to process request" },
-      { status: 500 }
-    );
-  }
-}
 
 export type TransformedMember = ReturnType<typeof membersTableTransform>;

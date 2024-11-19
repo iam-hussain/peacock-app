@@ -127,15 +127,18 @@ async function seed() {
         }
 
         if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
+          updated.fromId = memberId;
           updated.toId = accountId;
           updated.transactionType = "LOAN_TAKEN";
         }
         if (["PERIODIC_RETURN", "RETURNS"].includes(transactionType)) {
           updated.fromId = accountId;
+          updated.toId = memberId;
           updated.transactionType = "LOAN_REPAY";
         }
         if (["PROFIT"].includes(transactionType)) {
           updated.fromId = accountId;
+          updated.toId = memberId;
           updated.transactionType = "LOAN_INTEREST";
         }
       } else {
@@ -147,6 +150,8 @@ async function seed() {
         if (
           ["PERIODIC_RETURN", "RETURNS", "PROFIT"].includes(transactionType)
         ) {
+          updated.fromId = vendorId;
+          updated.toId = memberId;
           updated.transactionType = "VENDOR_RETURNS";
         }
       }

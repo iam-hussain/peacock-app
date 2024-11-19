@@ -39,8 +39,8 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         name={row.original.name}
         active={row.original.active}
         subLabel={
-          row.original.clubFund
-            ? row.original.clubFund.toLocaleString("en-IN", {
+          row.original.clubHeldAmount
+            ? row.original.clubHeldAmount.toLocaleString("en-IN", {
                 style: "currency",
                 currency: "INR",
               })
@@ -56,13 +56,13 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.deposit.toLocaleString("en-IN", {
+        label={row.original.totalDepositAmount.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
         subLabel={
-          row.original.offsetDeposit !== 0
-            ? `${row.original.periodIn.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDeposit.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+          row.original.offsetDepositAmount !== 0
+            ? `${row.original.periodicDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
             : ""
         }
       />
@@ -75,15 +75,15 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.balance.toLocaleString("en-IN", {
+        label={row.original.totalBalanceAmount.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        greenLabel={row.original.balance <= 0}
-        redLabel={row.original.balance > 0}
+        greenLabel={row.original.totalBalanceAmount <= 0}
+        redLabel={row.original.totalBalanceAmount > 0}
         subLabel={
-          row.original.offsetBalance !== 0
-            ? `${row.original.periodBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+          row.original.totalPeriodBalanceAmount !== 0
+            ? `${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
             : ""
         }
       />
@@ -96,7 +96,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.returns.toLocaleString("en-IN", {
+        label={row.original.totalReturnAmount.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -121,13 +121,13 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
 
 const editColumns: ColumnDef<TransformedMember>[] = [
   {
-    accessorKey: "joinedAt",
+    accessorKey: "startAt",
     header: ({ column }) => (
       <ActionTableHeader label="Joined" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={dateFormat(new Date(row.original.joinedAt))}
+        label={dateFormat(new Date(row.original.startAt))}
         subLabel={row.original.id}
       />
     ),

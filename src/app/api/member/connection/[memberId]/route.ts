@@ -4,33 +4,22 @@ import prisma from "@/db";
 
 function transformConnectionMemberVendor(input: {
   vendor: {
-    name: string;
     active: boolean;
-    owner: {
-      firstName: string;
-      lastName: string | null;
-      avatar: string | null;
-    } | null;
+    firstName: string;
+    lastName: string | null;
+    avatar: string | null;
   };
   id: string;
   active: boolean;
 }) {
-  const {
-    vendor: { owner, name, active },
-    ...props
-  } = input;
-  const memberName = owner?.firstName
-    ? `${owner.firstName} ${owner.lastName || ""}`
-    : "";
+  const { vendor, ...props } = input;
 
   return {
     id: props.id,
-    name: `${name}${owner?.firstName ? ` - ${owner.firstName} ${owner.lastName || " "}` : ""}`,
-    vendorName: name,
-    memberName,
-    memberAvatar: owner?.avatar ? `/image/${owner.avatar}` : undefined,
-    vendorActive: active,
+    name: `${vendor.firstName}${vendor.lastName ? ` ${vendor.lastName}` : ""}`,
+    avatar: vendor?.avatar ? `/image/${vendor.avatar}` : undefined,
     active: props.active,
+    memberActive: vendor.active,
   };
 }
 
@@ -40,8 +29,8 @@ export type ConnectionMemberVendor = ReturnType<
 
 export type GetConnectionMemberVendor = {
   connections: ConnectionMemberVendor[];
-  loanOffset: number;
-  loanPassbookId: string;
+  loanOffsetAmount: number;
+  passbookId: string;
 };
 
 // GET Request to fetch the member's vendor connections
@@ -52,44 +41,39 @@ export async function GET(
   const { memberId } = params;
 
   const [connections, passbook] = await Promise.all([
-    prisma.vendorProfitShare.findMany({
+    prisma.profitShare.findMany({
       where: { memberId },
       select: {
         id: true,
         active: true,
         vendor: {
           select: {
-            name: true,
+            firstName: true,
+            lastName: true,
+            avatar: true,
             active: true,
-            owner: {
-              select: {
-                firstName: true,
-                lastName: true,
-                avatar: true,
-              },
-            },
           },
         },
       },
     }),
-    prisma.passbook.findFirst({
+    prisma.passbook.findFirstOrThrow({
       where: {
-        member: {
+        account: {
           id: memberId,
         },
         type: "MEMBER",
       },
       select: {
-        loanOffset: true,
         id: true,
+        loanOffsetAmount: true,
       },
     }),
   ]);
 
   return NextResponse.json({
     connections: connections.map(transformConnectionMemberVendor),
-    loanOffset: passbook?.loanOffset || 0,
-    loanPassbookId: passbook?.id,
+    loanOffsetAmount: Number(passbook.loanOffsetAmount) || 0,
+    passbookId: passbook?.id,
   });
 }
 
@@ -99,14 +83,14 @@ export async function POST(
   { params }: { params: { memberId: string } }
 ) {
   const { memberId } = params;
-  const { connections, current, loanOffset, loanPassbookId } =
+  const { connections, current, loanOffsetAmount, passbookId } =
     await request.json();
 
   if (
     !connections ||
-    !loanPassbookId ||
+    !passbookId ||
     !Array.isArray(connections) ||
-    !(typeof loanOffset === "number" && loanOffset >= 0) ||
+    !(typeof loanOffsetAmount === "number" && loanOffsetAmount >= 0) ||
     !(typeof current === "number" && current >= 0)
   ) {
     return NextResponse.json(
@@ -115,41 +99,22 @@ export async function POST(
     );
   }
 
-  const { _sum } =
-    (await prisma.passbook.aggregate({
-      _sum: {
-        loanOffset: true,
-      },
-      where: {
-        type: "MEMBER",
-        id: { not: loanPassbookId },
-      },
-    })) || {};
-
   await prisma.$transaction([
     prisma.passbook.update({
       where: {
-        id: loanPassbookId,
+        id: passbookId,
       },
       data: {
-        loanOffset,
+        loanOffsetAmount: loanOffsetAmount,
       },
     }),
     ...connections.map((update: { id: string; active: boolean }) =>
-      prisma.vendorProfitShare.update({
+      prisma.profitShare.update({
         where: { id: update.id, memberId },
         data: { active: update.active },
       })
     ),
-    prisma.passbook.updateMany({
-      where: {
-        type: "CLUB",
-      },
-      data: {
-        loanOffset: Number(_sum?.loanOffset || 0) + loanOffset,
-      },
-    }),
   ]);
 
-  return NextResponse.json({ connections, loanOffset });
+  return NextResponse.json({ connections, loanOffsetAmount });
 }

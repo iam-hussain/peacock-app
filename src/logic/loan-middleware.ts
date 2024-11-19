@@ -1,25 +1,21 @@
+import { Transaction } from "@prisma/client";
+
 import prisma from "@/db";
 import { calculateTimePassed } from "@/lib/date";
+import { setPassbookUpdateQuery } from "@/lib/helper";
+import { PassbookToUpdate } from "@/lib/type";
 
-type PassbookToUpdate = Map<
-  string,
-  Parameters<typeof prisma.passbook.update>[0]
->;
+const ONE_MONTH_RATE = 0.01;
 
-function fetchLoanTransaction(vendorId?: string | null) {
+function fetchLoanTransaction(accountId?: string | null) {
   return prisma.transaction.findMany({
     where: {
-      vendor: {
-        type: "LEND",
-        ...(vendorId ? { id: vendorId } : {}),
-      },
-    },
-    include: {
-      vendor: {
-        select: {
-          passbookId: true,
-        },
-      },
+      ...(accountId
+        ? {
+            OR: [{ fromId: accountId }, { toId: accountId }],
+          }
+        : {}),
+      transactionType: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
     },
     orderBy: {
       transactionAt: "asc",
@@ -27,170 +23,134 @@ function fetchLoanTransaction(vendorId?: string | null) {
   });
 }
 
-export function calculateInterest(
-  transactions: Awaited<ReturnType<typeof fetchLoanTransaction>>
-) {
-  const ONE_MONTH_RATE = 0.01;
-  let invested = 0;
-  let returned = 0;
-  let account = 0;
-  let recentInvest: any;
-  let recentReturns: any;
-  let paid = 0;
-  let interest = 0;
-  let balance = 0;
-  let detailsList = [];
+export function calculateInterest(transactions: Transaction[]) {
+  let totalLoanTaken = 0;
+  let totalLoanRepay = 0;
+  let totalInterestPaid = 0;
+  let accountBalance = 0;
+  let recentLoanTakenDate: any = null;
+  let recentLoanRepayDate: any = null;
+  let totalInterestAmount = 0;
+
+  let loans = [];
 
   transactions.forEach((transaction) => {
     const { transactionType, amount, transactionAt } = transaction;
-    const date = new Date(transactionAt);
+    const transactionDate = new Date(transactionAt);
 
-    if (transactionType === "INVEST") {
-      invested += amount;
-      account += amount;
+    if (transactionType === "LOAN_TAKEN") {
+      totalLoanTaken += amount;
+      accountBalance += amount;
 
-      if (!recentReturns) {
-        recentReturns = date.toISOString().split("T")[0];
+      if (!recentLoanRepayDate) {
+        recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
       }
-      recentInvest = date.toISOString().split("T")[0];
+      recentLoanTakenDate = transactionDate.toISOString().split("T")[0];
     }
-    if (transactionType === "RETURNS") {
+    if (transactionType === "LOAN_REPAY") {
       const { monthsPassed, daysPassed } = calculateTimePassed(
-        new Date(recentReturns),
-        date
+        new Date(recentLoanRepayDate),
+        transactionDate
       );
 
       // Interest for months and days
-      const interestForMonths = account * ONE_MONTH_RATE * monthsPassed;
-      const interestForDays = account * ONE_MONTH_RATE * (daysPassed / 30);
-      const interestAmount = interestForMonths + interestForDays;
+      const interestForMonths = accountBalance * ONE_MONTH_RATE * monthsPassed;
+      const interestForDays =
+        accountBalance * ONE_MONTH_RATE * (daysPassed / 30);
 
-      interest += interestAmount;
+      const currentInterestAmount = interestForMonths + interestForDays;
 
-      detailsList.push({
+      totalInterestAmount += currentInterestAmount;
+
+      loans.push({
         active: false,
-        amount: account,
-        startDate: recentReturns,
-        investDate: recentInvest,
-        endDate: date.toISOString().split("T")[0],
-        interestAmount,
+        amount: accountBalance,
+        recentLoanTakenDate,
+        startDate: recentLoanRepayDate,
+        endDate: transactionDate.toISOString().split("T")[0],
+        currentInterestAmount,
+        totalInterestAmount,
         monthsPassed,
         daysPassed,
       });
 
-      recentReturns = date.toISOString().split("T")[0];
+      recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
 
-      account -= amount;
-      returned += amount;
-
-      if (returned === invested) {
-        recentReturns = null;
-      }
+      accountBalance -= amount;
+      totalLoanRepay += amount;
     }
-
-    if (transactionType === "PROFIT") {
-      paid += amount;
+    if (transactionType === "LOAN_INTEREST") {
+      totalInterestPaid += amount;
     }
   });
 
-  if (account > 0 && recentReturns) {
-    const { monthsPassed, daysPassed } = calculateTimePassed(
-      new Date(recentReturns),
-      new Date()
-    );
-    // Interest for months and days
-    const interestForMonths = account * ONE_MONTH_RATE * monthsPassed;
-    const interestAmount = interestForMonths; //  + interestForDays;
-
-    detailsList.push({
-      active: true,
-      amount: account,
-      startDate: recentReturns,
-      investDate: recentInvest,
-      interestAmount: interestAmount,
-      monthsPassed,
-      daysPassed,
+  if (accountBalance > 0 && recentLoanRepayDate) {
+    loans.push({
+      active: false,
+      amount: accountBalance,
+      recentLoanTakenDate,
+      startDate: recentLoanRepayDate,
+      totalInterestAmount,
     });
   }
 
-  balance = interest - paid;
-
   return {
-    invested,
-    returned,
-    paid,
-    account: Math.abs(account),
-    balance,
-    recentReturns,
-    recentInvest,
-    interest,
-    detailsList,
+    loanDetails: loans,
+    totalLoanTaken,
+    totalLoanRepay,
+    totalInterestPaid,
   };
 }
 
-function handleCalculateInterestMap(
-  transactions: Awaited<ReturnType<typeof fetchLoanTransaction>>,
-  passbookId: string
-): Parameters<typeof prisma.passbook.update>[0] {
-  const interestData = calculateInterest(transactions);
+export const calculateLoansHandler = (
+  passbookToUpdate: PassbookToUpdate,
+  transaction: Transaction[]
+) => {
+  const loanTransaction = transaction.filter((e) =>
+    ["LOAN_TAKEN", "LOAN_REPAY"].includes(e.transactionType)
+  );
+  const memberGroup: { [key in string]: Transaction[] } = {};
 
-  return {
-    where: { id: passbookId },
-    data: {
-      in: interestData.invested,
-      out: interestData.returned,
-      returns: interestData.paid,
-      offset: interestData.account,
-      balance: interestData.balance,
-      recentDate: interestData.recentReturns
-        ? new Date(interestData.recentReturns)
-        : undefined,
-      lastDate: interestData.recentInvest
-        ? new Date(interestData.recentInvest)
-        : undefined,
-      addon: interestData.detailsList,
-      fund: interestData.interest || 0,
-    },
-  };
-}
+  loanTransaction.forEach((each) => {
+    if (each.transactionType === "LOAN_TAKEN") {
+      if (!memberGroup[each.toId]) {
+        memberGroup[each.toId] = [];
+      }
 
-export async function updateAllLoanMiddleware(
-  passbookToUpdate: PassbookToUpdate
-) {
-  const transaction = await fetchLoanTransaction();
-  const transactionsByVendor: {
-    [key in string]: Awaited<ReturnType<typeof fetchLoanTransaction>>;
-  } = {};
+      memberGroup[each.toId].push(each);
+    } else {
+      if (!memberGroup[each.fromId]) {
+        memberGroup[each.fromId] = [];
+      }
 
-  transaction.forEach((e) => {
-    if (!transactionsByVendor[e.vendor.passbookId]) {
-      transactionsByVendor[e.vendor.passbookId] = [];
+      memberGroup[each.fromId].push(each);
     }
-    transactionsByVendor[e.vendor.passbookId].push(e);
   });
 
-  Object.entries(transactionsByVendor).forEach(([passbookId, transactions]) =>
-    passbookToUpdate.set(
-      passbookId,
-      handleCalculateInterestMap(transactions, passbookId)
-    )
-  );
+  Object.entries(memberGroup).forEach(([memberId, memTransactions]) => {
+    const data = calculateInterest(memTransactions);
+    const memberPassbook = passbookToUpdate.get(memberId);
+
+    if (memberPassbook) {
+      passbookToUpdate.set(
+        memberId,
+        setPassbookUpdateQuery(memberPassbook, data)
+      );
+    }
+  });
 
   return passbookToUpdate;
-}
+};
 
-export async function updateLoanMiddleware(
+export async function memberLoanMiddleware(
   passbookToUpdate: PassbookToUpdate,
-  vendorId: string
+  transaction: Transaction
 ) {
-  const transaction = await fetchLoanTransaction(vendorId);
+  let loanAccountId = transaction.fromId;
 
-  if (transaction[0].vendor.passbookId) {
-    passbookToUpdate.set(
-      transaction[0].vendor.passbookId,
-      handleCalculateInterestMap(transaction, transaction[0].vendor.passbookId)
-    );
+  if (transaction.transactionType === "LOAN_TAKEN") {
+    loanAccountId = transaction.toId;
   }
-
-  return passbookToUpdate;
+  const transactions = await fetchLoanTransaction(loanAccountId);
+  return calculateLoansHandler(passbookToUpdate, transactions);
 }

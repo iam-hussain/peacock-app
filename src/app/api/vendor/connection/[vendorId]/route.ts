@@ -37,7 +37,7 @@ export async function GET(
 ) {
   const { vendorId } = params;
 
-  const connections = await prisma.vendorProfitShare.findMany({
+  const connections = await prisma.profitShare.findMany({
     where: { vendorId },
     select: {
       id: true,
@@ -68,12 +68,12 @@ export async function POST(
 
   const updates = await prisma.$transaction(
     connections.map((update: { id: string; active: boolean }) =>
-      prisma.vendorProfitShare.update({
+      prisma.profitShare.update({
         where: { id: update.id, vendorId },
         data: { active: update.active },
       })
     )
   );
 
-  return NextResponse.json({ connections });
+  return NextResponse.json({ connections, updates });
 }

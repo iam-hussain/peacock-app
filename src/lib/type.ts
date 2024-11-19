@@ -1,3 +1,5 @@
+import prisma from "@/db";
+
 // Loan History structure
 export type LoanHistoryEntry = {
   active: boolean; // Indicates if the loan is currently active
@@ -36,8 +38,13 @@ export type MemberPassbookData = {
 export type VendorPassbookData = {
   totalInvestment: number; // Total amount invested by the vendor
   totalReturns: number; // Total amount returned to the vendor
-  profitEarned: number; // Profit earned from the vendor's investments
   accountBalance: number; // Current balance in the member's account
+
+  totalProfitAmount: number; // Profit earned from the vendor's investments
+  totalOffsetAmount: number; // Total amount offset to vendors
+  includedMembersCount: number;
+  excludedMembersCount: number;
+  memberProfitAmount: number;
 };
 
 // Represents data for the club's passbook, tracking overall deposits, withdrawals, balances, investments, profits, and offsets
@@ -65,6 +72,10 @@ export type ClubPassbookData = {
   totalVendorProfit: number; // Total profit earned by the club from vendor-related activities
 
   // Calculated Separately
+  totalVendorOffsetAmount: number; // Total amount offset to vendors on behalf of the member
+  totalLoanOffsetAmount: number; // Total amount offset to loans on behalf of the member
+
+  // Calculated Separately
   loanOffsetPaid: number; // Total amount of loan offsets paid by the club
   loanOffsetBalance: number; // Remaining balance of loan offsets to be paid by the club
 
@@ -72,3 +83,8 @@ export type ClubPassbookData = {
   vendorOffsetPaid: number; // Total amount of vendor offsets paid by the club
   vendorOffsetBalance: number; // Remaining balance of vendor offsets to be paid by the club
 };
+
+export type PassbookToUpdate = Map<
+  string,
+  Parameters<typeof prisma.passbook.update>[0]
+>;

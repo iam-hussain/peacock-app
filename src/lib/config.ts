@@ -92,28 +92,28 @@ export const vendorTypeTransactionMap = {
 
 // Transaction Type Map
 export const transactionTypeMap: { [key in TRANSACTION_TYPE]: string } = {
-  PERIODIC_DEPOSIT: "Members Deposit",
-  OFFSET_DEPOSIT: "Offset Deposit",
-  WITHDRAW: "Members Withdraw",
-  REJOIN: "Members Rejoin Deposit",
+  PERIODIC_DEPOSIT: "Member's Deposit",
+  OFFSET_DEPOSIT: "Member's Offset Deposit",
+  WITHDRAW: "Member's Withdrawal",
+  REJOIN: "Member's Rejoin Deposit",
   FUNDS_TRANSFER: "Club Funds Transfer",
-  VENDOR_INVEST: "Investment",
-  VENDOR_RETURNS: "Return",
+  VENDOR_INVEST: "Vendor Investment",
+  VENDOR_RETURNS: "Vendor Return",
   LOAN_TAKEN: "Loan Taken",
   LOAN_REPAY: "Loan Repayment",
-  LOAN_INTEREST: "Profit/Interest",
+  LOAN_INTEREST: "Loan Interest",
 };
 
-// Transaction Type Map
+// Transaction Type Human Map
 export const transactionTypeHumanMap: { [key in TRANSACTION_TYPE]: string } = {
   PERIODIC_DEPOSIT: "Member's Monthly Deposit",
   OFFSET_DEPOSIT: "Member's Offset Deposit",
   WITHDRAW: "Member's Withdrawal",
   REJOIN: "Member's Rejoin Deposit",
   FUNDS_TRANSFER: "Club Funds Transfer Between Members",
-  VENDOR_INVEST: "Investment to Vendor or Member",
-  VENDOR_RETURNS: "Return from Vendor or Member",
-  LOAN_TAKEN: "Loan to members",
-  LOAN_REPAY: "Collect loan Repayment from members ",
-  LOAN_INTEREST: "Profit/Interest Received from Vendor or Member",
+  VENDOR_INVEST: "Vendor Investment",
+  VENDOR_RETURNS: "Vendor Return",
+  LOAN_TAKEN: "Loan Given to Members",
+  LOAN_REPAY: "Loan Repayment Collected from Members",
+  LOAN_INTEREST: "Loan Interest Received from Members",
 };

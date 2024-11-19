@@ -23,7 +23,7 @@ model Account {
   passbook          Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
   passbookId        String        @unique @db.ObjectId
   memberProfitShare ProfitShare[] @relation("Member")
-  vendorProfitShare ProfitShare[] @relation("Vendor")
+  profitShare       ProfitShare[] @relation("Vendor")
   fromTransaction   Transaction[] @relation("FromAccount")
   toTransaction     Transaction[] @relation("ToAccount")
   createdAt         DateTime      @default(now())
@@ -57,13 +57,15 @@ model ProfitShare {
 }
 
 model Passbook {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  type      PASSBOOK_TYPE @default(VENDOR)
-  data      Json          @default("{}")
-  account   Account?
-  isChit    Boolean       @default(true)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  type             PASSBOOK_TYPE @default(VENDOR)
+  data             Json          @default("{}")
+  loans            Json          @default("[]")
+  account          Account?
+  isChit           Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  loanOffsetAmount Float         @default(0)
 }
 
 enum TRANSACTION_METHOD {

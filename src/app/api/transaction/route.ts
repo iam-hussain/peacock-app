@@ -68,16 +68,14 @@ function createFilters({
 }: any) {
   const filters: Record<string, any> = {};
   if (accountId)
-    filters.OR = {
-      OR: [
-        {
-          fromId: accountId,
-        },
-        {
-          toId: accountId,
-        },
-      ],
-    };
+    filters.OR = [
+      {
+        fromId: accountId,
+      },
+      {
+        toId: accountId,
+      },
+    ];
   if (transactionType) filters.transactionType = transactionType;
   if (startDate && endDate)
     filters.transactionAt = {
@@ -154,11 +152,11 @@ function transactionTableTransform(transaction: TransactionToTransform) {
   };
 
   if (["LOAN_TAKEN"].includes(transaction.transactionType)) {
-    updated.to.sub = "Loan";
+    updated.to.sub = "Loan Account";
   }
 
   if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.transactionType)) {
-    updated.from.sub = "Loan";
+    updated.from.sub = "Loan Account";
     updated.to.sub = "Club Account";
   }
 

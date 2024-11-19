@@ -22,7 +22,6 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 
 import { TransformedVendor } from "@/app/api/vendor/route";
-import { vendorTypeMap } from "@/lib/config";
 import { dateFormat } from "@/lib/date";
 import { fetchVendors } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -34,11 +33,10 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     cell: ({ row }) => (
       <AvatarCell
         id={row.original.id}
-        avatar={row.original.memberAvatar}
-        name={row.original.vendorName}
+        avatar={row.original.avatar}
+        name={row.original.name}
         avatarName={row.original.name}
         active={row.original.active}
-        subLabel={row.original.memberName}
       />
     ),
   },
@@ -69,20 +67,10 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
             : "-"
         }
         subLabel={
-          row.original.balanceAmount
-            ? moneyFormat(row.original.balanceAmount)
-            : ""
+          row.original.monthsPassedString && row.original.nextDueDate
+            ? row.original.monthsPassedString
+            : "-"
         }
-      />
-    ),
-  },
-  {
-    accessorKey: "type",
-    header: ({ column }) => <ActionTableHeader label="Type" column={column} />,
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={vendorTypeMap[row.original.type.toString()]}
-        subLabel={row.original.monthsPassedString || ""}
       />
     ),
   },
@@ -93,7 +81,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.invest.toLocaleString("en-IN", {
+        label={row.original.totalInvestment.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -107,7 +95,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.profit.toLocaleString("en-IN", {
+        label={row.original.totalReturns.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -121,12 +109,8 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={
-          row.original.calcReturns || row.original.type === "LEND"
-            ? moneyFormat(row.original.returns)
-            : " - "
-        }
-        greenLabel={row.original.calcReturns}
+        label={moneyFormat(row.original.totalProfitAmount)}
+        greenLabel={row.original.totalProfitAmount > 0}
       />
     ),
   },

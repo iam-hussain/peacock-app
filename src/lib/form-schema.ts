@@ -22,14 +22,6 @@ const transactionMethods = [
   "CHEQUE",
 ] as const;
 
-const memberTransactionTypes = [
-  "PERIODIC_DEPOSIT",
-  "OFFSET_DEPOSIT",
-  "WITHDRAW",
-  "REJOIN",
-  "FUNDS_TRANSFER",
-] as const;
-
 export const memberFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().optional(),
@@ -59,13 +51,14 @@ export const vendorFormSchema = z.object({
 const transactionTypes = [
   "PERIODIC_DEPOSIT",
   "OFFSET_DEPOSIT",
-  "PERIODIC_RETURN",
   "WITHDRAW",
   "REJOIN",
   "FUNDS_TRANSFER",
-  "INVEST",
-  "RETURNS",
-  "PROFIT",
+  "VENDOR_INVEST",
+  "VENDOR_RETURNS",
+  "LOAN_TAKEN",
+  "LOAN_REPAY",
+  "LOAN_INTEREST",
 ] as const;
 
 const vendorType = ["DEFAULT", "LEND"] as const;
@@ -96,7 +89,7 @@ export const transactionFormSchema = z.object({
 
 // Zod schema definition
 export const memberConnectionFormSchema = z.object({
-  loanOffset: z.preprocess(
+  loanOffsetAmount: z.preprocess(
     (val) => Number(val),
     z
       .number()

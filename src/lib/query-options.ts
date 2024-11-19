@@ -92,8 +92,7 @@ export const fetchTransactions = (options: any) => {
   const params = new URLSearchParams({
     page: options.page.toString(),
     limit: options.limit.toString(),
-    vendorId: options.vendorId.trim(),
-    memberId: options.memberId.trim(),
+    accountId: options.accountId.trim(),
     transactionType: options.transactionType.trim(),
     sortField: options.sortField,
     sortOrder: options.sortOrder,

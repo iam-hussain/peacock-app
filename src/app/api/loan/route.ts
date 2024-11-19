@@ -1,51 +1,39 @@
-import { Passbook, Vendor } from "@prisma/client";
+import { Account, Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { calculateTimePassed, getMonthsPassedString } from "@/lib/date";
+import { calculateMonthsDifference, calculateTimePassed, getMonthsPassedString } from "@/lib/date";
+import { MemberPassbookData } from "@/lib/type";
 
-type LoanToTransform = Vendor & {
+type LoanToTransform = Account & {
   passbook: Passbook;
-  owner: {
-    id: string;
-    firstName: string;
-    lastName: string | null;
-    avatar: string | null;
-  } | null;
 };
 
 export async function GET() {
-  const vendors = await prisma.vendor.findMany({
+  const loans = await prisma.account.findMany({
     where: {
-      type: "LEND",
+      isMember: true,
     },
     include: {
-      owner: {
-        select: {
-          id: true,
-          avatar: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
       passbook: true,
     },
   });
 
-  const transformedLoans = vendors
+  const transformedLoans = loans
     .map(transformLoanForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.type > b.type ? -1 : 1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
   return NextResponse.json({
-    vendors: transformedLoans,
+    accounts: transformedLoans,
   });
 }
 
 function transformLoanForTable(vendorInput: LoanToTransform) {
   const ONE_MONTH_RATE = 0.01;
-  const { passbook, owner, ...vendor } = vendorInput;
+  const { passbook, ...member } = vendorInput;
+  const data = passbook.data as unknown as MemberPassbookData;
 
   const recentDate = passbook?.recentDate
     ? new Date(passbook?.recentDate)
@@ -103,21 +91,19 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
 
   const actualBalance = loanData.expected - passbook.returns;
   const balance = loanData.current > 0 ? loanData.current : actualBalance;
+  
   return {
-    id: vendor.id,
-    name: memberName,
-    vendorName: "Loan",
-    searchName: memberName.trim(),
-    type: vendor.type,
-    memberName,
-    memberAvatar: owner?.avatar ? `/image/${owner.avatar}` : undefined,
-    startAt: recentDate ? recentDate.getTime() : undefined,
+    id: member.id,
+    name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
+    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+    joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
+    startAt: member.startAt.getTime(),
+    status: member.active ? "Active" : "Disabled",
+    active: member.active,
     investAt: lastDate ? lastDate.getTime() : undefined,
-    active: passbook.offset > 0,
     balance,
     ...loanData,
-    vendor: { ...vendor, calcReturns: passbook.calcReturns },
-    details: passbook.addon || [],
+    details:  [],
   };
 }
 

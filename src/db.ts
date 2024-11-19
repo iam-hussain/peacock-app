@@ -1,25 +1,11 @@
-import { Prisma, PrismaClient, Transaction, Vendor } from "@prisma/client";
+import { Prisma, PrismaClient, Transaction } from "@prisma/client";
 
+import cache from "./lib/cache";
 import { bulkPassbookUpdate } from "./lib/helper";
 import { connectionMiddleware } from "./logic/connection-middleware";
-import {
-  seedTransactionMiddlewareHandler,
-  transactionMiddlewareHandler,
-} from "./logic/middleware";
-
-export const seedTransactionExtends = Prisma.defineExtension({
-  name: "seedTransactionHandler",
-  query: {
-    transaction: {
-      async create({ args, query }) {
-        // Execute the original create query
-        const created = await query(args);
-        await seedTransactionMiddlewareHandler(created as Transaction);
-        return created;
-      },
-    },
-  },
-});
+// import { bulkPassbookUpdate } from "./lib/helper";
+// import { connectionMiddleware } from "./logic/connection-middleware";
+import { transactionMiddlewareHandler } from "./logic/middleware";
 
 export const transactionExtends = Prisma.defineExtension({
   name: "transactionHandler",
@@ -47,7 +33,7 @@ export const transactionExtends = Prisma.defineExtension({
 export const connectionExtends = Prisma.defineExtension({
   name: "connectionHandler",
   query: {
-    vendorProfitShare: {
+    profitShare: {
       async update({ args, query }) {
         // Execute the original create query
         const created = await query(args);
@@ -56,39 +42,110 @@ export const connectionExtends = Prisma.defineExtension({
         return created;
       },
     },
-    member: {
+    account: {
       async create({ args, query }) {
         // Execute the original create query
         const created = await query(args);
+
         const passbookToUpdate = await connectionMiddleware();
         await bulkPassbookUpdate(passbookToUpdate);
         return created;
       },
-    },
-    vendor: {
-      async create({ args, query }) {
-        // Execute the original create query
-        const created = (await query(args)) as Vendor;
-
-        if (["DEFAULT", "CHIT", "BANK"].includes(created?.type || "")) {
-          const passbookToUpdate = await connectionMiddleware();
-          await bulkPassbookUpdate(passbookToUpdate);
-        }
-
-        return created;
-      },
 
       async delete({ args, query }) {
-        const vendor = await prisma.vendor.findUnique(args);
-
         // Execute the original update query
         const deleted = await query(args);
 
-        if (["DEFAULT", "CHIT", "BANK"].includes(vendor?.type || "")) {
-          const passbookToUpdate = await connectionMiddleware();
-          await bulkPassbookUpdate(passbookToUpdate);
-        }
+        cache.flushAll();
+        const passbookToUpdate = await connectionMiddleware();
+        await bulkPassbookUpdate(passbookToUpdate);
         return deleted;
+      },
+    },
+  },
+});
+
+export const cacheExtends = Prisma.defineExtension({
+  name: "cacheHandler",
+  query: {
+    $allModels: {
+      async findFirst({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:findFirst:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ${cacheKey}`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for ${cacheKey}`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async findUnique({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:findUnique:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ${cacheKey}`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for ${cacheKey}`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async findMany({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:findMany:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ${cacheKey}`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for ${cacheKey}`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async create({ args, query, model }) {
+        const result = await query(args);
+
+        // Reset cache after an update
+        cache.flushAll(); // Alternatively, clear specific keys if needed
+        console.log(`Cache cleared after ${model}:update`);
+        return result;
+      },
+      async update({ args, query, model }) {
+        const result = await query(args);
+
+        // Reset cache after an update
+        cache.flushAll(); // Alternatively, clear specific keys if needed
+        console.log(`Cache cleared after ${model}:update`);
+        return result;
+      },
+      async delete({ args, query, model }) {
+        const result = await query(args);
+
+        // Reset cache after a delete
+        cache.flushAll(); // Alternatively, clear specific keys if needed
+        console.log(`Cache cleared after ${model}:delete`);
+        return result;
       },
     },
   },
@@ -98,6 +155,7 @@ const prismaClientSingleton = () => {
   return new PrismaClient({
     log: ["error"],
   })
+    .$extends(cacheExtends)
     .$extends(transactionExtends)
     .$extends(connectionExtends);
 };

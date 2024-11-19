@@ -134,7 +134,7 @@ const baseColumns = (
 ];
 
 const editColumns = (
-  handleSortClick: (id: string) => void
+  handleSortClick: (_id: string) => void
 ): ColumnDef<TransformedTransaction>[] => [
   {
     accessorKey: "updatedAt",
@@ -164,8 +164,7 @@ const editColumns = (
 ];
 
 const initialOptions = {
-  vendorId: "",
-  memberId: "",
+  accountId: "",
   transactionType: "",
   startDate: undefined,
   endDate: undefined,
@@ -177,7 +176,7 @@ const initialOptions = {
 
 export type MembersTransactionTableProps = {
   accounts: TransformedAccountSelect[];
-  handleAction: (select: null | TransformedTransaction) => void;
+  handleAction: (_select: null | TransformedTransaction) => void;
 };
 
 const TransactionTable = ({
@@ -188,10 +187,6 @@ const TransactionTable = ({
   const [options, setOptions] = useState<any>(initialOptions);
 
   const { data, isLoading, isError } = useQuery(fetchTransactions(options));
-
-  const handleOptionsReset = () => {
-    setOptions(initialOptions);
-  };
 
   const handleSortClick = (id: string) => {
     setOptions((item: any) => ({
@@ -241,7 +236,7 @@ const TransactionTable = ({
       <div className="w-full">
         <div className="grid gap-2 grid-cols-2 md:grid-cols-5 w-full mb-4">
           <SelectInputGroup
-            value={options.accountId || ''}
+            value={options.accountId || ""}
             onChange={(e) => setOptions({ ...options, accountId: e, page: 1 })}
             placeholder="Select ACCOUNT"
             options={accounts.map((each) => [each.id, each.name])}

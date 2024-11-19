@@ -1,7 +1,7 @@
 "use client";
 import { Dialog } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import { GenericModal } from "../atoms/generic-modal";
 import { TransactionDeleteForm } from "../organisms/forms/transaction-delete-form";
@@ -19,13 +19,6 @@ const TransactionsAction = () => {
   const { data: accounts = [] } = useQuery(fetchAccountSelect());
   const [selected, setSelected] = useState<null | TransformedTransaction>(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  const [members, vendors] = useMemo(() => {
-    return [
-      accounts.filter((e) => e.isMember),
-      accounts.filter((e) => !e.isMember),
-    ];
-  }, [accounts]);
 
   const handleAction = (select: null | TransformedTransaction) => {
     setSelected(select);
@@ -50,8 +43,7 @@ const TransactionsAction = () => {
               selected ? `Transactions ID: ${selected.id}` : undefined
             }
           >
-            <p>H</p>
-            {/* {selected && selected.id ? (
+            {selected && selected.id ? (
               <Tabs defaultValue="update" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="update">Update</TabsTrigger>
@@ -62,8 +54,7 @@ const TransactionsAction = () => {
                     selected={selected}
                     onSuccess={() => setIsOpen(false)}
                     onCancel={() => setIsOpen(false)}
-                    vendors={vendors}
-                    members={members}
+                    accounts={accounts}
                   />
                 </TabsContent>
 
@@ -80,10 +71,9 @@ const TransactionsAction = () => {
                 selected={selected}
                 onSuccess={() => setIsOpen(false)}
                 onCancel={() => setIsOpen(false)}
-                vendors={vendors}
-                members={members}
+                accounts={accounts}
               />
-            )} */}
+            )}
           </GenericModal>
         </Dialog>
       </Box>

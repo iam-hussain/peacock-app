@@ -10,9 +10,8 @@ import { DatePickerForm } from "../../atoms/date-picker-form";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
 
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { TransformedVendorSelect } from "@/app/api/vendor/select/route";
 import {
   Form,
   FormControl,
@@ -42,21 +41,26 @@ import {
 import { cn } from "@/lib/utils";
 
 type TransactionFormProps = {
-  vendors: TransformedMemberSelect[];
-  members: TransformedVendorSelect[];
+  accounts: TransformedAccountSelect[];
   selected: null | TransformedTransaction;
   onSuccess: () => void;
   onCancel?: () => void;
 };
 
 export function TransactionForm({
-  vendors,
-  members,
+  accounts,
   selected,
   onSuccess,
   onCancel,
 }: TransactionFormProps) {
   const queryClient = useQueryClient();
+
+  const [members, vendors] = useMemo(() => {
+    return [
+      accounts.filter((e) => e.isMember),
+      accounts.filter((e) => !e.isMember),
+    ];
+  }, [accounts]);
 
   const form = useForm<TransactionFormSchema>({
     resolver: zodResolver(transactionFormSchema),
@@ -86,8 +90,6 @@ export function TransactionForm({
   });
 
   const transactionType = form.watch("transactionType") || "PERIODIC_DEPOSIT";
-  const vendorType = form.watch("vendorType");
-
   const showVendorType = useMemo(() => {
     if (["INVEST", "PROFIT", "RETURNS"].includes(transactionType)) {
       return true;
@@ -104,38 +106,36 @@ export function TransactionForm({
       return ["Club - FROM", "Club - TO"];
     }
 
-    if (["PROFIT", "RETURNS"].includes(transactionType)) {
-      if (vendorType === "LEND") {
-        return ["Loan - FROM", "Club - TO"];
-      }
+    if (["VENDOR_RETURNS"].includes(transactionType)) {
       return ["Vendor - FROM", "Club - TO"];
     }
 
-    if (transactionType === "INVEST") {
-      if (vendorType === "LEND") {
-        return ["Club - FROM", "Loan - TO"];
-      }
+    if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transactionType)) {
+      return ["Loan - FROM", "Club - TO"];
+    }
 
+    if (transactionType === "VENDOR_INVEST") {
       return ["Club - FROM", "Vendor - TO"];
     }
 
+    if (transactionType === "LOAN_TAKEN") {
+      return ["Club - FROM", "Loan - TO"];
+    }
+
     return ["Member - FROM", "Club - TO"];
-  }, [transactionType, vendorType]);
+  }, [transactionType]);
 
   const formToValues = useMemo(() => {
-    if (
-      ["PROFIT", "RETURNS"].includes(transactionType) &&
-      vendorType === "DEFAULT"
-    ) {
+    if (["VENDOR_RETURNS"].includes(transactionType)) {
       return [vendors, members];
     }
 
-    if (transactionType === "INVEST" && vendorType === "DEFAULT") {
+    if (transactionType === "VENDOR_INVEST") {
       return [members, vendors];
     }
 
     return [members, members];
-  }, [transactionType, vendorType, members, vendors]);
+  }, [transactionType, members, vendors]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => fetcher.delete(`/api/transaction/${id}`),
