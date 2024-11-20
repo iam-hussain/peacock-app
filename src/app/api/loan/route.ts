@@ -2,8 +2,9 @@ import { Account, Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { calculateMonthsDifference, calculateTimePassed, getMonthsPassedString } from "@/lib/date";
-import { MemberPassbookData } from "@/lib/type";
+import { calculateMonthsDifference } from "@/lib/date";
+import { calculateInterestByAmount } from "@/lib/helper";
+import { LoanHistoryEntry, MemberPassbookData } from "@/lib/type";
 
 type LoanToTransform = Account & {
   passbook: Passbook;
@@ -20,10 +21,14 @@ export async function GET() {
   });
 
   const transformedLoans = loans
+    .filter(
+      (e) =>
+        Array.isArray(e.passbook.loanHistory) &&
+        e.passbook.loanHistory.length > 0
+    )
     .map(transformLoanForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.type > b.type ? -1 : 1))
-    .sort((a, b) => (a.active > b.active ? -1 : 1));
+    .sort((a, b) => (a.recentLoanTakenDate > b.recentLoanTakenDate ? 1 : -1));
 
   return NextResponse.json({
     accounts: transformedLoans,
@@ -31,67 +36,51 @@ export async function GET() {
 }
 
 function transformLoanForTable(vendorInput: LoanToTransform) {
-  const ONE_MONTH_RATE = 0.01;
+  const nowTime = new Date().getTime();
   const { passbook, ...member } = vendorInput;
-  const data = passbook.data as unknown as MemberPassbookData;
+  const {
+    totalLoanTaken = 0,
+    totalLoanRepay = 0,
+    totalLoanBalance = 0,
+    totalInterestPaid = 0,
+  } = passbook.payload as unknown as MemberPassbookData;
+  const loans = (passbook.loanHistory || []) as unknown as LoanHistoryEntry[];
 
-  const recentDate = passbook?.recentDate
-    ? new Date(passbook?.recentDate)
-    : undefined;
-  const lastDate = passbook?.lastDate
-    ? new Date(passbook?.lastDate)
-    : undefined;
-  const memberName = `${owner?.firstName} ${owner?.lastName || " "}`.trim();
+  let totalInterestAmount = 0;
+  let recentLoanTakenDate: any = null;
+  let recentPassedString: any = "";
 
-  const loanData: any = {
-    nextDueDate: null,
-    invest: passbook.in,
-    profit: passbook.out,
-    account: passbook.offset,
-    returns: passbook.returns || 0,
-    expected: passbook.fund || 0,
-    expectedMonth: null,
-    current: 0,
-    recentReturns: "",
-    recentInvest: "",
-  };
+  const loanHistory = loans.map((loan) => {
+    const {
+      interestAmount,
+      daysInMonth,
+      daysPassed,
+      monthsPassed,
+      monthsPassedString,
+      interestForDays,
+      interestPerDay,
+    } = calculateInterestByAmount(loan.amount, loan.startDate, loan?.endDate);
 
-  if (passbook.offset > 0 && recentDate) {
-    const recentReturnsDate = calculateTimePassed(
-      new Date(recentDate),
-      new Date()
-    );
+    totalInterestAmount += interestAmount;
+    recentLoanTakenDate = new Date(loan.recentLoanTakenDate).getTime();
+    recentPassedString = monthsPassedString;
+    return {
+      ...loan,
+      startDate: new Date(loan.startDate).getTime(),
+      endDate: new Date(loan.endDate || new Date()).getTime(),
+      totalInterestAmount,
+      interestAmount,
+      daysInMonth,
+      daysPassed,
+      monthsPassed,
+      monthsPassedString,
+      interestForDays,
+      interestPerDay,
+    };
+  });
 
-    const recentInvestDate = calculateTimePassed(
-      new Date(lastDate || ""),
-      new Date()
-    );
+  const totalInterestBalance = totalInterestAmount - totalInterestPaid;
 
-    // Interest for months and days
-    const interestForMonths =
-      passbook.offset * ONE_MONTH_RATE * recentReturnsDate.monthsPassed;
-    const interestForDays =
-      passbook.offset * ONE_MONTH_RATE * (recentReturnsDate.daysPassed / 30);
-
-    loanData.expected = passbook.fund + interestForMonths;
-    loanData.current =
-      passbook.fund + interestForMonths + interestForDays - loanData.returns;
-    loanData.expectedMonth = recentReturnsDate.recentStartDate.getTime();
-    loanData.recentReturns = getMonthsPassedString(
-      recentReturnsDate.monthsPassed,
-      recentReturnsDate.daysPassed
-    );
-    loanData.recentInvest = lastDate
-      ? getMonthsPassedString(
-          recentInvestDate.monthsPassed,
-          recentInvestDate.daysPassed
-        )
-      : "";
-  }
-
-  const actualBalance = loanData.expected - passbook.returns;
-  const balance = loanData.current > 0 ? loanData.current : actualBalance;
-  
   return {
     id: member.id,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
@@ -100,15 +89,20 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     startAt: member.startAt.getTime(),
     status: member.active ? "Active" : "Disabled",
     active: member.active,
-    investAt: lastDate ? lastDate.getTime() : undefined,
-    balance,
-    ...loanData,
-    details:  [],
+    totalLoanTaken,
+    totalLoanRepay,
+    totalLoanBalance,
+    totalInterestPaid,
+    totalInterestBalance,
+    totalInterestAmount,
+    recentLoanTakenDate: totalLoanBalance > 0 ? recentLoanTakenDate : nowTime,
+    loanHistory,
+    recentPassedString,
   };
 }
 
 export type GetLoanResponse = {
-  vendors: TransformedLoan[];
+  accounts: TransformedLoan[];
 };
 
 export type TransformedLoan = ReturnType<typeof transformLoanForTable>;

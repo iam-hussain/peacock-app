@@ -92,7 +92,6 @@ async function fetchTransactions(
   sortField: string,
   sortOrder: string
 ) {
-  console.log({ filters });
   return await prisma.transaction.findMany({
     where: filters,
     skip: (page - 1) * limit,

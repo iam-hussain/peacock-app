@@ -84,7 +84,12 @@ export const newDate = (input: any = new Date()) => {
   return zonedDate;
 };
 
-export const calculateTimePassed = (startDate: Date, endDate: Date) => {
+export const calculateTimePassed = (
+  start: Date | string,
+  end: Date | string
+) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
   // Calculate total months
   const monthsPassed = differenceInMonths(endDate, startDate);
 

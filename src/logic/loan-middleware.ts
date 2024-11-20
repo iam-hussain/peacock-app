@@ -1,11 +1,12 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import { Transaction } from "@prisma/client";
 
 import prisma from "@/db";
-import { calculateTimePassed } from "@/lib/date";
-import { setPassbookUpdateQuery } from "@/lib/helper";
-import { PassbookToUpdate } from "@/lib/type";
-
-const ONE_MONTH_RATE = 0.01;
+import {
+  calculateInterestByAmount,
+  setPassbookUpdateQuery,
+} from "@/lib/helper";
+import { LoanHistoryEntry, PassbookToUpdate } from "@/lib/type";
 
 function fetchLoanTransaction(accountId?: string | null) {
   return prisma.transaction.findMany({
@@ -32,7 +33,7 @@ export function calculateInterest(transactions: Transaction[]) {
   let recentLoanRepayDate: any = null;
   let totalInterestAmount = 0;
 
-  let loans = [];
+  let loanHistory: LoanHistoryEntry[] = [];
 
   transactions.forEach((transaction) => {
     const { transactionType, amount, transactionAt } = transaction;
@@ -42,36 +43,40 @@ export function calculateInterest(transactions: Transaction[]) {
       totalLoanTaken += amount;
       accountBalance += amount;
 
-      if (!recentLoanRepayDate) {
-        recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
-      }
+      recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
       recentLoanTakenDate = transactionDate.toISOString().split("T")[0];
     }
     if (transactionType === "LOAN_REPAY") {
-      const { monthsPassed, daysPassed } = calculateTimePassed(
-        new Date(recentLoanRepayDate),
+      const {
+        interestAmount,
+        daysInMonth,
+        daysPassed,
+        monthsPassed,
+        monthsPassedString,
+        interestForDays,
+        interestPerDay,
+      } = calculateInterestByAmount(
+        accountBalance,
+        recentLoanRepayDate,
         transactionDate
       );
 
-      // Interest for months and days
-      const interestForMonths = accountBalance * ONE_MONTH_RATE * monthsPassed;
-      const interestForDays =
-        accountBalance * ONE_MONTH_RATE * (daysPassed / 30);
+      totalInterestAmount += interestAmount;
 
-      const currentInterestAmount = interestForMonths + interestForDays;
-
-      totalInterestAmount += currentInterestAmount;
-
-      loans.push({
+      loanHistory.push({
         active: false,
         amount: accountBalance,
         recentLoanTakenDate,
         startDate: recentLoanRepayDate,
-        endDate: transactionDate.toISOString().split("T")[0],
-        currentInterestAmount,
+        endDate: new Date(transactionDate),
         totalInterestAmount,
-        monthsPassed,
+        interestAmount,
+        daysInMonth,
         daysPassed,
+        monthsPassed,
+        monthsPassedString,
+        interestForDays,
+        interestPerDay,
       });
 
       recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
@@ -85,8 +90,8 @@ export function calculateInterest(transactions: Transaction[]) {
   });
 
   if (accountBalance > 0 && recentLoanRepayDate) {
-    loans.push({
-      active: false,
+    loanHistory.push({
+      active: true,
       amount: accountBalance,
       recentLoanTakenDate,
       startDate: recentLoanRepayDate,
@@ -95,9 +100,10 @@ export function calculateInterest(transactions: Transaction[]) {
   }
 
   return {
-    loanDetails: loans,
+    loanHistory,
     totalLoanTaken,
     totalLoanRepay,
+    totalLoanBalance: accountBalance > 0 ? accountBalance : 0,
     totalInterestPaid,
   };
 }
@@ -128,13 +134,18 @@ export const calculateLoansHandler = (
   });
 
   Object.entries(memberGroup).forEach(([memberId, memTransactions]) => {
-    const data = calculateInterest(memTransactions);
-    const memberPassbook = passbookToUpdate.get(memberId);
+    const { loanHistory, totalLoanBalance } =
+      calculateInterest(memTransactions);
 
+    const memberPassbook = passbookToUpdate.get(memberId);
     if (memberPassbook) {
       passbookToUpdate.set(
         memberId,
-        setPassbookUpdateQuery(memberPassbook, data)
+        setPassbookUpdateQuery(
+          memberPassbook,
+          { totalLoanBalance },
+          { loanHistory }
+        )
       );
     }
   });

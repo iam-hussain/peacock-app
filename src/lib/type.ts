@@ -4,12 +4,17 @@ import prisma from "@/db";
 export type LoanHistoryEntry = {
   active: boolean; // Indicates if the loan is currently active
   amount: number; // Principal amount of the loan
+  recentLoanTakenDate: Date;
   startDate: Date; // Date the loan started
-  investDate: Date; // Date the loan was invested
   endDate?: Date; // Optional end date if the loan has been repaid
-  interest: number; // Interest rate on the loan
-  monthsPassed: number; // Number of months passed since the loan started
-  daysPassed: number; // Number of days passed since the last monthly update
+  interestAmount?: number; // Current Interest rate on the loan
+  totalInterestAmount: number; // Interest rate on the loan
+  monthsPassed?: number; // Number of months passed since the loan started
+  daysPassed?: number; // Number of days passed since the last monthly update
+  daysInMonth?: number;
+  monthsPassedString?: string | null;
+  interestForDays?: number;
+  interestPerDay?: number;
 };
 
 // Represents data for a member's passbook, tracking deposits, withdrawals, balances, and offsets
@@ -31,7 +36,6 @@ export type MemberPassbookData = {
   totalLoanRepay: number; // Total amount of loans repaid by the member
   totalLoanBalance: number; // Current balance of outstanding loans
   totalInterestPaid: number; // Total interest paid by the member on loans
-  loanHistory: LoanHistoryEntry[]; // Array of loan history entries
 };
 
 // Represents data for a vendor's passbook, tracking investments and returns

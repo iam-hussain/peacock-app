@@ -118,12 +118,18 @@ async function seed() {
       if (loanIds.includes(vendorId)) {
         const accountId = loanIdsMapMember[vendorId] || "";
 
+        if (["PERIODIC_RETURN", "RETURNS"].includes(transactionType)) {
+          updated.fromId = accountId;
+          updated.toId = memberId;
+          updated.transactionType = "LOAN_REPAY";
+        }
         if (
           ["RETURNS", "PERIODIC_RETURN"].includes(transactionType) &&
           each.amount <= 8000
         ) {
           updated.fromId = accountId;
-          updated.transactionType = "PROFIT";
+          updated.toId = memberId;
+          updated.transactionType = "LOAN_INTEREST";
         }
 
         if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
@@ -131,11 +137,7 @@ async function seed() {
           updated.toId = accountId;
           updated.transactionType = "LOAN_TAKEN";
         }
-        if (["PERIODIC_RETURN", "RETURNS"].includes(transactionType)) {
-          updated.fromId = accountId;
-          updated.toId = memberId;
-          updated.transactionType = "LOAN_REPAY";
-        }
+
         if (["PROFIT"].includes(transactionType)) {
           updated.fromId = accountId;
           updated.toId = memberId;

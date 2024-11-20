@@ -33,7 +33,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     cell: ({ row }) => (
       <AvatarCell
         id={row.original.id}
-        avatar={row.original.memberAvatar}
+        avatar={row.original.avatar}
         name={row.original.name}
         avatarName={row.original.name}
         active={row.original.active}
@@ -42,94 +42,60 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     ),
   },
   {
-    accessorKey: "recentInvest",
-    header: ({ column }) => (
-      <ActionTableHeader label="Invested" column={column} />
-    ),
+    accessorKey: "recentLoanTakenDate",
+    header: ({ column }) => <ActionTableHeader label="From" column={column} />,
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.account > 0 ? row.original.recentInvest : "-"}
+        label={
+          row.original.totalLoanBalance > 0 && row.original.recentLoanTakenDate
+            ? dateFormat(new Date(row.original.recentLoanTakenDate))
+            : "-"
+        }
         subLabel={
-          row.original.account > 0
-            ? dateFormat(new Date(row.original.investAt))
+          row.original.totalLoanBalance > 0 && row.original.recentPassedString
+            ? row.original.recentPassedString
             : undefined
         }
       />
     ),
   },
   {
-    accessorKey: "account",
+    accessorKey: "totalLoanBalance",
     header: ({ column }) => (
-      <ActionTableHeader label="Account" column={column} />
+      <ActionTableHeader label="Loan Amount" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.account.toLocaleString("en-IN", {
+        label={row.original.totalLoanBalance.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        subLabel={
-          row.original.account > 0
-            ? dateFormat(new Date(row.original.startAt))
-            : undefined
-        }
+        greenLabel={row.original.totalLoanBalance > 0}
       />
     ),
   },
-  // {
-  //   accessorKey: "expected",
-  //   header: ({ column }) => (
-  //     <ActionTableHeader label="Expected" column={column} />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <CommonTableCell
-  //       label={moneyFormat(row.original.expected)}
-  //       subLabel={
-  //         row.original.expectedMonth
-  //           ? dateFormat(new Date(row.original.expectedMonth))
-  //           : undefined
-  //       }
-  //     />
-  //   ),
-  // },
-
-  // {
-  //   accessorKey: "returns",
-  //   header: ({ column }) => <ActionTableHeader label="Paid" column={column} />,
-  //   cell: ({ row }) => (
-  //     <CommonTableCell
-  //       label={moneyFormat(row.original.returns || 0)}
-  //       // greenLabel={row.original.returns > 0}
-  //     />
-  //   ),
-  // },
-  // {
-  //   accessorKey: "balance",
-  //   header: ({ column }) => (
-  //     <ActionTableHeader label="Balance" column={column} />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <CommonTableCell
-  //       label={moneyFormat(row.original.balance)}
-  //       greenLabel={row.original.balance <= 0}
-  //       redLabel={row.original.balance > 0}
-  //     />
-  //   ),
-  // },
-
   {
-    accessorKey: "balance",
+    accessorKey: "totalInterestAmount",
+    header: ({ column }) => (
+      <ActionTableHeader label="Total / Paid" column={column} />
+    ),
+    cell: ({ row }) => (
+      <CommonTableCell
+        label={moneyFormat(row.original.totalInterestAmount)}
+        subLabel={moneyFormat(row.original.totalInterestPaid)}
+      />
+    ),
+  },
+  {
+    accessorKey: "totalInterestBalance",
     header: ({ column }) => (
       <ActionTableHeader label="Balance" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={moneyFormat(row.original.balance)}
-        greenLabel={row.original.balance <= 0}
-        redLabel={row.original.balance > 0}
-        subLabel={
-          row.original.account > 0 ? row.original.recentReturns : undefined
-        }
+        label={moneyFormat(row.original.totalInterestBalance)}
+        greenLabel={row.original.totalInterestBalance <= 0}
+        redLabel={row.original.totalInterestBalance > 0}
       />
     ),
   },
@@ -164,7 +130,7 @@ const LoanTable = ({ handleAction }: LoanTableProps) => {
   }, []);
 
   const table = useReactTable({
-    data: data?.vendors || [],
+    data: data?.accounts || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

@@ -69,7 +69,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
         subLabel={
           row.original.monthsPassedString && row.original.nextDueDate
             ? row.original.monthsPassedString
-            : "-"
+            : undefined
         }
       />
     ),

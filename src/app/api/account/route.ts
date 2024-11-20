@@ -74,6 +74,18 @@ export async function POST(request: Request) {
           memberId: created.id,
         })),
       });
+    } else {
+      const members = await prisma.account.findMany({
+        where: { isMember: true },
+        select: { active: true, id: true },
+      });
+      await prisma.profitShare.createMany({
+        data: members.map((e) => ({
+          vendorId: created.id,
+          active: e.active,
+          memberId: e.id,
+        })),
+      });
     }
 
     revalidatePath("/members");

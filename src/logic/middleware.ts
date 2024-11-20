@@ -48,7 +48,11 @@ export async function transactionMiddlewareHandler(
   let passbookToUpdate = initializePassbookToUpdate(passbooks);
 
   passbookToUpdate = transactionMiddleware(passbookToUpdate, created, isDelete);
-  if (["LOAN_TAKEN", "LOAN_REPAY"].includes(created.transactionType)) {
+  if (
+    ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"].includes(
+      created.transactionType
+    )
+  ) {
     passbookToUpdate = await memberLoanMiddleware(passbookToUpdate, created);
   }
 
@@ -59,7 +63,11 @@ export async function resetAllTransactionMiddlewareHandler() {
   cache.flushAll();
 
   const [transactions, passbooks, profitShare] = await Promise.all([
-    prisma.transaction.findMany(),
+    prisma.transaction.findMany({
+      orderBy: {
+        transactionAt: "asc",
+      },
+    }),
     fetchAllPassbook(),
     fetchAllProfitShares(),
   ]);

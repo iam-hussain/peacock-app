@@ -36,7 +36,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     totalReturns,
     totalProfitAmount,
     includedMembersCount,
-  } = passbook.data as VendorPassbookData;
+  } = passbook.payload as VendorPassbookData;
 
   const statusData: {
     nextDueDate: number | null;

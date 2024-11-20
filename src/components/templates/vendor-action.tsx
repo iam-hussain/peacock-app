@@ -1,6 +1,5 @@
 "use client";
 import { Dialog } from "@radix-ui/react-dialog";
-import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 
 import { GenericModal } from "../atoms/generic-modal";
@@ -10,10 +9,8 @@ import VendorsTable from "../organisms/tables/vendor-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 import { TransformedVendor } from "@/app/api/vendor/route";
-import { fetchMembersSelect } from "@/lib/query-options";
 
 const VendorAction = () => {
-  const { data: members = [] } = useQuery(fetchMembersSelect());
   const [selected, setSelected] = useState<null | TransformedVendor["vendor"]>(
     null
   );
@@ -43,7 +40,7 @@ const VendorAction = () => {
             <TabsContent value="details">
               <VendorForm
                 selected={selected}
-                members={members}
+                members={[]}
                 onSuccess={() => setIsOpen(false)}
                 onCancel={() => setIsOpen(false)}
               />
@@ -60,7 +57,7 @@ const VendorAction = () => {
         ) : (
           <VendorForm
             selected={selected}
-            members={members}
+            members={[]}
             onSuccess={() => setIsOpen(false)}
             onCancel={() => setIsOpen(false)}
           />

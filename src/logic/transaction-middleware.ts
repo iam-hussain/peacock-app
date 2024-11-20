@@ -21,7 +21,7 @@ function getPassbookUpdateQuery(
     | PassbookConfigAction["FROM"]
     | PassbookConfigAction["TO"]
 ): Parameters<typeof prisma.passbook.update>[0] {
-  const data: any = passbook.data.data || {};
+  const data: any = passbook.data.payload || {};
 
   return setPassbookUpdateQuery(passbook, {
     ...Object.fromEntries(

@@ -64,7 +64,6 @@ export const getDefaultPassbookData = (
       totalLoanRepay: 0,
       totalLoanBalance: 0,
       totalInterestPaid: 0,
-      loanHistory: [],
     };
   }
   if (type === "CLUB") {
@@ -105,18 +104,18 @@ export const getDefaultPassbookData = (
 
 export function setPassbookUpdateQuery(
   passbook: Parameters<typeof prisma.passbook.update>[0],
-  updatedData: Partial<
-    ClubPassbookData | MemberPassbookData | VendorPassbookData
-  >
+  calcData: Partial<ClubPassbookData | MemberPassbookData | VendorPassbookData>,
+  passData: Partial<any> = {}
 ): Parameters<typeof prisma.passbook.update>[0] {
-  const data: any = passbook.data.data || {};
+  const payload: any = passbook.data.payload || {};
   return {
     ...passbook,
     data: {
       ...passbook.data,
-      data: {
-        ...data,
-        ...updatedData,
+      ...passData,
+      payload: {
+        ...payload,
+        ...calcData,
       },
     },
   };
@@ -140,7 +139,8 @@ export function initializePassbookToUpdate(
           id: passbook.id,
         },
         data: {
-          data: getDefaultPassbookData(passbook.type),
+          payload: getDefaultPassbookData(passbook.type),
+          loanHistory: [],
         },
       });
     }
@@ -150,7 +150,8 @@ export function initializePassbookToUpdate(
           id: passbook.id,
         },
         data: {
-          data: getDefaultPassbookData(passbook.type),
+          payload: getDefaultPassbookData(passbook.type),
+          loanHistory: [],
         },
       });
     }
@@ -170,4 +171,39 @@ export function fetchAllPassbook() {
       },
     },
   });
+}
+
+const ONE_MONTH_RATE = 0.01;
+
+export function calculateInterestByAmount(
+  amount: number,
+  start: Date | string,
+  end: Date | string = new Date()
+) {
+  const { monthsPassed, daysPassed, recentStartDate } = calculateTimePassed(
+    start,
+    end
+  );
+
+  const daysInMonth = new Date(
+    recentStartDate.getFullYear(),
+    recentStartDate.getMonth() + 1,
+    0
+  ).getDate();
+
+  const interestForMonths = amount * ONE_MONTH_RATE * monthsPassed;
+  const interestPerDay = (amount * ONE_MONTH_RATE) / daysInMonth;
+  const interestForDays = amount * ONE_MONTH_RATE * (daysPassed / daysInMonth);
+
+  const interestAmount = interestForMonths + interestForDays;
+
+  return {
+    interestAmount,
+    monthsPassed,
+    daysPassed,
+    daysInMonth,
+    monthsPassedString: getMonthsPassedString(monthsPassed, daysPassed),
+    interestForDays,
+    interestPerDay,
+  };
 }

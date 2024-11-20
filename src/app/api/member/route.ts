@@ -25,7 +25,7 @@ export async function GET() {
         type: "CLUB",
       },
       select: {
-        data: true,
+        payload: true,
       },
     }),
   ]);
@@ -37,7 +37,7 @@ export async function GET() {
       membersTableTransform(
         each,
         memberTotalDeposit,
-        club.data as ClubPassbookData,
+        club.payload as ClubPassbookData,
         activeMembersCount
       )
     )
@@ -68,7 +68,7 @@ function membersTableTransform(
     // totalLoanRepay,
     // totalLoanBalance,
     // totalInterestPaid,
-  } = member.passbook.data as unknown as MemberPassbookData;
+  } = member.passbook.payload as unknown as MemberPassbookData;
 
   const totalOffsetAmount = totalVendorOffsetAmount + totalLoanOffsetAmount;
   const totalBalanceAmount =

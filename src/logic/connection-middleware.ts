@@ -60,7 +60,7 @@ export function calculatedVendorsConnection(
 
     if (vendorPassbook) {
       const { totalInvestment, totalReturns } = vendorPassbook.data
-        .data as VendorPassbookData;
+        .payload as VendorPassbookData;
 
       const totalReturnAmount =
         totalInvestment > 0 ? totalReturns - totalInvestment : totalReturns;

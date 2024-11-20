@@ -59,8 +59,8 @@ model ProfitShare {
 model Passbook {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId
   type             PASSBOOK_TYPE @default(VENDOR)
-  data             Json          @default("{}")
-  loans            Json          @default("[]")
+  payload          Json          @default("{}")
+  loanHistory      Json          @default("[]")
   account          Account?
   isChit           Boolean       @default(true)
   createdAt        DateTime      @default(now())
