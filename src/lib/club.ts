@@ -42,8 +42,8 @@ export const calculateMonthsPaid = (totalPaid: number): number => {
   return totalMonths;
 };
 
-export const calculateTotalDeposit = (membersCount: number): number => {
-  const perMember = memberTotalDepositAmount();
+export const getClubTotalDepositUpToday = (membersCount: number): number => {
+  const perMember = getMemberTotalDepositUpToday();
 
   return perMember * membersCount;
 };
@@ -52,7 +52,7 @@ export const clubMonthsFromStart = () => {
   return calculateMonthsDifference(new Date(), clubConfig.startedAt) + 1;
 };
 
-export const memberTotalDepositAmount = () => {
+export const getMemberTotalDepositUpToday = () => {
   const values = clubConfig.stages.map((e) => {
     const diff = calculateMonthsDifference(
       e?.endDate ? new Date(e.endDate) : new Date(),

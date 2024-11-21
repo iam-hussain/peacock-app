@@ -8,6 +8,7 @@ import {
 
 import prisma from "@/db";
 import { setPassbookUpdateQuery } from "@/lib/helper";
+import { MemberPassbookData } from "@/lib/type";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
@@ -49,15 +50,50 @@ export const transactionMiddleware = (
   transaction: Transaction,
   isRevert: Boolean = false
 ) => {
-  const values: PassbookConfigActionValueMap = {
-    AMOUNT: transaction.amount,
-  };
-
   const transactionPassbooks: any = {
     FROM: transaction.fromId,
     TO: transaction.toId,
     CLUB: "CLUB",
   };
+
+  const values: PassbookConfigActionValueMap = {
+    AMOUNT: transaction.amount,
+    DEPOSIT_DIFF: 0,
+  };
+
+  if (transaction.transactionType === "WITHDRAW" && !isRevert) {
+    const toPassbook = passbookToUpdate.get(transaction.toId);
+    if (toPassbook) {
+      const { periodicDepositAmount = 0, withdrawalAmount = 0 } = (toPassbook
+        .data.payload || {}) as MemberPassbookData;
+      const totalWithdrawalAmount = withdrawalAmount + transaction.amount;
+      const totalWithdrawalProfit =
+        totalWithdrawalAmount > periodicDepositAmount
+          ? totalWithdrawalAmount - periodicDepositAmount
+          : 0;
+      values.DEPOSIT_DIFF = totalWithdrawalProfit;
+      values.AMOUNT = transaction.amount - totalWithdrawalProfit;
+    }
+  }
+
+  if (transaction.transactionType === "WITHDRAW" && isRevert) {
+    const toPassbook = passbookToUpdate.get(transaction.toId);
+    if (toPassbook) {
+      const { profitWithdrawalAmount = 0 } = (toPassbook.data.payload ||
+        {}) as MemberPassbookData;
+      const differenceAmount =
+        profitWithdrawalAmount < transaction.amount
+          ? Math.abs(profitWithdrawalAmount - transaction.amount)
+          : 0;
+      values.DEPOSIT_DIFF = Math.abs(
+        profitWithdrawalAmount - transaction.amount
+      );
+      values.AMOUNT =
+        profitWithdrawalAmount < transaction.amount
+          ? 0
+          : transaction.amount - differenceAmount;
+    }
+  }
 
   Object.entries(transactionPassbookSettings).forEach(
     ([transactionType, passbooksOf]) => {

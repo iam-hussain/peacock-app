@@ -1,18 +1,16 @@
-"use client";
-
 import { useQuery } from "@tanstack/react-query";
 import { FaBalanceScale, FaPiggyBank, FaUsers } from "react-icons/fa";
-import { FaMoneyBillTrendUp } from "react-icons/fa6";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
+// import { FaMoneyBillTrendUp } from "react-icons/fa6";
+// import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { FaScaleUnbalancedFlip } from "react-icons/fa6";
 import { GiPayMoney } from "react-icons/gi";
 import { GiReceiveMoney } from "react-icons/gi";
 import { GiHandBandage } from "react-icons/gi";
-import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 
+// import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { DashboardCard } from "@/components/atoms/dashboard-card";
-import { DoughnutChart } from "@/components/molecules/doughnut-chart";
-import { PieChart } from "@/components/molecules/pie-chart";
+// import { DoughnutChart } from "@/components/molecules/doughnut-chart";
+// import { PieChart } from "@/components/molecules/pie-chart";
 import Box from "@/components/ui/box";
 import { clubAge } from "@/lib/date";
 import { fetchStatistics } from "@/lib/query-options";
@@ -50,16 +48,8 @@ export default function DashboardPage() {
           icon={<FaUsers className="text-3xl text-blue-600" />}
         />
         <DashboardCard
-          title="Loan Balance"
-          value={statistics.loadBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
           title="Members Deposit"
-          value={statistics.deposit.toLocaleString("en-IN", {
+          value={statistics.totalMemberWithdrawals.toLocaleString("en-IN", {
             style: "currency",
             currency: "INR",
           })}
@@ -67,15 +57,42 @@ export default function DashboardPage() {
         />
         <DashboardCard
           title="Members Balance"
-          value={statistics.balance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
+          value={statistics.totalMemberPeriodicDepositsBalance.toLocaleString(
+            "en-IN",
+            {
+              style: "currency",
+              currency: "INR",
+            }
+          )}
           icon={<FaBalanceScale className="text-3xl text-yellow-600" />}
         />
         <DashboardCard
+          title="Vendor Profit"
+          value={statistics.totalVendorProfit.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+          })}
+          icon={<FaScaleUnbalancedFlip className="text-3xl text-red-600" />}
+        />
+        <DashboardCard
+          title="Loan Interest Paid"
+          value={statistics.totalInterestPaid.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+          })}
+          icon={<GiHandBandage className="text-3xl text-purple-600" />}
+        />
+        <DashboardCard
+          title="Loan Interest Balance"
+          value={statistics.totalInterestBalance.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "INR",
+          })}
+          icon={<GiHandBandage className="text-3xl text-purple-600" />}
+        />
+        <DashboardCard
           title="Offset Deposit"
-          value={statistics.offsetIn.toLocaleString("en-IN", {
+          value={statistics.totalOffsetPaid.toLocaleString("en-IN", {
             style: "currency",
             currency: "INR",
           })}
@@ -83,23 +100,15 @@ export default function DashboardPage() {
         />
         <DashboardCard
           title="Offset Balance"
-          value={statistics.offsetBalance.toLocaleString("en-IN", {
+          value={statistics.totalOffsetBalance.toLocaleString("en-IN", {
             style: "currency",
             currency: "INR",
           })}
           icon={<FaBalanceScale className="text-3xl text-red-600" />}
         />
         <DashboardCard
-          title="Offset Value"
-          value={statistics.offset.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaScaleUnbalancedFlip className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
           title="Net Returns"
-          value={statistics.returns.toLocaleString("en-IN", {
+          value={statistics.netClubBalance.toLocaleString("en-IN", {
             style: "currency",
             currency: "INR",
           })}
@@ -107,13 +116,13 @@ export default function DashboardPage() {
         />
         <DashboardCard
           title="Liquidity Amount"
-          value={statistics.liquidity.toLocaleString("en-IN", {
+          value={statistics.currentClubBalance.toLocaleString("en-IN", {
             style: "currency",
             currency: "INR",
           })}
           icon={<GiReceiveMoney className="text-3xl text-orange-600" />}
         />
-        <DashboardCard
+        {/* <DashboardCard
           title="Club Net Amount"
           value={statistics.netAmount.toLocaleString("en-IN", {
             style: "currency",
@@ -136,10 +145,10 @@ export default function DashboardPage() {
             currency: "INR",
           })}
           icon={<FaMoneyBillTrendUp className="text-3xl text-teal-600" />}
-        />
+        /> */}
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <PieChart
+        {/* <PieChart
           available={statistics.liquidity}
           invested={statistics.invested}
           pending={statistics.balance}
@@ -148,7 +157,7 @@ export default function DashboardPage() {
           deposit={statistics.deposit}
           offset={statistics.offset}
           returns={statistics.returns}
-        />
+        /> */}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { Account, Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { memberTotalDepositAmount } from "@/lib/club";
+import { getMemberTotalDepositUpToday } from "@/lib/club";
 import { calculateMonthsDifference } from "@/lib/date";
 import { ClubPassbookData, MemberPassbookData } from "@/lib/type";
 
@@ -30,7 +30,7 @@ export async function GET() {
     }),
   ]);
 
-  const memberTotalDeposit = memberTotalDepositAmount();
+  const memberTotalDeposit = getMemberTotalDepositUpToday();
   const activeMembersCount = members.filter((e) => e.active).length;
   const transformedMembers = members
     .map((each) =>

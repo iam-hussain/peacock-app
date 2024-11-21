@@ -10,7 +10,7 @@ import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
 import { Switch } from "../../ui/switch";
 
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
+import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import {
   Form,
   FormControl,
@@ -33,17 +33,12 @@ import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
-  members: TransformedMemberSelect[]; // list of members for selection
+  members: TransformedAccountSelect[]; // list of members for selection
   onSuccess: () => void;
   onCancel?: () => void;
 };
 
-export function VendorForm({
-  selected,
-  members,
-  onSuccess,
-  onCancel,
-}: VendorFormProps) {
+export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
   const queryClient = useQueryClient();
 
   const form = useForm({

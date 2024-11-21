@@ -27,7 +27,7 @@ const VendorAction = () => {
         title={selected ? "Update Vendor" : "Add Vendor"}
         description={
           selected
-            ? `Vendor ID: ${selected.name} - [${selected.id}]`
+            ? `Vendor ID: ${selected?.firstName} - [${selected.id}]`
             : undefined
         }
       >

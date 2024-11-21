@@ -31,6 +31,7 @@ const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
     select: {
       id: true,
       type: true,
+      payload: true,
       account: {
         select: {
           id: true,
@@ -45,9 +46,12 @@ export async function transactionMiddlewareHandler(
   isDelete: boolean = false
 ) {
   const passbooks = await getTractionPassbook(created);
-  let passbookToUpdate = initializePassbookToUpdate(passbooks);
+  console.log("000000000");
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
+  console.log("1111111111111");
 
   passbookToUpdate = transactionMiddleware(passbookToUpdate, created, isDelete);
+  console.log("2222222");
   if (
     ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"].includes(
       created.transactionType
@@ -56,6 +60,7 @@ export async function transactionMiddlewareHandler(
     passbookToUpdate = await memberLoanMiddleware(passbookToUpdate, created);
   }
 
+  console.log("3333");
   return bulkPassbookUpdate(passbookToUpdate);
 }
 
@@ -72,7 +77,7 @@ export async function resetAllTransactionMiddlewareHandler() {
     fetchAllProfitShares(),
   ]);
 
-  let passbookToUpdate = initializePassbookToUpdate(passbooks);
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
 
   for (let transaction of transactions) {
     passbookToUpdate = transactionMiddleware(passbookToUpdate, transaction);

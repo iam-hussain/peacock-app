@@ -23,6 +23,7 @@ export type MemberPassbookData = {
   offsetDepositAmount: number; // Amount deposited for offset purposes by the member
   totalDepositAmount: number; // Sum of all deposits made by the member
   withdrawalAmount: number; // Total amount withdrawn by the member
+  profitWithdrawalAmount: number;
 
   accountBalance: number; // Current balance in the member's account
   clubHeldAmount: number; // Portion of the member's balance that belongs to the club
@@ -55,7 +56,9 @@ export type VendorPassbookData = {
 export type ClubPassbookData = {
   totalMemberPeriodicDeposits: number; // Total periodic deposits from all members to the club
   totalMemberOffsetDeposits: number; // Total offset deposits from all members to the club
+
   totalMemberWithdrawals: number; // Total amount withdrawn by members from the club
+  totalMemberProfitWithdrawals: number; // Total amount withdrawn by members from the club
 
   currentClubBalance: number; // Current balance available in the club
   netClubBalance: number; // Net balance considering all deposits, withdrawals, and offsets

@@ -140,7 +140,7 @@ export async function connectionMiddleware() {
     fetchAllProfitShares(),
   ]);
 
-  let passbookToUpdate = initializePassbookToUpdate(passbooks);
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
 
   return calculatedVendorsConnection(passbookToUpdate, profitShare);
 }

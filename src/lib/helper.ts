@@ -1,4 +1,5 @@
 import { $Enums, PASSBOOK_TYPE } from "@prisma/client";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 import { calculateTimePassed, getMonthsPassedString } from "./date";
 import {
@@ -56,6 +57,7 @@ export const getDefaultPassbookData = (
       offsetDepositAmount: 0,
       totalDepositAmount: 0,
       withdrawalAmount: 0,
+      profitWithdrawalAmount: 0,
       accountBalance: 0,
       clubHeldAmount: 0,
       totalVendorOffsetAmount: 0,
@@ -71,6 +73,7 @@ export const getDefaultPassbookData = (
       totalMemberPeriodicDeposits: 0,
       totalMemberOffsetDeposits: 0,
       totalMemberWithdrawals: 0,
+      totalMemberProfitWithdrawals: 0,
       currentClubBalance: 0,
       netClubBalance: 0,
       totalInvestment: 0,
@@ -128,7 +131,9 @@ export function initializePassbookToUpdate(
     } | null;
     id: string;
     type: $Enums.PASSBOOK_TYPE;
-  }[]
+    payload: JsonValue;
+  }[],
+  isClean: boolean = true
 ): PassbookToUpdate {
   let passbookToUpdate: PassbookToUpdate = new Map();
 
@@ -139,7 +144,9 @@ export function initializePassbookToUpdate(
           id: passbook.id,
         },
         data: {
-          payload: getDefaultPassbookData(passbook.type),
+          payload: isClean
+            ? getDefaultPassbookData(passbook.type)
+            : (passbook.payload as any),
           loanHistory: [],
         },
       });
@@ -150,7 +157,9 @@ export function initializePassbookToUpdate(
           id: passbook.id,
         },
         data: {
-          payload: getDefaultPassbookData(passbook.type),
+          payload: isClean
+            ? getDefaultPassbookData(passbook.type)
+            : (passbook.payload as any),
           loanHistory: [],
         },
       });
@@ -164,6 +173,7 @@ export function fetchAllPassbook() {
     select: {
       id: true,
       type: true,
+      payload: true,
       account: {
         select: {
           id: true,

@@ -51,7 +51,7 @@ export type PassbookConfigAction = {
   };
 };
 
-export type PassbookConfigActionValue = "AMOUNT";
+export type PassbookConfigActionValue = "AMOUNT" | "DEPOSIT_DIFF";
 
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
@@ -91,13 +91,19 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
   WITHDRAW: {
     FROM: { SUB: { clubHeldAmount: "AMOUNT" } },
     TO: {
-      ADD: { withdrawalAmount: "AMOUNT" },
+      ADD: {
+        withdrawalAmount: "AMOUNT",
+        profitWithdrawalAmount: "DEPOSIT_DIFF",
+      },
       SUB: {
         accountBalance: "AMOUNT",
       },
     },
     CLUB: {
-      ADD: { totalMemberWithdrawals: "AMOUNT" },
+      ADD: {
+        totalMemberWithdrawals: "AMOUNT",
+        totalMemberProfitWithdrawals: "DEPOSIT_DIFF",
+      },
       SUB: {
         currentClubBalance: "AMOUNT",
         netClubBalance: "AMOUNT",
