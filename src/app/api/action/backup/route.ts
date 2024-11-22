@@ -10,14 +10,12 @@ export async function POST() {
     // Fetch all data from Prisma models
     const account = await prisma.account.findMany();
     const transaction = await prisma.transaction.findMany();
-    const profitShare = await prisma.profitShare.findMany();
     const passbook = await prisma.passbook.findMany();
 
     // Prepare the data
     const backupData = {
       account,
       transaction,
-      profitShare,
       passbook,
     };
 

@@ -29,10 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  transactionTypeHumanMap,
-  vendorTypeTransactionMap,
-} from "@/lib/config";
+import { transactionTypeHumanMap } from "@/lib/config";
 import fetcher from "@/lib/fetcher";
 import {
   TransactionFormSchema,
@@ -69,7 +66,6 @@ export function TransactionForm({
           fromId: selected?.fromId || "",
           toId: selected?.toId || "",
           transactionType: selected.transactionType as any,
-          // vendorType: (selected?.vendorType as any) || "DEFAULT",
           method: (selected.method as any) || "ACCOUNT",
           amount: selected.amount || 0,
           note: selected.note || "",
@@ -81,7 +77,6 @@ export function TransactionForm({
           fromId: "",
           toId: "",
           transactionType: "PERIODIC_DEPOSIT",
-          vendorType: "DEFAULT",
           method: "ACCOUNT",
           amount: 0,
           note: "",
@@ -90,13 +85,6 @@ export function TransactionForm({
   });
 
   const transactionType = form.watch("transactionType") || "PERIODIC_DEPOSIT";
-  const showVendorType = useMemo(() => {
-    if (["INVEST", "PROFIT", "RETURNS"].includes(transactionType)) {
-      return true;
-    }
-    form.setValue("vendorType", "DEFAULT");
-    return false;
-  }, [form, transactionType]);
 
   const formToLabels = useMemo(() => {
     if (transactionType === "WITHDRAW") {
@@ -194,8 +182,8 @@ export function TransactionForm({
             render={({ field }) => (
               <FormItem
                 className={cn({
-                  "col-span-3": !showVendorType,
-                  "col-span-2": showVendorType,
+                  // "col-span-3": !showVendorType,
+                  // "col-span-2": showVendorType,
                 })}
               >
                 <FormLabel>Transaction Type</FormLabel>
@@ -222,38 +210,6 @@ export function TransactionForm({
               </FormItem>
             )}
           />
-          {showVendorType && (
-            <FormField
-              control={form.control}
-              name="vendorType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Vendor Type</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select transaction method" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(vendorTypeTransactionMap).map(
-                          ([key, name]) => (
-                            <SelectItem key={key} value={key}>
-                              {name}
-                            </SelectItem>
-                          )
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-
           {/* Transaction Method Selection */}
           {/* <FormField
             control={form.control}

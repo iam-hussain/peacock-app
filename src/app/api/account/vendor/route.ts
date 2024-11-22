@@ -31,12 +31,8 @@ export async function GET() {
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, ...vendor } = vendorInput;
-  const {
-    totalInvestment,
-    totalReturns,
-    totalProfitAmount,
-    includedMembersCount,
-  } = passbook.payload as VendorPassbookData;
+  const { totalInvestment, totalReturns, totalProfitAmount } =
+    passbook.payload as VendorPassbookData;
 
   const statusData: {
     nextDueDate: number | null;
@@ -63,7 +59,6 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     totalInvestment,
     totalReturns,
     totalProfitAmount,
-    includedMembersCount,
     ...statusData,
     account: { ...vendorInput, passbook: null },
   };

@@ -79,11 +79,11 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
           style: "currency",
           currency: "INR",
         })}
-        subLabel={
-          row.original.totalOffsetAmount !== 0
-            ? `${row.original.delayOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.joiningOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-            : ""
-        }
+        // subLabel={
+        //   row.original.totalOffsetAmount !== 0
+        //     ? `${row.original.joiningOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.delayOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+        //     : ""
+        // }
       />
     ),
   },
@@ -109,7 +109,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
   },
   {
-    accessorKey: "returns",
+    accessorKey: "totalReturnAmount",
     header: ({ column }) => (
       <ActionTableHeader label="Returns" column={column} />
     ),

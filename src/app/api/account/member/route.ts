@@ -82,7 +82,9 @@ function membersTableTransform(
     totalPeriodBalanceAmount > 0 ? totalOffsetAmount : offsetBalanceAmount;
 
   const totalReturnAmount =
-    (clubData.totalInterestPaid + clubData.totalVendorProfit) /
+    (clubData.totalInterestPaid +
+      clubData.totalVendorProfit -
+      clubData.totalMemberProfitWithdrawals) /
     activeMembersCount;
 
   return {
