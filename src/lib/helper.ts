@@ -54,8 +54,8 @@ export const bulkPassbookUpdate = async (
         await prisma.$transaction(operations); // Execute all updates in the batch
         console.log(`Batch ${i / batchSize + 1} updated successfully`);
         break; // Exit retry loop if successful
-      } catch (e) {
-        if (e.code === "P2034" && attempt < maxRetries - 1) {
+      } catch (e: any) {
+        if (e?.code === "P2034" && attempt < maxRetries - 1) {
           console.warn(
             `Retrying batch ${i / batchSize + 1} (${attempt + 1}/${maxRetries}) due to conflict...`
           );
