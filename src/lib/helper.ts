@@ -36,18 +36,37 @@ type PassbookToUpdate = Map<
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
-export const bulkPassbookUpdate = async (items: PassbookToUpdate) => {
-  try {
-    const operations = Array.from(items.values()).map((value) =>
-      prisma.passbook.update(value)
-    );
+export const bulkPassbookUpdate = async (
+  items: PassbookToUpdate,
+  maxRetries = 3,
+  batchSize = 100
+) => {
+  const values = Array.from(items.values());
 
-    await prisma.$transaction(operations);
+  for (let i = 0; i < values.length; i += batchSize) {
+    const batch = values.slice(i, i + batchSize); // Create a batch of updates
 
-    console.log("Bulk passbook updated successfully");
-  } catch (e) {
-    console.error("Bulk passbook update failed");
-    console.error(e);
+    let attempt = 0;
+    while (attempt < maxRetries) {
+      try {
+        const operations = batch.map((value) => prisma.passbook.update(value));
+
+        await prisma.$transaction(operations); // Execute all updates in the batch
+        console.log(`Batch ${i / batchSize + 1} updated successfully`);
+        break; // Exit retry loop if successful
+      } catch (e) {
+        if (e.code === "P2034" && attempt < maxRetries - 1) {
+          console.warn(
+            `Retrying batch ${i / batchSize + 1} (${attempt + 1}/${maxRetries}) due to conflict...`
+          );
+          attempt++;
+          continue;
+        }
+        console.error(`Batch ${i / batchSize + 1} update failed`);
+        console.error(e);
+        throw e; // Rethrow the error if retries are exhausted
+      }
+    }
   }
 };
 
