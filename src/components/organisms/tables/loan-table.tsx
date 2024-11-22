@@ -20,7 +20,7 @@ import {
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
 
-import { TransformedLoan } from "@/app/api/loan/route";
+import { TransformedLoan } from "@/app/api/account/loan/route";
 import { Button } from "@/components/ui/button";
 import { dateFormat } from "@/lib/date";
 import { fetchLoans } from "@/lib/query-options";

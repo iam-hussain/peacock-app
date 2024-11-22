@@ -56,21 +56,19 @@ function membersTableTransform(
   activeMembersCount: number
 ) {
   const {
+    passbook: { delayOffset, joiningOffset },
+    ...account
+  } = member;
+  const {
     periodicDepositAmount = 0,
     offsetDepositAmount = 0,
     totalDepositAmount = 0,
     withdrawalAmount = 0,
     accountBalance = 0,
     clubHeldAmount = 0,
-    totalVendorOffsetAmount = 0,
-    totalLoanOffsetAmount = 0,
-    // totalLoanTaken,
-    // totalLoanRepay,
-    // totalLoanBalance,
-    // totalInterestPaid,
   } = member.passbook.payload as unknown as MemberPassbookData;
 
-  const totalOffsetAmount = totalVendorOffsetAmount + totalLoanOffsetAmount;
+  const totalOffsetAmount = delayOffset + joiningOffset;
   const totalBalanceAmount =
     memberTotalDeposit + totalOffsetAmount - accountBalance;
   const totalPeriodBalanceAmount =
@@ -84,7 +82,7 @@ function membersTableTransform(
     totalPeriodBalanceAmount > 0 ? totalOffsetAmount : offsetBalanceAmount;
 
   const totalReturnAmount =
-    (clubData.totalLoanProfit + clubData.totalVendorProfit) /
+    (clubData.totalInterestPaid + clubData.totalVendorProfit) /
     activeMembersCount;
 
   return {
@@ -97,8 +95,6 @@ function membersTableTransform(
     active: member.active,
     totalDepositAmount: totalDepositAmount - withdrawalAmount,
     totalOffsetAmount,
-    totalVendorOffsetAmount,
-    totalLoanOffsetAmount,
     periodicDepositAmount,
     offsetDepositAmount,
     totalOffsetBalanceAmount,
@@ -106,8 +102,10 @@ function membersTableTransform(
     totalBalanceAmount,
     totalReturnAmount: totalReturnAmount || 0,
     clubHeldAmount,
+    delayOffset,
+    joiningOffset,
     netValue: accountBalance + (totalReturnAmount || 0),
-    member: { ...member, passbook: null },
+    account: { ...account, delayOffset, joiningOffset },
   };
 }
 

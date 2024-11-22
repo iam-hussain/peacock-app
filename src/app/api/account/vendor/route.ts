@@ -46,7 +46,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     monthsPassedString: null,
   };
 
-  if (passbook.isChit && vendor.active) {
+  if (vendor.active) {
     const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
     statusData.nextDueDate = vendor.active ? chitData.nextDueDate : null;
     statusData.monthsPassedString = chitData.monthsPassedString;
@@ -65,7 +65,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     totalProfitAmount,
     includedMembersCount,
     ...statusData,
-    vendor: { ...vendor, isChit: passbook.isChit },
+    account: { ...vendorInput, passbook: null },
   };
 }
 

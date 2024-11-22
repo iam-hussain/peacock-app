@@ -91,14 +91,6 @@ async function seed() {
 
   console.log(JSON.stringify({ passbookCreated }));
 
-  const profitShareCreated = await prisma.profitShare.createMany({
-    data: backupData.vendorProfitShares.filter(
-      (e: any) => !loanIds.includes(e.vendorId)
-    ),
-  });
-
-  console.log(JSON.stringify({ profitShareCreated }));
-
   const memberTransactionsCreated = await prisma.transaction.createMany({
     data: backupData.memberTransactions as any[],
   });

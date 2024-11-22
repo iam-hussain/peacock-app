@@ -6,7 +6,7 @@ import { GenericModal } from "../atoms/generic-modal";
 import LoanTable from "../organisms/tables/loan-table";
 import { Card, CardContent, CardHeader } from "../ui/card";
 
-import { TransformedLoan } from "@/app/api/loan/route";
+import { TransformedLoan } from "@/app/api/account/loan/route";
 import { dateFormat } from "@/lib/date";
 import { LoanHistoryEntry } from "@/lib/type";
 import { moneyFormat } from "@/lib/utils";

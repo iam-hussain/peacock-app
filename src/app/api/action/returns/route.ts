@@ -5,12 +5,6 @@ import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
 
 export async function GET() {
   try {
-    // Fetch all data from Prisma models
-    // let passbookToUpdate = await connectionMiddleware();
-    // passbookToUpdate = await updateAllLoanMiddleware(passbookToUpdate);
-
-    // await bulkPassbookUpdate(passbookToUpdate);
-
     const passbookToUpdate = await resetAllTransactionMiddlewareHandler();
 
     revalidatePath("/member");

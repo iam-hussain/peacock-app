@@ -2,20 +2,18 @@ import { queryOptions } from "@tanstack/react-query";
 
 import fetcher from "./fetcher";
 
+import { GetLoanResponse } from "@/app/api/account/loan/route";
+import { GetMemberResponse } from "@/app/api/account/member/route";
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
-import { GetStatisticsResponse } from "@/app/api/dashboard/statistics/route";
-import { GetLoanResponse } from "@/app/api/loan/route";
-import { GetConnectionMemberVendor } from "@/app/api/member/connection/[memberId]/route";
-import { GetMemberResponse } from "@/app/api/member/route";
+import { GetVendorResponse } from "@/app/api/account/vendor/route";
+import { GetStatisticsResponse } from "@/app/api/statistics/route";
 import { GetTransactionResponse } from "@/app/api/transaction/route";
-import { GetConnectionVendorMember } from "@/app/api/vendor/connection/[vendorId]/route";
-import { GetVendorResponse } from "@/app/api/vendor/route";
 
 const noRefetchConfigs = {
-  // refetchOnMount: false,
-  // refetchInactive: true,
-  // refetchOnReconnect: true,
-  // refetchOnWindowFocus: false,
+  refetchOnMount: false,
+  refetchInactive: true,
+  refetchOnReconnect: true,
+  refetchOnWindowFocus: false,
 };
 
 export const fetchAuthStatus = () =>
@@ -28,6 +26,29 @@ export const fetchAuthStatus = () =>
     ...noRefetchConfigs,
   });
 
+export const fetchMembers = () =>
+  queryOptions({
+    queryKey: ["member-details", "members", "accounts"],
+    queryFn: () =>
+      fetcher("/api/account/member") as unknown as GetMemberResponse,
+    ...noRefetchConfigs,
+  });
+
+export const fetchVendors = () =>
+  queryOptions({
+    queryKey: ["vendor-details", "vendors", "accounts"],
+    queryFn: () =>
+      fetcher("/api/account/vendor") as unknown as GetVendorResponse,
+    ...noRefetchConfigs,
+  });
+
+export const fetchLoans = () =>
+  queryOptions({
+    queryKey: ["loan-details", "loans", "accounts"],
+    queryFn: () => fetcher("/api/account/loan") as unknown as GetLoanResponse,
+    ...noRefetchConfigs,
+  });
+
 export const fetchAccountSelect = () =>
   queryOptions({
     queryKey: ["account-select", "select", "accounts"],
@@ -36,38 +57,10 @@ export const fetchAccountSelect = () =>
     ...noRefetchConfigs,
   });
 
-export const fetchMemberConnection = (memberId: string) =>
-  queryOptions({
-    queryKey: ["member-connection", "connection", "accounts", memberId],
-    queryFn: () =>
-      fetcher(
-        `/api/member/connection/${memberId}`
-      ) as never as GetConnectionMemberVendor,
-    ...noRefetchConfigs,
-  });
-
-export const fetchMembers = () =>
-  queryOptions({
-    queryKey: ["member-details", "members", "accounts"],
-    queryFn: () => fetcher("/api/member") as unknown as GetMemberResponse,
-    ...noRefetchConfigs,
-  });
-
 export const fetchStatistics = () =>
   queryOptions({
     queryKey: ["statistics", "connection"],
-    queryFn: () =>
-      fetcher("/api/dashboard/statistics") as never as GetStatisticsResponse,
-    ...noRefetchConfigs,
-  });
-
-export const fetchVendorConnection = (vendorId: string) =>
-  queryOptions({
-    queryKey: ["vendor-connection", "connection", "accounts", vendorId],
-    queryFn: () =>
-      fetcher(
-        `/api/vendor/connection/${vendorId}`
-      ) as never as GetConnectionVendorMember,
+    queryFn: () => fetcher("/api/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
 
@@ -92,17 +85,3 @@ export const fetchTransactions = (options: any) => {
     ...noRefetchConfigs,
   });
 };
-
-export const fetchVendors = () =>
-  queryOptions({
-    queryKey: ["vendor-details", "vendors", "accounts"],
-    queryFn: () => fetcher("/api/vendor") as unknown as GetVendorResponse,
-    ...noRefetchConfigs,
-  });
-
-export const fetchLoans = () =>
-  queryOptions({
-    queryKey: ["loan-details", "loans", "accounts"],
-    queryFn: () => fetcher("/api/loan") as unknown as GetLoanResponse,
-    ...noRefetchConfigs,
-  });

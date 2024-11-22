@@ -3,20 +3,18 @@ import { Dialog } from "@radix-ui/react-dialog";
 import React, { useState } from "react";
 
 import { GenericModal } from "../atoms/generic-modal";
-import { VendorConnectionsForm } from "../organisms/forms/vendor-connection-form";
 import { VendorForm } from "../organisms/forms/vendor-form";
 import VendorsTable from "../organisms/tables/vendor-table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
-import { TransformedVendor } from "@/app/api/vendor/route";
+import { TransformedVendor } from "@/app/api/account/vendor/route";
 
 const VendorAction = () => {
-  const [selected, setSelected] = useState<null | TransformedVendor["vendor"]>(
+  const [selected, setSelected] = useState<null | TransformedVendor["account"]>(
     null
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAction = (select: null | TransformedVendor["vendor"]) => {
+  const handleAction = (select: null | TransformedVendor["account"]) => {
     setSelected(select);
     setIsOpen(true);
   };
@@ -31,37 +29,11 @@ const VendorAction = () => {
             : undefined
         }
       >
-        {selected && selected.id ? (
-          <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="account">Connection</TabsTrigger>
-            </TabsList>
-            <TabsContent value="details">
-              <VendorForm
-                selected={selected}
-                members={[]}
-                onSuccess={() => setIsOpen(false)}
-                onCancel={() => setIsOpen(false)}
-              />
-            </TabsContent>
-
-            <TabsContent value="account">
-              <VendorConnectionsForm
-                onSuccess={() => setIsOpen(false)}
-                onCancel={() => setIsOpen(false)}
-                vendorId={selected.id}
-              />
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <VendorForm
-            selected={selected}
-            members={[]}
-            onSuccess={() => setIsOpen(false)}
-            onCancel={() => setIsOpen(false)}
-          />
-        )}
+        <VendorForm
+          selected={selected}
+          onSuccess={() => setIsOpen(false)}
+          onCancel={() => setIsOpen(false)}
+        />
       </GenericModal>
     </Dialog>
   );

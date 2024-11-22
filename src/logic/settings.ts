@@ -195,6 +195,7 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     },
     CLUB: {
       ADD: {
+        totalLoanBalance: "AMOUNT",
         totalLoanTaken: "AMOUNT",
       },
       SUB: {
@@ -220,6 +221,9 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
       ADD: {
         totalLoanRepay: "AMOUNT",
         currentClubBalance: "AMOUNT",
+      },
+      SUB: {
+        totalLoanBalance: "AMOUNT",
       },
     },
   },

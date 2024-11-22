@@ -19,6 +19,8 @@ type StatMemberPassbook = {
   payload: MemberPassbookData | ClubPassbookData;
   type: $Enums.PASSBOOK_TYPE;
   loanHistory: LoanHistoryEntry[];
+  joiningOffset: number;
+  delayOffset: number;
 };
 
 export async function GET() {
@@ -32,6 +34,8 @@ export async function GET() {
           type: true,
           loanHistory: true,
           payload: true,
+          joiningOffset: true,
+          delayOffset: true,
         },
       }),
       prisma.account.count({
@@ -88,6 +92,7 @@ function statisticsTransform(
     totalMemberPeriodicDeposits,
     totalMemberOffsetDeposits,
     totalMemberWithdrawals,
+    totalMemberProfitWithdrawals,
     currentClubBalance,
     netClubBalance,
     totalInvestment,
@@ -97,28 +102,44 @@ function statisticsTransform(
     totalLoanRepay,
     totalLoanBalance,
     totalInterestPaid,
-    totalLoanProfit,
     totalVendorProfit,
-    totalLoanOffsetAmount,
-    totalVendorOffsetAmount,
-    loanOffsetBalance,
-    loanOffsetPaid,
-    vendorOffsetBalance,
-    vendorOffsetPaid,
   } = clubPassbook.payload as ClubPassbookData;
+
+  const totalOffsetAmount = membersPassbooks
+    .map((e) => e.joiningOffset + e.delayOffset)
+    .reduce((a, b) => a + b, 0);
+
+  const actualMemberPeriodicDeposits =
+    totalMemberPeriodicDeposits - totalMemberWithdrawals;
+
+  const actualMemberMemberWithdrawals =
+    totalMemberProfitWithdrawals + totalMemberWithdrawals;
+
+  const totalVendorHolding = totalInvestment - totalReturns;
+
+  const currentClubNetValue =
+    totalMemberPeriodicDeposits +
+    totalMemberOffsetDeposits +
+    totalInterestPaid +
+    totalVendorProfit -
+    actualMemberMemberWithdrawals;
+
+  const expectedClubNetValue =
+    expectedTotalMemberPeriodicDeposits +
+    totalOffsetAmount +
+    expectedTotalLoanInterestAmount +
+    totalVendorProfit;
 
   return {
     membersCount,
     clubMonthsPassed: clubMonthsFromStart(),
     totalMemberWithdrawals,
-    totalMemberPeriodicDeposits:
-      totalMemberPeriodicDeposits - totalMemberWithdrawals,
+    totalMemberPeriodicDeposits: actualMemberPeriodicDeposits,
     expectedTotalMemberPeriodicDeposits,
     totalMemberPeriodicDepositsBalance:
       expectedTotalMemberPeriodicDeposits -
       (totalMemberPeriodicDeposits - totalMemberWithdrawals),
     expectedTotalLoanInterestAmount,
-    totalMemberOffsetDeposits,
     currentClubBalance,
     netClubBalance,
     totalInvestment,
@@ -129,16 +150,14 @@ function statisticsTransform(
     totalLoanBalance,
     totalInterestPaid,
     totalInterestBalance: expectedTotalLoanInterestAmount - totalInterestPaid,
-    totalLoanProfit,
     totalVendorProfit,
-    totalLoanOffsetAmount,
-    totalVendorOffsetAmount,
-    loanOffsetBalance,
-    loanOffsetPaid,
-    vendorOffsetBalance,
-    vendorOffsetPaid,
-    totalOffsetPaid: loanOffsetPaid + vendorOffsetPaid,
-    totalOffsetBalance: loanOffsetBalance + vendorOffsetBalance,
+    totalOffsetPaid: totalMemberOffsetDeposits,
+    totalOffsetBalance: totalOffsetAmount - totalMemberOffsetDeposits,
+    currentClubNetValue,
+    totalVendorHolding,
+    expectedClubNetValue,
+    totalMemberProfitWithdrawals,
+    totalOffsetAmount,
     // deposit: currentIn - statistics.offsetIn,
     // balance: totalDeposit - currentIn + offsetBalance,
     // offset: statistics.offset,

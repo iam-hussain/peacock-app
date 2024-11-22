@@ -28,10 +28,6 @@ export type MemberPassbookData = {
   accountBalance: number; // Current balance in the member's account
   clubHeldAmount: number; // Portion of the member's balance that belongs to the club
 
-  // Calculated Separately
-  totalVendorOffsetAmount: number; // Total amount offset to vendors on behalf of the member
-  totalLoanOffsetAmount: number; // Total amount offset to loans on behalf of the member
-
   // Loan Details
   totalLoanTaken: number; // Total amount of loans taken by the member
   totalLoanRepay: number; // Total amount of loans repaid by the member
@@ -44,12 +40,7 @@ export type VendorPassbookData = {
   totalInvestment: number; // Total amount invested by the vendor
   totalReturns: number; // Total amount returned to the vendor
   accountBalance: number; // Current balance in the member's account
-
   totalProfitAmount: number; // Profit earned from the vendor's investments
-  totalOffsetAmount: number; // Total amount offset to vendors
-  includedMembersCount: number;
-  excludedMembersCount: number;
-  memberProfitAmount: number;
 };
 
 // Represents data for the club's passbook, tracking overall deposits, withdrawals, balances, investments, profits, and offsets
@@ -75,20 +66,7 @@ export type ClubPassbookData = {
   totalInterestPaid: number; // Total interest paid by the member on loans
 
   // Calculated Separately
-  totalLoanProfit: number; // Total profit earned by the club from loan-related activities
   totalVendorProfit: number; // Total profit earned by the club from vendor-related activities
-
-  // Calculated Separately
-  totalVendorOffsetAmount: number; // Total amount offset to vendors on behalf of the member
-  totalLoanOffsetAmount: number; // Total amount offset to loans on behalf of the member
-
-  // Calculated Separately
-  loanOffsetPaid: number; // Total amount of loan offsets paid by the club
-  loanOffsetBalance: number; // Remaining balance of loan offsets to be paid by the club
-
-  // Calculated Separately
-  vendorOffsetPaid: number; // Total amount of vendor offsets paid by the club
-  vendorOffsetBalance: number; // Remaining balance of vendor offsets to be paid by the club
 };
 
 export type PassbookToUpdate = Map<

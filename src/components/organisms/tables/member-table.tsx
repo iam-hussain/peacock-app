@@ -23,7 +23,7 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 import Typography from "../../ui/typography";
 
-import { TransformedMember } from "@/app/api/member/route";
+import { TransformedMember } from "@/app/api/account/member/route";
 import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
 import { cn } from "@/lib/utils";
@@ -81,7 +81,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         })}
         subLabel={
           row.original.totalOffsetAmount !== 0
-            ? `${row.original.totalVendorOffsetAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalLoanOffsetAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+            ? `${row.original.delayOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.joiningOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
             : ""
         }
       />
@@ -154,7 +154,8 @@ const editColumns: ColumnDef<TransformedMember>[] = [
 ];
 
 export type MemberTableProps = {
-  handleAction: (select: null | TransformedMember["member"]) => void;
+  // eslint-disable-next-line prettier/prettier, unused-imports/no-unused-vars
+  handleAction: (select: null | TransformedMember['account']) => void;
 };
 
 const MembersTable = ({ handleAction }: MemberTableProps) => {
@@ -213,7 +214,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
     accessorKey: "action",
     header: () => <PlainTableHeader label="Action" />,
     cell: ({ row }: any) => (
-      <ActionCell onClick={() => handleAction(row.original.member)} />
+      <ActionCell onClick={() => handleAction(row.original.account)} />
     ),
   };
 

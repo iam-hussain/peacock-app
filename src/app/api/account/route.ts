@@ -50,48 +50,25 @@ export async function POST(request: Request) {
     }
 
     // Create a new member
-    const created = await prisma.account.create({
+    await prisma.account.create({
       data: {
         ...(commonData as any),
         passbook: {
           create: {
             type: isMember ? "MEMBER" : "VENDOR",
-            data: getDefaultPassbookData("MEMBER"),
+            payload: getDefaultPassbookData(isMember ? "MEMBER" : "VENDOR"),
+            loanHistory: [],
+            joiningOffset: 0,
+            delayOffset: 0,
           },
         },
       },
     });
 
-    if (isMember) {
-      const vendors = await prisma.account.findMany({
-        where: { isMember: false },
-        select: { active: true, id: true },
-      });
-      await prisma.profitShare.createMany({
-        data: vendors.map((e) => ({
-          vendorId: e.id,
-          active: e.active,
-          memberId: created.id,
-        })),
-      });
-    } else {
-      const members = await prisma.account.findMany({
-        where: { isMember: true },
-        select: { active: true, id: true },
-      });
-      await prisma.profitShare.createMany({
-        data: members.map((e) => ({
-          vendorId: created.id,
-          active: e.active,
-          memberId: e.id,
-        })),
-      });
-    }
-
     revalidatePath("/member");
     revalidatePath("/vendor");
     revalidatePath("/loan");
-    return NextResponse.json({ account: created }, { status: 200 });
+    return NextResponse.json({ account: commonData }, { status: 200 });
   } catch (error) {
     console.error("Error creating/updating member:", error);
     return NextResponse.json(

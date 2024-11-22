@@ -21,7 +21,7 @@ import {
 import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 
-import { TransformedVendor } from "@/app/api/vendor/route";
+import { TransformedVendor } from "@/app/api/account/vendor/route";
 import { dateFormat } from "@/lib/date";
 import { fetchVendors } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -128,7 +128,7 @@ const editColumns: ColumnDef<TransformedVendor>[] = [
 
 export type VendorTableProps = {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  handleAction: (select: null | TransformedVendor["vendor"]) => void;
+  handleAction: (select: null | TransformedVendor["account"]) => void;
 };
 
 const VendorsTable = ({ handleAction }: VendorTableProps) => {
@@ -139,7 +139,7 @@ const VendorsTable = ({ handleAction }: VendorTableProps) => {
     accessorKey: "action",
     header: () => <PlainTableHeader label="Action" />,
     cell: ({ row }: any) => (
-      <ActionCell onClick={() => handleAction(row.original.vendor)} />
+      <ActionCell onClick={() => handleAction(row.original.account)} />
     ),
   };
 

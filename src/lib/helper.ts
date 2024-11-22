@@ -60,8 +60,6 @@ export const getDefaultPassbookData = (
       profitWithdrawalAmount: 0,
       accountBalance: 0,
       clubHeldAmount: 0,
-      totalVendorOffsetAmount: 0,
-      totalLoanOffsetAmount: 0,
       totalLoanTaken: 0,
       totalLoanRepay: 0,
       totalLoanBalance: 0,
@@ -83,14 +81,7 @@ export const getDefaultPassbookData = (
       totalLoanRepay: 0,
       totalLoanBalance: 0,
       totalInterestPaid: 0,
-      totalLoanProfit: 0,
       totalVendorProfit: 0,
-      loanOffsetPaid: 0,
-      loanOffsetBalance: 0,
-      vendorOffsetPaid: 0,
-      vendorOffsetBalance: 0,
-      totalVendorOffsetAmount: 0,
-      totalLoanOffsetAmount: 0,
     };
   }
   return {
@@ -98,10 +89,6 @@ export const getDefaultPassbookData = (
     totalReturns: 0,
     accountBalance: 0,
     totalProfitAmount: 0,
-    totalOffsetAmount: 0,
-    includedMembersCount: 0,
-    excludedMembersCount: 0,
-    memberProfitAmount: 0,
   };
 };
 
