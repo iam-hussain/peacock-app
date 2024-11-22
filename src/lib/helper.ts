@@ -39,7 +39,7 @@ type PassbookToUpdate = Map<
 export const bulkPassbookUpdate = async (
   items: PassbookToUpdate,
   maxRetries = 3,
-  batchSize = 100
+  batchSize = 5
 ) => {
   const values = Array.from(items.values());
 
