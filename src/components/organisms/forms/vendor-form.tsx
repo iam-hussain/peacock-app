@@ -75,7 +75,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
       fetcher.post("/api/vendor", { body: { id: selected?.id, ...body } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["vendor-details"],
+        queryKey: ["vendor-details", "accounts"],
       });
 
       toast.success(

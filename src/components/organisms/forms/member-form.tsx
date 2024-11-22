@@ -63,7 +63,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       fetcher.post("/api/member", { body: { id: selected?.id, ...body } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["member-details"],
+        queryKey: ["member-details", "accounts"],
       });
 
       toast.success(

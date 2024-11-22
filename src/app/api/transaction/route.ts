@@ -1,4 +1,5 @@
 import { Transaction } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
@@ -218,6 +219,13 @@ export async function POST(request: Request) {
       transactionAt,
       createdAt,
     });
+
+    revalidatePath("/member");
+    revalidatePath("/vendor");
+    revalidatePath("/loan");
+    revalidatePath("/transaction");
+    revalidatePath("/dashboard");
+
     return NextResponse.json({ success: true, transaction }, { status: 201 });
   } catch (error) {
     console.error("Failed to create transaction", error);

@@ -20,9 +20,9 @@ const noRefetchConfigs = {
 
 export const fetchAuthStatus = () =>
   queryOptions({
-    queryKey: ["auth", "status"],
+    queryKey: ["authentication"],
     queryFn: () =>
-      fetcher("/api/auth/status", { tags: ["auth"] }) as never as {
+      fetcher("/api/auth/status") as never as {
         isLoggedIn: boolean;
       },
     ...noRefetchConfigs,
@@ -30,12 +30,7 @@ export const fetchAuthStatus = () =>
 
 export const fetchAccountSelect = () =>
   queryOptions({
-    queryKey: [
-      "account-details",
-      "account-select",
-      "members",
-      "member-details",
-    ],
+    queryKey: ["account-select", "select", "accounts"],
     queryFn: () =>
       fetcher("/api/account/select") as never as TransformedAccountSelect[],
     ...noRefetchConfigs,
@@ -43,21 +38,18 @@ export const fetchAccountSelect = () =>
 
 export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
-    queryKey: ["member-connection", "connection"],
+    queryKey: ["member-connection", "connection", "accounts"],
     queryFn: () =>
-      fetcher(`/api/member/connection/${memberId}`, {
-        tags: ["member-connection"],
-      }) as never as GetConnectionMemberVendor,
+      fetcher(
+        `/api/member/connection/${memberId}`
+      ) as never as GetConnectionMemberVendor,
     ...noRefetchConfigs,
   });
 
 export const fetchMembers = () =>
   queryOptions({
-    queryKey: ["member-details", "members", "connection"],
-    queryFn: () =>
-      fetcher("/api/member", {
-        tags: ["members"],
-      }) as unknown as GetMemberResponse,
+    queryKey: ["member-details", "members", "accounts"],
+    queryFn: () => fetcher("/api/member") as unknown as GetMemberResponse,
     ...noRefetchConfigs,
   });
 
@@ -65,19 +57,17 @@ export const fetchStatistics = () =>
   queryOptions({
     queryKey: ["statistics", "connection"],
     queryFn: () =>
-      fetcher("/api/dashboard/statistics", {
-        tags: ["statistics", "connection"],
-      }) as never as GetStatisticsResponse,
+      fetcher("/api/dashboard/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
 
 export const fetchVendorConnection = (vendorId: string) =>
   queryOptions({
-    queryKey: ["vendor-connection", "connection"],
+    queryKey: ["vendor-connection", "connection", "accounts"],
     queryFn: () =>
-      fetcher(`/api/vendor/connection/${vendorId}`, {
-        tags: ["vendor-connection"],
-      }) as never as GetConnectionVendorMember,
+      fetcher(
+        `/api/vendor/connection/${vendorId}`
+      ) as never as GetConnectionVendorMember,
     ...noRefetchConfigs,
   });
 
@@ -94,31 +84,25 @@ export const fetchTransactions = (options: any) => {
   });
 
   return queryOptions({
-    queryKey: ["transaction", options],
+    queryKey: ["transaction", "fetch-transaction", "all-transaction", options],
     queryFn: () =>
-      fetcher(`/api/transaction?${params.toString()}`, {
-        tags: ["fetch-transaction", "all-transaction"],
-      }) as unknown as GetTransactionResponse,
+      fetcher(
+        `/api/transaction?${params.toString()}`
+      ) as unknown as GetTransactionResponse,
     ...noRefetchConfigs,
   });
 };
 
 export const fetchVendors = () =>
   queryOptions({
-    queryKey: ["vendor-details", "vendors", "connection"],
-    queryFn: () =>
-      fetcher("/api/vendor", {
-        tags: ["vendors"],
-      }) as unknown as GetVendorResponse,
+    queryKey: ["vendor-details", "vendors", "accounts"],
+    queryFn: () => fetcher("/api/vendor") as unknown as GetVendorResponse,
     ...noRefetchConfigs,
   });
 
 export const fetchLoans = () =>
   queryOptions({
-    queryKey: ["loan-details", "loans"],
-    queryFn: () =>
-      fetcher("/api/loan", {
-        tags: ["vendors"],
-      }) as unknown as GetLoanResponse,
+    queryKey: ["loan-details", "loans", "accounts"],
+    queryFn: () => fetcher("/api/loan") as unknown as GetLoanResponse,
     ...noRefetchConfigs,
   });

@@ -84,7 +84,7 @@ function MenuItems({
     mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["auth"],
+        queryKey: ["authentication"],
       });
 
       dispatch(setIsLoggedIn(false));

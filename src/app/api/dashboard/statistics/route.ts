@@ -22,39 +22,46 @@ type StatMemberPassbook = {
 };
 
 export async function GET() {
-  const [passbooks, membersCount] = await Promise.all([
-    prisma.passbook.findMany({
-      where: {
-        type: { in: ["CLUB", "MEMBER"] },
-      },
-      select: {
-        type: true,
-        loanHistory: true,
-        payload: true,
-      },
-    }),
-    prisma.account.count({
-      where: {
-        isMember: true,
-        active: true,
-      },
-    }),
-  ]);
-  const clubPassbook = passbooks.find((e) => e.type === "CLUB");
-  const membersPassbooks = passbooks.filter((e) => e.type === "MEMBER");
+  try {
+    const [passbooks, membersCount] = await Promise.all([
+      prisma.passbook.findMany({
+        where: {
+          type: { in: ["CLUB", "MEMBER"] },
+        },
+        select: {
+          type: true,
+          loanHistory: true,
+          payload: true,
+        },
+      }),
+      prisma.account.count({
+        where: {
+          isMember: true,
+          active: true,
+        },
+      }),
+    ]);
+    const clubPassbook = passbooks.find((e) => e.type === "CLUB");
+    const membersPassbooks = passbooks.filter((e) => e.type === "MEMBER");
 
-  if (!clubPassbook) {
-    throw new Error("Invalid club statistics");
+    if (!clubPassbook) {
+      throw new Error("Invalid club statistics");
+    }
+
+    return NextResponse.json({
+      success: true,
+      statistics: statisticsTransform(
+        clubPassbook as any,
+        membersPassbooks as any[],
+        membersCount
+      ),
+    });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      error: error || "An unexpected error occurred",
+    });
   }
-
-  return NextResponse.json({
-    success: true,
-    statistics: statisticsTransform(
-      clubPassbook as any,
-      membersPassbooks as any[],
-      membersCount
-    ),
-  });
 }
 
 function statisticsTransform(

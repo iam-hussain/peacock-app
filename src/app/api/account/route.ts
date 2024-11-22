@@ -88,7 +88,9 @@ export async function POST(request: Request) {
       });
     }
 
-    revalidatePath("/members");
+    revalidatePath("/member");
+    revalidatePath("/vendor");
+    revalidatePath("/loan");
     return NextResponse.json({ account: created }, { status: 200 });
   } catch (error) {
     console.error("Error creating/updating member:", error);

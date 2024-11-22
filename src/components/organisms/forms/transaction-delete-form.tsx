@@ -27,7 +27,7 @@ export function TransactionDeleteForm({
     mutationFn: () => fetcher.delete(`/api/transaction/${transaction.id}`),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["fetch-transaction", "all-transaction"],
+        queryKey: ["transaction"],
       });
 
       toast.success("Transaction deleted successfully");

@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
@@ -11,6 +12,13 @@ export async function GET() {
     // await bulkPassbookUpdate(passbookToUpdate);
 
     const passbookToUpdate = await resetAllTransactionMiddlewareHandler();
+
+    revalidatePath("/member");
+    revalidatePath("/vendor");
+    revalidatePath("/loan");
+    revalidatePath("/transaction");
+    revalidatePath("/dashboard");
+
     // Return the file path
     return NextResponse.json({ success: true, data: passbookToUpdate });
   } catch (error) {

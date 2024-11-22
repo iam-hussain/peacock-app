@@ -1,3 +1,4 @@
+"use client";
 import { useQuery } from "@tanstack/react-query";
 import { FaBalanceScale, FaPiggyBank, FaUsers } from "react-icons/fa";
 // import { FaMoneyBillTrendUp } from "react-icons/fa6";

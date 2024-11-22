@@ -22,7 +22,7 @@ export default function Login() {
     mutationFn: () => fetcher.post("/api/auth/login", { body: { password } }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["auth"],
+        queryKey: ["authentication"],
       });
       toast.success("Logged in successfully!");
       router.push("/dashboard"); // Redirect to the dashboard or any protected route

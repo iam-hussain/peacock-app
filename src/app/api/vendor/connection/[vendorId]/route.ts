@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
@@ -75,5 +76,10 @@ export async function POST(
     )
   );
 
+  revalidatePath("/member");
+  revalidatePath("/vendor");
+  revalidatePath("/loan");
+  revalidatePath("/transaction");
+  revalidatePath("/dashboard");
   return NextResponse.json({ connections, updates });
 }
