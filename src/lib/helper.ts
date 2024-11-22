@@ -38,12 +38,15 @@ type PassbookToUpdate = Map<
 
 export const bulkPassbookUpdate = async (items: PassbookToUpdate) => {
   try {
-    await prisma.$transaction(
-      Array.from(items, ([_, value]) => value).map(prisma.passbook.update)
+    const operations = Array.from(items.values()).map((value) =>
+      prisma.passbook.update(value)
     );
+
+    await prisma.$transaction(operations);
+
     console.log("Bulk passbook updated successfully");
   } catch (e) {
-    console.error("Bulk passbook updated failed");
+    console.error("Bulk passbook update failed");
     console.error(e);
   }
 };
