@@ -50,7 +50,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
   },
   {
-    accessorKey: "deposit",
+    accessorKey: "totalDepositAmount",
     header: ({ column }) => (
       <ActionTableHeader label="Deposit" column={column} />
     ),
@@ -60,16 +60,35 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
           style: "currency",
           currency: "INR",
         })}
+        // subLabel={
+        //   row.original.offsetDepositAmount !== 0
+        //     ? `${row.original.periodicDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+        //     : ""
+        // }
+      />
+    ),
+  },
+  {
+    accessorKey: "totalOffsetAmount",
+    header: ({ column }) => (
+      <ActionTableHeader label="Offset" column={column} />
+    ),
+    cell: ({ row }) => (
+      <CommonTableCell
+        label={row.original.totalOffsetAmount.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+        })}
         subLabel={
-          row.original.offsetDepositAmount !== 0
-            ? `${row.original.periodicDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+          row.original.totalOffsetAmount !== 0
+            ? `${row.original.totalVendorOffsetAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalLoanOffsetAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
             : ""
         }
       />
     ),
   },
   {
-    accessorKey: "balance",
+    accessorKey: "totalBalanceAmount",
     header: ({ column }) => (
       <ActionTableHeader label="Balance" column={column} />
     ),
@@ -81,11 +100,11 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         })}
         greenLabel={row.original.totalBalanceAmount <= 0}
         redLabel={row.original.totalBalanceAmount > 0}
-        subLabel={
-          row.original.totalPeriodBalanceAmount !== 0
-            ? `${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-            : ""
-        }
+        // subLabel={
+        //   row.original.totalPeriodBalanceAmount !== 0
+        //     ? `${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+        //     : ""
+        // }
       />
     ),
   },

@@ -75,7 +75,7 @@ export function calculatedVendorsConnection(
           : 0;
       const totalVendorOffsetAmount =
         totalProfitAmount > 0 && excludedMembersCount > 0
-          ? Math.round(memberProfitAmount / excludedMembersCount)
+          ? Math.round(memberProfitAmount * excludedMembersCount)
           : 0;
 
       clubTotalVendorProfit = clubTotalVendorProfit + totalProfitAmount;
@@ -93,12 +93,12 @@ export function calculatedVendorsConnection(
         })
       );
 
-      each.forEach(({ memberId, member: { active = false } }) => {
+      each.forEach(({ memberId, member, active }) => {
         if (!memberTotalVendorOffsetAmount[memberId]) {
           memberTotalVendorOffsetAmount[memberId] = 0;
         }
 
-        if (!active) {
+        if (!active && member.active) {
           memberTotalVendorOffsetAmount[memberId] =
             memberTotalVendorOffsetAmount[memberId] + memberProfitAmount;
         }

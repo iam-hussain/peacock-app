@@ -76,22 +76,34 @@ export const transactionMiddleware = (
     }
   }
 
-  if (transaction.transactionType === "WITHDRAW" && isRevert) {
+  if (transaction.transactionType === "WITHDRAW") {
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
-      const { profitWithdrawalAmount = 0 } = (toPassbook.data.payload ||
-        {}) as MemberPassbookData;
-      const differenceAmount =
-        profitWithdrawalAmount < transaction.amount
-          ? Math.abs(profitWithdrawalAmount - transaction.amount)
-          : 0;
-      values.DEPOSIT_DIFF = Math.abs(
-        profitWithdrawalAmount - transaction.amount
-      );
-      values.AMOUNT =
-        profitWithdrawalAmount < transaction.amount
-          ? 0
-          : transaction.amount - differenceAmount;
+      const {
+        periodicDepositAmount = 0,
+        withdrawalAmount = 0,
+        profitWithdrawalAmount = 0,
+      } = (toPassbook.data.payload || {}) as MemberPassbookData;
+
+      if (!isRevert) {
+        const totalWithdrawalAmount = withdrawalAmount + transaction.amount;
+        const totalWithdrawalProfit =
+          totalWithdrawalAmount > periodicDepositAmount
+            ? totalWithdrawalAmount - periodicDepositAmount
+            : 0;
+        values.DEPOSIT_DIFF = totalWithdrawalProfit;
+        values.AMOUNT = transaction.amount - totalWithdrawalProfit;
+      } else {
+        // Revert case
+        values.DEPOSIT_DIFF =
+          transaction.amount > profitWithdrawalAmount
+            ? profitWithdrawalAmount
+            : transaction.amount;
+        values.AMOUNT =
+          transaction.amount > profitWithdrawalAmount
+            ? Math.max(transaction.amount - profitWithdrawalAmount, 0)
+            : 0;
+      }
     }
   }
 

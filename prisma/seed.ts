@@ -99,73 +99,73 @@ async function seed() {
 
   console.log(JSON.stringify({ profitShareCreated }));
 
-  // const memberTransactionsCreated = await prisma.transaction.createMany({
-  //   data: backupData.memberTransactions as any[],
-  // });
+  const memberTransactionsCreated = await prisma.transaction.createMany({
+    data: backupData.memberTransactions as any[],
+  });
 
-  // console.log(JSON.stringify({ memberTransactionsCreated }));
+  console.log(JSON.stringify({ memberTransactionsCreated }));
 
-  // const vendorTransactionsCreated = await prisma.transaction.createMany({
-  //   data: backupData.vendorTransactions.map((each) => {
-  //     const { vendorId, memberId, transactionType, ...other } = each;
+  const vendorTransactionsCreated = await prisma.transaction.createMany({
+    data: backupData.vendorTransactions.map((each) => {
+      const { vendorId, memberId, transactionType, ...other } = each;
 
-  //     const updated = {
-  //       fromId: vendorId,
-  //       toId: memberId,
-  //       transactionType,
-  //     };
+      const updated = {
+        fromId: vendorId,
+        toId: memberId,
+        transactionType,
+      };
 
-  //     if (loanIds.includes(vendorId)) {
-  //       const accountId = loanIdsMapMember[vendorId] || "";
+      if (loanIds.includes(vendorId)) {
+        const accountId = loanIdsMapMember[vendorId] || "";
 
-  //       if (["PERIODIC_RETURN", "RETURNS"].includes(transactionType)) {
-  //         updated.fromId = accountId;
-  //         updated.toId = memberId;
-  //         updated.transactionType = "LOAN_REPAY";
-  //       }
-  //       if (
-  //         ["RETURNS", "PERIODIC_RETURN"].includes(transactionType) &&
-  //         each.amount <= 8000
-  //       ) {
-  //         updated.fromId = accountId;
-  //         updated.toId = memberId;
-  //         updated.transactionType = "LOAN_INTEREST";
-  //       }
+        if (["PERIODIC_RETURN", "RETURNS"].includes(transactionType)) {
+          updated.fromId = accountId;
+          updated.toId = memberId;
+          updated.transactionType = "LOAN_REPAY";
+        }
+        if (
+          ["RETURNS", "PERIODIC_RETURN"].includes(transactionType) &&
+          each.amount <= 8000
+        ) {
+          updated.fromId = accountId;
+          updated.toId = memberId;
+          updated.transactionType = "LOAN_INTEREST";
+        }
 
-  //       if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
-  //         updated.fromId = memberId;
-  //         updated.toId = accountId;
-  //         updated.transactionType = "LOAN_TAKEN";
-  //       }
+        if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
+          updated.fromId = memberId;
+          updated.toId = accountId;
+          updated.transactionType = "LOAN_TAKEN";
+        }
 
-  //       if (["PROFIT"].includes(transactionType)) {
-  //         updated.fromId = accountId;
-  //         updated.toId = memberId;
-  //         updated.transactionType = "LOAN_INTEREST";
-  //       }
-  //     } else {
-  //       if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
-  //         updated.fromId = memberId;
-  //         updated.toId = vendorId;
-  //         updated.transactionType = "VENDOR_INVEST";
-  //       }
-  //       if (
-  //         ["PERIODIC_RETURN", "RETURNS", "PROFIT"].includes(transactionType)
-  //       ) {
-  //         updated.fromId = vendorId;
-  //         updated.toId = memberId;
-  //         updated.transactionType = "VENDOR_RETURNS";
-  //       }
-  //     }
+        if (["PROFIT"].includes(transactionType)) {
+          updated.fromId = accountId;
+          updated.toId = memberId;
+          updated.transactionType = "LOAN_INTEREST";
+        }
+      } else {
+        if (["INVEST", "PERIODIC_INVEST"].includes(transactionType)) {
+          updated.fromId = memberId;
+          updated.toId = vendorId;
+          updated.transactionType = "VENDOR_INVEST";
+        }
+        if (
+          ["PERIODIC_RETURN", "RETURNS", "PROFIT"].includes(transactionType)
+        ) {
+          updated.fromId = vendorId;
+          updated.toId = memberId;
+          updated.transactionType = "VENDOR_RETURNS";
+        }
+      }
 
-  //     return {
-  //       ...other,
-  //       ...updated,
-  //     } as any;
-  //   }),
-  // });
+      return {
+        ...other,
+        ...updated,
+      } as any;
+    }),
+  });
 
-  // console.log(JSON.stringify({ vendorTransactionsCreated }));
+  console.log(JSON.stringify({ vendorTransactionsCreated }));
 }
 
 seed()

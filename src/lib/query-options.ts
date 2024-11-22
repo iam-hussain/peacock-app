@@ -38,7 +38,7 @@ export const fetchAccountSelect = () =>
 
 export const fetchMemberConnection = (memberId: string) =>
   queryOptions({
-    queryKey: ["member-connection", "connection", "accounts"],
+    queryKey: ["member-connection", "connection", "accounts", memberId],
     queryFn: () =>
       fetcher(
         `/api/member/connection/${memberId}`
@@ -63,7 +63,7 @@ export const fetchStatistics = () =>
 
 export const fetchVendorConnection = (vendorId: string) =>
   queryOptions({
-    queryKey: ["vendor-connection", "connection", "accounts"],
+    queryKey: ["vendor-connection", "connection", "accounts", vendorId],
     queryFn: () =>
       fetcher(
         `/api/vendor/connection/${vendorId}`

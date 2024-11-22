@@ -91,9 +91,9 @@ export const transactionFormSchema = z.object({
 export const memberConnectionFormSchema = z.object({
   loanOffsetAmount: z.preprocess(
     (val) => Number(val),
-    z
-      .number()
-      .min(0.01, { message: "Reduce profit amount must be greater than 0." })
+    z.number().min(0, {
+      message: "Reduce profit amount must be greater than or equal to 0.",
+    })
   ),
   connections: z.array(
     z.object({
