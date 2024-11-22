@@ -5,7 +5,7 @@ import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
 
 export async function GET() {
   try {
-    const passbookToUpdate = await resetAllTransactionMiddlewareHandler();
+    resetAllTransactionMiddlewareHandler();
 
     revalidatePath("/member");
     revalidatePath("/vendor");
@@ -14,7 +14,7 @@ export async function GET() {
     revalidatePath("/dashboard");
 
     // Return the file path
-    return NextResponse.json({ success: true, data: passbookToUpdate });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ success: false, error: error }, { status: 500 });
