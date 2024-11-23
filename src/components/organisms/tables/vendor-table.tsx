@@ -21,8 +21,7 @@ import {
 import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 
-import { TransformedVendor } from "@/app/api/vendor/route";
-import { vendorTypeMap } from "@/lib/config";
+import { TransformedVendor } from "@/app/api/account/vendor/route";
 import { dateFormat } from "@/lib/date";
 import { fetchVendors } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -34,11 +33,10 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     cell: ({ row }) => (
       <AvatarCell
         id={row.original.id}
-        avatar={row.original.memberAvatar}
-        name={row.original.vendorName}
+        avatar={row.original.avatar}
+        name={row.original.name}
         avatarName={row.original.name}
         active={row.original.active}
-        subLabel={row.original.memberName}
       />
     ),
   },
@@ -65,24 +63,14 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
       <CommonTableCell
         label={
           row.original.active && row.original.nextDueDate
-            ? dateFormat(new Date(row.original.nextDueDate))
+            ? dateFormat(row.original.nextDueDate)
             : "-"
         }
         subLabel={
-          row.original.balanceAmount
-            ? moneyFormat(row.original.balanceAmount)
-            : ""
+          row.original.monthsPassedString && row.original.nextDueDate
+            ? row.original.monthsPassedString
+            : undefined
         }
-      />
-    ),
-  },
-  {
-    accessorKey: "type",
-    header: ({ column }) => <ActionTableHeader label="Type" column={column} />,
-    cell: ({ row }) => (
-      <CommonTableCell
-        label={vendorTypeMap[row.original.type]}
-        subLabel={row.original.period || ""}
       />
     ),
   },
@@ -93,7 +81,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.invest.toLocaleString("en-IN", {
+        label={row.original.totalInvestment.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -103,11 +91,11 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
     accessorKey: "profit",
     header: ({ column }) => (
-      <ActionTableHeader label="Profit" column={column} />
+      <ActionTableHeader label="Return" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.profit.toLocaleString("en-IN", {
+        label={row.original.totalReturns.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -117,16 +105,12 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
     accessorKey: "returns",
     header: ({ column }) => (
-      <ActionTableHeader label="Return" column={column} />
+      <ActionTableHeader label="Profit" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={
-          row.original.calcReturns || row.original.type === "LEND"
-            ? moneyFormat(row.original.returns)
-            : " - "
-        }
-        greenLabel={row.original.calcReturns}
+        label={moneyFormat(row.original.totalProfitAmount)}
+        greenLabel={row.original.totalProfitAmount > 0}
       />
     ),
   },
@@ -144,28 +128,26 @@ const editColumns: ColumnDef<TransformedVendor>[] = [
 
 export type VendorTableProps = {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  handleAction: (select: null | TransformedVendor["vendor"]) => void;
+  handleAction: (select: null | TransformedVendor["account"]) => void;
 };
 
 const VendorsTable = ({ handleAction }: VendorTableProps) => {
   const [editMode, setEditMode] = useState(false);
   const { data, isLoading, isError } = useQuery(fetchVendors());
 
+  const actionColumn = {
+    accessorKey: "action",
+    header: () => <PlainTableHeader label="Action" />,
+    cell: ({ row }: any) => (
+      <ActionCell onClick={() => handleAction(row.original.account)} />
+    ),
+  };
+
   const columns = useMemo(() => {
     if (!editMode) {
-      return baseColumns;
+      return [...baseColumns, actionColumn];
     }
-    return [
-      ...baseColumns,
-      ...editColumns,
-      {
-        accessorKey: "action",
-        header: () => <PlainTableHeader label="Action" />,
-        cell: ({ row }) => (
-          <ActionCell onClick={() => handleAction(row.original.vendor)} />
-        ),
-      },
-    ];
+    return [...baseColumns, ...editColumns, actionColumn];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode]);
 

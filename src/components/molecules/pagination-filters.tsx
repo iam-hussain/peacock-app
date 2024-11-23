@@ -21,7 +21,7 @@ export const PaginationFilters = ({
   toggleState,
 }: PaginationFiltersProps) => (
   <>
-    <div className="flex justify-end gap-2">
+    <div className="flex justify-end gap-2 col-span-2 md:col-span-1">
       <SelectInputGroup
         value={limit}
         onChange={(value: number | string) => onLimitChange(Number(value))}

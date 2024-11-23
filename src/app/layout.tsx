@@ -26,7 +26,7 @@ export default function RootLayout({
           </StoreProvider>
         </QueryProvider>
       </body>
-      <Toaster position="top-right" />
+      <Toaster position="bottom-right" />
     </html>
   );
 }

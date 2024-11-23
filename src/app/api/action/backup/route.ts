@@ -8,21 +8,15 @@ import { fileDateTime } from "@/lib/date";
 export async function POST() {
   try {
     // Fetch all data from Prisma models
-    const members = await prisma.member.findMany();
-    const vendors = await prisma.vendor.findMany();
-    const memberTransactions = await prisma.memberTransaction.findMany();
-    const vendorTransactions = await prisma.vendorTransaction.findMany();
-    const vendorProfitShares = await prisma.vendorProfitShare.findMany();
-    const passbooks = await prisma.passbook.findMany();
+    const account = await prisma.account.findMany();
+    const transaction = await prisma.transaction.findMany();
+    const passbook = await prisma.passbook.findMany();
 
     // Prepare the data
     const backupData = {
-      members,
-      vendors,
-      memberTransactions,
-      vendorTransactions,
-      vendorProfitShares,
-      passbooks,
+      account,
+      transaction,
+      passbook,
     };
 
     const fileName = `peacock_backup_${fileDateTime()}.json`;

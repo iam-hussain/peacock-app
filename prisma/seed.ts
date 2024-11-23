@@ -15,16 +15,19 @@ async function seed() {
   const backupData = JSON.parse(readFileSync(backupFilePath, "utf8"));
 
   // Insert the data into Prisma models
-  await prisma.member.createMany({ data: backupData.members });
-  await prisma.vendor.createMany({ data: backupData.vendors });
-  await prisma.memberTransaction.createMany({
-    data: backupData.memberTransactions,
-  });
-  await prisma.vendorTransaction.createMany({
-    data: backupData.vendorTransactions,
-  });
-  await prisma.vendorProfitShare.createMany({
-    data: backupData.vendorProfitShares,
+  await prisma.account.createMany({ data: backupData.account });
+  await prisma.transaction.createMany({
+    data: backupData.transaction.map((transaction: any) => {
+      let date = new Date(transaction.transactionAt);
+
+      // Set IST (UTC +5:30) and change the time to 10:00 AM IST
+      date.setUTCHours(4, 30, 0, 0); // 4:30 AM UTC is 10:00 AM IST
+
+      return {
+        ...transaction,
+        transactionAt: date.toISOString(),
+      };
+    }),
   });
   await prisma.passbook.createMany({ data: backupData.passbooks });
 }

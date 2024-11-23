@@ -10,7 +10,6 @@ import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
 import { Switch } from "../../ui/switch";
 
-import { TransformedMemberSelect } from "@/app/api/member/select/route";
 import {
   Form,
   FormControl,
@@ -20,67 +19,51 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { vendorTypeMap } from "@/lib/config";
 import fetcher from "@/lib/fetcher";
-import { vendorFormSchema, VendorFromSchema } from "@/lib/form-schema";
+import { accountFormSchema, AccountFromSchema } from "@/lib/form-schema";
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
-  members: TransformedMemberSelect[]; // list of members for selection
   onSuccess: () => void;
   onCancel?: () => void;
 };
 
-export function VendorForm({
-  selected,
-  members,
-  onSuccess,
-  onCancel,
-}: VendorFormProps) {
+export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
   const queryClient = useQueryClient();
 
   const form = useForm({
-    resolver: zodResolver(vendorFormSchema),
+    resolver: zodResolver(accountFormSchema),
     defaultValues: selected
       ? {
-          name: selected.name,
-          slug: selected.slug || "",
-          terms: selected.terms || 0,
-          type: selected.type || "DEFAULT",
-          ownerId: selected.ownerId || "",
-          termType: selected.termType || "MONTH",
-          startAt: selected.startAt ? new Date(selected.startAt) : undefined,
-          endAt: selected.endAt ? new Date(selected.endAt) : undefined,
+          firstName: selected.firstName,
+          lastName: selected.lastName || "",
+          phone: selected.phone || "",
+          email: selected.email || "",
+          avatar: selected.avatar || "",
           active: selected.active ?? true,
-          calcReturns: selected.calcReturns ?? true,
+          startAt: selected.startAt ? new Date(selected.startAt) : new Date(),
+          endAt: selected.endAt ? new Date(selected.endAt) : undefined,
         }
       : {
-          name: "",
-          slug: "",
-          terms: 0,
-          type: "DEFAULT",
-          ownerId: "",
-          termType: "MONTH",
+          firstName: "",
+          lastName: "",
+          phone: "",
+          email: "",
+          avatar: "",
+          active: true,
           startAt: new Date(),
           endAt: undefined,
-          active: true,
-          calcReturns: true,
         },
   });
 
   const mutation = useMutation({
     mutationFn: (body: any) =>
-      fetcher.post("/api/vendor", { body: { id: selected?.id, ...body } }),
-    onSuccess: async () => {
+      fetcher.post("/api/account", {
+        body: { id: selected?.id, ...body, isMember: false },
+      }),
+    onSuccess: async (data: any) => {
       await queryClient.invalidateQueries({
-        queryKey: ["vendor-details"],
+        queryKey: ["vendor-details", "accounts"],
       });
 
       toast.success(
@@ -88,7 +71,7 @@ export function VendorForm({
           ? "Vendor updated successfully 🌟"
           : "Vendor created successfully 🚀"
       );
-      if (!selected) form.reset(); // Reset form after submission
+      form.reset(data?.account || {}); // Reset form after submission
       if (onSuccess) {
         onSuccess();
       }
@@ -100,7 +83,7 @@ export function VendorForm({
     },
   });
 
-  async function onSubmit(variables: VendorFromSchema) {
+  async function onSubmit(variables: AccountFromSchema) {
     return await mutation.mutateAsync(variables as any);
   }
 
@@ -111,130 +94,36 @@ export function VendorForm({
         className="w-full max-w-lg space-y-4"
       >
         <Box preset={"grid-split"}>
-          {/* Name */}
+          {/* First Name */}
           <FormField
             control={form.control}
-            name="name"
+            name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Vendor name" />
+                  <Input {...field} placeholder="First name" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Slug */}
+          {/* Last Name */}
           <FormField
             control={form.control}
-            name="slug"
+            name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Slug</FormLabel>
+                <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Vendor slug" />
+                  <Input {...field} placeholder="Last name" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </Box>
-        <Box preset={"grid-split"}>
-          {/* Terms */}
-          {/* <FormField
-                        control={form.control}
-                        name="terms"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Terms</FormLabel>
-                                <FormControl>
-                                    <Input type="number" {...field} placeholder="Terms" />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    /> */}
-
-          {/* Owner */}
-          <FormField
-            control={form.control}
-            name="ownerId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Owner</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select owner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {members.map((member) => (
-                        <SelectItem key={member.id} value={member.id}>
-                          {member.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Type */}
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Type</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select vendor type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(vendorTypeMap).map(([key, name]) => (
-                        <SelectItem key={key} value={key}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* Term Type
-                    <FormField
-                        control={form.control}
-                        name="termType"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Term Type</FormLabel>
-                                <FormControl>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select term type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="NONE">NONE</SelectItem>
-                                            <SelectItem value="DAY">DAY</SelectItem>
-                                            <SelectItem value="WEEK">WEEK</SelectItem>
-                                            <SelectItem value="MONTH">MONTH</SelectItem>
-                                            <SelectItem value="YEAR">YEAR</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    /> */}
-        </Box>
-
         <Box preset={"grid-split"}>
           {/* Start Date */}
           <FormField
@@ -267,26 +156,54 @@ export function VendorForm({
           />
         </Box>
 
+        <Box preset={"grid-split"}>
+          {/* Phone */}
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Phone" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Email */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </Box>
+
         <Box preset={"grid-split"} className="pt-2">
-          {/* calcReturns */}
-          <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
-            <FormLabel>Calculate Returns</FormLabel>
-            <FormControl>
-              <Controller
-                name={`calcReturns`}
-                control={form.control}
-                render={({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    defaultChecked={selected?.calcReturns ?? true}
-                    className="m-0 mt-0"
-                  />
-                )}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+          {/* Avatar */}
+          <FormField
+            control={form.control}
+            name="avatar"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Avatar URL</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Avatar URL" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Active */}
           <FormItem className="flex items-center justify-between border border-input px-3 min-h-[36px] py-1 rounded-md">
             <FormLabel>Active</FormLabel>

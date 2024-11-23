@@ -1,5 +1,6 @@
 import { serialize } from "cookie"; // To set cookies
 import { sign } from "jsonwebtoken"; // For generating JWTs
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -29,6 +30,8 @@ export async function POST(request: Request) {
     maxAge: 3600,
     path: "/",
   });
+
+  revalidatePath("/dashboard", "layout");
 
   const response = NextResponse.json({ message: "Login successful" });
   response.headers.set("Set-Cookie", cookie);

@@ -26,7 +26,6 @@
   background-color: rgba(0, 136, 255, 0.096);
 } */
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -103,7 +102,6 @@
     --ring: 216 12.2% 83.9%;
   }
 }
-
 
 .width-avl {
   width: -webkit-fill-available;
@@ -182,13 +180,16 @@ body {
   min-width: 220px;
 }
 
+[data-table="createdAt"],
 [data-table="updatedAt"],
-[data-table="transactionAt"],
-[data-table="transactionType"] {
+[data-table="transactionAt"] {
   min-width: 200px;
 }
 
-[data-table="nextDueDate"] [data-table="startAt"] [data-table="amount"] {
+[data-table="recentInvest"],
+[data-table="nextDueDate"],
+[data-table="startAt"],
+[data-table="amount"] {
   min-width: 140px;
 }
 
@@ -199,10 +200,15 @@ body {
   min-width: 205px;
 }
 
+[data-table="transactionType"],
 [data-table="name"] {
   min-width: 215px;
 }
 
+[data-table="current"],
+[data-table="balance"],
+[data-table="account"],
+[data-table="expected"],
 [data-table="amount"],
 [data-table="deposit"],
 [data-table="balance"],

@@ -13,11 +13,11 @@ import { cn } from "@/lib/utils";
 
 type AvatarCellProps = {
   id: string;
-  avatar?: string;
+  avatar?: string | null;
   name: string;
   active?: boolean;
-  subLabel?: string;
-  avatarName?: string;
+  subLabel?: string | null;
+  avatarName?: string | null;
   className?: string;
   isSmall?: boolean;
 };
@@ -121,6 +121,7 @@ type CommonTableCellProps = {
   subLabel?: string;
   className?: string;
   greenLabel?: boolean;
+  redLabel?: boolean;
 };
 
 export const CommonTableCell = ({
@@ -128,11 +129,13 @@ export const CommonTableCell = ({
   subLabel,
   className,
   greenLabel = false,
+  redLabel = false,
 }: CommonTableCellProps) => (
   <div className={cn("flex flex-col items-start", className)}>
     <p
       className={cn("text-foreground font-medium", {
         "text-emerald-500": greenLabel,
+        "text-rose-500": redLabel,
       })}
     >
       {label}

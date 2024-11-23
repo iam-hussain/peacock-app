@@ -1,24 +1,33 @@
 "use client";
 import { Dialog } from "@radix-ui/react-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 
 import { GenericModal } from "../atoms/generic-modal";
-import { MemberConnectionsForm } from "../organisms/forms/member-connection-form";
 import { MemberForm } from "../organisms/forms/member-form";
+import { OffsetForm } from "../organisms/forms/offset-form";
 import MembersTable from "../organisms/tables/member-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
-import { TransformedMember } from "@/app/api/member/route";
+import { TransformedMember } from "@/app/api/account/member/route";
 
 const MemberAction = () => {
-  const [selected, setSelected] = useState<null | TransformedMember["member"]>(
+  const queryClient = useQueryClient();
+  const [selected, setSelected] = useState<null | TransformedMember["account"]>(
     null
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleAction = (select: null | TransformedMember["member"]) => {
+  const handleAction = (select: null | TransformedMember["account"]) => {
     setSelected(select);
     setIsOpen(!isOpen);
+  };
+
+  const onSuccess = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["member-details"],
+    });
+    setIsOpen(false);
   };
 
   return (
@@ -26,27 +35,33 @@ const MemberAction = () => {
       <MembersTable handleAction={handleAction} />
       <GenericModal
         title={selected ? "Update Member" : "Add Member"}
-        description={selected ? `Member ID: ${selected.id}` : undefined}
+        description={
+          selected
+            ? `Member ID: ${selected.firstName} ${selected?.lastName || ""} - [${selected.id}]`.trim()
+            : undefined
+        }
       >
         {selected && selected.id ? (
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="account">Connection</TabsTrigger>
+              <TabsTrigger value="account">Offset</TabsTrigger>
             </TabsList>
             <TabsContent value="details">
               <MemberForm
                 selected={selected}
-                onSuccess={() => setIsOpen(false)}
-                onCancel={() => setIsOpen(false)}
+                onSuccess={onSuccess}
+                onCancel={onSuccess}
               />
             </TabsContent>
 
             <TabsContent value="account">
-              <MemberConnectionsForm
+              <OffsetForm
                 onSuccess={() => setIsOpen(false)}
                 onCancel={() => setIsOpen(false)}
-                memberId={selected.id}
+                passbookId={selected.passbookId || ""}
+                joiningOffset={selected.joiningOffset || 0}
+                delayOffset={selected.delayOffset || 0}
               />
             </TabsContent>
           </Tabs>

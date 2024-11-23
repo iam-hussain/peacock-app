@@ -23,7 +23,7 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 import Typography from "../../ui/typography";
 
-import { TransformedMember } from "@/app/api/member/route";
+import { TransformedMember } from "@/app/api/account/member/route";
 import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
 import { cn } from "@/lib/utils";
@@ -39,8 +39,8 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         name={row.original.name}
         active={row.original.active}
         subLabel={
-          row.original.clubFund
-            ? row.original.clubFund.toLocaleString("en-IN", {
+          row.original.clubHeldAmount
+            ? row.original.clubHeldAmount.toLocaleString("en-IN", {
                 style: "currency",
                 currency: "INR",
               })
@@ -50,51 +50,72 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
   },
   {
-    accessorKey: "deposit",
+    accessorKey: "totalDepositAmount",
     header: ({ column }) => (
       <ActionTableHeader label="Deposit" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.deposit.toLocaleString("en-IN", {
+        label={row.original.totalDepositAmount.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        subLabel={
-          row.original.offsetDeposit !== 0
-            ? `${row.original.periodIn.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDeposit.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-            : ""
-        }
+        // subLabel={
+        //   row.original.offsetDepositAmount !== 0
+        //     ? `${row.original.periodicDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+        //     : ""
+        // }
       />
     ),
   },
   {
-    accessorKey: "balance",
+    accessorKey: "totalOffsetAmount",
+    header: ({ column }) => (
+      <ActionTableHeader label="Offset" column={column} />
+    ),
+    cell: ({ row }) => (
+      <CommonTableCell
+        label={row.original.totalOffsetAmount.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+        })}
+        // subLabel={
+        //   row.original.totalOffsetAmount !== 0
+        //     ? `${row.original.joiningOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.delayOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+        //     : ""
+        // }
+      />
+    ),
+  },
+  {
+    accessorKey: "totalBalanceAmount",
     header: ({ column }) => (
       <ActionTableHeader label="Balance" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.balance.toLocaleString("en-IN", {
+        label={row.original.totalBalanceAmount.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        subLabel={
-          row.original.offsetBalance !== 0
-            ? `${row.original.periodBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetBalance.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-            : ""
-        }
+        greenLabel={row.original.totalBalanceAmount <= 0}
+        redLabel={row.original.totalBalanceAmount > 0}
+        // subLabel={
+        //   row.original.totalPeriodBalanceAmount !== 0
+        //     ? `${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
+        //     : ""
+        // }
       />
     ),
   },
   {
-    accessorKey: "returns",
+    accessorKey: "totalReturnAmount",
     header: ({ column }) => (
       <ActionTableHeader label="Returns" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.returns.toLocaleString("en-IN", {
+        label={row.original.totalReturnAmount.toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -119,13 +140,13 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
 
 const editColumns: ColumnDef<TransformedMember>[] = [
   {
-    accessorKey: "joinedAt",
+    accessorKey: "startAt",
     header: ({ column }) => (
       <ActionTableHeader label="Joined" column={column} />
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={dateFormat(new Date(row.original.joinedAt))}
+        label={dateFormat(new Date(row.original.startAt))}
         subLabel={row.original.id}
       />
     ),
@@ -133,7 +154,8 @@ const editColumns: ColumnDef<TransformedMember>[] = [
 ];
 
 export type MemberTableProps = {
-  handleAction: (select: null | TransformedMember["member"]) => void;
+  // eslint-disable-next-line prettier/prettier, unused-imports/no-unused-vars
+  handleAction: (select: null | TransformedMember['account']) => void;
 };
 
 const MembersTable = ({ handleAction }: MemberTableProps) => {
@@ -188,21 +210,19 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
     return data.members.filter((e) => e.active);
   }, [editMode, data]);
 
+  const actionColumn = {
+    accessorKey: "action",
+    header: () => <PlainTableHeader label="Action" />,
+    cell: ({ row }: any) => (
+      <ActionCell onClick={() => handleAction(row.original.account)} />
+    ),
+  };
+
   const columns = useMemo(() => {
     if (!editMode) {
-      return baseColumns;
+      return [...baseColumns, actionColumn];
     }
-    return [
-      ...baseColumns,
-      ...editColumns,
-      {
-        accessorKey: "action",
-        header: () => <PlainTableHeader label="Action" />,
-        cell: ({ row }) => (
-          <ActionCell onClick={() => handleAction(row.original.member)} />
-        ),
-      },
-    ];
+    return [...baseColumns, ...editColumns, actionColumn];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode]);
 

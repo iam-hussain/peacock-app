@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import fetcher from "@/lib/fetcher";
-import { memberFormSchema, MemberFromSchema } from "@/lib/form-schema";
+import { accountFormSchema, AccountFromSchema } from "@/lib/form-schema";
 
 type MemberFormProps = {
   selected?: any;
@@ -29,49 +29,43 @@ type MemberFormProps = {
 };
 
 export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
-  const queryClient = useQueryClient();
-
   const form = useForm({
-    resolver: zodResolver(memberFormSchema),
+    resolver: zodResolver(accountFormSchema),
     defaultValues: selected
       ? {
           firstName: selected.firstName,
           lastName: selected.lastName || "",
-          username: selected.username,
           phone: selected.phone || "",
           email: selected.email || "",
           avatar: selected.avatar || "",
           active: selected.active ?? true,
-          joinedAt: selected.joinedAt
-            ? new Date(selected.joinedAt)
-            : new Date(),
+          startAt: selected.startAt ? new Date(selected.startAt) : new Date(),
+          endAt: undefined,
         }
       : {
           firstName: "",
           lastName: "",
-          username: "",
           phone: "",
           email: "",
           avatar: "",
           active: true,
-          joinedAt: new Date(),
+          startAt: new Date(),
+          endAt: undefined,
         },
   });
 
   const mutation = useMutation({
     mutationFn: (body: any) =>
-      fetcher.post("/api/member", { body: { id: selected?.id, ...body } }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["member-details"],
-      });
-
+      fetcher.post("/api/account", {
+        body: { id: selected?.id, ...body, isMember: true },
+      }),
+    onSuccess: async (data: any) => {
       toast.success(
         selected
           ? "Member updated successfully 🌟"
           : "Member created successfully 🚀"
       );
-      if (!selected) form.reset(); // Reset form after submission
+      form.reset(data?.account || {}); // Reset form after submission
       if (onSuccess) {
         onSuccess();
       }
@@ -83,7 +77,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     },
   });
 
-  async function onSubmit(variables: MemberFromSchema) {
+  async function onSubmit(variables: AccountFromSchema) {
     return await mutation.mutateAsync(variables as any);
   }
 
@@ -158,16 +152,13 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
         </Box>
 
         <Box preset={"grid-split"}>
-          {/* Username */}
           <FormField
             control={form.control}
-            name="username"
+            name="startAt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Username" />
-                </FormControl>
+                <FormLabel>Joined Date</FormLabel>
+                <DatePickerForm field={field} placeholder="Joined date" />
                 <FormMessage />
               </FormItem>
             )}
@@ -189,18 +180,6 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
         </Box>
 
         <Box preset={"grid-split"}>
-          <FormField
-            control={form.control}
-            name="joinedAt"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Joined Date</FormLabel>
-                <DatePickerForm field={field} placeholder="Joined date" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* Active */}
           <FormItem className="flex items-center justify-between align-bottom border border-input px-3 min-h-[36px] mt-auto w-full rounded-md">
             <FormLabel>Active</FormLabel>

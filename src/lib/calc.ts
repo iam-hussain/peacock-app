@@ -7,23 +7,10 @@ import {
 } from "date-fns";
 
 import { clubConfig } from "./config";
+import { calculateTimePassed } from "./date";
 
 const getPeriodString = (months: number, days: number) => {
   return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;
-};
-
-const getTimePassed = (startDate: Date, endDate: Date) => {
-  // Calculate total months
-  const monthsPassed = differenceInMonths(endDate, startDate);
-
-  // Calculate remaining days
-  const dateAfterFullMonths = addMonths(startDate, monthsPassed);
-  const daysPassed = differenceInDays(endDate, dateAfterFullMonths);
-
-  return {
-    monthsPassed,
-    daysPassed,
-  };
 };
 
 const getNextDueDate = (start: string | Date, end?: string | Date | null) => {
@@ -61,9 +48,9 @@ export const newLoanCalculator = (
   const startDate = new Date(start);
   const endDate = end ? new Date(end) : new Date();
   const nextDueDate = getNextDueDate(start, end);
-  const actualPassed = getTimePassed(startDate, endDate);
+  const actualPassed = calculateTimePassed(startDate, endDate);
 
-  const { monthsPassed, daysPassed } = getTimePassed(
+  const { monthsPassed, daysPassed } = calculateTimePassed(
     startDate,
     nextDueDate || new Date()
   );
@@ -109,7 +96,7 @@ export const legacyLoanCalculator = (
   const startDate = new Date(start);
   const endDate = end ? new Date(end) : new Date();
 
-  const { monthsPassed, daysPassed } = getTimePassed(startDate, endDate);
+  const { monthsPassed, daysPassed } = calculateTimePassed(startDate, endDate);
 
   const monthsCount = daysPassed > 15 ? monthsPassed + 1 : monthsPassed;
   // Calculate interest for full months
@@ -146,7 +133,7 @@ export const chitCalculator = (
   const startDate = new Date(start);
   const endDate = end ? new Date(end) : new Date();
 
-  const { monthsPassed, daysPassed } = getTimePassed(startDate, endDate);
+  const { monthsPassed, daysPassed } = calculateTimePassed(startDate, endDate);
 
   return {
     monthsPassed,

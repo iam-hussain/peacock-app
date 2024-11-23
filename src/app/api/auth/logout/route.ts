@@ -1,4 +1,5 @@
 import { serialize } from "cookie"; // To set cookies
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function POST() {
@@ -9,6 +10,8 @@ export async function POST() {
     maxAge: 3600,
     path: "/",
   });
+
+  revalidatePath("/dashboard", "layout");
 
   const response = NextResponse.json({ message: "Logout successful" });
   response.headers.set("Set-Cookie", cookie);
