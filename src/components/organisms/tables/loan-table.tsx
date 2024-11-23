@@ -42,13 +42,13 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     ),
   },
   {
-    accessorKey: "recentLoanTakenDate",
+    accessorKey: "startDate",
     header: ({ column }) => <ActionTableHeader label="From" column={column} />,
     cell: ({ row }) => (
       <CommonTableCell
         label={
-          row.original.totalLoanBalance > 0 && row.original.recentLoanTakenDate
-            ? dateFormat(new Date(row.original.recentLoanTakenDate))
+          row.original.totalLoanBalance > 0 && row.original.startAt
+            ? dateFormat(new Date(row.original.startAt))
             : "-"
         }
         subLabel={

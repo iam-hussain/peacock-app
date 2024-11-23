@@ -28,7 +28,7 @@ export async function GET() {
     )
     .map(transformLoanForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.recentLoanTakenDate > b.recentLoanTakenDate ? 1 : -1));
+    .sort((a, b) => (a.recentMonthsPassed > b.recentMonthsPassed ? 1 : -1));
 
   return NextResponse.json({
     accounts: transformedLoans,
@@ -36,7 +36,6 @@ export async function GET() {
 }
 
 function transformLoanForTable(vendorInput: LoanToTransform) {
-  const nowTime = new Date().getTime();
   const { passbook, ...member } = vendorInput;
   const {
     totalLoanTaken = 0,
@@ -47,8 +46,8 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
   const loans = (passbook.loanHistory || []) as unknown as LoanHistoryEntry[];
 
   let totalInterestAmount = 0;
-  let recentLoanTakenDate: any = null;
   let recentPassedString: any = "";
+  let recentMonthsPassed = 0;
 
   const loanHistory = loans.map((loan) => {
     const {
@@ -62,8 +61,8 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     } = calculateInterestByAmount(loan.amount, loan.startDate, loan?.endDate);
 
     totalInterestAmount += interestAmount;
-    recentLoanTakenDate = new Date(loan.recentLoanTakenDate).getTime();
     recentPassedString = monthsPassedString;
+    recentMonthsPassed = monthsPassed;
     return {
       ...loan,
       startDate: new Date(loan.startDate).getTime(),
@@ -95,9 +94,9 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     totalInterestPaid,
     totalInterestBalance,
     totalInterestAmount,
-    recentLoanTakenDate: totalLoanBalance > 0 ? recentLoanTakenDate : nowTime,
     loanHistory,
     recentPassedString,
+    recentMonthsPassed,
   };
 }
 

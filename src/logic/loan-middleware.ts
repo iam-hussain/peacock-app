@@ -24,87 +24,64 @@ function fetchLoanTransaction(accountId?: string | null) {
   });
 }
 
-export function calculateInterest(transactions: Transaction[]) {
-  let totalLoanTaken = 0;
-  let totalLoanRepay = 0;
-  let totalInterestPaid = 0;
-  let accountBalance = 0;
-  let recentLoanTakenDate: any = null;
-  let recentLoanRepayDate: any = null;
-  let totalInterestAmount = 0;
+const getOneLoanDetails = (
+  amount: number,
+  start: Date | string,
+  end: Date | string = new Date()
+): LoanHistoryEntry => {
+  const data = calculateInterestByAmount(amount, start, end);
+  return {
+    active: false,
+    amount,
+    ...data,
+    startDate: data.startDate.getTime(),
+    endDate: data.endDate.getTime(),
+  };
+};
 
-  let loanHistory: LoanHistoryEntry[] = [];
+export function calculateLoanDetails(transactions: Transaction[]) {
+  const loanHistory: LoanHistoryEntry[] = [];
+  let accountBalance = 0;
+  let prevLoan: any = null;
 
   transactions.forEach((transaction) => {
-    const { transactionType, amount, transactionAt } = transaction;
-    const transactionDate = new Date(transactionAt);
+    const { transactionAt, transactionType, amount } = transaction;
 
     if (transactionType === "LOAN_TAKEN") {
-      totalLoanTaken += amount;
-      accountBalance += amount;
-
-      recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
-      recentLoanTakenDate = transactionDate.toISOString().split("T")[0];
-    }
-    if (transactionType === "LOAN_REPAY") {
-      const {
-        interestAmount,
-        daysInMonth,
-        daysPassed,
-        monthsPassed,
-        monthsPassedString,
-        interestForDays,
-        interestPerDay,
-      } = calculateInterestByAmount(
-        accountBalance,
-        recentLoanRepayDate,
-        transactionDate
-      );
-
-      totalInterestAmount += interestAmount;
-
-      loanHistory.push({
-        active: false,
-        amount: accountBalance,
-        recentLoanTakenDate,
-        startDate: recentLoanRepayDate,
-        endDate: new Date(transactionDate),
-        totalInterestAmount,
-        interestAmount,
-        daysInMonth,
-        daysPassed,
-        monthsPassed,
-        monthsPassedString,
-        interestForDays,
-        interestPerDay,
-      });
-
-      recentLoanRepayDate = transactionDate.toISOString().split("T")[0];
-
-      accountBalance -= amount;
-      totalLoanRepay += amount;
-    }
-    if (transactionType === "LOAN_INTEREST") {
-      totalInterestPaid += amount;
+      if (prevLoan) {
+        loanHistory.push(
+          getOneLoanDetails(prevLoan.amount, prevLoan.startDate, transactionAt)
+        );
+      }
+      prevLoan = {
+        active: true,
+        amount: accountBalance + amount,
+        startDate: new Date(transactionAt),
+        transactionType,
+      };
+      accountBalance = accountBalance + amount;
+    } else if (transactionType === "LOAN_REPAY") {
+      if (prevLoan) {
+        loanHistory.push(
+          getOneLoanDetails(accountBalance, prevLoan.startDate, transactionAt)
+        );
+        prevLoan = null;
+      }
+      accountBalance = accountBalance - amount;
     }
   });
 
-  if (accountBalance > 0 && recentLoanRepayDate) {
+  if (accountBalance > 0 && prevLoan) {
     loanHistory.push({
       active: true,
       amount: accountBalance,
-      recentLoanTakenDate,
-      startDate: recentLoanRepayDate,
-      totalInterestAmount,
+      startDate: prevLoan.startDate.getTime(),
+      interestAmount: 0,
     });
   }
-
   return {
     loanHistory,
-    totalLoanTaken,
-    totalLoanRepay,
-    totalLoanBalance: accountBalance > 0 ? accountBalance : 0,
-    totalInterestPaid,
+    totalLoanBalance: accountBalance,
   };
 }
 
@@ -135,7 +112,7 @@ export const calculateLoansHandler = (
 
   Object.entries(memberGroup).forEach(([memberId, memTransactions]) => {
     const { loanHistory, totalLoanBalance } =
-      calculateInterest(memTransactions);
+      calculateLoanDetails(memTransactions);
 
     const memberPassbook = passbookToUpdate.get(memberId);
     if (memberPassbook) {

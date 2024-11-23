@@ -1,7 +1,11 @@
 import { $Enums, PASSBOOK_TYPE } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
 
-import { calculateTimePassed, getMonthsPassedString } from "./date";
+import {
+  calculateDateDiff,
+  calculateTimePassed,
+  getMonthsPassedString,
+} from "./date";
 import {
   ClubPassbookData,
   MemberPassbookData,
@@ -196,13 +200,11 @@ const ONE_MONTH_RATE = 0.01;
 
 export function calculateInterestByAmount(
   amount: number,
-  start: Date | string,
-  end: Date | string = new Date()
+  start: Date | string | number,
+  end: Date | string | number = new Date()
 ) {
-  const { monthsPassed, daysPassed, recentStartDate } = calculateTimePassed(
-    start,
-    end
-  );
+  const { monthsPassed, daysPassed, startDate, endDate, recentStartDate } =
+    calculateDateDiff(start, end);
 
   const daysInMonth = new Date(
     recentStartDate.getFullYear(),
@@ -210,18 +212,24 @@ export function calculateInterestByAmount(
     0
   ).getDate();
 
-  const interestForMonths = amount * ONE_MONTH_RATE * monthsPassed;
-  const interestPerDay = (amount * ONE_MONTH_RATE) / daysInMonth;
-  const interestForDays = amount * ONE_MONTH_RATE * (daysPassed / daysInMonth);
+  const interestForMonths = Number(
+    (amount * ONE_MONTH_RATE * monthsPassed).toFixed(2)
+  );
+  const interestPerDay = Number(
+    ((amount * ONE_MONTH_RATE) / daysInMonth).toFixed(2)
+  );
+  const interestForDays = Number((interestPerDay * daysPassed).toFixed(2));
 
-  const interestAmount = interestForMonths + interestForDays;
+  const interestAmount = Math.round(interestForMonths + interestForDays);
 
   return {
-    interestAmount,
+    startDate,
+    endDate,
     monthsPassed,
     daysPassed,
-    daysInMonth,
+    interestAmount,
     monthsPassedString: getMonthsPassedString(monthsPassed, daysPassed),
+    daysInMonth,
     interestForDays,
     interestPerDay,
   };

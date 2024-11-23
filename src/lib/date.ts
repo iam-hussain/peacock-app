@@ -103,9 +103,35 @@ export const calculateTimePassed = (
     daysPassed: Math.abs(daysPassed),
     recentStartDate,
     nextStartDate,
+    startDate,
+    endDate,
   };
 };
 
 export const getMonthsPassedString = (months: number, days: number) => {
-  return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;
+  return months
+    ? `${months} mons${days ? ` ${days} d` : ""}`
+    : `${days ? ` ${days} d` : ""}`;
+};
+
+export const calculateDateDiff = (
+  start: Date | string | number,
+  end: Date | string | number
+) => {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  // Calculate total months
+  const monthsPassed = differenceInMonths(endDate, startDate);
+
+  // Calculate remaining days
+  const recentStartDate = addMonths(startDate, monthsPassed);
+  const daysPassed = differenceInDays(endDate, recentStartDate);
+
+  return {
+    monthsPassed: Math.abs(monthsPassed),
+    daysPassed: Math.abs(daysPassed),
+    startDate,
+    endDate,
+    recentStartDate,
+  };
 };

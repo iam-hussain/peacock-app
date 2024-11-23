@@ -101,14 +101,16 @@ const LoanAction = () => {
                     </strong>{" "}
                     {moneyFormat(item.interestAmount || 0)}
                   </div>
-                  {item.startDate && (
+                  {/* {item.startDate && (
                     <div className="flex justify-between text-sm border-b">
                       <strong className="text-sm text-foreground/80">
                         Invest Date:
                       </strong>{" "}
-                      {dateFormat(new Date(item.recentLoanTakenDate))}
+                      {dateFormat(
+                        new Date(item.recentLoanTakenDate || new Date())
+                      )}
                     </div>
-                  )}
+                  )} */}
                   <div className="flex justify-between text-sm border-b">
                     <strong className="text-sm text-foreground/80">
                       Start Date:

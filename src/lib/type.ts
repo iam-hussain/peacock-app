@@ -4,11 +4,9 @@ import prisma from "@/db";
 export type LoanHistoryEntry = {
   active: boolean; // Indicates if the loan is currently active
   amount: number; // Principal amount of the loan
-  recentLoanTakenDate: Date;
-  startDate: Date; // Date the loan started
-  endDate?: Date; // Optional end date if the loan has been repaid
+  startDate: Date | string | number; // Date the loan started
+  endDate?: Date | string | number; // Optional end date if the loan has been repaid
   interestAmount?: number; // Current Interest rate on the loan
-  totalInterestAmount: number; // Interest rate on the loan
   monthsPassed?: number; // Number of months passed since the loan started
   daysPassed?: number; // Number of days passed since the last monthly update
   daysInMonth?: number;
