@@ -17,17 +17,7 @@ async function seed() {
   // Insert the data into Prisma models
   await prisma.account.createMany({ data: backupData.account });
   await prisma.transaction.createMany({
-    data: backupData.transaction.map((transaction: any) => {
-      let date = new Date(transaction.transactionAt);
-
-      // Set IST (UTC +5:30) and change the time to 10:00 AM IST
-      date.setUTCHours(4, 30, 0, 0); // 4:30 AM UTC is 10:00 AM IST
-
-      return {
-        ...transaction,
-        transactionAt: date.toISOString(),
-      };
-    }),
+    data: backupData.transaction,
   });
   await prisma.passbook.createMany({ data: backupData.passbooks });
 }

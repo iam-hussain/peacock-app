@@ -53,13 +53,13 @@ export function calculateLoanDetails(transactions: Transaction[]) {
           getOneLoanDetails(prevLoan.amount, prevLoan.startDate, transactionAt)
         );
       }
+      accountBalance = accountBalance + amount;
       prevLoan = {
         active: true,
-        amount: accountBalance + amount,
+        amount: accountBalance,
         startDate: new Date(transactionAt),
         transactionType,
       };
-      accountBalance = accountBalance + amount;
     } else if (transactionType === "LOAN_REPAY") {
       if (prevLoan) {
         loanHistory.push(
@@ -68,6 +68,15 @@ export function calculateLoanDetails(transactions: Transaction[]) {
         prevLoan = null;
       }
       accountBalance = accountBalance - amount;
+
+      if (accountBalance > 0) {
+        prevLoan = {
+          active: true,
+          amount: accountBalance,
+          startDate: new Date(transactionAt),
+          transactionType,
+        };
+      }
     }
   });
 
