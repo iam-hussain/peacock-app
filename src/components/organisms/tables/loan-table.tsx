@@ -42,7 +42,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     ),
   },
   {
-    accessorKey: "startDate",
+    accessorKey: "startAt",
     header: ({ column }) => <ActionTableHeader label="From" column={column} />,
     cell: ({ row }) => (
       <CommonTableCell

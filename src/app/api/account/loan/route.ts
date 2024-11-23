@@ -28,7 +28,7 @@ export async function GET() {
     )
     .map(transformLoanForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.recentMonthsPassed > b.recentMonthsPassed ? 1 : -1));
+    .sort((a, b) => (a.position > b.position ? 1 : -1));
 
   return NextResponse.json({
     accounts: transformedLoans,
@@ -47,7 +47,6 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
 
   let totalInterestAmount = 0;
   let recentPassedString: any = "";
-  let recentMonthsPassed = 0;
 
   const loanHistory = loans.map((loan) => {
     const {
@@ -62,7 +61,6 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
 
     totalInterestAmount += interestAmount;
     recentPassedString = monthsPassedString;
-    recentMonthsPassed = monthsPassed;
     return {
       ...loan,
       startDate: new Date(loan.startDate).getTime(),
@@ -78,6 +76,9 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     };
   });
 
+  const position = loans[loans.length - 1].endDate
+    ? new Date(loans[loans.length - 1].startDate).getTime()
+    : new Date().getTime();
   const totalInterestBalance = totalInterestAmount - totalInterestPaid;
 
   return {
@@ -85,7 +86,7 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
-    startAt: member.startAt.getTime(),
+    startAt: position,
     status: member.active ? "Active" : "Disabled",
     active: member.active,
     totalLoanTaken,
@@ -96,7 +97,7 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
     totalInterestAmount,
     loanHistory,
     recentPassedString,
-    recentMonthsPassed,
+    position,
   };
 }
 
