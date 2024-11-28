@@ -31,7 +31,7 @@ export async function GET() {
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, ...vendor } = vendorInput;
-  const { totalInvestment, totalReturns, totalProfitAmount } =
+  const { totalInvestment, totalReturns } =
     passbook.payload as VendorPassbookData;
 
   const statusData: {
@@ -58,7 +58,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     active: vendor.active,
     totalInvestment,
     totalReturns,
-    totalProfitAmount,
+    totalProfitAmount: Math.max(totalReturns - totalInvestment, 0),
     ...statusData,
     account: { ...vendorInput, passbook: null },
   };

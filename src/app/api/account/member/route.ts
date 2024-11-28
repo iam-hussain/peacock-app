@@ -29,17 +29,30 @@ export async function GET() {
       },
     }),
   ]);
-
+  const totalOffsetAmount = members
+    .map((e) => e.passbook.joiningOffset + e.passbook.delayOffset)
+    .reduce((a, b) => a + b, 0);
   const memberTotalDeposit = getMemberTotalDepositUpToday();
   const activeMembersCount = members.filter((e) => e.active).length;
+  const clubData = club.payload as ClubPassbookData;
+
+  // console.log({ totalVendorProfit: clubData.totalVendorProfit });
+  // const totalVendorProfit = Math.max(
+  //   clubData.totalReturns - clubData.totalInvestment,
+  //   0
+  // );
+
+  const totalProfitCollected =
+    totalOffsetAmount + clubData.totalInterestPaid + clubData.totalVendorProfit;
+
+  const availableProfitAmount =
+    totalProfitCollected - clubData.totalMemberProfitWithdrawals;
+
+  const totalReturnAmount = availableProfitAmount / activeMembersCount;
+
   const transformedMembers = members
     .map((each) =>
-      membersTableTransform(
-        each,
-        memberTotalDeposit,
-        club.payload as ClubPassbookData,
-        activeMembersCount
-      )
+      membersTableTransform(each, memberTotalDeposit, totalReturnAmount)
     )
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
@@ -52,8 +65,7 @@ export async function GET() {
 function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number,
-  clubData: ClubPassbookData,
-  activeMembersCount: number
+  totalReturnAmount: number
 ) {
   const {
     passbook: { delayOffset, joiningOffset },
@@ -69,7 +81,7 @@ function membersTableTransform(
   } = member.passbook.payload as unknown as MemberPassbookData;
 
   const totalOffsetAmount = delayOffset + joiningOffset;
-  const totalBalanceAmount =
+  let totalBalanceAmount =
     memberTotalDeposit + totalOffsetAmount - accountBalance;
   const totalPeriodBalanceAmount =
     totalBalanceAmount > memberTotalDeposit
@@ -81,11 +93,10 @@ function membersTableTransform(
   const totalOffsetBalanceAmount =
     totalPeriodBalanceAmount > 0 ? totalOffsetAmount : offsetBalanceAmount;
 
-  const totalReturnAmount =
-    (clubData.totalInterestPaid +
-      clubData.totalVendorProfit -
-      clubData.totalMemberProfitWithdrawals) /
-    activeMembersCount;
+  if (!member.active) {
+    totalBalanceAmount = totalBalanceAmount + totalReturnAmount;
+    totalReturnAmount = 0;
+  }
 
   return {
     id: member.id,

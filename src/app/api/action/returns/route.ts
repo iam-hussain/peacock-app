@@ -5,7 +5,7 @@ import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
 
 export async function GET() {
   try {
-    resetAllTransactionMiddlewareHandler();
+    await resetAllTransactionMiddlewareHandler();
 
     revalidatePath("/member");
     revalidatePath("/vendor");
