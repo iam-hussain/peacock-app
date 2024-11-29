@@ -30,7 +30,6 @@ export async function GET() {
     .map(transformLoanForTable)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
-  // .sort((a, b) => (a.position > b.position ? 1 : -1));
 
   return NextResponse.json({
     accounts: transformedLoans,
@@ -78,9 +77,6 @@ export function transformLoanForTable(vendorInput: LoanToTransform) {
     };
   });
 
-  // const position = loans[loans.length - 1].endDate
-  //   ? new Date(loans[loans.length - 1].startDate).getTime()
-  //   : new Date().getTime();
   const totalInterestBalance = totalInterestAmount - totalInterestPaid;
 
   return {
@@ -103,7 +99,6 @@ export function transformLoanForTable(vendorInput: LoanToTransform) {
     totalInterestAmount,
     loanHistory,
     recentPassedString,
-    // position,
   };
 }
 
