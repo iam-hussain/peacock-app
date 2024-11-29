@@ -9,7 +9,7 @@ import { OffsetForm } from "../organisms/forms/offset-form";
 import MembersTable from "../organisms/tables/member-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
-import { TransformedMember } from "@/app/api/account/member/route";
+import { TransformedMember } from "@/transformers/account";
 
 const MemberAction = () => {
   const queryClient = useQueryClient();

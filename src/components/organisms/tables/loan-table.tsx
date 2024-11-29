@@ -20,11 +20,11 @@ import {
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
 
-import { TransformedLoan } from "@/app/api/account/loan/route";
 import { Button } from "@/components/ui/button";
 import { dateFormat } from "@/lib/date";
 import { fetchLoans } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
+import { TransformedLoan } from "@/transformers/account";
 
 const baseColumns: ColumnDef<TransformedLoan>[] = [
   {

@@ -23,10 +23,10 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 import Typography from "../../ui/typography";
 
-import { TransformedMember } from "@/app/api/account/member/route";
 import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
 import { cn } from "@/lib/utils";
+import { TransformedMember } from "@/transformers/account";
 
 const baseColumns: ColumnDef<TransformedMember>[] = [
   {

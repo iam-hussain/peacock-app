@@ -77,7 +77,7 @@ export function transformLoanForTable(vendorInput: ToTransform) {
 export type TransformedLoan = ReturnType<typeof transformLoanForTable>;
 
 export function membersTableTransform(
-  member: ToTransfor,
+  member: ToTransform,
   memberTotalDeposit: number,
   totalReturnAmount: number
 ) {
