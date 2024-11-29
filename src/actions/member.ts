@@ -1,9 +1,11 @@
-import { transformLoanForTable } from "@/app/api/account/loan/route";
-import { membersTableTransform } from "@/app/api/account/member/route";
 import prisma from "@/db";
 import { getMemberTotalDepositUpToday } from "@/lib/club";
 import { memberMonthsPassedString } from "@/lib/date";
 import { ClubPassbookData, VendorPassbookData } from "@/lib/type";
+import {
+  membersTableTransform,
+  transformLoanForTable,
+} from "@/transformers/account";
 
 export const getMemberBySlug = async (slug: string) => {
   const [account, club, membersCount, offsetData, vendorsPass] =

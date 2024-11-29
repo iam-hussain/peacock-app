@@ -1,18 +1,12 @@
-import { Account, Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { getMemberTotalDepositUpToday } from "@/lib/club";
-import { calculateMonthsDifference } from "@/lib/date";
+import { ClubPassbookData, VendorPassbookData } from "@/lib/type";
 import {
-  ClubPassbookData,
-  MemberPassbookData,
-  VendorPassbookData,
-} from "@/lib/type";
-
-type MemberToTransform = Account & {
-  passbook: Passbook;
-};
+  membersTableTransform,
+  TransformedMember,
+} from "@/transformers/account";
 
 export async function GET() {
   const [members, club, vendorsPass] = await Promise.all([
@@ -76,72 +70,6 @@ export async function GET() {
   });
 }
 
-export function membersTableTransform(
-  member: MemberToTransform,
-  memberTotalDeposit: number,
-  totalReturnAmount: number
-) {
-  const {
-    passbook: { delayOffset, joiningOffset },
-    ...account
-  } = member;
-  const {
-    periodicDepositAmount = 0,
-    offsetDepositAmount = 0,
-    totalDepositAmount = 0,
-    withdrawalAmount = 0,
-    accountBalance = 0,
-    clubHeldAmount = 0,
-  } = member.passbook.payload as unknown as MemberPassbookData;
-
-  const totalOffsetAmount = delayOffset + joiningOffset;
-  let totalBalanceAmount =
-    memberTotalDeposit + totalOffsetAmount - accountBalance;
-  const totalPeriodBalanceAmount =
-    totalBalanceAmount > memberTotalDeposit
-      ? memberTotalDeposit - accountBalance
-      : 0;
-  const offsetBalanceAmount =
-    accountBalance - (memberTotalDeposit + totalOffsetAmount);
-
-  const totalOffsetBalanceAmount =
-    totalPeriodBalanceAmount > 0 ? totalOffsetAmount : offsetBalanceAmount;
-
-  if (!member.active) {
-    totalBalanceAmount = totalBalanceAmount + totalReturnAmount;
-    totalReturnAmount = 0;
-  }
-
-  const memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
-
-  return {
-    id: member.id,
-    slug: member.slug,
-    link: `/dashboard/member/${member.slug}`,
-    name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-    joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
-    startAt: member.startAt.getTime(),
-    status: member.active ? "Active" : "Disabled",
-    active: member.active,
-    totalDepositAmount: totalDepositAmount - withdrawalAmount,
-    totalOffsetAmount,
-    periodicDepositAmount,
-    offsetDepositAmount,
-    totalOffsetBalanceAmount,
-    totalPeriodBalanceAmount,
-    totalBalanceAmount,
-    totalReturnAmount: memberTotalReturnAmount,
-    clubHeldAmount,
-    delayOffset,
-    joiningOffset,
-    netValue: accountBalance + memberTotalReturnAmount,
-    account: { ...account, delayOffset, joiningOffset },
-  };
-}
-
 export type GetMemberResponse = {
   members: TransformedMember[];
 };
-
-export type TransformedMember = ReturnType<typeof membersTableTransform>;

@@ -17,7 +17,7 @@ async function seed() {
   // Insert the data into Prisma models
   await prisma.passbook.createMany({ data: backupData.passbook });
   await prisma.account.createMany({
-    data: backupData.account
+    data: backupData.account,
   });
   await prisma.transaction.createMany({
     data: backupData.transaction,
