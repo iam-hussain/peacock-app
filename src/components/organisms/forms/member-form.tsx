@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { nanoid } from "@reduxjs/toolkit";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       ? {
           firstName: selected.firstName,
           lastName: selected.lastName || "",
+          slug: selected.slug || "",
           phone: selected.phone || "",
           email: selected.email || "",
           avatar: selected.avatar || "",
@@ -45,6 +47,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       : {
           firstName: "",
           lastName: "",
+          slug: nanoid(8),
           phone: "",
           email: "",
           avatar: "",
@@ -198,6 +201,21 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
             </FormControl>
             <FormMessage />
           </FormItem>
+
+          {/* Last Name */}
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Slug" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </Box>
 
         <GenericModalFooter

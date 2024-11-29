@@ -35,6 +35,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
         id={row.original.id}
         avatar={row.original.avatar}
         name={row.original.name}
+        link={row.original.link}
         avatarName={row.original.name}
         active={row.original.active}
         subLabel={"Loan"}

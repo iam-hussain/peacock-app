@@ -3,7 +3,6 @@ import { Transaction } from "@prisma/client";
 
 import { calculateLoansHandler, memberLoanMiddleware } from "./loan-middleware";
 import { transactionMiddleware } from "./transaction-middleware";
-import { vendorCalcHandler } from "./vendor-middleware";
 
 import prisma from "@/db";
 import cache from "@/lib/cache";
@@ -82,11 +81,6 @@ export async function resetAllTransactionMiddlewareHandler() {
     passbookToUpdate = transactionMiddleware(passbookToUpdate, transaction);
   }
   passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
-
-  passbookToUpdate = vendorCalcHandler(
-    passbookToUpdate,
-    vendors.map((e) => e.id)
-  );
 
   // passbookToUpdate = calculatedVendorsConnection(passbookToUpdate, profitShare);
 

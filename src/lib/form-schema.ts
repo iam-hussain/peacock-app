@@ -24,6 +24,7 @@ const transactionMethods = [
 
 export const accountFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
+  slug: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().optional(),
   email: z.union([z.literal(""), z.string().email()]),

@@ -2,7 +2,6 @@ import { Prisma, PrismaClient, Transaction } from "@prisma/client";
 
 import cache from "./lib/cache";
 import { transactionMiddlewareHandler } from "./logic/middleware";
-import { vendorMiddlewareHandler } from "./logic/vendor-middleware";
 
 export const transactionExtends = Prisma.defineExtension({
   name: "transactionHandler",
@@ -27,40 +26,40 @@ export const transactionExtends = Prisma.defineExtension({
   },
 });
 
-export const vendorExtends = Prisma.defineExtension({
-  name: "vendorExtends",
-  query: {
-    transaction: {
-      async create({ args, query }) {
-        // Execute the original create query
-        const created = await query(args);
-        if (
-          created.transactionType &&
-          ["VENDOR_INVEST", "VENDOR_RETURNS"].includes(created.transactionType)
-        ) {
-          await vendorMiddlewareHandler();
-        }
-        return created;
-      },
+// export const vendorExtends = Prisma.defineExtension({
+//   name: "vendorExtends",
+//   query: {
+//     transaction: {
+//       async create({ args, query }) {
+//         // Execute the original create query
+//         const created = await query(args);
+//         if (
+//           created.transactionType &&
+//           ["VENDOR_INVEST", "VENDOR_RETURNS"].includes(created.transactionType)
+//         ) {
+//           await vendorMiddlewareHandler();
+//         }
+//         return created;
+//       },
 
-      async delete({ args, query }) {
-        const transaction = await prisma.transaction.findUnique(args);
-        // Execute the original update query
-        const deleted = await query(args);
-        if (
-          transaction &&
-          transaction.transactionType &&
-          ["VENDOR_INVEST", "VENDOR_RETURNS"].includes(
-            transaction.transactionType
-          )
-        ) {
-          await vendorMiddlewareHandler();
-        }
-        return deleted;
-      },
-    },
-  },
-});
+//       async delete({ args, query }) {
+//         const transaction = await prisma.transaction.findUnique(args);
+//         // Execute the original update query
+//         const deleted = await query(args);
+//         if (
+//           transaction &&
+//           transaction.transactionType &&
+//           ["VENDOR_INVEST", "VENDOR_RETURNS"].includes(
+//             transaction.transactionType
+//           )
+//         ) {
+//           await vendorMiddlewareHandler();
+//         }
+//         return deleted;
+//       },
+//     },
+//   },
+// });
 
 export const cacheExtends = Prisma.defineExtension({
   name: "cacheHandler",
@@ -155,7 +154,6 @@ const prismaClientSingleton = () => {
     })
       // .$extends(cacheExtends)
       .$extends(transactionExtends)
-      .$extends(vendorExtends)
   );
 };
 

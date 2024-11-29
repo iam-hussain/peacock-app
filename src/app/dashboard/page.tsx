@@ -9,6 +9,7 @@ import { GiReceiveMoney } from "react-icons/gi";
 import { GiHandBandage } from "react-icons/gi";
 import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 
+import { AvatarGroup } from "@/components/atoms/avatar-group";
 import { DashboardCard } from "@/components/atoms/dashboard-card";
 import { DoughnutChart } from "@/components/molecules/doughnut-chart";
 import { PieChart } from "@/components/molecules/pie-chart";
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const club = clubAge();
   const { data, isLoading, isError } = useQuery(fetchStatistics());
   const statistics = data?.statistics || null;
+  const members = data?.members || [];
 
   if (isLoading) {
     return (
@@ -225,6 +227,27 @@ export default function DashboardPage() {
           offset={parseInt(Number(statistics.totalOffsetPaid).toString())}
           returns={parseInt(Number(statistics.totalInterestPaid).toString())}
         />
+      </div>
+
+      <div className="flex bg-background flex-col gap-4 justify-center align-middle items-center p-6">
+        <h1 className="text-3xl uppercase">Members</h1>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 justify-center align-middle items-center">
+          {members.map((member) => (
+            <div
+              className="py-6 gap-2 rounded-md flex flex-col justify-center align-middle items-center"
+              key={member.slug}
+            >
+              <AvatarGroup
+                className={"px-6"}
+                src={member.avatar || ""}
+                name={member.name}
+                isLarge={true}
+                link={member.link}
+              />
+              <p className="text-sm">{member.name}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

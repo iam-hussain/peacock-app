@@ -37,7 +37,7 @@ export async function GET() {
   });
 }
 
-function transformLoanForTable(vendorInput: LoanToTransform) {
+export function transformLoanForTable(vendorInput: LoanToTransform) {
   const { passbook, ...member } = vendorInput;
   const {
     totalLoanTaken = 0,
@@ -85,6 +85,8 @@ function transformLoanForTable(vendorInput: LoanToTransform) {
 
   return {
     id: member.id,
+    slug: member.slug,
+    link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),

@@ -4,14 +4,18 @@ import { NextResponse } from "next/server";
 import prisma from "@/db";
 import { getMemberTotalDepositUpToday } from "@/lib/club";
 import { calculateMonthsDifference } from "@/lib/date";
-import { ClubPassbookData, MemberPassbookData } from "@/lib/type";
+import {
+  ClubPassbookData,
+  MemberPassbookData,
+  VendorPassbookData,
+} from "@/lib/type";
 
 type MemberToTransform = Account & {
   passbook: Passbook;
 };
 
 export async function GET() {
-  const [members, club] = await Promise.all([
+  const [members, club, vendorsPass] = await Promise.all([
     prisma.account.findMany({
       where: {
         isMember: true,
@@ -28,6 +32,14 @@ export async function GET() {
         payload: true,
       },
     }),
+    prisma.passbook.findMany({
+      where: {
+        type: "VENDOR",
+      },
+      select: {
+        payload: true,
+      },
+    }),
   ]);
   const totalOffsetAmount = members
     .map((e) => e.passbook.joiningOffset + e.passbook.delayOffset)
@@ -36,14 +48,16 @@ export async function GET() {
   const activeMembersCount = members.filter((e) => e.active).length;
   const clubData = club.payload as ClubPassbookData;
 
-  // console.log({ totalVendorProfit: clubData.totalVendorProfit });
-  // const totalVendorProfit = Math.max(
-  //   clubData.totalReturns - clubData.totalInvestment,
-  //   0
-  // );
+  const totalVendorProfit = vendorsPass
+    .map((e) => {
+      const { totalInvestment = 0, totalReturns = 0 } =
+        e.payload as VendorPassbookData;
+      return Math.max(totalReturns - totalInvestment, 0);
+    })
+    .reduce((a, b) => a + b, 0);
 
   const totalProfitCollected =
-    totalOffsetAmount + clubData.totalInterestPaid + clubData.totalVendorProfit;
+    totalOffsetAmount + clubData.totalInterestPaid + totalVendorProfit;
 
   const availableProfitAmount =
     totalProfitCollected - clubData.totalMemberProfitWithdrawals;
@@ -62,7 +76,7 @@ export async function GET() {
   });
 }
 
-function membersTableTransform(
+export function membersTableTransform(
   member: MemberToTransform,
   memberTotalDeposit: number,
   totalReturnAmount: number
@@ -98,8 +112,12 @@ function membersTableTransform(
     totalReturnAmount = 0;
   }
 
+  const memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
+
   return {
     id: member.id,
+    slug: member.slug,
+    link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
@@ -113,11 +131,11 @@ function membersTableTransform(
     totalOffsetBalanceAmount,
     totalPeriodBalanceAmount,
     totalBalanceAmount,
-    totalReturnAmount: totalReturnAmount || 0,
+    totalReturnAmount: memberTotalReturnAmount,
     clubHeldAmount,
     delayOffset,
     joiningOffset,
-    netValue: accountBalance + (totalReturnAmount || 0),
+    netValue: accountBalance + memberTotalReturnAmount,
     account: { ...account, delayOffset, joiningOffset },
   };
 }

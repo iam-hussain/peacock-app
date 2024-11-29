@@ -1,3 +1,4 @@
+import { nanoid } from "@reduxjs/toolkit";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -11,6 +12,7 @@ export async function POST(request: Request) {
       id,
       firstName,
       lastName,
+      slug,
       phone,
       email,
       avatar,
@@ -31,6 +33,7 @@ export async function POST(request: Request) {
     const commonData: Parameters<typeof prisma.account.update>[0]["data"] = {
       firstName: firstName || undefined,
       lastName: lastName ?? undefined,
+      slug: slug ?? undefined,
       phone: phone ?? undefined,
       email: email ?? undefined,
       avatar: avatar ?? undefined,
@@ -52,6 +55,7 @@ export async function POST(request: Request) {
     // Create a new member
     await prisma.account.create({
       data: {
+        slug: nanoid(8),
         ...(commonData as any),
         passbook: {
           create: {

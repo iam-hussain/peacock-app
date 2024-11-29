@@ -135,3 +135,23 @@ export const calculateDateDiff = (
     recentStartDate,
   };
 };
+
+export const memberMonthsPassedString = (start: Date | string) => {
+  const startDate = new Date(start);
+  const endDate = new Date();
+  // Calculate total months
+  const monthsPassed = differenceInMonths(endDate, startDate);
+
+  // Calculate remaining days
+  const recentStartDate = addMonths(startDate, monthsPassed);
+  const daysPassed = differenceInDays(endDate, recentStartDate);
+
+  return {
+    monthsPassed: Math.abs(monthsPassed),
+    daysPassed: Math.abs(daysPassed),
+    monthsPassedString: getMonthsPassedString(
+      Math.abs(monthsPassed),
+      Math.abs(daysPassed)
+    ),
+  };
+};

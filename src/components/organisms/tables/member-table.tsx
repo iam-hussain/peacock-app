@@ -37,6 +37,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         id={row.original.id}
         avatar={row.original.avatar}
         name={row.original.name}
+        link={row.original.link}
         active={row.original.active}
         subLabel={
           row.original.clubHeldAmount
@@ -155,7 +156,7 @@ const editColumns: ColumnDef<TransformedMember>[] = [
 
 export type MemberTableProps = {
   // eslint-disable-next-line prettier/prettier, unused-imports/no-unused-vars
-  handleAction: (select: null | TransformedMember['account']) => void;
+  handleAction: (select: null | TransformedMember["account"]) => void;
 };
 
 const MembersTable = ({ handleAction }: MemberTableProps) => {

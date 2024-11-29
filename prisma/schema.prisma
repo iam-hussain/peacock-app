@@ -13,6 +13,7 @@ model Account {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
   firstName       String
   lastName        String?
+  slug            String        @unique
   phone           String?
   email           String?
   avatar          String?

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 type AvatarCellProps = {
   id: string;
+  link?: string | null;
   avatar?: string | null;
   name: string;
   active?: boolean;
@@ -84,6 +85,7 @@ export const ActionTableHeader = ({
 export const AvatarCell = ({
   id,
   avatar,
+  link,
   name,
   active,
   subLabel,
@@ -97,6 +99,7 @@ export const AvatarCell = ({
   >
     <AvatarGroup
       src={avatar || ""}
+      link={link || null}
       name={avatarName || name}
       active={active || false}
       isSmall={isSmall}

@@ -15,11 +15,13 @@ async function seed() {
   const backupData = JSON.parse(readFileSync(backupFilePath, "utf8"));
 
   // Insert the data into Prisma models
-  await prisma.account.createMany({ data: backupData.account });
+  await prisma.passbook.createMany({ data: backupData.passbook });
+  await prisma.account.createMany({
+    data: backupData.account
+  });
   await prisma.transaction.createMany({
     data: backupData.transaction,
   });
-  await prisma.passbook.createMany({ data: backupData.passbooks });
 }
 
 seed()
