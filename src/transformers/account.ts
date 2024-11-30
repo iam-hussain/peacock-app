@@ -92,6 +92,7 @@ export function membersTableTransform(
     withdrawalAmount = 0,
     accountBalance = 0,
     clubHeldAmount = 0,
+    profitWithdrawalAmount
   } = member.passbook.payload as unknown as MemberPassbookData;
 
   const totalOffsetAmount = delayOffset + joiningOffset;
@@ -136,6 +137,9 @@ export function membersTableTransform(
     netValue: accountBalance + memberTotalReturnAmount,
     account: { ...account, delayOffset, joiningOffset },
     periodicDepositBalance,
+    withdrawalAmount: withdrawalAmount,
+    profitWithdrawalAmount,
+    accountBalance
   };
 }
 
