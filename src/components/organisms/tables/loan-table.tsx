@@ -20,6 +20,7 @@ import {
   PlainTableHeader,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
+import { useRouter } from "next/navigation";
 
 import { FilterBar } from "@/components/molecules/filter-bar-group";
 import { Button } from "@/components/ui/button";
@@ -107,10 +108,11 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
 
 export type LoanTableProps = {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  handleAction: (select: null | TransformedLoan) => void;
+  // handleAction: (select: null | TransformedLoan) => void;
 };
 
-const LoanTable = ({ handleAction }: LoanTableProps) => {
+const LoanTable = () => {
+  const router = useRouter();
   const captureRef = useRef<HTMLDivElement>(null);
   const [captureMode, setCaptureMode] = useState(false);
 
@@ -160,7 +162,7 @@ const LoanTable = ({ handleAction }: LoanTableProps) => {
           <Button
             variant={"ghost"}
             className="px-3 py-1"
-            onClick={() => handleAction(row.original)}
+            onClick={() => router.push(row.original.link)}
           >
             <LuView className="h-4 w-4" />
           </Button>
@@ -195,7 +197,7 @@ const LoanTable = ({ handleAction }: LoanTableProps) => {
         }
         onToggleChange={() => {}}
         toggleState={false}
-        onAddClick={() => handleAction(null)}
+        onAddClick={() => null}
         onCapture={onCapture}
         hasMode={false}
       />

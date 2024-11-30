@@ -1,4 +1,4 @@
-import LoanAction from "@/components/templates/loan-action";
+import LoanTable from "@/components/organisms/tables/loan-table";
 import Box from "@/components/ui/box";
 import Typography from "@/components/ui/typography";
 
@@ -11,7 +11,7 @@ export default async function Vendors() {
         </Typography>
       </Box>
       <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
-        <LoanAction />
+        <LoanTable />
       </Box>
     </Box>
   );

@@ -14,6 +14,7 @@ import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMemberBySlug } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
 import { DashboardCard } from "@/components/atoms/dashboard-card";
+import { Separator } from "@/components/ui/separator";
 
 export default function EachMember({ params }: { params: { slug: string } }) {
   const slug = params.slug;
@@ -204,43 +205,47 @@ export default function EachMember({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          <h1 className="text-xl">Loan</h1>
-          <div className="flex flex-col w-full gap-2 pb-8">
-            <div className="flex justify-between text-sm border-b">
-              <strong className="text-sm text-foreground/70 font-medium">
-                Total Loan Taken:
-              </strong>{" "}
-              {moneyFormat(member.totalLoanTaken)}
-            </div>
-            <div className="flex justify-between text-sm border-b">
-              <strong className="text-sm text-foreground/70 font-medium">
-                Total Loan Repay:
-              </strong>{" "}
-              {moneyFormat(member.totalLoanRepay || 0)}
-            </div>
-            <div className="flex justify-between text-sm border-b">
-              <strong className="text-sm text-foreground/70 font-medium">
-                Current Loan Amount:
-              </strong>{" "}
-              {moneyFormat(member.totalLoanBalance || 0)}
-            </div>
-            <div className="flex justify-between text-sm border-b">
-              <strong className="text-sm text-foreground/70 font-medium">
-                Total Interest Amount:
-              </strong>{" "}
-              {moneyFormat(member.totalInterestAmount || 0)}
-            </div>
-            <div className="flex justify-between text-sm border-b">
-              <strong className="text-sm text-foreground/70 font-medium">
-                Interest Paid Amount:
-              </strong>{" "}
-              {moneyFormat(member.totalInterestPaid || 0)}
-            </div>
-            <div className="flex justify-between text-sm">
-              <strong className="text-sm text-foreground/70 font-medium">
-                Interest Balance Amount:
-              </strong>{" "}
-              {moneyFormat(member.totalInterestBalance || 0)}
+          <Separator />
+
+          <div className="flex flex-col w-full">
+            <h1 className="text-xl text-center w-full">Loan</h1>
+            <div className="flex flex-col w-full gap-2 pb-8">
+              <div className="flex justify-between text-sm border-b">
+                <strong className="text-sm text-foreground/70 font-medium">
+                  Total Loan Taken:
+                </strong>{" "}
+                {moneyFormat(member.totalLoanTaken)}
+              </div>
+              <div className="flex justify-between text-sm border-b">
+                <strong className="text-sm text-foreground/70 font-medium">
+                  Total Loan Repay:
+                </strong>{" "}
+                {moneyFormat(member.totalLoanRepay || 0)}
+              </div>
+              <div className="flex justify-between text-sm border-b">
+                <strong className="text-sm text-foreground/70 font-medium">
+                  Current Loan Amount:
+                </strong>{" "}
+                {moneyFormat(member.totalLoanBalance || 0)}
+              </div>
+              <div className="flex justify-between text-sm border-b">
+                <strong className="text-sm text-foreground/70 font-medium">
+                  Total Interest Amount:
+                </strong>{" "}
+                {moneyFormat(member.totalInterestAmount || 0)}
+              </div>
+              <div className="flex justify-between text-sm border-b">
+                <strong className="text-sm text-foreground/70 font-medium">
+                  Interest Paid Amount:
+                </strong>{" "}
+                {moneyFormat(member.totalInterestPaid || 0)}
+              </div>
+              <div className="flex justify-between text-sm">
+                <strong className="text-sm text-foreground/70 font-medium">
+                  Interest Balance Amount:
+                </strong>{" "}
+                {moneyFormat(member.totalInterestBalance || 0)}
+              </div>
             </div>
           </div>
 
