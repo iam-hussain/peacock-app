@@ -72,11 +72,11 @@ export const cacheExtends = Prisma.defineExtension({
         // Check if data is already in cache
         const cachedData = cache.get(cacheKey);
         if (cachedData && !process.env.SKIP_CACHE) {
-          console.log(`Cache hit for ${cacheKey}`);
+          console.log(`Cache hit for ✅💚💚💚😊`);
           return cachedData;
         }
 
-        console.log(`Cache miss for ${cacheKey}`);
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
         const result = await query(args);
 
         // Cache the result
@@ -90,11 +90,47 @@ export const cacheExtends = Prisma.defineExtension({
         // Check if data is already in cache
         const cachedData = cache.get(cacheKey);
         if (cachedData && !process.env.SKIP_CACHE) {
-          console.log(`Cache hit for ${cacheKey}`);
+          console.log(`Cache hit for ✅💚💚💚😊`);
           return cachedData;
         }
 
-        console.log(`Cache miss for ${cacheKey}`);
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async findUniqueOrThrow({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:findUniqueOrThrow:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ✅💚💚💚😊`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async findFirstOrThrow({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:findFirstOrThrow:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ✅💚💚💚😊`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
         const result = await query(args);
 
         // Cache the result
@@ -108,11 +144,47 @@ export const cacheExtends = Prisma.defineExtension({
         // Check if data is already in cache
         const cachedData = cache.get(cacheKey);
         if (cachedData && !process.env.SKIP_CACHE) {
-          console.log(`Cache hit for ${cacheKey}`);
+          console.log(`Cache hit for ✅💚💚💚😊`);
           return cachedData;
         }
 
-        console.log(`Cache miss for ${cacheKey}`);
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async aggregate({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:aggregate:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ✅💚💚💚😊`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
+        const result = await query(args);
+
+        // Cache the result
+        cache.set(cacheKey, result);
+        return result;
+      },
+      async count({ args, query, model }) {
+        // Generate a cache key
+        const cacheKey = `${model}:count:${JSON.stringify(args)}`;
+
+        // Check if data is already in cache
+        const cachedData = cache.get(cacheKey);
+        if (cachedData && !process.env.SKIP_CACHE) {
+          console.log(`Cache hit for ✅💚💚💚😊`);
+          return cachedData;
+        }
+
+        console.log(`Cache miss for 🔴🚫🚫🚫🤑`);
         const result = await query(args);
 
         // Cache the result
@@ -124,7 +196,15 @@ export const cacheExtends = Prisma.defineExtension({
 
         // Reset cache after an update
         cache.flushAll(); // Alternatively, clear specific keys if needed
-        console.log(`Cache cleared after ${model}:update`);
+        console.log(`Cache cleared after ${model}:create 📟😎🌟🌟🌟🌟`);
+        return result;
+      },
+      async createMany({ args, query, model }) {
+        const result = await query(args);
+
+        // Reset cache after an update
+        cache.flushAll(); // Alternatively, clear specific keys if needed
+        console.log(`Cache cleared after ${model}:createMany 📟😎🌟🌟🌟🌟`);
         return result;
       },
       async update({ args, query, model }) {
@@ -132,7 +212,7 @@ export const cacheExtends = Prisma.defineExtension({
 
         // Reset cache after an update
         cache.flushAll(); // Alternatively, clear specific keys if needed
-        console.log(`Cache cleared after ${model}:update`);
+        console.log(`Cache cleared after ${model}:update 📟😎🌟🌟🌟🌟`);
         return result;
       },
       async delete({ args, query, model }) {
@@ -140,7 +220,7 @@ export const cacheExtends = Prisma.defineExtension({
 
         // Reset cache after a delete
         cache.flushAll(); // Alternatively, clear specific keys if needed
-        console.log(`Cache cleared after ${model}:delete`);
+        console.log(`Cache cleared after ${model}:delete 📟😎🌟🌟🌟🌟`);
         return result;
       },
     },
@@ -152,7 +232,7 @@ const prismaClientSingleton = () => {
     new PrismaClient({
       log: ["error"],
     })
-      // .$extends(cacheExtends)
+      .$extends(cacheExtends)
       .$extends(transactionExtends)
   );
 };
