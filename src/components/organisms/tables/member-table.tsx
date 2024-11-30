@@ -178,6 +178,11 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       const canvas = await html2canvas(captureRef.current, {
         scrollX: window.scrollX,
         scrollY: window.scrollY,
+        useCORS: true,
+        allowTaint: true,
+        scale: 3,
+        logging: true, // Enable logging to check for errors
+        backgroundColor: "#ffffff", // Set a white background if transparency causes issues
       });
       setCaptureMode(false);
       const capturedImage = canvas.toDataURL("image/png");
@@ -258,7 +263,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       <div
         ref={captureRef}
         className={cn("flex bg-background", {
-          "absolute p-8 pb-16 flex-col": captureMode,
+          "absolute p-8 pb-16 flex-col w-auto overflow-visible": captureMode,
         })}
       >
         <div
