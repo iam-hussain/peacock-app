@@ -92,7 +92,7 @@ export function membersTableTransform(
     withdrawalAmount = 0,
     accountBalance = 0,
     clubHeldAmount = 0,
-    profitWithdrawalAmount
+    profitWithdrawalAmount,
   } = member.passbook.payload as unknown as MemberPassbookData;
 
   const totalOffsetAmount = delayOffset + joiningOffset;
@@ -109,7 +109,8 @@ export function membersTableTransform(
   }
 
   const memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
-  const periodicDepositBalance = memberTotalDeposit -( periodicDepositAmount - withdrawalAmount);
+  const periodicDepositBalance =
+    memberTotalDeposit - (periodicDepositAmount - withdrawalAmount);
 
   const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositAmount;
 
@@ -141,7 +142,7 @@ export function membersTableTransform(
     profitWithdrawalAmount,
     accountBalance,
     memberTotalDeposit,
-    totalWithdrawalAmount: profitWithdrawalAmount + withdrawalAmount
+    totalWithdrawalAmount: profitWithdrawalAmount + withdrawalAmount,
   };
 }
 

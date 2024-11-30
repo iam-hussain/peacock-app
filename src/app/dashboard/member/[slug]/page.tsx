@@ -1,18 +1,18 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { toPng } from "html-to-image";
 import { useRef } from "react";
 import { IoCamera } from "react-icons/io5";
-import { toPng } from "html-to-image";
 
+import { LoanHistory } from "@/components/molecules/loan-history";
+import { MemberDash } from "@/components/molecules/member-dash";
+import { MemberDetails } from "@/components/molecules/member-details";
 import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
+import { fileDateTime } from "@/lib/date";
 import { fetchMemberBySlug } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
-import { MemberDash } from "@/components/molecules/member-dash";
-import { LoanHistory } from "@/components/molecules/loan-history";
-import { MemberDetails } from "@/components/molecules/member-details";
-import { fileDateTime } from "@/lib/date";
 
 export default function MemberPage({ params }: { params: { slug: string } }) {
   const slug = params.slug;

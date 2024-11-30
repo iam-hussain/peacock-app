@@ -1,7 +1,8 @@
-import { LoanHistoryEntry } from "@/lib/type";
 import { Card, CardContent, CardHeader } from "../ui/card";
-import { cn, moneyFormat } from "@/lib/utils";
+
 import { dateFormat } from "@/lib/date";
+import { LoanHistoryEntry } from "@/lib/type";
+import { cn, moneyFormat } from "@/lib/utils";
 
 export function LoanHistory({
   loanHistory,
@@ -13,10 +14,7 @@ export function LoanHistory({
   return (
     <div className="flex flex-wrap gap-4 justify-between align-middle items-center w-full">
       {loanHistory.map((item, index) => (
-        <Card
-          key={index}
-          className={"border rounded-md w-full md:w-auto min-w-[300px]"}
-        >
+        <Card key={index} className={"border rounded-md w-full min-w-[300px]"}>
           <CardHeader className="flex flex-col">
             <div className="flex justify-between w-full align-bottom items-center">
               <div>Transaction #{index + 1}</div>

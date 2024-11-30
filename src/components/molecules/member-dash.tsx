@@ -1,6 +1,7 @@
-import { moneyFormat } from "@/lib/utils";
 import { DashboardCard } from "../atoms/dashboard-card";
+
 import { GetMemberBySlugResponse } from "@/app/api/account/member/[slug]/route";
+import { moneyFormat } from "@/lib/utils";
 
 export function MemberDash({ member }: GetMemberBySlugResponse) {
   return (

@@ -1,8 +1,9 @@
+import { AvatarGroup } from "../atoms/avatar-group";
+import Box from "../ui/box";
+import Typography from "../ui/typography";
+
 import { GetMemberBySlugResponse } from "@/app/api/account/member/[slug]/route";
 import { dateFormat, displayDateTime } from "@/lib/date";
-import Typography from "../ui/typography";
-import Box from "../ui/box";
-import { AvatarGroup } from "../atoms/avatar-group";
 import { cn } from "@/lib/utils";
 
 // MemberDetails.tsx

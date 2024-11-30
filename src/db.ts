@@ -228,13 +228,11 @@ export const cacheExtends = Prisma.defineExtension({
 });
 
 const prismaClientSingleton = () => {
-  return (
-    new PrismaClient({
-      log: ["error"],
-    })
-      .$extends(cacheExtends)
-      .$extends(transactionExtends)
-  );
+  return new PrismaClient({
+    log: ["error"],
+  })
+    .$extends(cacheExtends)
+    .$extends(transactionExtends);
 };
 
 declare const globalThis: {
