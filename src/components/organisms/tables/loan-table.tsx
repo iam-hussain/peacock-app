@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import html2canvas from "html2canvas";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { LuView } from "react-icons/lu";
 
@@ -20,7 +21,6 @@ import {
   PlainTableHeader,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
-import { useRouter } from "next/navigation";
 
 import { FilterBar } from "@/components/molecules/filter-bar-group";
 import { Button } from "@/components/ui/button";

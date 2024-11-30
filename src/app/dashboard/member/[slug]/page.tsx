@@ -6,15 +6,15 @@ import { useEffect, useRef, useState } from "react";
 import { IoCamera } from "react-icons/io5";
 
 import { AvatarGroup } from "@/components/atoms/avatar-group";
+import { DashboardCard } from "@/components/atoms/dashboard-card";
 import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import Typography from "@/components/ui/typography";
 import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMemberBySlug } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
-import { DashboardCard } from "@/components/atoms/dashboard-card";
-import { Separator } from "@/components/ui/separator";
 
 export default function EachMember({ params }: { params: { slug: string } }) {
   const slug = params.slug;
