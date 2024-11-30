@@ -38,37 +38,37 @@ const LoanAction = () => {
       <GenericModal title={selected?.name || ""} description={"Loan Details"}>
         <div className="flex flex-col w-full gap-2 pb-8">
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Total Loan Taken:
             </strong>{" "}
             {moneyFormat(totalLoanTaken)}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Total Loan Repay:
             </strong>{" "}
             {moneyFormat(totalLoanRepay || 0)}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Current Loan Amount:
             </strong>{" "}
             {moneyFormat(totalLoanBalance || 0)}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Total Interest Amount:
             </strong>{" "}
             {moneyFormat(totalInterestAmount || 0)}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Interest Paid Amount:
             </strong>{" "}
             {moneyFormat(totalInterestPaid || 0)}
           </div>
           <div className="flex justify-between text-sm">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Interest Balance Amount:
             </strong>{" "}
             {moneyFormat(totalInterestBalance || 0)}
@@ -90,20 +90,20 @@ const LoanAction = () => {
               <CardContent className="">
                 <div className="flex flex-col w-full gap-2">
                   <div className="flex justify-between text-sm border-b">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       Amount:
                     </strong>{" "}
                     {moneyFormat(item.amount)}
                   </div>
                   <div className="flex justify-between text-sm border-b">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       Interest Amount:
                     </strong>{" "}
                     {moneyFormat(item.interestAmount || 0)}
                   </div>
                   {/* {item.startDate && (
                     <div className="flex justify-between text-sm border-b">
-                      <strong className="text-sm text-foreground/80">
+                      <strong className="text-sm text-foreground/70 font-medium">
                         Invest Date:
                       </strong>{" "}
                       {dateFormat(
@@ -112,32 +112,32 @@ const LoanAction = () => {
                     </div>
                   )} */}
                   <div className="flex justify-between text-sm border-b">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       Start Date:
                     </strong>{" "}
                     {dateFormat(new Date(item.startDate))}
                   </div>
                   <div className="flex justify-between text-sm border-b">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       End Date:
                     </strong>
                     {item.active ? "(Ongoing) - " : ""}
                     {dateFormat(new Date(item.endDate || new Date()))}
                   </div>
                   <div className="flex justify-between text-sm border-b">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       Months Passed:
                     </strong>{" "}
                     {item.monthsPassed} Months
                   </div>
                   <div className="flex justify-between text-sm border-b">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       Days Passed:
                     </strong>{" "}
                     {item.daysPassed} of {item.daysInMonth} days
                   </div>
                   {/* <div className="flex justify-between text-sm">
-                    <strong className="text-sm text-foreground/80">
+                    <strong className="text-sm text-foreground/70 font-medium">
                       Per Day interest:
                     </strong>{" "}
                     {moneyFormat(item.interestPerDay || 0)}

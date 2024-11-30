@@ -272,10 +272,12 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
           <Typography variant={"brandMini"} className="text-4xl">
             Peacock Club
           </Typography>
-          <Typography variant={"h4"} className="text-2xl">
-            Members
-          </Typography>
-          <p className="test-sm text-foreground/80">{displayDateTime()}</p>
+          <div className="flex justify-center align-middle flex-col items-center">
+            <Typography variant={"h4"} className="text-2xl">
+              Members
+            </Typography>
+            <p className="test-sm text-foreground/80">{displayDateTime()}</p>
+          </div>
         </div>
         <TableLayout
           table={table}

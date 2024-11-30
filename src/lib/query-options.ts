@@ -3,6 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 import fetcher from "./fetcher";
 
 import { GetLoanResponse } from "@/app/api/account/loan/route";
+import { GetMemberBySlugResponse } from "@/app/api/account/member/[slug]/route";
 import { GetMemberResponse } from "@/app/api/account/member/route";
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { GetVendorResponse } from "@/app/api/account/vendor/route";
@@ -23,6 +24,16 @@ export const fetchAuthStatus = () =>
       fetcher("/api/auth/status") as never as {
         isLoggedIn: boolean;
       },
+    ...noRefetchConfigs,
+  });
+
+export const fetchMemberBySlug = (slug: string) =>
+  queryOptions({
+    queryKey: ["member-details", "members", "member", "accounts", slug],
+    queryFn: () =>
+      fetcher(
+        `/api/account/member/${slug}`
+      ) as unknown as GetMemberBySlugResponse,
     ...noRefetchConfigs,
   });
 

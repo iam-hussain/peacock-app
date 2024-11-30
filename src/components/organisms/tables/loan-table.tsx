@@ -41,7 +41,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
         link={row.original.link}
         avatarName={row.original.name}
         active={row.original.active}
-        subLabel={"Loan"}
+        // subLabel={"Loan"}
       />
     ),
   },
@@ -216,10 +216,12 @@ const LoanTable = ({ handleAction }: LoanTableProps) => {
           <Typography variant={"brandMini"} className="text-4xl">
             Peacock Club
           </Typography>
-          <Typography variant={"h4"} className="text-2xl">
-            Loans
-          </Typography>
-          <p className="test-sm text-foreground/80">{displayDateTime()}</p>
+          <div className="flex justify-center align-middle flex-col items-center">
+            <Typography variant={"h4"} className="text-2xl">
+              Loans
+            </Typography>
+            <p className="test-sm text-foreground/80">{displayDateTime()}</p>
+          </div>
         </div>
         <TableLayout
           table={table}

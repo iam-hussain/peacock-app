@@ -55,31 +55,37 @@ export function TransactionDeleteForm({
 
         <div className="flex flex-col w-full gap-2 py-4 px-2 ">
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">Sender:</strong>{" "}
+            <strong className="text-sm text-foreground/70 font-medium">
+              Sender:
+            </strong>{" "}
             {transaction.from.name}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">Receiver:</strong>{" "}
+            <strong className="text-sm text-foreground/70 font-medium">
+              Receiver:
+            </strong>{" "}
             {transaction.to.name}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">Amount:</strong>{" "}
+            <strong className="text-sm text-foreground/70 font-medium">
+              Amount:
+            </strong>{" "}
             {moneyFormat(transaction.amount)}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Transaction Type:
             </strong>{" "}
             {transactionTypeMap[transaction.transactionType]}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Transaction Date:
             </strong>{" "}
             {dateFormat(new Date(transaction.transactionAt))}
           </div>
           <div className="flex justify-between text-sm border-b">
-            <strong className="text-sm text-foreground/80">
+            <strong className="text-sm text-foreground/70 font-medium">
               Created Date:
             </strong>{" "}
             {dateFormat(new Date(transaction.createdAt))}
