@@ -23,6 +23,7 @@ type FilterBarProps = {
   searchPlaceholder?: string;
   children?: React.ReactNode;
   onCapture?: () => void;
+  hasMode?: Boolean;
 };
 
 export const FilterBar = ({
@@ -35,6 +36,7 @@ export const FilterBar = ({
   onAddClick,
   toggleIcons,
   searchPlaceholder = "Filter names...",
+  hasMode = true,
 }: FilterBarProps) => {
   const { TrueIcon = HiMiniViewColumns, FalseIcon = PiColumnsFill } =
     toggleIcons || {};
@@ -56,23 +58,27 @@ export const FilterBar = ({
           </Button>
         )}
 
-        <Toggle
-          aria-label="Toggle"
-          variant={"outline"}
-          onPressedChange={onToggleChange}
-          className="gap-2"
-        >
-          {toggleState ? (
-            <TrueIcon className="w-6 h-6" />
-          ) : (
-            <FalseIcon className="w-6 h-6" />
-          )}
-        </Toggle>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="icon" onClick={onAddClick}>
-            <TiUserAdd className="w-6 h-6" />
-          </Button>
-        </DialogTrigger>
+        {hasMode && (
+          <>
+            <Toggle
+              aria-label="Toggle"
+              variant={"outline"}
+              onPressedChange={onToggleChange}
+              className="gap-2"
+            >
+              {toggleState ? (
+                <TrueIcon className="w-6 h-6" />
+              ) : (
+                <FalseIcon className="w-6 h-6" />
+              )}
+            </Toggle>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon" onClick={onAddClick}>
+                <TiUserAdd className="w-6 h-6" />
+              </Button>
+            </DialogTrigger>
+          </>
+        )}
       </Box>
     </div>
   );

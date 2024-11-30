@@ -184,11 +184,11 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       const newTab = window.open();
       if (newTab) {
         newTab.document.write(
-          `<img src="${capturedImage}" alt="peacock_club_${fileDateTime()}" />`
+          `<img src="${capturedImage}" alt="peacock_club_member_${fileDateTime()}" />`
         );
       } else {
         const link = document.createElement("a");
-        link.download = `peacock_club_${fileDateTime()}.png`;
+        link.download = `peacock_club_member_${fileDateTime()}.png`;
         link.href = capturedImage;
         link.click();
       }
@@ -271,6 +271,9 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
         >
           <Typography variant={"brandMini"} className="text-4xl">
             Peacock Club
+          </Typography>
+          <Typography variant={"h4"} className="text-2xl">
+            Members
           </Typography>
           <p className="test-sm text-foreground/80">{displayDateTime()}</p>
         </div>

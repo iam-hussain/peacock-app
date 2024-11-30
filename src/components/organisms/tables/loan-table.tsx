@@ -9,7 +9,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useMemo } from "react";
+import html2canvas from "html2canvas";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { LuView } from "react-icons/lu";
 
 import {
@@ -20,10 +21,12 @@ import {
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
 
+import { FilterBar } from "@/components/molecules/filter-bar-group";
 import { Button } from "@/components/ui/button";
-import { dateFormat } from "@/lib/date";
+import Typography from "@/components/ui/typography";
+import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchLoans } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/utils";
 import { TransformedLoan } from "@/transformers/account";
 
 const baseColumns: ColumnDef<TransformedLoan>[] = [
@@ -108,7 +111,44 @@ export type LoanTableProps = {
 };
 
 const LoanTable = ({ handleAction }: LoanTableProps) => {
+  const captureRef = useRef<HTMLDivElement>(null);
+  const [captureMode, setCaptureMode] = useState(false);
+
   const { data, isLoading, isError } = useQuery(fetchLoans());
+
+  const onCapture = async () => {
+    if (captureRef.current) {
+      setCaptureMode(true);
+    }
+  };
+
+  const handleOnCapture = async () => {
+    if (captureRef.current) {
+      const canvas = await html2canvas(captureRef.current, {
+        scrollX: window.scrollX,
+        scrollY: window.scrollY,
+      });
+      setCaptureMode(false);
+      const capturedImage = canvas.toDataURL("image/png");
+      const newTab = window.open();
+      if (newTab) {
+        newTab.document.write(
+          `<img src="${capturedImage}" alt="peacock_club_loan_${fileDateTime()}" />`
+        );
+      } else {
+        const link = document.createElement("a");
+        link.download = `peacock_club_loan_${fileDateTime()}.png`;
+        link.href = capturedImage;
+        link.click();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (captureMode) {
+      handleOnCapture();
+    }
+  }, [captureMode]);
 
   const columns = useMemo(() => {
     return [
@@ -146,12 +186,48 @@ const LoanTable = ({ handleAction }: LoanTableProps) => {
 
   return (
     <div className="w-full">
-      <TableLayout
-        table={table}
-        columns={columns}
-        isLoading={isLoading}
-        isError={isError}
+      <FilterBar
+        searchValue={
+          (table.getColumn("name")?.getFilterValue() as string) ?? ""
+        }
+        onSearchChange={(value) =>
+          table.getColumn("name")?.setFilterValue(value)
+        }
+        onToggleChange={() => {}}
+        toggleState={false}
+        onAddClick={() => handleAction(null)}
+        onCapture={onCapture}
+        hasMode={false}
       />
+      <div
+        ref={captureRef}
+        className={cn("flex bg-background", {
+          "absolute p-8 pb-16 flex-col": captureMode,
+        })}
+      >
+        <div
+          className={cn(
+            "hidden justify-end align-middle items-center flex-col pb-6 gap-2",
+            {
+              flex: captureMode,
+            }
+          )}
+        >
+          <Typography variant={"brandMini"} className="text-4xl">
+            Peacock Club
+          </Typography>
+          <Typography variant={"h4"} className="text-2xl">
+            Loans
+          </Typography>
+          <p className="test-sm text-foreground/80">{displayDateTime()}</p>
+        </div>
+        <TableLayout
+          table={table}
+          columns={columns}
+          isLoading={isLoading}
+          isError={isError}
+        />
+      </div>
     </div>
   );
 };
