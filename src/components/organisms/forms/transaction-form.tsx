@@ -180,12 +180,7 @@ export function TransactionForm({
             control={form.control}
             name="transactionType"
             render={({ field }) => (
-              <FormItem
-                className={cn({
-                  // "col-span-3": !showVendorType,
-                  // "col-span-2": showVendorType,
-                })}
-              >
+              <FormItem className={"col-span-3"}>
                 <FormLabel>Transaction Type</FormLabel>
                 <FormControl>
                   <Select

@@ -1,15 +1,19 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import html2canvas from "html2canvas";
+import { useEffect, useRef, useState } from "react";
+import { IoCamera } from "react-icons/io5";
 
 import { AvatarGroup } from "@/components/atoms/avatar-group";
 import Box from "@/components/ui/box";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
-import { dateFormat } from "@/lib/date";
+import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
 import { fetchMemberBySlug } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/utils";
+import { DashboardCard } from "@/components/atoms/dashboard-card";
 
 export default function EachMember({ params }: { params: { slug: string } }) {
   const slug = params.slug;
@@ -19,6 +23,40 @@ export default function EachMember({ params }: { params: { slug: string } }) {
   const { data, isLoading, isError } = useQuery(fetchMemberBySlug(slug));
 
   const member = data?.member;
+
+  const onCapture = async () => {
+    if (captureRef.current) {
+      setCaptureMode(true);
+    }
+  };
+
+  const handleOnCapture = async () => {
+    if (captureRef.current) {
+      const canvas = await html2canvas(captureRef.current, {
+        scrollX: window.scrollX,
+        scrollY: window.scrollY,
+      });
+      setCaptureMode(false);
+      const capturedImage = canvas.toDataURL("image/png");
+      const newTab = window.open();
+      if (newTab) {
+        newTab.document.write(
+          `<img src="${capturedImage}" alt="peacock_club_members_${fileDateTime()}" />`
+        );
+      } else {
+        const link = document.createElement("a");
+        link.download = `peacock_club_members_${fileDateTime()}.png`;
+        link.href = capturedImage;
+        link.click();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (captureMode) {
+      handleOnCapture();
+    }
+  }, [captureMode]);
 
   if (isLoading || !member) {
     return (
@@ -39,17 +77,35 @@ export default function EachMember({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <Box preset={"stack-start"}>
-      {/* <Box preset={"row-between"} className="px-4 md:px-6">
-        <Typography variant={"h3"} className="">
-          {member.name}
-        </Typography>
-      </Box> */}
-      <Box
-        preset={"stack-start"}
-        className="bg-background p-4 md:p-6 rounded-md width-avl"
+    <div className="flex flex-col justify-start items-start relative w-full h-full">
+      <div
+        className="flex flex-col justify-start items-start relative w-full h-full bg-background p-4 md:p-6 rounded-md"
+        ref={captureRef}
       >
+        <div
+          className={cn("absolute top-4 right-4", {
+            hidden: captureMode,
+          })}
+        >
+          <Button onClick={onCapture} size="icon" variant={"outline"}>
+            <IoCamera className="w-4 h-4" />
+          </Button>
+        </div>
         <div className="max-w-2xl mx-auto w-full flex flex-col justify-start align-middle items-center gap-6">
+          <div
+            className={cn(
+              "hidden justify-end align-middle items-center flex-col pb-6 gap-2",
+              {
+                flex: captureMode,
+              }
+            )}
+          >
+            <Typography variant={"brandMini"} className="text-4xl">
+              Peacock Club
+            </Typography>
+            <p className="test-sm text-foreground/80">{displayDateTime()}</p>
+          </div>
+
           <Box preset={"row-center"}>
             <AvatarGroup
               className={"p-2"}
@@ -69,6 +125,25 @@ export default function EachMember({ params }: { params: { slug: string } }) {
               </p> */}
             </div>
           </Box>
+          <div className={"grid grid-cols-1 md:grid-cols-3 gap-2 w-full"}>
+            <DashboardCard
+              title="Deposit Balance"
+              value={moneyFormat(member.totalBalanceAmount || 0)}
+              useRed={member.totalBalanceAmount > 0}
+              useGreen={member.totalBalanceAmount < 0}
+            />
+            <DashboardCard
+              title="Loan Amount"
+              value={moneyFormat(member.totalLoanBalance || 0)}
+              useGreen={member.totalLoanBalance > 0}
+            />
+            <DashboardCard
+              title="Interest Balance"
+              value={moneyFormat(member.totalInterestBalance || 0)}
+              useRed={member.totalInterestBalance > 0}
+              useGreen={member.totalInterestBalance < 0}
+            />
+          </div>
 
           <div className="flex flex-col w-full gap-2 pb-8">
             <div className="flex justify-between text-sm border-b">
@@ -83,9 +158,28 @@ export default function EachMember({ params }: { params: { slug: string } }) {
               </strong>{" "}
               {moneyFormat(member.periodicDepositAmount || 0)}
             </div>
+            <div className="flex justify-between text-sm">
+              <strong className="text-sm text-foreground/70 font-medium">
+                Deposit Balance:
+              </strong>{" "}
+              {moneyFormat(member.periodicDepositBalance || 0)}
+            </div>
+            <div className="py-2"></div>
             <div className="flex justify-between text-sm border-b">
               <strong className="text-sm text-foreground/70 font-medium">
-                Offset Amount:
+                Late Join Offset:
+              </strong>{" "}
+              {moneyFormat(member.joiningOffset || 0)}
+            </div>
+            <div className="flex justify-between text-sm border-b">
+              <strong className="text-sm text-foreground/70 font-medium">
+                Delay Paying Offset:
+              </strong>{" "}
+              {moneyFormat(member.delayOffset || 0)}
+            </div>
+            <div className="flex justify-between text-sm border-b">
+              <strong className="text-sm text-foreground/70 font-medium">
+                Total Offset:
               </strong>{" "}
               {moneyFormat(member.totalOffsetAmount || 0)}
             </div>
@@ -95,21 +189,22 @@ export default function EachMember({ params }: { params: { slug: string } }) {
               </strong>{" "}
               {moneyFormat(member.offsetDepositAmount || 0)}
             </div>
-            <div className="flex justify-between text-sm border-b">
+            <div className="flex justify-between text-sm">
               <strong className="text-sm text-foreground/70 font-medium">
                 Offset Balance:
               </strong>{" "}
               {moneyFormat(member.totalOffsetBalanceAmount || 0)}
             </div>
+            <div className="py-2"></div>
             <div className="flex justify-between text-sm">
               <strong className="text-sm text-foreground/70 font-medium">
-                Total Balance:
+                Total Deposit Balance:
               </strong>{" "}
               {moneyFormat(member.totalBalanceAmount || 0)}
             </div>
           </div>
 
-          <h1>Loan</h1>
+          <h1 className="text-xl">Loan</h1>
           <div className="flex flex-col w-full gap-2 pb-8">
             <div className="flex justify-between text-sm border-b">
               <strong className="text-sm text-foreground/70 font-medium">
@@ -170,22 +265,19 @@ export default function EachMember({ params }: { params: { slug: string } }) {
                       </strong>{" "}
                       {moneyFormat(item.amount)}
                     </div>
+
+                    <div className="flex justify-between text-sm border-b">
+                      <strong className="text-sm text-foreground/70 font-medium">
+                        Interest Rate:
+                      </strong>{" "}
+                      1%
+                    </div>
                     <div className="flex justify-between text-sm border-b">
                       <strong className="text-sm text-foreground/70 font-medium">
                         Interest Amount:
                       </strong>{" "}
                       {moneyFormat(item.interestAmount || 0)}
                     </div>
-                    {/* {item.startDate && (
-                    <div className="flex justify-between text-sm border-b">
-                      <strong className="text-sm text-foreground/70 font-medium">
-                        Invest Date:
-                      </strong>{" "}
-                      {dateFormat(
-                        new Date(item.recentLoanTakenDate || new Date())
-                      )}
-                    </div>
-                  )} */}
                     <div className="flex justify-between text-sm border-b">
                       <strong className="text-sm text-foreground/70 font-medium">
                         Start Date:
@@ -205,25 +297,19 @@ export default function EachMember({ params }: { params: { slug: string } }) {
                       </strong>{" "}
                       {item.monthsPassed} Months
                     </div>
-                    <div className="flex justify-between text-sm border-b">
+                    <div className="flex justify-between text-sm">
                       <strong className="text-sm text-foreground/70 font-medium">
                         Days Passed:
                       </strong>{" "}
                       {item.daysPassed} of {item.daysInMonth} days
                     </div>
-                    {/* <div className="flex justify-between text-sm">
-                    <strong className="text-sm text-foreground/70 font-medium">
-                      Per Day interest:
-                    </strong>{" "}
-                    {moneyFormat(item.interestPerDay || 0)}
-                  </div> */}
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

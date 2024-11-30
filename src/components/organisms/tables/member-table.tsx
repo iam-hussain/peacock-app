@@ -184,11 +184,11 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
       const newTab = window.open();
       if (newTab) {
         newTab.document.write(
-          `<img src="${capturedImage}" alt="peacock_club_member_${fileDateTime()}" />`
+          `<img src="${capturedImage}" alt="peacock_club_members_${fileDateTime()}" />`
         );
       } else {
         const link = document.createElement("a");
-        link.download = `peacock_club_member_${fileDateTime()}.png`;
+        link.download = `peacock_club_members_${fileDateTime()}.png`;
         link.href = capturedImage;
         link.click();
       }

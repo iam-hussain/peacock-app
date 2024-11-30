@@ -79,7 +79,7 @@ export function OffsetForm({
               name="joiningOffset"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Joining Offset Amount</FormLabel>
+                  <FormLabel>Late Join Offset Amount</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -100,7 +100,7 @@ export function OffsetForm({
               name="delayOffset"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Delay Pay Offset Amount</FormLabel>
+                  <FormLabel>Delay Paying Offset Amount</FormLabel>
                   <FormControl>
                     <Input
                       type="number"

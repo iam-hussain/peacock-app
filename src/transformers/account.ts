@@ -101,11 +101,6 @@ export function membersTableTransform(
     totalBalanceAmount > memberTotalDeposit
       ? memberTotalDeposit - accountBalance
       : 0;
-  const offsetBalanceAmount =
-    accountBalance - (memberTotalDeposit + totalOffsetAmount);
-
-  const totalOffsetBalanceAmount =
-    totalPeriodBalanceAmount > 0 ? totalOffsetAmount : offsetBalanceAmount;
 
   if (!member.active) {
     totalBalanceAmount = totalBalanceAmount + totalReturnAmount;
@@ -113,6 +108,9 @@ export function membersTableTransform(
   }
 
   const memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
+  const periodicDepositBalance = memberTotalDeposit - periodicDepositAmount;
+
+  const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositAmount;
 
   return {
     id: member.id,
@@ -137,6 +135,7 @@ export function membersTableTransform(
     joiningOffset,
     netValue: accountBalance + memberTotalReturnAmount,
     account: { ...account, delayOffset, joiningOffset },
+    periodicDepositBalance,
   };
 }
 

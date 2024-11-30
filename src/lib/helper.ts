@@ -196,7 +196,7 @@ export function fetchAllPassbook() {
   });
 }
 
-const ONE_MONTH_RATE = 0.01;
+export const ONE_MONTH_RATE = 0.01;
 
 export function calculateInterestByAmount(
   amount: number,
