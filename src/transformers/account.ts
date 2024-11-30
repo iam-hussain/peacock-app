@@ -109,7 +109,7 @@ export function membersTableTransform(
   }
 
   const memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
-  const periodicDepositBalance = memberTotalDeposit - periodicDepositAmount;
+  const periodicDepositBalance = memberTotalDeposit -( periodicDepositAmount - withdrawalAmount);
 
   const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositAmount;
 
@@ -125,7 +125,7 @@ export function membersTableTransform(
     active: member.active,
     totalDepositAmount: totalDepositAmount - withdrawalAmount,
     totalOffsetAmount,
-    periodicDepositAmount,
+    periodicDepositAmount: periodicDepositAmount - withdrawalAmount,
     offsetDepositAmount,
     totalOffsetBalanceAmount,
     totalPeriodBalanceAmount,
@@ -137,9 +137,11 @@ export function membersTableTransform(
     netValue: accountBalance + memberTotalReturnAmount,
     account: { ...account, delayOffset, joiningOffset },
     periodicDepositBalance,
-    withdrawalAmount: withdrawalAmount,
+    withdrawalAmount,
     profitWithdrawalAmount,
-    accountBalance
+    accountBalance,
+    memberTotalDeposit,
+    totalWithdrawalAmount: profitWithdrawalAmount + withdrawalAmount
   };
 }
 

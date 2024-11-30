@@ -1,12 +1,14 @@
 import { LoanHistoryEntry } from "@/lib/type";
 import { Card, CardContent, CardHeader } from "../ui/card";
-import { moneyFormat } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/utils";
 import { dateFormat } from "@/lib/date";
 
 export function LoanHistory({
   loanHistory,
+  captureMode = false,
 }: {
   loanHistory: LoanHistoryEntry[];
+  captureMode: boolean;
 }) {
   return (
     <div className="flex flex-wrap gap-4 justify-between align-middle items-center w-full">
@@ -27,38 +29,62 @@ export function LoanHistory({
           </CardHeader>
           <CardContent>
             <div className="flex flex-col w-full gap-2">
-              <div className="flex justify-between text-sm border-b">
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
                 <strong className="text-sm text-foreground/70 font-medium">
                   Amount:
                 </strong>{" "}
                 {moneyFormat(item.amount)}
               </div>
-              <div className="flex justify-between text-sm border-b">
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
                 <strong className="text-sm text-foreground/70 font-medium">
                   Interest Rate:
                 </strong>{" "}
                 1%
               </div>
-              <div className="flex justify-between text-sm border-b">
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
                 <strong className="text-sm text-foreground/70 font-medium">
                   Interest Amount:
                 </strong>{" "}
                 {moneyFormat(item.interestAmount || 0)}
               </div>
-              <div className="flex justify-between text-sm border-b">
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
                 <strong className="text-sm text-foreground/70 font-medium">
                   Start Date:
                 </strong>{" "}
                 {dateFormat(new Date(item.startDate))}
               </div>
-              <div className="flex justify-between text-sm border-b">
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
                 <strong className="text-sm text-foreground/70 font-medium">
                   End Date:
                 </strong>
                 {item.active ? "(Ongoing) - " : ""}
                 {dateFormat(new Date(item.endDate || new Date()))}
               </div>
-              <div className="flex justify-between text-sm border-b">
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
                 <strong className="text-sm text-foreground/70 font-medium">
                   Months Passed:
                 </strong>{" "}
