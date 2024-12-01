@@ -1,7 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { Transaction } from "@prisma/client";
 
-import { calculateLoansHandler, memberLoanMiddleware } from "./loan-middleware";
+import { calculateLoansHandler } from "./loan-middleware";
 import { transactionMiddleware } from "./transaction-middleware";
 
 import prisma from "@/db";
@@ -42,38 +42,24 @@ export async function transactionMiddlewareHandler(
   created: Transaction,
   isDelete: boolean = false
 ) {
+  clearCache();
   const passbooks = await getTractionPassbook(created);
   let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
 
   passbookToUpdate = transactionMiddleware(passbookToUpdate, created, isDelete);
-  if (
-    ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"].includes(
-      created.transactionType
-    )
-  ) {
-    passbookToUpdate = await memberLoanMiddleware(passbookToUpdate, created);
-  }
   return bulkPassbookUpdate(passbookToUpdate);
 }
 
 export async function resetAllTransactionMiddlewareHandler() {
   clearCache();
 
-  const [transactions, passbooks, vendors] = await Promise.all([
+  const [transactions, passbooks] = await Promise.all([
     prisma.transaction.findMany({
       orderBy: {
         transactionAt: "asc",
       },
     }),
     fetchAllPassbook(),
-    prisma.account.findMany({
-      where: {
-        isMember: false,
-      },
-      select: {
-        id: true,
-      },
-    }),
   ]);
 
   let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
@@ -102,7 +88,7 @@ export async function resetAllLoanHandler() {
     fetchAllLoanPassbook(),
   ]);
 
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
   passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
 
   return bulkPassbookUpdate(passbookToUpdate);

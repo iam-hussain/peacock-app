@@ -4,6 +4,7 @@ import { Transaction } from "@prisma/client";
 import prisma from "@/db";
 import {
   calculateInterestByAmount,
+  initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
 import { LoanHistoryEntry, PassbookToUpdate } from "@/lib/type";
@@ -139,15 +140,27 @@ export const calculateLoansHandler = (
   return passbookToUpdate;
 };
 
-export async function memberLoanMiddleware(
-  passbookToUpdate: PassbookToUpdate,
-  transaction: Transaction
-) {
-  let loanAccountId = transaction.fromId;
-
-  if (transaction.transactionType === "LOAN_TAKEN") {
-    loanAccountId = transaction.toId;
-  }
-  const transactions = await fetchLoanTransaction(loanAccountId);
+export async function recalculateMemberLoanById(memberId: string) {
+  const [passbook, transactions] = await Promise.all([
+    prisma.passbook.findFirstOrThrow({
+      where: {
+        account: {
+          id: memberId,
+        },
+      },
+      select: {
+        id: true,
+        type: true,
+        payload: true,
+        account: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    }),
+    fetchLoanTransaction(),
+  ]);
+  let passbookToUpdate = initializePassbookToUpdate([passbook], false);
   return calculateLoansHandler(passbookToUpdate, transactions);
 }

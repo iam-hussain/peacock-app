@@ -28,11 +28,16 @@ class Cache {
 
 export function clearCache() {
   if (global.nodeCache) {
-    console.log(`🌟🌟🌟🌟1️⃣1️⃣: ${JSON.stringify(global.nodeCache.getStats())}`);
-    global.nodeCache.flushAll();
-    global.nodeCache.flushStats();
-    console.log(`Cache cleared after API call 📟😎🌟🌟🌟🌟`);
-    console.log(`🌟🌟🌟🌟💀💀: ${JSON.stringify(global.nodeCache.getStats())}`);
+    const catchState = global.nodeCache.getStats();
+    if (catchState.keys > 0) {
+      console.log(`🌟🌟🌟🌟1️⃣1️⃣: ${JSON.stringify(catchState)}`);
+      global.nodeCache.flushAll();
+      global.nodeCache.flushStats();
+      console.log(`Cache cleared after API call 📟😎🌟🌟🌟🌟`);
+      console.log(
+        `🌟🌟🌟🌟💀💀: ${JSON.stringify(global.nodeCache.getStats())}`
+      );
+    }
   } else {
     console.log(`No Cache instance found 🔴🔴🌟🌟🌟🌟`);
   }

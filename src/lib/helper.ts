@@ -47,6 +47,11 @@ export const bulkPassbookUpdate = async (
 ) => {
   const values = Array.from(items.values());
 
+  if (values.length === 1) {
+    const updated = await prisma.passbook.update(values[0]);
+    return updated;
+  }
+
   for (let i = 0; i < values.length; i += batchSize) {
     const batch = values.slice(i, i + batchSize); // Create a batch of updates
 

@@ -141,17 +141,45 @@ export function TransactionForm({
       fetcher.post("/api/transaction", {
         body: { createdAt: selected?.transactionAt, ...body },
       }),
-    onSuccess: async () => {
+    onSuccess: async ({ transaction }: any = {}) => {
+      if (!selected) form.reset(transaction); // Reset form after submission
       if (selected && selected?.id) {
         await deleteMutation.mutateAsync(selected.id);
       }
+
+      const recalculatedIds = new Set();
+      if (
+        selected?.transactionType &&
+        selected?.transactionType === "LOAN_TAKEN" &&
+        selected?.toId
+      ) {
+        recalculatedIds.add(selected?.toId);
+      }
+      if (
+        selected?.transactionType &&
+        selected?.transactionType === "LOAN_REPAY" &&
+        selected?.fromId
+      ) {
+        recalculatedIds.add(selected?.fromId);
+      }
+      if (transactionType === "LOAN_TAKEN" && transaction?.toId) {
+        recalculatedIds.add(transaction?.toId);
+      }
+      if (transactionType === "LOAN_REPAY" && transaction?.fromId) {
+        recalculatedIds.add(transaction?.fromId);
+      }
+
+      await Promise.all(
+        Array.from(recalculatedIds).map((id) =>
+          fetcher.post(`/api/action/recalculate/loan/${id}`)
+        )
+      );
 
       if (selected) {
         toast.success("Transaction successfully updated!");
       } else {
         toast.success("Transaction successfully added!");
       }
-      if (!selected) form.reset(); // Reset form after submission
       if (onSuccess) {
         onSuccess();
       }

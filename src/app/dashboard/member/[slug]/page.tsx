@@ -221,6 +221,19 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
               </span>{" "}
               {moneyFormat(member.totalOffsetBalanceAmount || 0)}
             </div>
+            {member.expectedOffsetAmount > 0 && (
+              <div
+                className={cn("flex justify-between text-sm", {
+                  "border-b": !captureMode,
+                })}
+              >
+                <span className="text-sm text-foreground/70 font-medium">
+                  Expected Offset:
+                </span>{" "}
+                {moneyFormat(member.expectedOffsetAmount || 0)}
+              </div>
+            )}
+
             <div className="flex justify-between text-sm">
               <span className="text-sm text-foreground/70 font-medium">
                 Total Deposit Balance:

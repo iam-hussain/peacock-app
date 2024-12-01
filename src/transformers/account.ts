@@ -103,16 +103,18 @@ export function membersTableTransform(
       ? memberTotalDeposit - accountBalance
       : 0;
 
-  if (!member.active) {
-    totalBalanceAmount = totalBalanceAmount + totalReturnAmount;
-    totalReturnAmount = 0;
-  }
-
-  const memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
+  let memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
   const periodicDepositBalance =
     memberTotalDeposit - (periodicDepositAmount - withdrawalAmount);
 
   const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositAmount;
+  let expectedOffsetAmount = 0;
+
+  if (!member.active) {
+    totalBalanceAmount = totalBalanceAmount + memberTotalReturnAmount;
+    expectedOffsetAmount = memberTotalReturnAmount;
+    memberTotalReturnAmount = 0;
+  }
 
   return {
     id: member.id,
@@ -143,6 +145,7 @@ export function membersTableTransform(
     accountBalance,
     memberTotalDeposit,
     totalWithdrawalAmount: profitWithdrawalAmount + withdrawalAmount,
+    expectedOffsetAmount,
   };
 }
 
