@@ -15,7 +15,7 @@ export function MemberDetails({
     <>
       <div
         className={cn(
-          "hidden justify-end align-middle items-center flex-col pb-6 gap-2",
+          "hidden justify-end align-middle items-center flex-col gap-2",
           {
             flex: captureMode,
           }

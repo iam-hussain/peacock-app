@@ -27,12 +27,7 @@ export async function DELETE(
       where: { id },
     });
 
-    revalidatePath("/member");
-    revalidatePath("/vendor");
-    revalidatePath("/loan");
-    revalidatePath("/transaction");
-    revalidatePath("/dashboard");
-
+    revalidatePath("*");
     return NextResponse.json(
       { message: "Transaction deleted successfully." },
       { status: 200 }

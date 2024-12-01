@@ -202,6 +202,27 @@ export default function DashboardPage() {
           icon={<FaMoneyBillTrendUp className="text-3xl text-teal-600" />}
         /> */}
       </div>
+      <div className="flex bg-background flex-col gap-6 justify-center align-middle items-center p-4">
+        <h1 className="text-xl uppercase">Members</h1>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 justify-center align-middle items-center">
+          {members.map((member) => (
+            <div
+              className="gap-0 p-2 rounded-md flex flex-col justify-center align-middle items-center"
+              key={member.slug}
+            >
+              <AvatarGroup
+                className={"px-6"}
+                src={member.avatar || ""}
+                name={member.name}
+                isLarge={true}
+                link={member.link}
+              />
+              <p className="text-sm">{member.name}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <PieChart
           available={parseInt(
@@ -227,27 +248,6 @@ export default function DashboardPage() {
           offset={parseInt(Number(statistics.totalOffsetPaid).toString())}
           returns={parseInt(Number(statistics.totalInterestPaid).toString())}
         />
-      </div>
-
-      <div className="flex bg-background flex-col gap-4 justify-center align-middle items-center p-6">
-        <h1 className="text-3xl uppercase">Members</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 justify-center align-middle items-center">
-          {members.map((member) => (
-            <div
-              className="py-6 gap-2 rounded-md flex flex-col justify-center align-middle items-center"
-              key={member.slug}
-            >
-              <AvatarGroup
-                className={"px-6"}
-                src={member.avatar || ""}
-                name={member.name}
-                isLarge={true}
-                link={member.link}
-              />
-              <p className="text-sm">{member.name}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

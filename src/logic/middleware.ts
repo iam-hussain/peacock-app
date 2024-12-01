@@ -5,7 +5,7 @@ import { calculateLoansHandler, memberLoanMiddleware } from "./loan-middleware";
 import { transactionMiddleware } from "./transaction-middleware";
 
 import prisma from "@/db";
-import cache from "@/lib/cache";
+import { clearCache } from "@/lib/cache";
 import {
   bulkPassbookUpdate,
   fetchAllPassbook,
@@ -56,7 +56,7 @@ export async function transactionMiddlewareHandler(
 }
 
 export async function resetAllTransactionMiddlewareHandler() {
-  cache.flushAll();
+  clearCache();
 
   const [transactions, passbooks, vendors] = await Promise.all([
     prisma.transaction.findMany({

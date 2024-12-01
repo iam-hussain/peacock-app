@@ -1,13 +1,14 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
+import { clearCache } from "@/lib/cache";
 
 export async function GET() {
   try {
-    await resetAllTransactionMiddlewareHandler();
-
+    // Reset cache after an update
+    clearCache();
     revalidatePath("*");
+
     // Return the file path
     return NextResponse.json({ success: true });
   } catch (error) {

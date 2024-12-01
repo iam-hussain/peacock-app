@@ -37,6 +37,7 @@ export async function GET(
       prisma.account.count({
         where: {
           isMember: true,
+          active: true,
         },
       }),
       prisma.passbook.aggregate({

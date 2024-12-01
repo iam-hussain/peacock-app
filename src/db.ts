@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient, Transaction } from "@prisma/client";
 
-import cache from "./lib/cache";
+import cache, { clearCache } from "./lib/cache";
 import { transactionMiddlewareHandler } from "./logic/middleware";
 
 export const transactionExtends = Prisma.defineExtension({
@@ -195,7 +195,7 @@ export const cacheExtends = Prisma.defineExtension({
         const result = await query(args);
 
         // Reset cache after an update
-        cache.flushAll(); // Alternatively, clear specific keys if needed
+        clearCache(); // Alternatively, clear specific keys if needed
         console.log(`Cache cleared after ${model}:create 📟😎🌟🌟🌟🌟`);
         return result;
       },
@@ -203,7 +203,7 @@ export const cacheExtends = Prisma.defineExtension({
         const result = await query(args);
 
         // Reset cache after an update
-        cache.flushAll(); // Alternatively, clear specific keys if needed
+        clearCache(); // Alternatively, clear specific keys if needed
         console.log(`Cache cleared after ${model}:createMany 📟😎🌟🌟🌟🌟`);
         return result;
       },
@@ -211,7 +211,7 @@ export const cacheExtends = Prisma.defineExtension({
         const result = await query(args);
 
         // Reset cache after an update
-        cache.flushAll(); // Alternatively, clear specific keys if needed
+        clearCache(); // Alternatively, clear specific keys if needed
         console.log(`Cache cleared after ${model}:update 📟😎🌟🌟🌟🌟`);
         return result;
       },
@@ -219,7 +219,7 @@ export const cacheExtends = Prisma.defineExtension({
         const result = await query(args);
 
         // Reset cache after a delete
-        cache.flushAll(); // Alternatively, clear specific keys if needed
+        clearCache(); // Alternatively, clear specific keys if needed
         console.log(`Cache cleared after ${model}:delete 📟😎🌟🌟🌟🌟`);
         return result;
       },

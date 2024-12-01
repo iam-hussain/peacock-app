@@ -69,9 +69,7 @@ export async function POST(request: Request) {
       },
     });
 
-    revalidatePath("/member");
-    revalidatePath("/vendor");
-    revalidatePath("/loan");
+    revalidatePath("*");
     return NextResponse.json({ account: commonData }, { status: 200 });
   } catch (error) {
     console.error("Error creating/updating member:", error);

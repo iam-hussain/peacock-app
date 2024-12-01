@@ -23,11 +23,6 @@ export async function POST(request: Request) {
     },
   });
 
-  revalidatePath("/member");
-  revalidatePath("/vendor");
-  revalidatePath("/loan");
-  revalidatePath("/transaction");
-  revalidatePath("/dashboard");
-
+  revalidatePath("*");
   return NextResponse.json({ joiningOffset, delayOffset });
 }

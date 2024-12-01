@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 import ActionMenu from "../molecules/action-menu";
+import BaseActionMenu from "../molecules/base-action-menu";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
@@ -137,6 +138,11 @@ function MenuItems({
               <Icon className="h-5 w-5" /> {each.label}
             </CustomLink>
           ))}
+
+          <>
+            <Separator className="my-2" />
+            <BaseActionMenu />
+          </>
 
           {isLoggedIn && (
             <>

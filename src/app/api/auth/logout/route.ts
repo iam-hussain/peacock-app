@@ -11,7 +11,7 @@ export async function POST() {
     path: "/",
   });
 
-  revalidatePath("/dashboard", "layout");
+  revalidatePath("*");
 
   const response = NextResponse.json({ message: "Logout successful" });
   response.headers.set("Set-Cookie", cookie);

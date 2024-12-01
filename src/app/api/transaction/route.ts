@@ -220,12 +220,7 @@ export async function POST(request: Request) {
       createdAt,
     });
 
-    revalidatePath("/member");
-    revalidatePath("/vendor");
-    revalidatePath("/loan");
-    revalidatePath("/transaction");
-    revalidatePath("/dashboard");
-
+    revalidatePath("*");
     return NextResponse.json({ success: true, transaction }, { status: 201 });
   } catch (error) {
     console.error("Failed to create transaction", error);
