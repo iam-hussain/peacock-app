@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
   getCoreRowModel,
@@ -12,7 +12,8 @@ import {
 import html2canvas from "html2canvas";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { LuView } from "react-icons/lu";
+import { FaCalculator } from "react-icons/fa";
+import { toast } from "sonner";
 
 import {
   ActionTableHeader,
@@ -26,6 +27,7 @@ import { FilterBar } from "@/components/molecules/filter-bar-group";
 import { Button } from "@/components/ui/button";
 import Typography from "@/components/ui/typography";
 import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
+import fetcher from "@/lib/fetcher";
 import { fetchLoans } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
 import { TransformedLoan } from "@/transformers/account";
@@ -113,6 +115,7 @@ export type LoanTableProps = {
 
 const LoanTable = () => {
   const router = useRouter();
+  const [editMode, setEditMode] = useState(false);
   const captureRef = useRef<HTMLDivElement>(null);
   const [captureMode, setCaptureMode] = useState(false);
 
@@ -151,31 +154,46 @@ const LoanTable = () => {
     }
   };
 
+  const loanCalcMutation = useMutation({
+    mutationFn: (id) => fetcher.post(`/api/action/recalculate/loan/${id}`),
+    onSuccess: async () => {
+      toast.success("Loan recalculated successfully.");
+    },
+    onError: (error) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
+    },
+  });
+
   useEffect(() => {
     if (captureMode) {
       handleOnCapture();
     }
   }, [captureMode]);
 
+  const actionColumn = {
+    accessorKey: "action",
+    header: () => <PlainTableHeader label="Recalculate" />,
+    cell: ({ row }: any) => (
+      <Button
+        variant={"ghost"}
+        className="px-3 py-1"
+        onClick={() => loanCalcMutation.mutateAsync(row.original.id)}
+        disabled={loanCalcMutation.isPending}
+      >
+        <FaCalculator className="h-4 w-4" />
+      </Button>
+    ),
+  };
+
   const columns = useMemo(() => {
-    return [
-      ...baseColumns,
-      {
-        accessorKey: "action",
-        header: () => <PlainTableHeader label="Details" />,
-        cell: ({ row }) => (
-          <Button
-            variant={"ghost"}
-            className="px-3 py-1"
-            onClick={() => router.push(row.original.link)}
-          >
-            <LuView className="h-4 w-4" />
-          </Button>
-        ),
-      },
-    ];
+    if (!editMode) {
+      return baseColumns;
+    }
+    return [...baseColumns, actionColumn];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [editMode]);
 
   const table = useReactTable({
     data: data?.accounts || [],
@@ -200,8 +218,8 @@ const LoanTable = () => {
         onSearchChange={(value) =>
           table.getColumn("name")?.setFilterValue(value)
         }
-        onToggleChange={() => {}}
-        toggleState={false}
+        onToggleChange={setEditMode}
+        toggleState={editMode}
         onAddClick={() => null}
         onCapture={onCapture}
         hasMode={false}

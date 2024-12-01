@@ -58,20 +58,21 @@ export const FilterBar = ({
           </Button>
         )}
 
+        <Toggle
+          aria-label="Toggle"
+          variant={"outline"}
+          onPressedChange={onToggleChange}
+          className="gap-2"
+        >
+          {toggleState ? (
+            <TrueIcon className="w-6 h-6" />
+          ) : (
+            <FalseIcon className="w-6 h-6" />
+          )}
+        </Toggle>
+
         {hasMode && (
           <>
-            <Toggle
-              aria-label="Toggle"
-              variant={"outline"}
-              onPressedChange={onToggleChange}
-              className="gap-2"
-            >
-              {toggleState ? (
-                <TrueIcon className="w-6 h-6" />
-              ) : (
-                <FalseIcon className="w-6 h-6" />
-              )}
-            </Toggle>
             <DialogTrigger asChild>
               <Button variant="outline" size="icon" onClick={onAddClick}>
                 <TiUserAdd className="w-6 h-6" />
