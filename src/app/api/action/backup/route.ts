@@ -3,10 +3,12 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
+import { clearCache } from "@/lib/cache";
 import { fileDateTime } from "@/lib/date";
 
 export async function POST() {
   try {
+    clearCache();
     // Fetch all data from Prisma models
     const account = await prisma.account.findMany();
     const transaction = await prisma.transaction.findMany();

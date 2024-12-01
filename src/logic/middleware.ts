@@ -8,6 +8,7 @@ import prisma from "@/db";
 import { clearCache } from "@/lib/cache";
 import {
   bulkPassbookUpdate,
+  fetchAllLoanPassbook,
   fetchAllPassbook,
   initializePassbookToUpdate,
 } from "@/lib/helper";
@@ -80,9 +81,29 @@ export async function resetAllTransactionMiddlewareHandler() {
   for (let transaction of transactions) {
     passbookToUpdate = transactionMiddleware(passbookToUpdate, transaction);
   }
-  passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
 
-  // passbookToUpdate = calculatedVendorsConnection(passbookToUpdate, profitShare);
+  return bulkPassbookUpdate(passbookToUpdate);
+}
+
+export async function resetAllLoanHandler() {
+  clearCache();
+
+  const [transactions, passbooks] = await Promise.all([
+    prisma.transaction.findMany({
+      where: {
+        transactionType: {
+          in: ["LOAN_TAKEN", "LOAN_REPAY"],
+        },
+      },
+      orderBy: {
+        transactionAt: "asc",
+      },
+    }),
+    fetchAllLoanPassbook(),
+  ]);
+
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
+  passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
 
   return bulkPassbookUpdate(passbookToUpdate);
 }

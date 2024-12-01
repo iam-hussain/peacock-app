@@ -196,6 +196,24 @@ export function fetchAllPassbook() {
   });
 }
 
+export function fetchAllLoanPassbook() {
+  return prisma.passbook.findMany({
+    where: {
+      type: { in: ["CLUB", "MEMBER"] },
+    },
+    select: {
+      id: true,
+      type: true,
+      payload: true,
+      account: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
+}
+
 export const ONE_MONTH_RATE = 0.01;
 
 export function calculateInterestByAmount(

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
 
-export async function GET() {
+export async function POST() {
   try {
     await resetAllTransactionMiddlewareHandler();
 
