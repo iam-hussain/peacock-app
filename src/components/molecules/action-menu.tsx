@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
+import { BiSolidObjectsVerticalCenter } from "react-icons/bi";
 import { BsDatabaseFillCheck } from "react-icons/bs";
 import { FaDownload } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
@@ -105,7 +106,7 @@ const ActionMenu = () => {
           loanMutation.isPending
         }
       >
-        <FaCalculator className="h-5 w-5" />{" "}
+        <BiSolidObjectsVerticalCenter className="h-5 w-5" />{" "}
         {returnsMutation.isPending ? "Loans ..." : "Recalculated Loans"}
       </Button>
       <Button
