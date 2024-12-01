@@ -126,11 +126,7 @@ export function TransactionForm({
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => fetcher.delete(`/api/transaction/${id}`),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["fetch-transaction", "all-transaction"],
-      });
-    },
+    onSuccess: async () => {},
     onError: (error) => {
       toast.error(`Error: ${error.message || "Failed to delete transaction"}`);
     },
@@ -146,6 +142,10 @@ export function TransactionForm({
       if (selected && selected?.id) {
         await deleteMutation.mutateAsync(selected.id);
       }
+
+      await queryClient.invalidateQueries({
+        queryKey: ["transaction", "loan", "statistic"],
+      });
 
       const recalculatedIds = new Set();
       if (

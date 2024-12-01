@@ -25,7 +25,7 @@ const MemberAction = () => {
 
   const onSuccess = async () => {
     await queryClient.invalidateQueries({
-      queryKey: ["member-details"],
+      queryKey: ["member"],
     });
     setIsOpen(false);
   };

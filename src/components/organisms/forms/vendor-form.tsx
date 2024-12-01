@@ -63,7 +63,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
       }),
     onSuccess: async (data: any) => {
       await queryClient.invalidateQueries({
-        queryKey: ["vendor-details", "accounts"],
+        queryKey: ["vendor"],
       });
 
       toast.success(

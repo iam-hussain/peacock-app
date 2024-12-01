@@ -39,12 +39,7 @@ async function verifyJwt(token: string, secretKey: string) {
 }
 
 export const config = {
-  matcher: [
-    "/api/action/:path*",
-    "/api/dashboard/:path*",
-    "/api/member/:path*",
-    "/api/vendor/:path*",
-  ], // Apply to all API routes
+  matcher: ["/api/:path*"], // Apply to all API routes
 };
 
 export function middleware(request: NextRequest) {

@@ -40,7 +40,7 @@ const ActionMenu = () => {
     mutationFn: () => fetcher.post("/api/action/recalculate"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["connection", "statistics"],
+        queryKey: ["statistic"],
       });
 
       toast.success("Returns are recalculated successfully.");
@@ -56,7 +56,7 @@ const ActionMenu = () => {
     mutationFn: () => fetcher.post("/api/action/recalculate/loan"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["connection", "statistics", "loans"],
+        queryKey: ["statistic", "loan"],
       });
 
       toast.success("Loans are recalculated successfully.");

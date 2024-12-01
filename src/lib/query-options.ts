@@ -29,7 +29,7 @@ export const fetchAuthStatus = () =>
 
 export const fetchMemberBySlug = (slug: string) =>
   queryOptions({
-    queryKey: ["member-details", "members", "member", "accounts", slug],
+    queryKey: ["member", "accounts", slug],
     queryFn: () =>
       fetcher(
         `/api/account/member/${slug}`
@@ -39,7 +39,7 @@ export const fetchMemberBySlug = (slug: string) =>
 
 export const fetchMembers = () =>
   queryOptions({
-    queryKey: ["member-details", "members", "accounts"],
+    queryKey: ["member", "account"],
     queryFn: () =>
       fetcher("/api/account/member") as unknown as GetMemberResponse,
     ...noRefetchConfigs,
@@ -47,7 +47,7 @@ export const fetchMembers = () =>
 
 export const fetchVendors = () =>
   queryOptions({
-    queryKey: ["vendor-details", "vendors", "accounts"],
+    queryKey: ["vendor", "account"],
     queryFn: () =>
       fetcher("/api/account/vendor") as unknown as GetVendorResponse,
     ...noRefetchConfigs,
@@ -55,14 +55,14 @@ export const fetchVendors = () =>
 
 export const fetchLoans = () =>
   queryOptions({
-    queryKey: ["loan-details", "loans", "accounts"],
+    queryKey: ["loan", "account"],
     queryFn: () => fetcher("/api/account/loan") as unknown as GetLoanResponse,
     ...noRefetchConfigs,
   });
 
 export const fetchAccountSelect = () =>
   queryOptions({
-    queryKey: ["account-select", "select", "accounts"],
+    queryKey: ["select", "account"],
     queryFn: () =>
       fetcher("/api/account/select") as never as TransformedAccountSelect[],
     ...noRefetchConfigs,
@@ -70,7 +70,7 @@ export const fetchAccountSelect = () =>
 
 export const fetchStatistics = () =>
   queryOptions({
-    queryKey: ["statistics", "connection"],
+    queryKey: ["statistic"],
     queryFn: () => fetcher("/api/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
@@ -88,7 +88,7 @@ export const fetchTransactions = (options: any) => {
   });
 
   return queryOptions({
-    queryKey: ["transaction", "fetch-transaction", "all-transaction", options],
+    queryKey: ["transaction", options],
     queryFn: () =>
       fetcher(
         `/api/transaction?${params.toString()}`
