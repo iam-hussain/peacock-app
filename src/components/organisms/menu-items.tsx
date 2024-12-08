@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaPiggyBank } from "react-icons/fa";
 import { FaPeopleGroup } from "react-icons/fa6";
+import { GoLaw } from "react-icons/go";
 import { HiBriefcase } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
@@ -62,7 +63,7 @@ const appMenus: Menu[] = [
     link: "/dashboard/transaction",
   },
   {
-    Icon: FaPiggyBank,
+    Icon: GoLaw,
     label: "Terms & Conditions",
     link: "/dashboard/terms-and-conditions",
   },
