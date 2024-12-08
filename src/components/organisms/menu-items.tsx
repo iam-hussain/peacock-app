@@ -61,6 +61,11 @@ const appMenus: Menu[] = [
     label: "Transactions",
     link: "/dashboard/transaction",
   },
+  {
+    Icon: FaPiggyBank,
+    label: "Terms & Conditions",
+    link: "/dashboard/terms-and-conditions",
+  },
 ];
 function MenuItems({
   onItemClick,

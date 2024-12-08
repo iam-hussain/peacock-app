@@ -10,7 +10,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import html2canvas from "html2canvas";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaCalculator } from "react-icons/fa";
 import { toast } from "sonner";
@@ -114,7 +113,6 @@ export type LoanTableProps = {
 };
 
 const LoanTable = () => {
-  const router = useRouter();
   const [editMode, setEditMode] = useState(false);
   const captureRef = useRef<HTMLDivElement>(null);
   const [captureMode, setCaptureMode] = useState(false);
