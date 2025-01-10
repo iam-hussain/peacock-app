@@ -66,6 +66,7 @@ function createFilters({
   transactionType,
   startDate,
   endDate,
+  sortField,
 }: any) {
   const filters: Record<string, any> = {};
   if (accountId && (!transactionType || transactionType === "FUNDS_TRANSFER")) {
@@ -80,7 +81,7 @@ function createFilters({
   }
   if (transactionType) {
     filters.transactionType = transactionType;
-    if (accountId) {
+    if (accountId && transactionType !== "FUNDS_TRANSFER") {
       if (
         [
           "PERIODIC_DEPOSIT",
@@ -103,10 +104,20 @@ function createFilters({
   }
 
   if (startDate && endDate)
-    filters.createdAt = {
-      gte: new Date(startDate),
-      lte: new Date(endDate),
-    };
+    if (
+      sortField &&
+      (sortField === "transactionAt" || sortField === "createdAt")
+    ) {
+      filters[sortField] = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    } else {
+      filters.createdAt = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    }
   return filters;
 }
 
