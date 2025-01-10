@@ -68,7 +68,7 @@ function createFilters({
   endDate,
 }: any) {
   const filters: Record<string, any> = {};
-  if (accountId)
+  if (accountId && (!transactionType || transactionType === "FUNDS_TRANSFER")) {
     filters.OR = [
       {
         fromId: accountId,
@@ -77,9 +77,33 @@ function createFilters({
         toId: accountId,
       },
     ];
-  if (transactionType) filters.transactionType = transactionType;
+  }
+  if (transactionType) {
+    filters.transactionType = transactionType;
+    if (accountId) {
+      if (
+        [
+          "PERIODIC_DEPOSIT",
+          "OFFSET_DEPOSIT",
+          "REJOIN",
+          "VENDOR_RETURNS",
+          "LOAN_REPAY",
+          "LOAN_INTEREST",
+        ].includes(transactionType)
+      ) {
+        filters.fromId = accountId;
+      }
+
+      if (
+        ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"].includes(transactionType)
+      ) {
+        filters.toId = accountId;
+      }
+    }
+  }
+
   if (startDate && endDate)
-    filters.transactionAt = {
+    filters.createdAt = {
       gte: new Date(startDate),
       lte: new Date(endDate),
     };
