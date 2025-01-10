@@ -34,6 +34,7 @@ export const PaginationFilters = ({
           ["30", "30/page"],
           ["40", "40/page"],
           ["50", "50/page"],
+          ["100", "100/page"],
         ]}
       />
       <Toggle
