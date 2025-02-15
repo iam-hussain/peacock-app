@@ -23,7 +23,12 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 import Typography from "../../ui/typography";
 
-import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
+import {
+  dateFormat,
+  displayDateTime,
+  fileDateTime,
+  newZoneDate,
+} from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
 import { cn } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
@@ -147,7 +152,7 @@ const editColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={dateFormat(new Date(row.original.startAt))}
+        label={dateFormat(newZoneDate(row.original.startAt))}
         subLabel={row.original.id}
       />
     ),

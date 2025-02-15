@@ -18,7 +18,7 @@ const fetcher = async (
       },
       ...(method !== "GET" ? { body: JSON.stringify(body) } : {}),
       next: { tags },
-      // cache: "no-store",
+      cache: "no-store",
     });
 
     const responseData = await response.json();

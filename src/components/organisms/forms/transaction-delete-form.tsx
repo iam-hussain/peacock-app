@@ -6,7 +6,7 @@ import { GenericModalFooter } from "../../atoms/generic-modal";
 
 import { TransformedTransaction } from "@/app/api/transaction/route";
 import { transactionTypeMap } from "@/lib/config";
-import { dateFormat } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { moneyFormat } from "@/lib/utils";
 
@@ -82,13 +82,13 @@ export function TransactionDeleteForm({
             <strong className="text-sm text-foreground/70 font-medium">
               Transaction Date:
             </strong>{" "}
-            {dateFormat(new Date(transaction.transactionAt))}
+            {dateFormat(newZoneDate(transaction.transactionAt))}
           </div>
           <div className="flex justify-between text-sm border-b">
             <strong className="text-sm text-foreground/70 font-medium">
               Created Date:
             </strong>{" "}
-            {dateFormat(new Date(transaction.createdAt))}
+            {dateFormat(newZoneDate(transaction.createdAt))}
           </div>
         </div>
       </div>

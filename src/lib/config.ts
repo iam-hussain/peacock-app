@@ -1,6 +1,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { TRANSACTION_TYPE } from "@prisma/client";
 
+import { newZoneDate } from "./date";
+
 type Stage = {
   name: string;
   amount: number;
@@ -11,22 +13,22 @@ type Stage = {
 const alpha: Stage = {
   name: "alpha",
   amount: 1000,
-  startDate: new Date("09/01/2020"),
-  endDate: new Date("09/01/2023"),
+  startDate: newZoneDate("09/01/2020"),
+  endDate: newZoneDate("09/01/2023"),
 };
 
 const bravo: Stage = {
   name: "bravo",
   amount: 2000,
-  startDate: new Date("08/31/2023"),
+  startDate: newZoneDate("08/31/2023"),
 };
 
 export const clubConfig = {
-  startedAt: new Date("09/01/2020"),
+  startedAt: newZoneDate("09/01/2020"),
   stages: [alpha, bravo],
   alpha,
   bravo,
-  dayInterestFrom: new Date("06/01/2024"),
+  dayInterestFrom: newZoneDate("06/01/2024"),
 };
 
 // Member Transaction Type Map

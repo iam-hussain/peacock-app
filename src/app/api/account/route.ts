@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { newZoneDate } from "@/lib/date";
 import { getDefaultPassbookData } from "@/lib/helper";
 
 export async function POST(request: Request) {
@@ -37,8 +38,8 @@ export async function POST(request: Request) {
       phone: phone ?? undefined,
       email: email ?? undefined,
       avatar: avatar ?? undefined,
-      startAt: new Date(startAt || new Date()),
-      endAt: endAt ? new Date(endAt) : undefined,
+      startAt: newZoneDate(startAt || undefined),
+      endAt: endAt ? newZoneDate(endAt) : undefined,
       active: active ?? true,
       isMember: isMember || false,
     };

@@ -28,6 +28,7 @@ import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
 import { Dialog } from "@/components/ui/dialog";
 import { transactionTypeMap } from "@/lib/config";
+import { newZoneDate } from "@/lib/date";
 import { fetchTransactions } from "@/lib/query-options";
 
 const baseColumns = (
@@ -105,7 +106,7 @@ const baseColumns = (
     cell: ({ row }) => (
       <CommonTableCell
         label={format(
-          new Date(row.original.transactionAt),
+          newZoneDate(row.original.transactionAt),
           "dd MMM yyyy hh:mm a"
         )}
       />
@@ -122,10 +123,13 @@ const baseColumns = (
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={format(new Date(row.original.createdAt), "dd MMM yyyy hh:mm a")}
+        label={format(
+          newZoneDate(row.original.createdAt),
+          "dd MMM yyyy hh:mm a"
+        )}
         subLabel={
           row.original.updatedAt !== row.original.createdAt
-            ? format(new Date(row.original.updatedAt), "dd MMM yyyy hh:mm a")
+            ? format(newZoneDate(row.original.updatedAt), "dd MMM yyyy hh:mm a")
             : undefined
         }
       />
@@ -148,7 +152,7 @@ const editColumns = (
     cell: ({ row }) => (
       <CommonTableCell
         label={format(
-          new Date(row.original.updatedAt || row.original.createdAt),
+          newZoneDate(row.original.updatedAt || row.original.createdAt),
           "dd MMM yyyy hh:mm a"
         )}
       />

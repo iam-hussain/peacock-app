@@ -2,6 +2,7 @@
 import { Transaction } from "@prisma/client";
 
 import prisma from "@/db";
+import { newZoneDate } from "@/lib/date";
 import {
   calculateInterestByAmount,
   initializePassbookToUpdate,
@@ -28,7 +29,7 @@ function fetchLoanTransaction(accountId?: string | null) {
 const getOneLoanDetails = (
   amount: number,
   start: Date | string,
-  end: Date | string = new Date()
+  end: Date | string = newZoneDate()
 ): LoanHistoryEntry => {
   const data = calculateInterestByAmount(amount, start, end);
   return {
@@ -58,7 +59,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
       prevLoan = {
         active: true,
         amount: accountBalance,
-        startDate: new Date(transactionAt),
+        startDate: newZoneDate(transactionAt),
         transactionType,
       };
     } else if (transactionType === "LOAN_REPAY") {
@@ -74,7 +75,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
         prevLoan = {
           active: true,
           amount: accountBalance,
-          startDate: new Date(transactionAt),
+          startDate: newZoneDate(transactionAt),
           transactionType,
         };
       }

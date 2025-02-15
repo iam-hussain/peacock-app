@@ -1,6 +1,6 @@
 import { Account, Passbook } from "@prisma/client";
 
-import { calculateMonthsDifference } from "@/lib/date";
+import { calculateMonthsDifference, newZoneDate } from "@/lib/date";
 import { calculateInterestByAmount } from "@/lib/helper";
 import { LoanHistoryEntry, MemberPassbookData } from "@/lib/type";
 
@@ -36,8 +36,8 @@ export function transformLoanForTable(vendorInput: ToTransform) {
     recentPassedString = monthsPassedString;
     return {
       ...loan,
-      startDate: new Date(loan.startDate).getTime(),
-      endDate: new Date(loan.endDate || new Date()).getTime(),
+      startDate: newZoneDate(loan.startDate).getTime(),
+      endDate: newZoneDate(loan.endDate || undefined).getTime(),
       totalInterestAmount,
       interestAmount,
       daysInMonth,
@@ -57,9 +57,12 @@ export function transformLoanForTable(vendorInput: ToTransform) {
     link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-    joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
+    joined: calculateMonthsDifference(
+      newZoneDate(),
+      newZoneDate(member.startAt)
+    ),
     startAt: loans.length
-      ? new Date(loans[loans.length - 1].startDate).getTime()
+      ? newZoneDate(loans[loans.length - 1].startDate).getTime()
       : 0,
     status: member.active ? "Active" : "Disabled",
     active: totalLoanBalance > 0,
@@ -122,7 +125,10 @@ export function membersTableTransform(
     link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
-    joined: calculateMonthsDifference(new Date(), new Date(member.startAt)),
+    joined: calculateMonthsDifference(
+      newZoneDate(),
+      newZoneDate(member.startAt)
+    ),
     startAt: member.startAt.getTime(),
     status: member.active ? "Active" : "Disabled",
     active: member.active,

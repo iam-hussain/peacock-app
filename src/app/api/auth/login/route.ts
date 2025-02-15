@@ -1,3 +1,4 @@
+import { newZoneDate } from "@/lib/date";
 import { serialize } from "cookie"; // To set cookies
 import { sign } from "jsonwebtoken"; // For generating JWTs
 import { revalidatePath } from "next/cache";
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
 
   // Generate JWT token (you can also use next-auth or other libraries)
   const token = sign(
-    { time: new Date().toDateString() },
+    { time: newZoneDate().toDateString() },
     process.env.JWT_SECRET!,
     { expiresIn: "1h" }
   );

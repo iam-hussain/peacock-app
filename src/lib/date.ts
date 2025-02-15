@@ -13,16 +13,56 @@ import { toZonedTime } from "date-fns-tz";
 
 const timeZone = "Asia/Kolkata";
 
+/**
+ * Creates a new date in the specified time zone, with or without time.
+ * @param {Date|string} date - The input date (can be a Date object or a date string).
+ * @param {boolean} [includeTime=true] - If true, includes the time; otherwise, sets time to 00:00:00.
+ * @returns {Date} - A new Date object in the specified time zone.
+ */
+export function newZoneDate(
+  date?: Date | string | number,
+  excludeTime?: boolean
+): Date {
+  // Convert the input date to a Date object if it's not already
+  const inputDate =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date || new Date();
+
+  // Check if the input date is already in the desired timezone
+  const isAlreadyIST =
+    Intl.DateTimeFormat().resolvedOptions().timeZone === timeZone;
+
+  // Convert the date to the specified time zone if it's not already in IST
+  const zonedDate = isAlreadyIST ? inputDate : toZonedTime(inputDate, timeZone);
+
+  // Extract the year, month, and day from the zoned date
+  const year = zonedDate.getFullYear();
+  const month = zonedDate.getMonth();
+  const day = zonedDate.getDate();
+
+  // If includeTime is true, include the time components; otherwise, set time to 00:00:00
+  if (excludeTime) {
+    return new Date(year, month, day);
+  }
+
+  const hours = zonedDate.getHours();
+  const minutes = zonedDate.getMinutes();
+  const seconds = zonedDate.getSeconds();
+  const milliseconds = zonedDate.getMilliseconds();
+  return new Date(year, month, day, hours, minutes, seconds, milliseconds);
+}
+
 export const calculateMonthsDifference = (
   a: Date,
-  b: Date | null = new Date()
+  b: Date | null = newZoneDate()
 ) => {
-  return Math.abs(differenceInCalendarMonths(a, b || new Date()));
+  return Math.abs(differenceInCalendarMonths(a, b || newZoneDate()));
 };
 
 export const clubAge = () => {
-  const current = new Date();
-  const clubStart = new Date("09/01/2020");
+  const current = newZoneDate();
+  const clubStart = newZoneDate("09/01/2020");
 
   // Calculate the difference in years, months, and days
   const years = differenceInYears(current, clubStart);
@@ -57,11 +97,11 @@ export const clubAge = () => {
 };
 
 export const dateFormat = (input: Date | number) => {
-  return format(new Date(input), "dd MMM yyyy");
+  return format(newZoneDate(input), "dd MMM yyyy");
 };
 
-export const displayDateTime = (input: Date = new Date()) => {
-  return format(new Date(input), "dd MMM yyyy hh:mm a");
+export const displayDateTime = (input: Date = newZoneDate()) => {
+  return format(newZoneDate(input), "dd MMM yyyy hh:mm a");
 };
 
 type DueDates = {
@@ -70,13 +110,13 @@ type DueDates = {
   monthsPassed: number;
 };
 
-export const fileDateTime = (input: Date = new Date()) => {
-  return format(new Date(input), "dd_mm_yy_HH_mm");
+export const fileDateTime = (input: Date = newZoneDate()) => {
+  return format(newZoneDate(input), "dd_mm_yy_HH_mm");
 };
 
-export const newDate = (input: any = new Date()) => {
+export const newDate = (input: any = newZoneDate()) => {
   // Parse the date string as a Date object
-  const parsedDate = parse(input, "MM/dd/yyyy", new Date());
+  const parsedDate = parse(input, "MM/dd/yyyy", newZoneDate());
 
   // Convert the parsed date to the specified time zone
   const zonedDate = toZonedTime(parsedDate, timeZone);
@@ -88,8 +128,8 @@ export const calculateTimePassed = (
   start: Date | string,
   end: Date | string
 ) => {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate(end);
   // Calculate total months
   const monthsPassed = differenceInMonths(endDate, startDate);
 
@@ -118,8 +158,8 @@ export const calculateDateDiff = (
   start: Date | string | number,
   end: Date | string | number
 ) => {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate(end);
   // Calculate total months
   const monthsPassed = differenceInMonths(endDate, startDate);
 
@@ -137,8 +177,8 @@ export const calculateDateDiff = (
 };
 
 export const memberMonthsPassedString = (start: Date | string) => {
-  const startDate = new Date(start);
-  const endDate = new Date();
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate();
   // Calculate total months
   const monthsPassed = differenceInMonths(endDate, startDate);
 

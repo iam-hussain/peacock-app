@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { transactionTypeHumanMap } from "@/lib/config";
+import { newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import {
   TransactionFormSchema,
@@ -68,9 +69,7 @@ export function TransactionForm({
           method: (selected.method as any) || "ACCOUNT",
           amount: selected.amount || 0,
           note: selected.note || "",
-          transactionAt: selected.transactionAt
-            ? new Date(selected.transactionAt)
-            : new Date(),
+          transactionAt: newZoneDate(selected.transactionAt || undefined),
         }
       : {
           fromId: "",
@@ -79,7 +78,7 @@ export function TransactionForm({
           method: "ACCOUNT",
           amount: 0,
           note: "",
-          transactionAt: new Date(),
+          transactionAt: newZoneDate(),
         },
   });
 

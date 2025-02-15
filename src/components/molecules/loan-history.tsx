@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "../ui/card";
 
-import { dateFormat } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/date";
 import { LoanHistoryEntry } from "@/lib/type";
 import { cn, moneyFormat } from "@/lib/utils";
 
@@ -65,7 +65,7 @@ export function LoanHistory({
                 <strong className="text-sm text-foreground/70 font-medium">
                   Start Date:
                 </strong>{" "}
-                {dateFormat(new Date(item.startDate))}
+                {dateFormat(newZoneDate(item.startDate))}
               </div>
               <div
                 className={cn("flex justify-between text-sm", {
@@ -76,7 +76,7 @@ export function LoanHistory({
                   End Date:
                 </strong>
                 {item.active ? "(Ongoing) - " : ""}
-                {dateFormat(new Date(item.endDate || new Date()))}
+                {dateFormat(newZoneDate(item.endDate || undefined))}
               </div>
               <div
                 className={cn("flex justify-between text-sm", {

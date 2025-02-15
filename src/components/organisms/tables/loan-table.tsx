@@ -25,7 +25,12 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "@/components/molecules/filter-bar-group";
 import { Button } from "@/components/ui/button";
 import Typography from "@/components/ui/typography";
-import { dateFormat, displayDateTime, fileDateTime } from "@/lib/date";
+import {
+  dateFormat,
+  displayDateTime,
+  fileDateTime,
+  newZoneDate,
+} from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { fetchLoans } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
@@ -54,7 +59,7 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
       <CommonTableCell
         label={
           row.original.totalLoanBalance > 0 && row.original.startAt
-            ? dateFormat(new Date(row.original.startAt))
+            ? dateFormat(newZoneDate(row.original.startAt))
             : "-"
         }
         subLabel={

@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { accountFormSchema, AccountFromSchema } from "@/lib/form-schema";
 
@@ -41,7 +42,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
           email: selected.email || "",
           avatar: selected.avatar || "",
           active: selected.active ?? true,
-          startAt: selected.startAt ? new Date(selected.startAt) : new Date(),
+          startAt: newZoneDate(selected.startAt || undefined),
           endAt: undefined,
         }
       : {
@@ -52,7 +53,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
           email: "",
           avatar: "",
           active: true,
-          startAt: new Date(),
+          startAt: newZoneDate(),
           endAt: undefined,
         },
   });

@@ -7,31 +7,31 @@ import {
 } from "date-fns";
 
 import { clubConfig } from "./config";
-import { calculateTimePassed } from "./date";
+import { calculateTimePassed, newZoneDate } from "./date";
 
 const getPeriodString = (months: number, days: number) => {
   return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;
 };
 
 const getNextDueDate = (start: string | Date, end?: string | Date | null) => {
-  const startDate = new Date(start);
+  const startDate = newZoneDate(start);
 
   // Calculate next due date if no end date is provided or the current date is before the end date
   let nextDueDate: Date | null = null;
-  const currentDate = new Date();
+  const currentDate = newZoneDate();
 
-  if (!end || isBefore(currentDate, new Date(end))) {
-    const monthsPassed = differenceInMonths(new Date(), startDate);
+  if (!end || isBefore(currentDate, newZoneDate(end))) {
+    const monthsPassed = differenceInMonths(newZoneDate(), startDate);
     nextDueDate = addMonths(startDate, monthsPassed + 1);
 
     // If the current date is after the now date, calculate the next due date
-    if (isAfter(new Date(), nextDueDate)) {
-      nextDueDate = new Date(addMonths(nextDueDate, 1));
+    if (isAfter(newZoneDate(), nextDueDate)) {
+      nextDueDate = newZoneDate(addMonths(nextDueDate, 1));
     }
 
     // If remaining time is less than a month, set endDate as the next due date
-    if (end && differenceInMonths(new Date(end), currentDate) === 0) {
-      nextDueDate = new Date(end);
+    if (end && differenceInMonths(newZoneDate(end), currentDate) === 0) {
+      nextDueDate = newZoneDate(end);
     }
   }
 
@@ -45,14 +45,14 @@ export const newLoanCalculator = (
   interestRate: number = 0.01
 ) => {
   // Input values
-  const startDate = new Date(start);
-  const endDate = end ? new Date(end) : new Date();
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate(end || undefined);
   const nextDueDate = getNextDueDate(start, end);
   const actualPassed = calculateTimePassed(startDate, endDate);
 
   const { monthsPassed, daysPassed } = calculateTimePassed(
     startDate,
-    nextDueDate || new Date()
+    nextDueDate || newZoneDate()
   );
 
   // Calculate interest for full months
@@ -93,8 +93,8 @@ export const legacyLoanCalculator = (
   interestRate: number = 0.01
 ) => {
   // Input values
-  const startDate = new Date(start);
-  const endDate = end ? new Date(end) : new Date();
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate(end || undefined);
 
   const { monthsPassed, daysPassed } = calculateTimePassed(startDate, endDate);
 
@@ -118,7 +118,8 @@ export const loanCalculator = (
   interestRate: number = 0.01
 ) => {
   if (
-    new Date(start).getTime() < new Date(clubConfig.dayInterestFrom).getTime()
+    newZoneDate(start).getTime() <
+    newZoneDate(clubConfig.dayInterestFrom).getTime()
   ) {
     return legacyLoanCalculator(amount, start, end, interestRate);
   }
@@ -130,8 +131,8 @@ export const chitCalculator = (
   end?: string | Date | null
 ) => {
   // Input values
-  const startDate = new Date(start);
-  const endDate = end ? new Date(end) : new Date();
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate(end || undefined);
 
   const { monthsPassed, daysPassed } = calculateTimePassed(startDate, endDate);
 

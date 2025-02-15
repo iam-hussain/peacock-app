@@ -1,5 +1,5 @@
 import { clubConfig } from "./config";
-import { calculateMonthsDifference } from "./date";
+import { calculateMonthsDifference, newZoneDate } from "./date";
 
 export function calculateMonthlyInterest(
   principal: number,
@@ -19,7 +19,7 @@ export const calculateMonthsPaid = (totalPaid: number): number => {
     const { amount, startDate, endDate } = stage;
 
     // Calculate the number of months in the current stage
-    const stageEndDate = endDate || new Date(); // Use current date if endDate is not provided
+    const stageEndDate = endDate || newZoneDate(); // Use current date if endDate is not provided
     const monthsInStage =
       calculateMonthsDifference(stageEndDate, startDate) + 1; // +1 to include the starting month
 
@@ -49,14 +49,14 @@ export const getClubTotalDepositUpToday = (membersCount: number): number => {
 };
 
 export const clubMonthsFromStart = () => {
-  return calculateMonthsDifference(new Date(), clubConfig.startedAt) + 1;
+  return calculateMonthsDifference(newZoneDate(), clubConfig.startedAt) + 1;
 };
 
 export const getMemberTotalDepositUpToday = () => {
   const values = clubConfig.stages.map((e) => {
     const diff = calculateMonthsDifference(
-      e?.endDate ? new Date(e.endDate) : new Date(),
-      new Date(e.startDate)
+      newZoneDate(e?.endDate || undefined),
+      newZoneDate(e.startDate)
     );
     return diff * e.amount;
   });

@@ -5,6 +5,7 @@ import {
   calculateDateDiff,
   calculateTimePassed,
   getMonthsPassedString,
+  newZoneDate,
 } from "./date";
 import {
   ClubPassbookData,
@@ -19,8 +20,8 @@ export const chitCalculator = (
   end?: string | Date | null
 ) => {
   // Input values
-  const startDate = new Date(start);
-  const endDate = end ? new Date(end) : new Date();
+  const startDate = newZoneDate(start);
+  const endDate = newZoneDate(end || undefined);
 
   const { nextStartDate, monthsPassed, daysPassed } = calculateTimePassed(
     startDate,
@@ -224,15 +225,13 @@ export const ONE_MONTH_RATE = 0.01;
 export function calculateInterestByAmount(
   amount: number,
   start: Date | string | number,
-  end: Date | string | number = new Date()
+  end: Date | string | number = newZoneDate()
 ) {
   const { monthsPassed, daysPassed, startDate, endDate, recentStartDate } =
     calculateDateDiff(start, end);
 
-  const daysInMonth = new Date(
-    recentStartDate.getFullYear(),
-    recentStartDate.getMonth() + 1,
-    0
+  const daysInMonth = newZoneDate(
+    new Date(recentStartDate.getFullYear(), recentStartDate.getMonth() + 1, 0)
   ).getDate();
 
   const interestForMonths = Number(

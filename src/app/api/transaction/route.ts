@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { newZoneDate } from "@/lib/date";
 
 type TransactionToTransform = Transaction & {
   from: AccountDetails;
@@ -109,13 +110,13 @@ function createFilters({
       (sortField === "transactionAt" || sortField === "createdAt")
     ) {
       filters[sortField] = {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
+        gte: newZoneDate(startDate),
+        lte: newZoneDate(endDate),
       };
     } else {
       filters.createdAt = {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
+        gte: newZoneDate(startDate),
+        lte: newZoneDate(endDate),
       };
     }
   return filters;
@@ -284,7 +285,7 @@ async function createTransaction({
       transactionType,
       method: method || "ACCOUNT",
       note: note ?? undefined,
-      transactionAt: new Date(transactionAt || new Date()),
+      transactionAt: newZoneDate(transactionAt || undefined),
       createdAt: createdAt || undefined,
     },
   });

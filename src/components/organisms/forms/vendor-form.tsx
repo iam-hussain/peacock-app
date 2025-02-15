@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { accountFormSchema, AccountFromSchema } from "@/lib/form-schema";
 
@@ -41,8 +42,8 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
           email: selected.email || "",
           avatar: selected.avatar || "",
           active: selected.active ?? true,
-          startAt: selected.startAt ? new Date(selected.startAt) : new Date(),
-          endAt: selected.endAt ? new Date(selected.endAt) : undefined,
+          startAt: newZoneDate(selected.startAt || undefined),
+          endAt: newZoneDate(selected.endAt || undefined),
         }
       : {
           firstName: "",
@@ -51,7 +52,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
           email: "",
           avatar: "",
           active: true,
-          startAt: new Date(),
+          startAt: newZoneDate(),
           endAt: undefined,
         },
   });
