@@ -11,7 +11,7 @@ const fetcher = async (
     method = "GET",
     header = {},
     body = {},
-    tags = ["api"],
+    // tags = ["api"],
   } = options || {};
 
   try {
@@ -22,7 +22,7 @@ const fetcher = async (
         ...header,
       },
       ...(method !== "GET" ? { body: JSON.stringify(body) } : {}),
-      next: { tags, revalidate: 30 },
+      next: { revalidate: 1 },
       cache: "no-store",
     });
 
