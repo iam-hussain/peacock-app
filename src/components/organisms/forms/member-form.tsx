@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { nanoid } from "@reduxjs/toolkit";
 import { useMutation } from "@tanstack/react-query";
+import { nanoid } from "nanoid";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
