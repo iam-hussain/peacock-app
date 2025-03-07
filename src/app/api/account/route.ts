@@ -1,4 +1,4 @@
-import { nanoid } from "@reduxjs/toolkit";
+import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
@@ -56,8 +56,8 @@ export async function POST(request: Request) {
     // Create a new member
     await prisma.account.create({
       data: {
-        slug: nanoid(8),
         ...(commonData as any),
+        slug: nanoid(8),
         passbook: {
           create: {
             type: isMember ? "MEMBER" : "VENDOR",
