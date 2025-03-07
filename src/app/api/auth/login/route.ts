@@ -1,6 +1,6 @@
 import { serialize } from "cookie"; // To set cookies
 import { sign } from "jsonwebtoken"; // For generating JWTs
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { newZoneDate } from "@/lib/date";
@@ -34,6 +34,7 @@ export async function POST(request: Request) {
   });
 
   revalidatePath("*");
+  revalidateTag("api");
 
   const response = NextResponse.json({ message: "Login successful" });
   response.headers.set("Set-Cookie", cookie);

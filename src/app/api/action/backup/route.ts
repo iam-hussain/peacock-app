@@ -1,4 +1,5 @@
 import fs from "fs";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import path from "path";
 
@@ -7,6 +8,7 @@ import { clearCache } from "@/lib/cache";
 import { fileDateTime } from "@/lib/date";
 
 export async function POST() {
+  revalidateTag("api");
   try {
     clearCache();
     // Fetch all data from Prisma models

@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { clearCache } from "@/lib/cache";
@@ -17,6 +17,7 @@ export async function POST(
     const passbooks = await recalculateMemberLoanById(memberId);
     const updated = await bulkPassbookUpdate(passbooks);
     revalidatePath("*");
+    revalidateTag("api");
     return NextResponse.json(
       { message: "Member loan updated successfully.", updated },
       { status: 200 }

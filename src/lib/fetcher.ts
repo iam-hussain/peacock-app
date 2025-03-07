@@ -7,7 +7,12 @@ const fetcher = async (
   path: string,
   options?: FetcherPropsOptions
 ): Promise<any> => {
-  const { method = "GET", header = {}, body = {}, tags = [] } = options || {};
+  const {
+    method = "GET",
+    header = {},
+    body = {},
+    tags = ["api"],
+  } = options || {};
 
   try {
     const response = await fetch(path, {

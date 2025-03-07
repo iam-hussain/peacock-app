@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
@@ -71,6 +71,7 @@ export async function POST(request: Request) {
     });
 
     revalidatePath("*");
+    revalidateTag("api");
     return NextResponse.json({ account: commonData }, { status: 200 });
   } catch (error) {
     console.error("Error creating/updating member:", error);

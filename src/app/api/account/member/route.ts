@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { getMemberTotalDepositUpToday } from "@/lib/club";
@@ -9,6 +10,8 @@ import {
 } from "@/transformers/account";
 
 export async function GET() {
+  revalidateTag("api");
+
   const [members, club, vendorsPass] = await Promise.all([
     prisma.account.findMany({
       where: {
