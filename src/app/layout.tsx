@@ -1,3 +1,4 @@
+export const fetchCache = "force-no-store";
 import type { Metadata } from "next";
 
 import "../styles/globals.css";
