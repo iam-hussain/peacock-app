@@ -22,7 +22,7 @@ const fetcher = async (
         ...header,
       },
       ...(method !== "GET" ? { body: JSON.stringify(body) } : {}),
-      next: { revalidate: 1 },
+      next: { revalidate: 0 },
       cache: "no-store",
     });
 

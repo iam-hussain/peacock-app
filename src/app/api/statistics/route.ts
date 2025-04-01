@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 import { $Enums, Account } from "@prisma/client";
 import { NextResponse } from "next/server";
 
