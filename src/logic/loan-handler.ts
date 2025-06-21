@@ -5,15 +5,9 @@ import prisma from "@/db";
 import { newZoneDate } from "@/lib/date";
 import {
   calculateInterestByAmount,
-  initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import {
-  ClubPassbookData,
-  LoanHistoryEntry,
-  MemberPassbookData,
-  PassbookToUpdate,
-} from "@/lib/type";
+import { LoanHistoryEntry, PassbookToUpdate } from "@/lib/type";
 
 export function fetchLoanTransaction(accountId?: string | null) {
   return prisma.transaction.findMany({

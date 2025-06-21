@@ -1,6 +1,11 @@
 import { Transaction } from "@prisma/client";
 
 import {
+  calculateLoansHandler,
+  fetchLoanTransaction,
+  resetMemberLoanPassbookData,
+} from "./loan-handler";
+import {
   PassbookConfigAction,
   PassbookConfigActionValue,
   transactionPassbookSettings,
@@ -13,11 +18,6 @@ import {
   setPassbookUpdateQuery,
 } from "@/lib/helper";
 import { MemberPassbookData } from "@/lib/type";
-import {
-  calculateLoansHandler,
-  fetchLoanTransaction,
-  resetMemberLoanPassbookData,
-} from "./loan-handler";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;

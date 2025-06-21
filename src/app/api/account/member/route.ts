@@ -7,7 +7,12 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { getMemberTotalDepositUpToday } from "@/lib/club";
-import { ClubPassbookData, VendorPassbookData } from "@/lib/type";
+import { calculateInterestByAmount } from "@/lib/helper";
+import {
+  ClubPassbookData,
+  LoanHistoryEntry,
+  VendorPassbookData,
+} from "@/lib/type";
 import {
   membersTableTransform,
   TransformedMember,
@@ -53,12 +58,41 @@ export async function POST() {
 
   const totalReturnAmount = availableProfitAmount / activeMembersCount;
 
+  // Calculate total interest amount from all members' loan histories
+  const totalInterestAmount = members.reduce((sum, member) => {
+    const loanHistory = (member.passbook.loanHistory ||
+      []) as LoanHistoryEntry[];
+    return (
+      sum +
+      loanHistory.reduce((acc, entry) => {
+        const { interestAmount } = calculateInterestByAmount(
+          entry.amount,
+          entry.startDate,
+          entry?.endDate
+        );
+        return acc + interestAmount;
+      }, 0)
+    );
+  }, 0);
+
+  const totalInterestBalance = totalInterestAmount - clubData.totalInterestPaid;
+  const memberExpectedLoanProfit =
+    activeMembersCount > 0 ? totalInterestBalance / activeMembersCount : 0;
+
   const transformedMembers = members
     .map((each) =>
-      membersTableTransform(each, memberTotalDeposit, totalReturnAmount)
+      membersTableTransform(
+        each,
+        memberTotalDeposit,
+        activeMembersCount > 0 ? totalReturnAmount : 0,
+        memberExpectedLoanProfit
+      )
     )
-    .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.active > b.active ? -1 : 1));
+    .sort((a, b) => {
+      // Sort active first, then by name
+      if (a.active !== b.active) return a.active ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
 
   return NextResponse.json({ members: transformedMembers });
 }

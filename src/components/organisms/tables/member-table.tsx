@@ -110,6 +110,10 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
           style: "currency",
           currency: "INR",
         })}
+        subLabel={row.original.expectedReturnAmount.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+        })}
       />
     ),
   },

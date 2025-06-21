@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
   getCoreRowModel,
@@ -10,20 +10,16 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import html2canvas from "html2canvas";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { FaCalculator } from "react-icons/fa";
-import { toast } from "sonner";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   ActionTableHeader,
   AvatarCell,
   CommonTableCell,
-  PlainTableHeader,
 } from "../../atoms/table-component";
 import TableLayout from "../../atoms/table-layout";
 
 import { FilterBar } from "@/components/molecules/filter-bar-group";
-import { Button } from "@/components/ui/button";
 import Typography from "@/components/ui/typography";
 import {
   dateFormat,
@@ -31,7 +27,6 @@ import {
   fileDateTime,
   newZoneDate,
 } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
 import { fetchLoans } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
 import { TransformedLoan } from "@/transformers/account";
