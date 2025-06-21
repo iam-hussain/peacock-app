@@ -1,5 +1,4 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { Transaction } from "@prisma/client";
 
 import { calculateLoansHandler } from "./loan-middleware";
 import { updatePassbookByTransaction } from "./transaction-handler";
