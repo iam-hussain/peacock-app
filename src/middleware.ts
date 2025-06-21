@@ -63,13 +63,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  console.log("Middleware triggered for:", request.url);
   // Token Validation for Protected Methods and Paths
   const path = request.nextUrl.pathname;
   const isProtectedPath = matcher.includes(path);
-
-  console.log("Is protected path:", isProtectedPath);
-  console.log("Request method:", request.nextUrl.pathname);
 
   if (isProtectedPath && ["POST", "PUT", "DELETE"].includes(request.method)) {
     const token = request.cookies.get("token")?.value;
