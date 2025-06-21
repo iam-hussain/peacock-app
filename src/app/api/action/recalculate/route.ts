@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { resetAllTransactionMiddlewareHandler } from "@/logic/middleware";
+import { resetAllTransactionMiddlewareHandler } from "@/logic/reset-handler";
 
 export async function POST() {
   try {

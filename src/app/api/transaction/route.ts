@@ -3,11 +3,11 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { Transaction } from "@prisma/client";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { newZoneDate } from "@/lib/date";
+import { clubData } from "@/lib/config";
 
 type TransactionToTransform = Transaction & {
   from: AccountDetails;
@@ -23,7 +23,7 @@ type AccountDetails = {
   isMember: boolean;
 };
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   const queryParams = getQueryParams(request.url);
   const filters = createFilters(queryParams);
 
@@ -35,7 +35,9 @@ export async function GET(request: Request) {
       queryParams.sortField,
       queryParams.sortOrder
     );
-    const totalTransactions = await getTotalTransactions(filters);
+    const totalTransactions = await prisma.transaction.count({
+      where: filters,
+    });
 
     return NextResponse.json({
       transactions: transactions.map(transactionTableTransform),
@@ -75,14 +77,7 @@ function createFilters({
 }: any) {
   const filters: Record<string, any> = {};
   if (accountId && (!transactionType || transactionType === "FUNDS_TRANSFER")) {
-    filters.OR = [
-      {
-        fromId: accountId,
-      },
-      {
-        toId: accountId,
-      },
-    ];
+    filters.OR = [{ fromId: accountId }, { toId: accountId }];
   }
   if (transactionType) {
     filters.transactionType = transactionType;
@@ -126,14 +121,14 @@ function createFilters({
   return filters;
 }
 
-async function fetchTransactions(
+function fetchTransactions(
   filters: any,
   page: number,
   limit: number,
   sortField: string,
   sortOrder: string
 ) {
-  return await prisma.transaction.findMany({
+  return prisma.transaction.findMany({
     where: filters,
     skip: (page - 1) * limit,
     take: limit,
@@ -162,11 +157,6 @@ async function fetchTransactions(
     },
   });
 }
-
-async function getTotalTransactions(filters: any) {
-  return await prisma.transaction.count({ where: filters });
-}
-const clubData = { sub: "Peacock Club", avatar: "/peacock_cash.png" };
 
 function transactionTableTransform(transaction: TransactionToTransform) {
   const fromName = `${transaction.from.firstName || ""} ${transaction.from.lastName || ""}`;
@@ -223,10 +213,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
     updated.to.avatar = clubData.avatar;
   }
 
-  return {
-    ...transaction,
-    ...updated,
-  };
+  return { ...transaction, ...updated };
 }
 
 export type GetTransactionResponse = {
@@ -235,66 +222,6 @@ export type GetTransactionResponse = {
   page: number;
   totalPages: number;
 };
-
-export async function POST(request: Request) {
-  try {
-    const {
-      createdAt,
-      transactionAt,
-      fromId,
-      toId,
-      amount,
-      transactionType,
-      method,
-      note,
-    } = await request.json();
-
-    const transaction = await createTransaction({
-      fromId,
-      toId,
-      amount,
-      transactionType,
-      method,
-      note,
-      transactionAt,
-      createdAt,
-    });
-
-    revalidatePath("*");
-    revalidateTag("api");
-    return NextResponse.json({ success: true, transaction }, { status: 201 });
-  } catch (error) {
-    console.error("Failed to create transaction", error);
-    return NextResponse.json(
-      { error: "Failed to create transaction" },
-      { status: 500 }
-    );
-  }
-}
-
-async function createTransaction({
-  fromId,
-  toId,
-  amount,
-  transactionType,
-  method,
-  note,
-  transactionAt,
-  createdAt,
-}: Transaction | any) {
-  return await prisma.transaction.create({
-    data: {
-      fromId,
-      toId,
-      amount: amount,
-      transactionType,
-      method: method || "ACCOUNT",
-      note: note ?? undefined,
-      transactionAt: newZoneDate(transactionAt || undefined),
-      createdAt: createdAt || undefined,
-    },
-  });
-}
 
 export type TransformedTransaction = ReturnType<
   typeof transactionTableTransform

@@ -11,7 +11,7 @@ import fetcher from "@/lib/fetcher";
 
 const BaseActionMenu = () => {
   const catchMutation = useMutation({
-    mutationFn: () => fetcher.get("/api/action/catch"),
+    mutationFn: () => fetcher.post("/api/action/catch"),
     onSuccess: async () => {
       toast.success("Catch cleared successfully. ✅");
     },

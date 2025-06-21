@@ -4,7 +4,7 @@
 import { Column } from "@tanstack/react-table";
 import React from "react";
 import { FaSortAmountDown, FaSortAmountDownAlt } from "react-icons/fa";
-import { LuClipboardEdit } from "react-icons/lu";
+import { LuClipboardPenLine } from "react-icons/lu";
 
 import { AvatarGroup } from "./avatar-group";
 
@@ -25,14 +25,11 @@ type AvatarCellProps = {
 
 export const ActionCell = ({ onClick }: ActionCellProps) => (
   <Button variant={"ghost"} className="px-3 py-1" onClick={onClick}>
-    <LuClipboardEdit className="h-4 w-4" />
+    <LuClipboardPenLine className="h-4 w-4" />
   </Button>
 );
 
-type TableHeaderProps = {
-  label: string;
-  className?: string;
-};
+type TableHeaderProps = { label: string; className?: string };
 
 export const ActionTableHeader = ({
   label,
@@ -149,9 +146,7 @@ export const CommonTableCell = ({
   </div>
 );
 
-type ActionCellProps = {
-  onClick: () => void;
-};
+type ActionCellProps = { onClick: () => void };
 
 export const PaginationControls = ({
   page,

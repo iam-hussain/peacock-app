@@ -7,7 +7,11 @@ import {
 } from "./settings";
 
 import prisma from "@/db";
-import { setPassbookUpdateQuery } from "@/lib/helper";
+import {
+  bulkPassbookUpdate,
+  initializePassbookToUpdate,
+  setPassbookUpdateQuery,
+} from "@/lib/helper";
 import { MemberPassbookData } from "@/lib/type";
 
 type PassbookConfigActionValueMap = {
@@ -40,12 +44,26 @@ function getPassbookUpdateQuery(
   });
 }
 
+const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
+  return prisma.passbook.findMany({
+    where: {
+      OR: [{ account: { id: { in: [fromId, toId] } } }, { type: "CLUB" }],
+    },
+    select: {
+      id: true,
+      type: true,
+      payload: true,
+      account: { select: { id: true } },
+    },
+  });
+};
+
 type PassbookToUpdate = Map<
   string,
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
-export const transactionMiddleware = (
+export const updatePassbookByTransaction = (
   passbookToUpdate: PassbookToUpdate,
   transaction: Transaction,
   isRevert: Boolean = false
@@ -59,6 +77,7 @@ export const transactionMiddleware = (
   const values: PassbookConfigActionValueMap = {
     AMOUNT: transaction.amount,
     DEPOSIT_DIFF: 0,
+    TOTAL: transaction.amount,
   };
 
   if (transaction.transactionType === "WITHDRAW" && !isRevert) {
@@ -117,10 +136,7 @@ export const transactionMiddleware = (
           if (currentPassbook) {
             let currentAction = action;
             if (isRevert) {
-              currentAction = {
-                ADD: action.SUB,
-                SUB: action.ADD,
-              };
+              currentAction = { ADD: action.SUB, SUB: action.ADD };
             }
             passbookToUpdate.set(
               transactionPassbooks[passbookOf],
@@ -134,3 +150,18 @@ export const transactionMiddleware = (
 
   return passbookToUpdate;
 };
+
+export async function transactionEntryHandler(
+  created: Transaction,
+  isDelete: boolean = false
+) {
+  const passbooks = await getTractionPassbook(created);
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
+
+  passbookToUpdate = updatePassbookByTransaction(
+    passbookToUpdate,
+    created,
+    isDelete
+  );
+  return bulkPassbookUpdate(passbookToUpdate);
+}

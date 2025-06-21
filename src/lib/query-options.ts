@@ -21,9 +21,7 @@ export const fetchAuthStatus = () =>
   queryOptions({
     queryKey: ["authentication"],
     queryFn: () =>
-      fetcher("/api/auth/status") as never as {
-        isLoggedIn: boolean;
-      },
+      fetcher.post("/api/auth/status") as never as { isLoggedIn: boolean },
     ...noRefetchConfigs,
   });
 
@@ -31,7 +29,7 @@ export const fetchMemberBySlug = (slug: string) =>
   queryOptions({
     queryKey: ["member", "accounts", slug],
     queryFn: () =>
-      fetcher(
+      fetcher.post(
         `/api/account/member/${slug}`
       ) as unknown as GetMemberBySlugResponse,
     ...noRefetchConfigs,
@@ -41,7 +39,7 @@ export const fetchMembers = () =>
   queryOptions({
     queryKey: ["member", "account"],
     queryFn: () =>
-      fetcher("/api/account/member") as unknown as GetMemberResponse,
+      fetcher.post("/api/account/member") as unknown as GetMemberResponse,
     ...noRefetchConfigs,
   });
 
@@ -49,14 +47,15 @@ export const fetchVendors = () =>
   queryOptions({
     queryKey: ["vendor", "account"],
     queryFn: () =>
-      fetcher("/api/account/vendor") as unknown as GetVendorResponse,
+      fetcher.post("/api/account/vendor") as unknown as GetVendorResponse,
     ...noRefetchConfigs,
   });
 
 export const fetchLoans = () =>
   queryOptions({
     queryKey: ["loan", "account"],
-    queryFn: () => fetcher("/api/account/loan") as unknown as GetLoanResponse,
+    queryFn: () =>
+      fetcher.post("/api/account/loan") as unknown as GetLoanResponse,
     ...noRefetchConfigs,
   });
 
@@ -64,14 +63,17 @@ export const fetchAccountSelect = () =>
   queryOptions({
     queryKey: ["select", "account"],
     queryFn: () =>
-      fetcher("/api/account/select") as never as TransformedAccountSelect[],
+      fetcher.post(
+        "/api/account/select"
+      ) as never as TransformedAccountSelect[],
     ...noRefetchConfigs,
   });
 
 export const fetchStatistics = () =>
   queryOptions({
     queryKey: ["statistic"],
-    queryFn: () => fetcher("/api/statistics") as never as GetStatisticsResponse,
+    queryFn: () =>
+      fetcher.post("/api/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
   });
 
@@ -90,7 +92,7 @@ export const fetchTransactions = (options: any) => {
   return queryOptions({
     queryKey: ["transaction", options],
     queryFn: () =>
-      fetcher(
+      fetcher.post(
         `/api/transaction?${params.toString()}`
       ) as unknown as GetTransactionResponse,
     ...noRefetchConfigs,

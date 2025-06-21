@@ -17,10 +17,7 @@ const fetcher = async (
   try {
     const response = await fetch(path, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        ...header,
-      },
+      headers: { "Content-Type": "application/json", ...header },
       ...(method !== "GET" ? { body: JSON.stringify(body) } : {}),
       next: { revalidate: 0 },
       cache: "no-store",

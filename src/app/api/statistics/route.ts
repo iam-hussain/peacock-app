@@ -28,13 +28,11 @@ type StatMemberPassbook = {
   delayOffset: number;
 };
 
-export async function GET() {
+export async function POST() {
   try {
     const [passbooks, members, vendorsPass] = await Promise.all([
       prisma.passbook.findMany({
-        where: {
-          type: { in: ["CLUB", "MEMBER"] },
-        },
+        where: { type: { in: ["CLUB", "MEMBER"] } },
         select: {
           type: true,
           loanHistory: true,
@@ -43,19 +41,10 @@ export async function GET() {
           delayOffset: true,
         },
       }),
-      prisma.account.findMany({
-        where: {
-          isMember: true,
-          active: true,
-        },
-      }),
+      prisma.account.findMany({ where: { isMember: true, active: true } }),
       prisma.passbook.findMany({
-        where: {
-          type: "VENDOR",
-        },
-        select: {
-          payload: true,
-        },
+        where: { type: "VENDOR" },
+        select: { payload: true },
       }),
     ]);
 

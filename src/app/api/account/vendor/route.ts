@@ -9,18 +9,12 @@ import prisma from "@/db";
 import { chitCalculator } from "@/lib/helper";
 import { VendorPassbookData } from "@/lib/type";
 
-type VendorToTransform = Account & {
-  passbook: Passbook;
-};
+type VendorToTransform = Account & { passbook: Passbook };
 
-export async function GET() {
+export async function POST() {
   const vendors = await prisma.account.findMany({
-    where: {
-      isMember: false,
-    },
-    include: {
-      passbook: true,
-    },
+    where: { isMember: false },
+    include: { passbook: true },
   });
 
   const transformedVendors = vendors
@@ -28,9 +22,7 @@ export async function GET() {
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
-  return NextResponse.json({
-    vendors: transformedVendors,
-  });
+  return NextResponse.json({ vendors: transformedVendors });
 }
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
@@ -41,10 +33,7 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
   const statusData: {
     nextDueDate: number | null;
     monthsPassedString: string | null;
-  } = {
-    nextDueDate: null,
-    monthsPassedString: null,
-  };
+  } = { nextDueDate: null, monthsPassedString: null };
 
   if (vendor.active) {
     const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
@@ -68,8 +57,6 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
   };
 }
 
-export type GetVendorResponse = {
-  vendors: TransformedVendor[];
-};
+export type GetVendorResponse = { vendors: TransformedVendor[] };
 
 export type TransformedVendor = ReturnType<typeof transformVendorForTable>;

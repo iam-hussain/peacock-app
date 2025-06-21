@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 import ActionMenu from "../molecules/action-menu";
-import BaseActionMenu from "../molecules/base-action-menu";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
@@ -29,39 +28,14 @@ import fetcher from "@/lib/fetcher";
 import { RootState } from "@/store";
 import { setIsLoggedIn } from "@/store/pageSlice";
 
-type Menu = {
-  Icon: IconType;
-  label: string;
-  active?: boolean;
-  link?: string;
-};
+type Menu = { Icon: IconType; label: string; active?: boolean; link?: string };
 
 const appMenus: Menu[] = [
-  {
-    Icon: TbLayoutDashboardFilled,
-    label: "Dashboard",
-    link: "/dashboard",
-  },
-  {
-    Icon: FaPeopleGroup,
-    label: "Members",
-    link: "/dashboard/member",
-  },
-  {
-    Icon: HiBriefcase,
-    label: "Vendors",
-    link: "/dashboard/vendor",
-  },
-  {
-    Icon: RiFolderTransferFill,
-    label: "Loans",
-    link: "/dashboard/loan",
-  },
-  {
-    Icon: FaPiggyBank,
-    label: "Transactions",
-    link: "/dashboard/transaction",
-  },
+  { Icon: TbLayoutDashboardFilled, label: "Dashboard", link: "/dashboard" },
+  { Icon: FaPeopleGroup, label: "Members", link: "/dashboard/member" },
+  { Icon: HiBriefcase, label: "Vendors", link: "/dashboard/vendor" },
+  { Icon: RiFolderTransferFill, label: "Loans", link: "/dashboard/loan" },
+  { Icon: FaPiggyBank, label: "Transactions", link: "/dashboard/transaction" },
   {
     Icon: GoLaw,
     label: "Terms & Conditions",
@@ -90,9 +64,7 @@ function MenuItems({
   const mutation = useMutation({
     mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["authentication"],
-      });
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
 
       dispatch(setIsLoggedIn(false));
       toast.success("Logged out successfully!");
@@ -144,11 +116,6 @@ function MenuItems({
               <Icon className="h-5 w-5" /> {each.label}
             </CustomLink>
           ))}
-
-          <>
-            <Separator className="my-2" />
-            <BaseActionMenu />
-          </>
 
           {isLoggedIn && (
             <>

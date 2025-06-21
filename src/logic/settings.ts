@@ -51,7 +51,7 @@ export type PassbookConfigAction = {
   };
 };
 
-export type PassbookConfigActionValue = "AMOUNT" | "DEPOSIT_DIFF";
+export type PassbookConfigActionValue = "AMOUNT" | "DEPOSIT_DIFF" | "TOTAL";
 
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
@@ -89,160 +89,78 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     },
   },
   WITHDRAW: {
-    FROM: { SUB: { clubHeldAmount: "AMOUNT" } },
+    FROM: { SUB: { clubHeldAmount: "TOTAL" } },
     TO: {
       ADD: {
         withdrawalAmount: "AMOUNT",
         profitWithdrawalAmount: "DEPOSIT_DIFF",
       },
-      SUB: {
-        accountBalance: "AMOUNT",
-      },
+      SUB: { accountBalance: "TOTAL" },
     },
     CLUB: {
       ADD: {
         totalMemberWithdrawals: "AMOUNT",
         totalMemberProfitWithdrawals: "DEPOSIT_DIFF",
       },
-      SUB: {
-        currentClubBalance: "AMOUNT",
-        netClubBalance: "AMOUNT",
-      },
+      SUB: { currentClubBalance: "TOTAL", netClubBalance: "TOTAL" },
     },
   },
   REJOIN: {
     FROM: {
       SUB: { withdrawalAmount: "AMOUNT" },
-      ADD: {
-        accountBalance: "AMOUNT",
-      },
+      ADD: { accountBalance: "AMOUNT" },
     },
     TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
-      ADD: {
-        currentClubBalance: "AMOUNT",
-        netClubBalance: "AMOUNT",
-      },
+      ADD: { currentClubBalance: "AMOUNT", netClubBalance: "AMOUNT" },
       SUB: { totalMemberWithdrawals: "AMOUNT" },
     },
   },
   FUNDS_TRANSFER: {
-    FROM: {
-      SUB: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
-    TO: {
-      ADD: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
+    FROM: { SUB: { clubHeldAmount: "AMOUNT" } },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {},
   },
   VENDOR_INVEST: {
-    FROM: {
-      SUB: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
-    TO: {
-      ADD: {
-        totalInvestment: "AMOUNT",
-        accountBalance: "AMOUNT",
-      },
-    },
+    FROM: { SUB: { clubHeldAmount: "AMOUNT" } },
+    TO: { ADD: { totalInvestment: "AMOUNT", accountBalance: "AMOUNT" } },
     CLUB: {
-      ADD: {
-        totalInvestment: "AMOUNT",
-      },
-      SUB: {
-        currentClubBalance: "AMOUNT",
-      },
+      ADD: { totalInvestment: "AMOUNT" },
+      SUB: { currentClubBalance: "AMOUNT" },
     },
   },
   VENDOR_RETURNS: {
     FROM: {
-      ADD: {
-        totalReturns: "AMOUNT",
-      },
-      SUB: {
-        accountBalance: "AMOUNT",
-      },
+      ADD: { totalReturns: "AMOUNT" },
+      SUB: { accountBalance: "AMOUNT" },
     },
-    TO: {
-      ADD: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
-    CLUB: {
-      ADD: {
-        currentClubBalance: "AMOUNT",
-        totalReturns: "AMOUNT",
-      },
-    },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
+    CLUB: { ADD: { currentClubBalance: "AMOUNT", totalReturns: "AMOUNT" } },
   },
   LOAN_TAKEN: {
-    FROM: {
-      SUB: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
-    TO: {
-      ADD: {
-        totalLoanBalance: "AMOUNT",
-        totalLoanTaken: "AMOUNT",
-      },
-    },
+    FROM: { SUB: { clubHeldAmount: "AMOUNT" } },
+    TO: { ADD: { totalLoanBalance: "AMOUNT", totalLoanTaken: "AMOUNT" } },
     CLUB: {
-      ADD: {
-        totalLoanBalance: "AMOUNT",
-        totalLoanTaken: "AMOUNT",
-      },
-      SUB: {
-        currentClubBalance: "AMOUNT",
-      },
+      ADD: { totalLoanBalance: "AMOUNT", totalLoanTaken: "AMOUNT" },
+      SUB: { currentClubBalance: "AMOUNT" },
     },
   },
   LOAN_REPAY: {
     FROM: {
-      ADD: {
-        totalLoanRepay: "AMOUNT",
-      },
-      SUB: {
-        totalLoanBalance: "AMOUNT",
-      },
+      ADD: { totalLoanRepay: "AMOUNT" },
+      SUB: { totalLoanBalance: "AMOUNT" },
     },
-    TO: {
-      ADD: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
-      ADD: {
-        totalLoanRepay: "AMOUNT",
-        currentClubBalance: "AMOUNT",
-      },
-      SUB: {
-        totalLoanBalance: "AMOUNT",
-      },
+      ADD: { totalLoanRepay: "AMOUNT", currentClubBalance: "AMOUNT" },
+      SUB: { totalLoanBalance: "AMOUNT" },
     },
   },
   LOAN_INTEREST: {
-    FROM: {
-      ADD: {
-        totalInterestPaid: "AMOUNT",
-      },
-    },
-    TO: {
-      ADD: {
-        clubHeldAmount: "AMOUNT",
-      },
-    },
+    FROM: { ADD: { totalInterestPaid: "AMOUNT" } },
+    TO: { ADD: { clubHeldAmount: "AMOUNT" } },
     CLUB: {
-      ADD: {
-        totalInterestPaid: "AMOUNT",
-        currentClubBalance: "AMOUNT",
-      },
+      ADD: { totalInterestPaid: "AMOUNT", currentClubBalance: "AMOUNT" },
     },
   },
 };

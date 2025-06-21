@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 
 import { clearCache } from "@/lib/cache";
 
-export async function GET() {
+export async function POST() {
   try {
     // Reset cache after an update
     clearCache();

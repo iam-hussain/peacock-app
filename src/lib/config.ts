@@ -3,12 +3,7 @@ import { TRANSACTION_TYPE } from "@prisma/client";
 
 import { newZoneDate } from "./date";
 
-type Stage = {
-  name: string;
-  amount: number;
-  startDate: Date;
-  endDate?: Date;
-};
+type Stage = { name: string; amount: number; startDate: Date; endDate?: Date };
 
 const alpha: Stage = {
   name: "alpha",
@@ -119,3 +114,5 @@ export const transactionTypeHumanMap: { [key in TRANSACTION_TYPE]: string } = {
   LOAN_REPAY: "Loan Repayment Collected from Members",
   LOAN_INTEREST: "Loan Interest Received from Members",
 };
+
+export const clubData = { sub: "Peacock Club", avatar: "/peacock_cash.png" };

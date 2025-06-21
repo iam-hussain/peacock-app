@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function DELETE(
   request: Request,
@@ -15,9 +16,9 @@ export async function DELETE(
 
   try {
     // Check if the transaction exists
-    const transaction = await prisma.transaction.findUnique({
-      where: { id },
-    });
+    const transaction = await prisma.transaction.findUnique({ where: { id } });
+
+    if (transaction) await transactionEntryHandler(transaction, true);
 
     if (!transaction) {
       return NextResponse.json(
@@ -27,9 +28,7 @@ export async function DELETE(
     }
 
     // Delete the transaction
-    await prisma.transaction.delete({
-      where: { id },
-    });
+    await prisma.transaction.delete({ where: { id } });
 
     revalidatePath("*");
     return NextResponse.json(

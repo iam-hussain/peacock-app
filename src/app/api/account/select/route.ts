@@ -23,7 +23,7 @@ function accountSelectTransform(account: AccountToTransform) {
   };
 }
 
-export async function GET() {
+export async function POST() {
   const accounts = await prisma.account.findMany({
     select: {
       id: true,

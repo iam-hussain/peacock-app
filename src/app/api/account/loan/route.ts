@@ -6,14 +6,10 @@ import { NextResponse } from "next/server";
 import prisma from "@/db";
 import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
 
-export async function GET() {
+export async function POST() {
   const loans = await prisma.account.findMany({
-    where: {
-      isMember: true,
-    },
-    include: {
-      passbook: true,
-    },
+    where: { isMember: true },
+    include: { passbook: true },
   });
 
   const transformedLoans = loans
@@ -27,11 +23,7 @@ export async function GET() {
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
-  return NextResponse.json({
-    accounts: transformedLoans,
-  });
+  return NextResponse.json({ accounts: transformedLoans });
 }
 
-export type GetLoanResponse = {
-  accounts: TransformedLoan[];
-};
+export type GetLoanResponse = { accounts: TransformedLoan[] };

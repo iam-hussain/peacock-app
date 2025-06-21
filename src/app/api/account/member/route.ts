@@ -13,33 +13,21 @@ import {
   TransformedMember,
 } from "@/transformers/account";
 
-export async function GET() {
+export async function POST() {
   revalidateTag("api");
 
   const [members, club, vendorsPass] = await Promise.all([
     prisma.account.findMany({
-      where: {
-        isMember: true,
-      },
-      include: {
-        passbook: true,
-      },
+      where: { isMember: true },
+      include: { passbook: true },
     }),
     prisma.passbook.findFirstOrThrow({
-      where: {
-        type: "CLUB",
-      },
-      select: {
-        payload: true,
-      },
+      where: { type: "CLUB" },
+      select: { payload: true },
     }),
     prisma.passbook.findMany({
-      where: {
-        type: "VENDOR",
-      },
-      select: {
-        payload: true,
-      },
+      where: { type: "VENDOR" },
+      select: { payload: true },
     }),
   ]);
   const totalOffsetAmount = members
@@ -72,11 +60,7 @@ export async function GET() {
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
-  return NextResponse.json({
-    members: transformedMembers,
-  });
+  return NextResponse.json({ members: transformedMembers });
 }
 
-export type GetMemberResponse = {
-  members: TransformedMember[];
-};
+export type GetMemberResponse = { members: TransformedMember[] };

@@ -133,7 +133,7 @@ export function TransactionForm({
 
   const mutation = useMutation({
     mutationFn: (body: any) =>
-      fetcher.post("/api/transaction", {
+      fetcher.post("/api/transaction/add", {
         body: { createdAt: selected?.transactionAt, ...body },
       }),
     onSuccess: async ({ transaction }: any = {}) => {

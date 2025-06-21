@@ -66,11 +66,6 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
           style: "currency",
           currency: "INR",
         })}
-        // subLabel={
-        //   row.original.offsetDepositAmount !== 0
-        //     ? `${row.original.periodicDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.offsetDepositAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-        //     : ""
-        // }
       />
     ),
   },
@@ -85,11 +80,6 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
           style: "currency",
           currency: "INR",
         })}
-        // subLabel={
-        //   row.original.totalOffsetAmount !== 0
-        //     ? `${row.original.joiningOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.delayOffset.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-        //     : ""
-        // }
       />
     ),
   },
@@ -106,11 +96,6 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
         })}
         greenLabel={row.original.totalBalanceAmount <= 0}
         redLabel={row.original.totalBalanceAmount > 0}
-        // subLabel={
-        //   row.original.totalPeriodBalanceAmount !== 0
-        //     ? `${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })} + ${row.original.totalPeriodBalanceAmount.toLocaleString("en-IN", { style: "currency", currency: "INR" })}`
-        //     : ""
-        // }
       />
     ),
   },
@@ -246,9 +231,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
     getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     pageCount: 1,
-    state: {
-      pagination: { pageIndex: 0, pageSize: 50 },
-    },
+    state: { pagination: { pageIndex: 0, pageSize: 50 } },
   });
 
   return (
@@ -274,9 +257,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
         <div
           className={cn(
             "hidden justify-end align-middle items-center flex-col pb-6 gap-2",
-            {
-              flex: captureMode,
-            }
+            { flex: captureMode }
           )}
         >
           <Typography variant={"brandMini"} className="text-4xl">
@@ -294,9 +275,7 @@ const MembersTable = ({ handleAction }: MemberTableProps) => {
           columns={columns}
           isLoading={isLoading}
           isError={isError}
-          className={cn({
-            "w-auto p-8 border": captureMode,
-          })}
+          className={cn({ "w-auto p-8 border": captureMode })}
         />
       </div>
     </div>

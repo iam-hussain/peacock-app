@@ -15,7 +15,7 @@ import {
   transformLoanForTable,
 } from "@/transformers/account";
 
-export async function GET(
+export async function POST(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
@@ -24,42 +24,22 @@ export async function GET(
   try {
     const account = await prisma.account.findUniqueOrThrow({
       where: { slug, isMember: true },
-      include: {
-        passbook: true,
-      },
+      include: { passbook: true },
     });
 
     const [club, membersCount, offsetData, vendorsPass] = await Promise.all([
       prisma.passbook.findFirstOrThrow({
-        where: {
-          type: "CLUB",
-        },
-        select: {
-          payload: true,
-        },
+        where: { type: "CLUB" },
+        select: { payload: true },
       }),
-      prisma.account.count({
-        where: {
-          isMember: true,
-          active: true,
-        },
-      }),
+      prisma.account.count({ where: { isMember: true, active: true } }),
       prisma.passbook.aggregate({
-        where: {
-          type: "MEMBER",
-        },
-        _sum: {
-          delayOffset: true,
-          joiningOffset: true,
-        },
+        where: { type: "MEMBER" },
+        _sum: { delayOffset: true, joiningOffset: true },
       }),
       prisma.passbook.findMany({
-        where: {
-          type: "VENDOR",
-        },
-        select: {
-          payload: true,
-        },
+        where: { type: "VENDOR" },
+        select: { payload: true },
       }),
     ]);
 

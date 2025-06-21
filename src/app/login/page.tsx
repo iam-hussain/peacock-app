@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { CustomLink } from "@/components/ui/link";
 import Typography from "@/components/ui/typography";
 import fetcher from "@/lib/fetcher";
+import { setIsLoggedIn } from "@/store/pageSlice";
 
 export default function Login() {
   const router = useRouter();
@@ -21,9 +22,8 @@ export default function Login() {
   const mutation = useMutation({
     mutationFn: () => fetcher.post("/api/auth/login", { body: { password } }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["authentication"],
-      });
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      setIsLoggedIn(true); // Assuming you have a function to set the logged-in state
       toast.success("Logged in successfully!");
       router.push("/dashboard"); // Redirect to the dashboard or any protected route
     },
