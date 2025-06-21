@@ -135,19 +135,14 @@ export function setPassbookUpdateQuery(
     data: {
       ...passbook.data,
       ...passData,
-      payload: {
-        ...payload,
-        ...calcData,
-      },
+      payload: { ...payload, ...calcData },
     },
   };
 }
 
 export function initializePassbookToUpdate(
   passbooks: {
-    account: {
-      id: string;
-    } | null;
+    account: { id: string } | null;
     id: string;
     type: $Enums.PASSBOOK_TYPE;
     payload: JsonValue;
@@ -159,9 +154,7 @@ export function initializePassbookToUpdate(
   for (let passbook of passbooks) {
     if (passbook.account?.id && passbook.type !== "CLUB") {
       passbookToUpdate.set(passbook.account?.id, {
-        where: {
-          id: passbook.id,
-        },
+        where: { id: passbook.id },
         data: {
           payload: isClean
             ? getDefaultPassbookData(passbook.type)
@@ -172,9 +165,7 @@ export function initializePassbookToUpdate(
     }
     if (passbook.type === "CLUB") {
       passbookToUpdate.set("CLUB", {
-        where: {
-          id: passbook.id,
-        },
+        where: { id: passbook.id },
         data: {
           payload: isClean
             ? getDefaultPassbookData(passbook.type)
@@ -193,29 +184,19 @@ export function fetchAllPassbook() {
       id: true,
       type: true,
       payload: true,
-      account: {
-        select: {
-          id: true,
-        },
-      },
+      account: { select: { id: true } },
     },
   });
 }
 
 export function fetchAllLoanPassbook() {
   return prisma.passbook.findMany({
-    where: {
-      type: { in: ["CLUB", "MEMBER"] },
-    },
+    where: { type: { in: ["CLUB", "MEMBER"] } },
     select: {
       id: true,
       type: true,
       payload: true,
-      account: {
-        select: {
-          id: true,
-        },
-      },
+      account: { select: { id: true } },
     },
   });
 }

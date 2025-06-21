@@ -8,21 +8,22 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { LoanHistoryEntry, PassbookToUpdate } from "@/lib/type";
+import {
+  ClubPassbookData,
+  LoanHistoryEntry,
+  MemberPassbookData,
+  PassbookToUpdate,
+} from "@/lib/type";
 
-function fetchLoanTransaction(accountId?: string | null) {
+export function fetchLoanTransaction(accountId?: string | null) {
   return prisma.transaction.findMany({
     where: {
       ...(accountId
-        ? {
-            OR: [{ fromId: accountId }, { toId: accountId }],
-          }
+        ? { OR: [{ fromId: accountId }, { toId: accountId }] }
         : {}),
       transactionType: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
     },
-    orderBy: {
-      transactionAt: "asc",
-    },
+    orderBy: { transactionAt: "asc" },
   });
 }
 
@@ -90,10 +91,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
       interestAmount: 0,
     });
   }
-  return {
-    loanHistory,
-    totalLoanBalance: accountBalance,
-  };
+  return { loanHistory, totalLoanBalance: accountBalance };
 }
 
 export const calculateLoansHandler = (
@@ -125,15 +123,15 @@ export const calculateLoansHandler = (
     const { loanHistory, totalLoanBalance } =
       calculateLoanDetails(memTransactions);
 
+    console.log(
+      `Member ID: ${memberId}, Total Loan Balance: ${totalLoanBalance}, Loan History: ${JSON.stringify(loanHistory)}`
+    );
+
     const memberPassbook = passbookToUpdate.get(memberId);
     if (memberPassbook) {
       passbookToUpdate.set(
         memberId,
-        setPassbookUpdateQuery(
-          memberPassbook,
-          { totalLoanBalance },
-          { loanHistory }
-        )
+        setPassbookUpdateQuery(memberPassbook, {}, { loanHistory })
       );
     }
   });
@@ -141,27 +139,32 @@ export const calculateLoansHandler = (
   return passbookToUpdate;
 };
 
-export async function recalculateMemberLoanById(memberId: string) {
-  const [passbook, transactions] = await Promise.all([
-    prisma.passbook.findFirstOrThrow({
-      where: {
-        account: {
-          id: memberId,
-        },
-      },
-      select: {
-        id: true,
-        type: true,
-        payload: true,
-        account: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    }),
-    fetchLoanTransaction(),
-  ]);
-  let passbookToUpdate = initializePassbookToUpdate([passbook], false);
-  return calculateLoansHandler(passbookToUpdate, transactions);
+export function resetMemberLoanPassbookData(
+  passbookToUpdate: PassbookToUpdate,
+  memberId: string
+): PassbookToUpdate {
+  // const clubPassbook = passbookToUpdate.get("CLUB");
+  const memberPassbook = passbookToUpdate.get(memberId);
+
+  // const { totalLoanBalance = 0 } = memberPassbook?.data
+  //   .payload as MemberPassbookData;
+
+  // if (clubPassbook) {
+  //   const { totalLoanBalance: clubTotalLoanBalance = 0 } = clubPassbook.data
+  //     .payload as ClubPassbookData;
+  //   // Update club passbook with the reverted loan data
+  //   passbookToUpdate.set(
+  //     "CLUB",
+  //     setPassbookUpdateQuery(clubPassbook, {
+  //       totalLoanBalance: clubTotalLoanBalance - totalLoanBalance,
+  //     })
+  //   );
+  // }
+  if (memberPassbook) {
+    passbookToUpdate.set(
+      memberId,
+      setPassbookUpdateQuery(memberPassbook, {}, { loanHistory: [] })
+    );
+  }
+  return passbookToUpdate;
 }

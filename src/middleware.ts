@@ -38,18 +38,15 @@ async function verifyJwt(token: string, secretKey: string) {
   return JSON.parse(atob(payload));
 }
 
-export const config = {
-  matcher: [
-    "/api/account",
-    "/api/account/:path*",
-    "/api/action",
-    "/api/action/:path*",
-    "/api/statistics",
-    "/api/statistics/:path*",
-    "/api/transaction",
-    "/api/transaction/:path*",
-  ], // Apply to all API routes
-};
+export const matcher = [
+  "/api/action/backup",
+  "/api/action/recalculate",
+  "/api/action/recalculate/loan",
+  "/api/auth/logout",
+  "/api/account",
+  "/api/account/offset",
+  "/api/transaction/add",
+];
 
 export function middleware(request: NextRequest) {
   // CORS Handling
@@ -66,8 +63,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  // Token Validation for Protected Methods
-  if (["POST", "PUT", "DELETE"].includes(request.method)) {
+  console.log("Middleware triggered for:", request.url);
+  // Token Validation for Protected Methods and Paths
+  const path = request.nextUrl.pathname;
+  const isProtectedPath = matcher.includes(path);
+
+  console.log("Is protected path:", isProtectedPath);
+  console.log("Request method:", request.nextUrl.pathname);
+
+  if (isProtectedPath && ["POST", "PUT", "DELETE"].includes(request.method)) {
     const token = request.cookies.get("token")?.value;
 
     if (!token) {

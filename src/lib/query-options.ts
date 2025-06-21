@@ -27,7 +27,7 @@ export const fetchAuthStatus = () =>
 
 export const fetchMemberBySlug = (slug: string) =>
   queryOptions({
-    queryKey: ["member", "accounts", slug],
+    queryKey: ["all", "member", "accounts", slug],
     queryFn: () =>
       fetcher.post(
         `/api/account/member/${slug}`
@@ -37,7 +37,7 @@ export const fetchMemberBySlug = (slug: string) =>
 
 export const fetchMembers = () =>
   queryOptions({
-    queryKey: ["member", "account"],
+    queryKey: ["all", "member", "account"],
     queryFn: () =>
       fetcher.post("/api/account/member") as unknown as GetMemberResponse,
     ...noRefetchConfigs,
@@ -45,7 +45,7 @@ export const fetchMembers = () =>
 
 export const fetchVendors = () =>
   queryOptions({
-    queryKey: ["vendor", "account"],
+    queryKey: ["all", "vendor", "account"],
     queryFn: () =>
       fetcher.post("/api/account/vendor") as unknown as GetVendorResponse,
     ...noRefetchConfigs,
@@ -53,7 +53,7 @@ export const fetchVendors = () =>
 
 export const fetchLoans = () =>
   queryOptions({
-    queryKey: ["loan", "account"],
+    queryKey: ["all", "loan", "account"],
     queryFn: () =>
       fetcher.post("/api/account/loan") as unknown as GetLoanResponse,
     ...noRefetchConfigs,
@@ -61,7 +61,7 @@ export const fetchLoans = () =>
 
 export const fetchAccountSelect = () =>
   queryOptions({
-    queryKey: ["select", "account"],
+    queryKey: ["select", "account", "member", "vendor"],
     queryFn: () =>
       fetcher.post(
         "/api/account/select"
@@ -71,7 +71,7 @@ export const fetchAccountSelect = () =>
 
 export const fetchStatistics = () =>
   queryOptions({
-    queryKey: ["statistic"],
+    queryKey: ["all", "statistic"],
     queryFn: () =>
       fetcher.post("/api/statistics") as never as GetStatisticsResponse,
     ...noRefetchConfigs,
@@ -90,7 +90,7 @@ export const fetchTransactions = (options: any) => {
   });
 
   return queryOptions({
-    queryKey: ["transaction", options],
+    queryKey: ["all", "transaction", options],
     queryFn: () =>
       fetcher.post(
         `/api/transaction?${params.toString()}`

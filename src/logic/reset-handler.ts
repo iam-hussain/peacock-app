@@ -1,6 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
-import { calculateLoansHandler } from "./loan-middleware";
+import { calculateLoansHandler } from "./loan-handler";
 import { updatePassbookByTransaction } from "./transaction-handler";
 
 import prisma from "@/db";

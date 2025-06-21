@@ -142,9 +142,7 @@ export function TransactionForm({
         await deleteMutation.mutateAsync(selected.id);
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["transaction", "loan", "statistic"],
-      });
+      await queryClient.invalidateQueries({ queryKey: ["all"] });
 
       const recalculatedIds = new Set();
       if (
@@ -167,12 +165,6 @@ export function TransactionForm({
       if (transactionType === "LOAN_REPAY" && transaction?.fromId) {
         recalculatedIds.add(transaction?.fromId);
       }
-
-      await Promise.all(
-        Array.from(recalculatedIds).map((id) =>
-          fetcher.post(`/api/action/recalculate/loan/${id}`)
-        )
-      );
 
       if (selected) {
         toast.success("Transaction successfully updated!");

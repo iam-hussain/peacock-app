@@ -16,9 +16,9 @@ import { Toggle } from "@/components/ui/toggle";
 type FilterBarProps = {
   searchValue: string;
   onSearchChange: (value: string) => void;
-  onToggleChange: (value: boolean) => void;
-  toggleState: boolean;
-  onAddClick: () => void;
+  onToggleChange?: (value: boolean) => void;
+  toggleState?: boolean;
+  onAddClick?: () => void;
   toggleIcons?: { TrueIcon: IconType; FalseIcon: IconType };
   searchPlaceholder?: string;
   children?: React.ReactNode;
@@ -33,7 +33,7 @@ export const FilterBar = ({
   onSearchChange,
   onToggleChange,
   toggleState,
-  onAddClick,
+  onAddClick = () => {},
   toggleIcons,
   searchPlaceholder = "Filter names...",
   hasMode = true,
@@ -58,18 +58,20 @@ export const FilterBar = ({
           </Button>
         )}
 
-        <Toggle
-          aria-label="Toggle"
-          variant={"outline"}
-          onPressedChange={onToggleChange}
-          className="gap-2"
-        >
-          {toggleState ? (
-            <TrueIcon className="w-6 h-6" />
-          ) : (
-            <FalseIcon className="w-6 h-6" />
-          )}
-        </Toggle>
+        {onToggleChange && (
+          <Toggle
+            aria-label="Toggle"
+            variant={"outline"}
+            onPressedChange={onToggleChange}
+            className="gap-2"
+          >
+            {toggleState ? (
+              <TrueIcon className="w-6 h-6" />
+            ) : (
+              <FalseIcon className="w-6 h-6" />
+            )}
+          </Toggle>
+        )}
 
         {hasMode && (
           <>

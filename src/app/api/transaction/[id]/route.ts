@@ -18,8 +18,6 @@ export async function DELETE(
     // Check if the transaction exists
     const transaction = await prisma.transaction.findUnique({ where: { id } });
 
-    if (transaction) await transactionEntryHandler(transaction, true);
-
     if (!transaction) {
       return NextResponse.json(
         { message: "Vendor transaction not found." },
@@ -29,6 +27,7 @@ export async function DELETE(
 
     // Delete the transaction
     await prisma.transaction.delete({ where: { id } });
+    if (transaction) await transactionEntryHandler(transaction, true);
 
     revalidatePath("*");
     return NextResponse.json(

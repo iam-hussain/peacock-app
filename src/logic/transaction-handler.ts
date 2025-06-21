@@ -13,6 +13,11 @@ import {
   setPassbookUpdateQuery,
 } from "@/lib/helper";
 import { MemberPassbookData } from "@/lib/type";
+import {
+  calculateLoansHandler,
+  fetchLoanTransaction,
+  resetMemberLoanPassbookData,
+} from "./loan-handler";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
@@ -163,5 +168,22 @@ export async function transactionEntryHandler(
     created,
     isDelete
   );
+
+  // If the transaction is a loan-related transaction, fetch the loan transaction and update the passbook accordingly
+  if (
+    ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"].includes(
+      created.transactionType
+    )
+  ) {
+    const loanMember =
+      created.transactionType === "LOAN_TAKEN" ? created.toId : created.fromId;
+    passbookToUpdate = resetMemberLoanPassbookData(
+      passbookToUpdate,
+      loanMember
+    );
+    const loanTransaction = await fetchLoanTransaction(loanMember);
+
+    passbookToUpdate = calculateLoansHandler(passbookToUpdate, loanTransaction);
+  }
   return bulkPassbookUpdate(passbookToUpdate);
 }
