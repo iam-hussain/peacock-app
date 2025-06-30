@@ -1,19 +1,18 @@
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
-
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { getMemberTotalDepositUpToday } from "@/lib/club";
 import { memberMonthsPassedString } from "@/lib/date";
-import { ClubPassbookData, VendorPassbookData } from "@/lib/type";
+import { getMemberClubStats } from "@/lib/member-club-stats";
 import {
   membersTableTransform,
   TransformedLoan,
   TransformedMember,
   transformLoanForTable,
 } from "@/transformers/account";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 export async function POST(
   request: Request,
@@ -27,47 +26,19 @@ export async function POST(
       include: { passbook: true },
     });
 
-    const [club, membersCount, offsetData, vendorsPass] = await Promise.all([
-      prisma.passbook.findFirstOrThrow({
-        where: { type: "CLUB" },
-        select: { payload: true },
-      }),
-      prisma.account.count({ where: { isMember: true, active: true } }),
-      prisma.passbook.aggregate({
-        where: { type: "MEMBER" },
-        _sum: { delayOffset: true, joiningOffset: true },
-      }),
-      prisma.passbook.findMany({
-        where: { type: "VENDOR" },
-        select: { payload: true },
-      }),
-    ]);
+    const stats = await getMemberClubStats();
+    const {
+      memberTotalDeposit,
+      totalReturnPerMember,
+      expectedLoanProfitPerMember,
+    } = stats;
 
-    const totalVendorProfit = vendorsPass
-      .map((e) => {
-        const { totalInvestment = 0, totalReturns = 0 } =
-          e.payload as VendorPassbookData;
-        return Math.max(totalReturns - totalInvestment, 0);
-      })
-      .reduce((a, b) => a + b, 0);
-
-    const totalOffsetAmount =
-      (offsetData._sum.delayOffset || 0) + (offsetData._sum.joiningOffset || 0);
-    const clubData = club.payload as ClubPassbookData;
-    const totalProfitCollected =
-      totalOffsetAmount + clubData.totalInterestPaid + totalVendorProfit;
-
-    const availableProfitAmount =
-      totalProfitCollected - clubData.totalMemberProfitWithdrawals;
-
-    const totalReturnAmount = availableProfitAmount / membersCount;
-
-    const memberTotalDeposit = getMemberTotalDepositUpToday();
     const memberLoan = transformLoanForTable(account);
     const memberData = membersTableTransform(
       account,
       memberTotalDeposit,
-      totalReturnAmount
+      totalReturnPerMember,
+      expectedLoanProfitPerMember
     );
 
     return NextResponse.json({
@@ -78,9 +49,9 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error("Error deleting transaction:", error);
+    console.error("Error fetching member by slug:", error);
     return NextResponse.json(
-      { message: "Failed to delete transaction." },
+      { message: "Failed to fetch member." },
       { status: 500 }
     );
   }

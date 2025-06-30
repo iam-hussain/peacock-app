@@ -238,7 +238,7 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
               <span className="text-sm text-foreground/70 font-medium">
                 Total Deposit Balance:
               </span>{" "}
-              {moneyFormat(member.totalBalanceAmount || 0)}
+              {moneyFormat(member.totalPeriodBalanceAmount || 0)}
             </div>
           </div>
 

@@ -106,7 +106,7 @@ export function membersTableTransform(
   let totalBalanceAmount =
     memberTotalDeposit + totalOffsetAmount - accountBalance;
   // If total balance is more than memberTotalDeposit, use only the period balance
-  const totalPeriodBalanceAmount =
+  let totalPeriodBalanceAmount =
     totalBalanceAmount > memberTotalDeposit
       ? memberTotalDeposit - accountBalance
       : 0;
@@ -114,14 +114,16 @@ export function membersTableTransform(
   // Calculate member's share of returns
   let memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
   // Calculate periodic deposit balance
-  const periodicDepositBalance =
+  let periodicDepositBalance =
     memberTotalDeposit - (periodicDepositAmount - withdrawalAmount);
 
   // Expected offset amount for inactive members
   let expectedOffsetAmount = 0;
   if (!member.active) {
+    totalPeriodBalanceAmount =
+      memberTotalDeposit + expectedLoanProfit + totalReturnAmount;
     totalBalanceAmount += memberTotalReturnAmount;
-    expectedOffsetAmount = memberTotalReturnAmount;
+    expectedOffsetAmount = memberTotalReturnAmount + expectedLoanProfit;
     memberTotalReturnAmount = 0;
   }
 

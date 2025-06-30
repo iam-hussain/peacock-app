@@ -48,7 +48,6 @@ export function OffsetForm({
     mutationFn: (body: any) => fetcher.post("/api/account/offset", { body }),
     onSuccess: async (data) => {
       toast.success("Member offset updated successfully 🌟");
-      console.log({ data });
       if (!data) reset(data); // Reset form after submission
       if (onSuccess) {
         onSuccess();

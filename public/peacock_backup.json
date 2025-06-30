@@ -230,15 +230,15 @@
       "lastName": "",
       "slug": "prabha",
       "phone": "",
-      "email": null,
-      "avatar": null,
-      "startAt": "2020-08-31T18:30:00.000Z",
+      "email": "",
+      "avatar": "",
+      "startAt": "2020-09-01T01:30:00.000Z",
       "endAt": null,
-      "active": true,
+      "active": false,
       "isMember": true,
       "passbookId": "66d95de79ff85b6e7c1106a5",
       "createdAt": "2023-06-29T12:34:59.326Z",
-      "updatedAt": "2024-09-05T10:36:03.410Z"
+      "updatedAt": "2025-06-22T09:09:34.701Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ae",
@@ -262,15 +262,15 @@
       "lastName": "Kumar",
       "slug": "deepak",
       "phone": "",
-      "email": null,
+      "email": "",
       "avatar": "avatar_4_1688567292848.webp",
-      "startAt": "2020-08-31T18:30:00.000Z",
+      "startAt": "2020-08-31T21:30:00.000Z",
       "endAt": null,
-      "active": true,
+      "active": false,
       "isMember": true,
       "passbookId": "66d95de89ff85b6e7c1106bb",
       "createdAt": "2023-06-29T12:34:59.270Z",
-      "updatedAt": "2023-09-04T14:37:24.726Z"
+      "updatedAt": "2025-06-21T23:56:04.147Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c0",
@@ -14619,18 +14619,6 @@
       "updatedAt": "2025-06-21T13:34:03.437Z"
     },
     {
-      "id": "6856b4fb59c8fa126ff5b305",
-      "amount": 50000,
-      "transactionType": "LOAN_TAKEN",
-      "transactionAt": "2025-05-08T21:30:00.000Z",
-      "method": "ACCOUNT",
-      "fromId": "66d95de79ff85b6e7c1106ac",
-      "toId": "66d95de79ff85b6e7c1106b6",
-      "note": "",
-      "createdAt": "2025-06-21T13:34:51.741Z",
-      "updatedAt": "2025-06-21T13:34:51.741Z"
-    },
-    {
       "id": "6856b50e59c8fa126ff5b306",
       "amount": 50000,
       "transactionType": "LOAN_TAKEN",
@@ -14787,18 +14775,6 @@
       "updatedAt": "2025-06-21T13:59:50.127Z"
     },
     {
-      "id": "6856baf359c8fa126ff5b314",
-      "amount": 11600,
-      "transactionType": "VENDOR_INVEST",
-      "transactionAt": "2025-06-01T21:30:00.000Z",
-      "method": "ACCOUNT",
-      "fromId": "66d95de79ff85b6e7c1106ac",
-      "toId": "6856b28a59c8fa126ff5b2f6",
-      "note": "",
-      "createdAt": "2025-06-21T14:00:19.143Z",
-      "updatedAt": "2025-06-21T14:00:19.143Z"
-    },
-    {
       "id": "6856bb1259c8fa126ff5b315",
       "amount": 2000,
       "transactionType": "PERIODIC_DEPOSIT",
@@ -14869,6 +14845,66 @@
       "note": "",
       "createdAt": "2025-06-21T17:10:13.299Z",
       "updatedAt": "2025-06-21T14:14:12.593Z"
+    },
+    {
+      "id": "6857473a9790cc78683d70f1",
+      "amount": 50000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-05-09T00:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "66d95de79ff85b6e7c1106b6",
+      "note": "",
+      "createdAt": "2025-05-08T21:30:00.000Z",
+      "updatedAt": "2025-06-21T23:58:50.534Z"
+    },
+    {
+      "id": "685747569790cc78683d70f2",
+      "amount": 11600,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-06-02T00:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "6856b28a59c8fa126ff5b2f6",
+      "note": "",
+      "createdAt": "2025-06-01T21:30:00.000Z",
+      "updatedAt": "2025-06-21T23:59:18.377Z"
+    },
+    {
+      "id": "6857c6e3af99f71a10e26db4",
+      "amount": 68210,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-04-21T01:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a6",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-06-22T09:03:31.487Z",
+      "updatedAt": "2025-06-22T09:03:31.487Z"
+    },
+    {
+      "id": "6857c703af99f71a10e26db5",
+      "amount": 64000,
+      "transactionType": "WITHDRAW",
+      "transactionAt": "2025-04-21T01:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106a6",
+      "note": "",
+      "createdAt": "2025-06-22T09:04:03.362Z",
+      "updatedAt": "2025-06-22T09:04:03.362Z"
+    },
+    {
+      "id": "6857c72caf99f71a10e26db6",
+      "amount": 4210,
+      "transactionType": "WITHDRAW",
+      "transactionAt": "2025-04-21T01:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106a6",
+      "note": "Profit withdraw",
+      "createdAt": "2025-06-22T09:04:44.814Z",
+      "updatedAt": "2025-06-22T09:04:44.814Z"
     }
   ],
   "passbook": [
@@ -14893,7 +14929,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:42.505Z"
+      "updatedAt": "2025-06-22T09:37:11.623Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bd",
@@ -14956,7 +14992,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:42.505Z"
+      "updatedAt": "2025-06-22T09:37:11.623Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c5",
@@ -14972,7 +15008,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:33.369Z"
+      "updatedAt": "2025-06-22T09:37:01.026Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cd",
@@ -14988,7 +15024,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:33.369Z"
+      "updatedAt": "2025-06-22T09:37:01.026Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a3",
@@ -15031,7 +15067,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:42.505Z"
+      "updatedAt": "2025-06-22T09:37:11.623Z"
     },
     {
       "id": "66d95dea9ff85b6e7c1106e7",
@@ -15039,16 +15075,16 @@
       "payload": {
         "totalMemberPeriodicDeposits": 1499992,
         "totalMemberOffsetDeposits": 3699,
-        "totalMemberWithdrawals": 238000,
-        "totalMemberProfitWithdrawals": 11283,
-        "currentClubBalance": 73843,
-        "netClubBalance": 1265691,
+        "totalMemberWithdrawals": 302000,
+        "totalMemberProfitWithdrawals": 15493,
+        "currentClubBalance": 62560,
+        "netClubBalance": 1186198,
         "totalInvestment": 1311675,
         "totalReturns": 1248940,
         "totalProfit": 0,
         "totalLoanTaken": 3415000,
-        "totalLoanRepay": 2215000,
-        "totalLoanBalance": 1200000,
+        "totalLoanRepay": 2283210,
+        "totalLoanBalance": 1131790,
         "totalInterestPaid": 70887,
         "totalVendorProfit": 0
       },
@@ -15057,7 +15093,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:42.505Z"
+      "updatedAt": "2025-06-22T09:37:11.623Z"
     },
     {
       "id": "66d95de69ff85b6e7c110695",
@@ -15080,7 +15116,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:42.505Z"
+      "updatedAt": "2025-06-22T09:37:11.623Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c9",
@@ -15096,7 +15132,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:34.459Z"
+      "updatedAt": "2025-06-22T09:37:02.020Z"
     },
     {
       "id": "66d95de69ff85b6e7c110697",
@@ -15119,7 +15155,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:43.451Z"
+      "updatedAt": "2025-06-22T09:37:12.540Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c1",
@@ -15130,7 +15166,7 @@
         "totalDepositAmount": 19000,
         "withdrawalAmount": 19000,
         "profitWithdrawalAmount": 1629,
-        "accountBalance": 0,
+        "accountBalance": -1629,
         "clubHeldAmount": 0,
         "totalLoanTaken": 0,
         "totalLoanRepay": 0,
@@ -15142,7 +15178,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:43.451Z"
+      "updatedAt": "2025-06-22T09:37:12.540Z"
     },
     {
       "id": "66d95de69ff85b6e7c110691",
@@ -15154,7 +15190,7 @@
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
         "accountBalance": 76000,
-        "clubHeldAmount": 27225,
+        "clubHeldAmount": 19200,
         "totalLoanTaken": 300000,
         "totalLoanRepay": 0,
         "totalLoanBalance": 300000,
@@ -15172,7 +15208,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:43.451Z"
+      "updatedAt": "2025-06-22T09:37:12.540Z"
     },
     {
       "id": "66d95de69ff85b6e7c110693",
@@ -15195,7 +15231,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:43.451Z"
+      "updatedAt": "2025-06-22T09:37:12.540Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a9",
@@ -15218,7 +15254,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:43.451Z"
+      "updatedAt": "2025-06-22T09:37:12.540Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069d",
@@ -15274,7 +15310,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:44.439Z"
+      "updatedAt": "2025-06-22T09:37:13.450Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ad",
@@ -15297,7 +15333,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:44.439Z"
+      "updatedAt": "2025-06-22T09:37:13.450Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106af",
@@ -15309,7 +15345,7 @@
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
         "accountBalance": 74000,
-        "clubHeldAmount": 108218,
+        "clubHeldAmount": 43360,
         "totalLoanTaken": 200000,
         "totalLoanRepay": 200000,
         "totalLoanBalance": 0,
@@ -15347,7 +15383,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:44.439Z"
+      "updatedAt": "2025-06-22T09:37:13.450Z"
     },
     {
       "id": "66d95de69ff85b6e7c1106a1",
@@ -15384,7 +15420,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:44.439Z"
+      "updatedAt": "2025-06-22T09:37:13.450Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bf",
@@ -15440,7 +15476,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:44.439Z"
+      "updatedAt": "2025-06-22T09:37:13.450Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a5",
@@ -15449,13 +15485,13 @@
         "periodicDepositAmount": 64000,
         "offsetDepositAmount": 0,
         "totalDepositAmount": 64000,
-        "withdrawalAmount": 0,
-        "profitWithdrawalAmount": 0,
-        "accountBalance": 64000,
+        "withdrawalAmount": 64000,
+        "profitWithdrawalAmount": 4210,
+        "accountBalance": -4210,
         "clubHeldAmount": 0,
         "totalLoanTaken": 315000,
-        "totalLoanRepay": 215000,
-        "totalLoanBalance": 100000,
+        "totalLoanRepay": 283210,
+        "totalLoanBalance": 31790,
         "totalInterestPaid": 6500
       },
       "loanHistory": [
@@ -15499,9 +15535,22 @@
           "interestPerDay": 11.29
         },
         {
-          "active": true,
+          "active": false,
           "amount": 100000,
-          "startDate": 1730059200000,
+          "startDate": 1730064600000,
+          "endDate": 1745204400000,
+          "monthsPassed": 5,
+          "daysPassed": 24,
+          "interestAmount": 5774,
+          "monthsPassedString": "5 mons 24 d",
+          "daysInMonth": 31,
+          "interestForDays": 774.24,
+          "interestPerDay": 32.26
+        },
+        {
+          "active": true,
+          "amount": 31790,
+          "startDate": 1745204400000,
           "interestAmount": 0
         }
       ],
@@ -15509,7 +15558,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:45.469Z"
+      "updatedAt": "2025-06-22T09:37:14.402Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ab",
@@ -15521,7 +15570,7 @@
         "withdrawalAmount": 16000,
         "profitWithdrawalAmount": 0,
         "accountBalance": 0,
-        "clubHeldAmount": -61600,
+        "clubHeldAmount": 0,
         "totalLoanTaken": 0,
         "totalLoanRepay": 0,
         "totalLoanBalance": 0,
@@ -15532,7 +15581,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:45.469Z"
+      "updatedAt": "2025-06-22T09:37:14.402Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b1",
@@ -15608,7 +15657,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:45.469Z"
+      "updatedAt": "2025-06-22T09:37:14.402Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b5",
@@ -15670,19 +15719,19 @@
           "active": false,
           "amount": 100000,
           "startDate": 1746491400000,
-          "endDate": 1746745200000,
+          "endDate": 1746756000000,
           "monthsPassed": 0,
-          "daysPassed": 2,
-          "interestAmount": 65,
-          "monthsPassedString": " 2 d",
+          "daysPassed": 3,
+          "interestAmount": 97,
+          "monthsPassedString": " 3 d",
           "daysInMonth": 31,
-          "interestForDays": 64.52,
+          "interestForDays": 96.78,
           "interestPerDay": 32.26
         },
         {
           "active": false,
           "amount": 150000,
-          "startDate": 1746750600000,
+          "startDate": 1746761400000,
           "endDate": 1747177200000,
           "monthsPassed": 0,
           "daysPassed": 4,
@@ -15703,7 +15752,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:45.469Z"
+      "updatedAt": "2025-06-22T09:37:14.402Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b7",
@@ -15740,7 +15789,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:45.469Z"
+      "updatedAt": "2025-06-22T09:37:14.402Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c3",
@@ -15774,7 +15823,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:46.508Z"
+      "updatedAt": "2025-06-22T09:37:15.376Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a7",
@@ -15830,7 +15879,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:46.508Z"
+      "updatedAt": "2025-06-22T09:37:15.376Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c7",
@@ -15846,7 +15895,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:38.545Z"
+      "updatedAt": "2025-06-22T09:37:06.290Z"
     },
     {
       "id": "66d95de59ff85b6e7c11068d",
@@ -15883,7 +15932,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:46.508Z"
+      "updatedAt": "2025-06-22T09:37:15.376Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106b9",
@@ -15894,7 +15943,7 @@
         "totalDepositAmount": 33000,
         "withdrawalAmount": 33000,
         "profitWithdrawalAmount": 1629,
-        "accountBalance": 0,
+        "accountBalance": -1629,
         "clubHeldAmount": 0,
         "totalLoanTaken": 0,
         "totalLoanRepay": 0,
@@ -15906,7 +15955,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:46.508Z"
+      "updatedAt": "2025-06-22T09:37:15.376Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bb",
@@ -15917,7 +15966,7 @@
         "totalDepositAmount": 78000,
         "withdrawalAmount": 78000,
         "profitWithdrawalAmount": 8025,
-        "accountBalance": 0,
+        "accountBalance": -8025,
         "clubHeldAmount": 0,
         "totalLoanTaken": 200000,
         "totalLoanRepay": 200000,
@@ -16021,7 +16070,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:46.508Z"
+      "updatedAt": "2025-06-22T09:37:15.376Z"
     },
     {
       "id": "66d95de69ff85b6e7c110699",
@@ -16103,7 +16152,7 @@
       "delayOffset": 441,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:47.539Z"
+      "updatedAt": "2025-06-22T09:37:16.295Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069b",
@@ -16126,7 +16175,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:47.539Z"
+      "updatedAt": "2025-06-22T09:37:16.295Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b3",
@@ -16149,7 +16198,7 @@
       "delayOffset": 1734,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-21T14:25:47.539Z"
+      "updatedAt": "2025-06-22T09:37:16.295Z"
     },
     {
       "id": "67cb123b43dce1b56e2c62cc",
@@ -16165,7 +16214,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2025-03-07T15:35:22.542Z",
-      "updatedAt": "2025-06-21T14:25:39.564Z"
+      "updatedAt": "2025-06-22T09:37:07.256Z"
     },
     {
       "id": "6856b28a59c8fa126ff5b2f5",
@@ -16181,7 +16230,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2025-06-21T13:24:26.641Z",
-      "updatedAt": "2025-06-21T14:25:39.564Z"
+      "updatedAt": "2025-06-22T09:37:07.256Z"
     }
   ]
 }
