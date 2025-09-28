@@ -1,0 +1,386 @@
+---
+
+description: Project rules for a Next.js + TypeScript + shadcn/ui app. Structure, style, performance, a11y, and DX guardrails.
+globs:
+
+* "\*\*/\*"
+  alwaysApply: true
+
+---
+
+# Code Style & Type Safety
+
+* Use **TypeScript everywhere**.
+* `tsconfig.json`: set `"strict": true` and enforce `noImplicitAny`, `strictNullChecks`, `strictFunctionTypes`, `noUncheckedIndexedAccess`, `noFallthroughCasesInSwitch`.
+* Explicitly type function returns and object literals.
+* Minimize `@ts-ignore` / `@ts-expect-error`; leave a comment with a ticket ref when used.
+* Formatting: 2-space indent, **single quotes**, **no semicolons** (unless disambiguation), space after keywords and before function `(`, `=== / !==` only, operators spaced (`a + b`), commas followed by a space, `else` on same line as closing `}`, multi-line `if` blocks always use `{ }`.
+* Naming: **camelCase** for vars/functions; **PascalCase** for components/types; **UPPER\_SNAKE\_CASE** for env-derived constants.
+* Prefer named exports; React components in PascalCase.
+
+# File & Folder Naming / Layout
+
+* Directories: lowercase with **dashes** (e.g., `components/auth-wizard`).
+* Files: **kebab-case** (e.g., `user-profile-card.tsx`).
+* Components → `.tsx`, hooks/utils → `.ts`, styles → `.module.scss` (or Tailwind preferred).
+* Module layout order: exported component → subcomponents → hooks/helpers → static content.
+* Keep shared types in `types/` (or global `.d.ts` when needed).
+* Example app structure (App Router):
+
+  ```
+  app/
+    (marketing)/
+      layout.tsx
+      page.tsx
+    (app)/
+      dashboard/
+        page.tsx
+      settings/
+        page.tsx
+    api/
+      auth/route.ts
+    layout.tsx
+    error.tsx
+    global-error.tsx
+  components/
+  hooks/
+  lib/
+  styles/
+  types/
+  ```
+
+# React / Next.js Patterns
+
+* Prefer **SSR** by default; use **SSG**/ISR (`revalidate`) or **Client Components** only when justified.
+* Follow **Atomic Design**: Atoms → Molecules → Organisms → Templates → Pages.
+* Clear separation of concerns; hooks called only at top level.
+* Extract reusable logic to custom hooks (e.g., `useAuth`, `useForm`, `useDebounce`).
+* Avoid inline functions in JSX—use `useCallback`/`useMemo` or lift out.
+* Favor composition (`children`, render props) over inheritance.
+* Use `React.lazy` + `Suspense` or `next/dynamic` for code-splitting.
+* Provide `error.tsx` per route segment and `global-error.tsx`.
+* Clean up effects in `useEffect`.
+* Minimize client-only code; push logic to server where possible (Server Components, Route Handlers, Server Actions if enabled).
+
+# UI & Theme
+
+* Prefer **shadcn/ui** components; adhere to project theme tokens.
+* Install required shadcn components before creating custom ones.
+* Use semantic HTML with correct ARIA roles and labels.
+* Ensure full keyboard nav: focus order, visible focus rings, `Esc` to close modals, `Tab` trap in dialogs.
+* Use Tailwind for styling; keep class names composable and readable.
+
+## Theme System (shadcn CSS variables — no `dark:` utilities)
+
+* **Do not use Tailwind's `dark:` variant** anywhere. All dark mode styling must come from CSS variables (shadcn theme tokens) and semantic Tailwind classes.
+* Use semantic classes that read from tokens: `bg-background`, `text-foreground`, `border-border`, `bg-card`, `text-muted-foreground`, etc.
+* Define light/dark tokens in `globals.css` only. Components may not override tokens; they consume them.
+* Theme switching is via a single attribute/class at the root (`html`) managed by a `ThemeProvider`—no per-component `dark:`.
+* Prefer `data-theme` or `.dark` on `<html>`; both map to variables—**components never reference `dark:`**.
+* Any color that isn't a token must be added to the token set (no hard-coded hex for UI surfaces/text).
+
+### Token-only colors (never use raw colors)
+
+* **Never use direct colors** (no `bg-white`, `text-gray-500`, `#fff`, `rgb()`, `hsl()` literals) in class names, CSS modules, or inline styles.
+* **Always use tokens** from the theme via Tailwind semantic utilities or CSS variables.
+* ✅ **Recommended**: `bg-background`, `bg-background/60`, `text-foreground`, `text-foreground/50`, `border-border`, `bg-card`, `text-muted-foreground`.
+* ❌ **Avoid**: `bg-white`, `bg-slate-100`, `text-black/80`, `style={{ color: '#333' }}`, `dark:bg-slate-800`, `dark:text-white`.
+* If a new surface/text color is needed, **introduce a token** in `:root` / dark theme section and map it in `tailwind.config.ts`.
+
+### Current Theme Tokens Available
+
+The following semantic tokens are available and should be used instead of hardcoded colors:
+
+**Background & Surface:**
+- `bg-background` / `text-foreground` - Main background and text
+- `bg-card` / `text-card-foreground` - Card backgrounds and text
+- `bg-popover` / `text-popover-foreground` - Popover backgrounds and text
+- `bg-muted` / `text-muted-foreground` - Muted/subtle backgrounds and text
+
+**Brand Colors:**
+- `bg-primary` / `text-primary-foreground` - Primary brand color
+- `bg-secondary` / `text-secondary-foreground` - Secondary brand color  
+- `bg-accent` / `text-accent-foreground` - Accent color
+- `bg-destructive` / `text-destructive-foreground` - Error/destructive actions
+
+**Interactive Elements:**
+- `border-border` - Default borders
+- `border-input` - Input borders
+- `ring-ring` - Focus rings
+
+**Custom Tokens (defined in project):**
+- `bg-success` / `text-success-foreground` - Success states
+- `bg-surface` / `text-surface-foreground` - Surface variations
+- `text-text-primary` / `text-text-secondary` - Custom text hierarchy
+
+
+**Note: Clean Organized Approach**
+
+- **CSS variables** organized in `@layer base` with clear light/dark structure
+- **Tailwind config** with nested color objects for better organization
+- **CSS utilities** provide explicit utility classes
+- **Theme switching** works through CSS class toggling on `<html>`
+- **Responsive breakpoints** and custom animations included
+- Implement responsive styles for **sm, md, lg, xl, 2xl**.
+- Test mobile, tablet, desktop; ensure touch targets ≥44px.
+
+- Implement responsive styles for **sm, md, lg, xl, 2xl**.
+- Test layouts on mobile, tablet, desktop; ensure touch targets ≥44px.
+
+## Configuration Files Structure (PRESERVE EXISTING PATTERN)
+
+**CRITICAL: Do not modify the core structure of these configuration files:**
+
+### tailwind.config.ts
+- **PRESERVE**: TypeScript format with proper `Config` typing
+- **PRESERVE**: `darkMode: "class"` strategy
+- **PRESERVE**: Specific content paths: `"./src/pages/**/*.{js,ts,jsx,tsx,mdx}"`, `"./src/components/**/*.{js,ts,jsx,tsx,mdx}"`, `"./src/app/**/*.{js,ts,jsx,tsx,mdx}"`
+- **PRESERVE**: Custom keyframes and animations in `theme.extend`
+- **PRESERVE**: Empty `plugins: []` array
+
+### postcss.config.mjs
+- **PRESERVE**: ES modules format (`export default config`)
+- **PRESERVE**: `"@tailwindcss/postcss"` plugin configuration
+- **PRESERVE**: Object structure with `plugins` property
+
+### globals.css
+- **PRESERVE**: `@import "tailwindcss"` and `@import "tw-animate-css"` at the top
+- **PRESERVE**: `@custom-variant dark (&:is(.dark *))` directive
+- **PRESERVE**: OKLCH color space for all CSS custom properties
+- **PRESERVE**: `@theme inline` directive with color mappings
+- **PRESERVE**: `@layer base` structure with universal selector and body styles
+- **PRESERVE**: Complete light/dark theme variable definitions
+
+**DO NOT:**
+- Change import statements or their order
+- Switch from OKLCH to HSL or other color spaces
+- Modify the `@theme inline` directive structure
+- Alter the `@layer base` organization
+- Change the TypeScript/ES modules format of config files
+- Modify the specific content paths in Tailwind config
+
+# State & Data
+- Server data: **TanStack Query** or **SWR**; co-locate queries and cache keys.
+- Prefer local state; avoid unnecessary global state.
+- Use Context or lightweight stores (Zustand/Jotai) instead of deep prop drilling.
+- Validate props and API data with **Zod** (input & output).
+- For mutations, provide optimistic updates with rollback on error when safe.
+
+# API & Backend
+- Centralize API client in `lib/api.ts` (fetch wrapper with interceptors).
+- Type responses with generics and/or Zod schemas; fail fast on parse errors.
+- Graceful states: loading skeletons, empty states, retry affordances.
+- Prefer Route Handlers in `app/api/**/route.ts` for server APIs; keep them pure and typed.
+
+# Performance
+- Use `next/dynamic` for heavy components; specify `ssr: false` only when necessary.
+- Memoize expensive ops with `useMemo`; wrap pure components with `React.memo`.
+- Stabilize handlers with `useCallback`.
+- Ensure tree-shaking by avoiding barrel files that re-export everything indiscriminately; prefer explicit imports.
+- Use `next/image` for images; set proper `sizes` and `priority` for LCP images.
+- Use `next/font` for fonts; avoid layout shift.
+- Use **Edge Runtime** for latency-sensitive route handlers when appropriate.
+
+# Security
+- Never hardcode secrets; use `.env` and access via `process.env` only on server.
+- Validate and sanitize all inputs (Zod + escaping where needed).
+- Escape user-generated HTML; prefer text over `dangerouslySetInnerHTML`.
+- Add security headers in `next.config.mjs` (`Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, etc.).
+
+# Forms
+- Prefer controlled inputs.
+- Simple forms: custom hooks; complex forms: **react-hook-form** + Zod.
+- Validate early (guard clauses), keep happy path last.
+- Clear, user-friendly error messages; log unexpected errors server-side.
+
+# Accessibility (a11y)
+- Color contrast ≥ 4.5:1; test dark/light themes.
+- Provide labels for all form controls (use `aria-describedby` for help/error text).
+- Announce route changes and async updates with ARIA live regions where applicable.
+- Provide skip links and proper landmarks (`header`, `main`, `nav`, `footer`).
+
+# Internationalization (optional)
+- If using i18n, centralize messages; avoid inline literals in components.
+- Use ICU message format where pluralization/gender needed.
+
+# Observability & Analytics
+- Centralize logging in `lib/logger.ts`.
+- Instrument critical flows with analytics events; gate by consent.
+- Integrate error tracking (e.g., Sentry) with release/version tags.
+
+# Caching & Data Freshness
+- For SSG/ISR, set `export const revalidate = <seconds>` per page/route.
+- For SSR data fetching, leverage HTTP cache headers and conditional requests (ETag/Last-Modified) when proxying APIs.
+- Use Query stale times that reflect backend SLAs; avoid refetch storms.
+
+# Documentation & Readability
+- JSDoc for complex utilities and public hooks.
+- Maintain `README.md` per major module/page when helpful.
+- Descriptive prop/variable names; avoid abbreviations.
+
+# Component Definition Template
+```tsx
+interface ButtonProps {
+  label: string
+  onClick?: () => void
+}
+export function Button({ label, onClick }: ButtonProps) {
+  return <button onClick={onClick}>{label}</button>
+}
+````
+
+# Cleanup & Quality
+
+* Remove junk/dead code and unused imports/vars.
+* Run lint and format before committing.
+* Regularly revisit these rules and improve them based on lessons learned and team inputs.
+
+---
+
+## Tooling Guardrails (Drop-in Config)
+
+### ESLint (excerpt)
+
+```json
+{
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["@typescript-eslint", "unused-imports"],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "unused-imports/no-unused-imports": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
+  }
+}
+```
+
+### Prettier (no semicolons, single quotes)
+
+```json
+{
+  "singleQuote": true,
+  "semi": false,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "tabWidth": 2
+}
+```
+
+### EditorConfig
+
+```
+root = true
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+```
+
+### Zod Env Schema (example)
+
+```ts
+// lib/env.ts
+import { z } from 'zod'
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']),
+  NEXT_PUBLIC_API_BASE: z.string().url(),
+  DATABASE_URL: z.string().min(1),
+})
+
+export const env = envSchema.parse({
+  NODE_ENV: process.env.NODE_ENV,
+  NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE,
+  DATABASE_URL: process.env.DATABASE_URL,
+})
+```
+
+### Fetch Wrapper (typed)
+
+```ts
+// lib/api.ts
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+
+export async function api<T>(path: string, init: RequestInit & { method?: HttpMethod } = {}) {
+  const res = await fetch(path, {
+    ...init,
+    headers: { 'content-type': 'application/json', ...(init.headers || {}) },
+    cache: init.cache ?? 'no-store',
+  })
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+  return (await res.json()) as T
+}
+```
+
+### Route Security Headers (Next config snippet)
+
+```ts
+// next.config.mjs
+export default {
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+        ],
+      },
+    ]
+  },
+}
+```
+
+### Error Boundary Template
+
+```tsx
+'use client'
+import { useEffect } from 'react'
+
+export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
+  useEffect(() => {
+    // send to logger
+    console.error(error)
+  }, [error])
+  return (
+    <html>
+      <body className="p-6">
+        <h1 className="text-xl font-bold">Something went wrong</h1>
+        <button className="btn" onClick={() => reset()}>Try again</button>
+      </body>
+    </html>
+  )
+}
+```
+
+### Testing
+
+* **Unit**: Vitest or Jest + React Testing Library.
+* **E2E**: Playwright.
+* Require tests for shared utilities and critical flows.
+
+### Git & CI
+
+* Conventional Commits (`feat:`, `fix:`, `chore:`...).
+* Pre-push CI: typecheck, lint, test, build.
+* Protect `main`: PRs require passing checks and code review.
+
+---
+
+## Cursor Usage
+
+* Save this file as a top-level rules doc; it will auto-apply (`alwaysApply: true`).
+* Keep rules concise; link to deeper docs from `docs/` when needed.
+* Update versions and libs in one place (`package.json` + `docs/changelog.md`).
+
+## Rule Governance & Continuous Improvement
+
+* **Single source of truth**: This file defines the baseline. All deviations require an explicit rule update here.
+* **Always evolve rules based on Developer inputs**:
+
+  * Treat user feedback as **authoritative**. Translate inputs into concrete, testable rules.
+  * When Developer proposes a change, **edit this file in the same PR** as any related code changes.
