@@ -9,6 +9,7 @@ import {
   Download,
   MoreHorizontal,
   Receipt,
+  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -21,7 +22,12 @@ import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
+import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
+import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
+import { TransactionSummaryCard } from "@/components/molecules/transaction-summary-card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { transactionTypeMap } from "@/lib/config";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchAccountSelect, fetchTransactions } from "@/lib/query-options";
@@ -37,6 +43,7 @@ export default function TransactionsPage() {
   const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransformedTransaction | null>(null);
 
@@ -55,7 +62,9 @@ export default function TransactionsPage() {
     [accountFilter, typeFilter, startDate, endDate, pageSize, currentPage]
   );
 
-  const { data, isLoading } = useQuery(fetchTransactions(queryOptions));
+  const { data, isLoading, isError } = useQuery(
+    fetchTransactions(queryOptions)
+  );
 
   // Use transactions directly from API (filtering is done server-side)
   const transactions = data?.transactions || [];
@@ -130,7 +139,8 @@ export default function TransactionsPage() {
   };
 
   const handleViewTransaction = (transaction: TransformedTransaction) => {
-    console.log("View transaction", transaction);
+    setSelectedTransaction(transaction);
+    setDialogOpen(true);
   };
 
   const handleResetFilters = () => {
@@ -142,18 +152,46 @@ export default function TransactionsPage() {
     setCurrentPage(1);
   };
 
-  // Transaction type options for filter chips
-  const transactionTypeOptions = [
+  const handleApplyFilters = () => {
+    setFilterDrawerOpen(false);
+    setCurrentPage(1);
+  };
+
+  // All transaction type options (for filter drawer)
+  const allTransactionTypeOptions = [
+    { label: "All Types", value: "all" },
+    { label: "Member's Deposit", value: "PERIODIC_DEPOSIT" },
+    { label: "Member's Offset Deposit", value: "OFFSET_DEPOSIT" },
+    { label: "Member's Withdrawal", value: "WITHDRAW" },
+    { label: "Member's Rejoin Deposit", value: "REJOIN" },
+    { label: "Club Funds Transfer", value: "FUNDS_TRANSFER" },
+    { label: "Vendor Investment", value: "VENDOR_INVEST" },
+    { label: "Vendor Return", value: "VENDOR_RETURNS" },
+    { label: "Loan Taken", value: "LOAN_TAKEN" },
+    { label: "Loan Repayment", value: "LOAN_REPAY" },
+    { label: "Loan Interest", value: "LOAN_INTEREST" },
+  ];
+
+  // Mobile filter chips (simplified)
+  const mobileFilterChips = [
     { label: "All Types", value: "all" },
     { label: "Deposit", value: "PERIODIC_DEPOSIT" },
     { label: "Withdrawal", value: "WITHDRAW" },
-    { label: "Loan Taken", value: "LOAN_TAKEN" },
-    { label: "Loan Repayment", value: "LOAN_REPAY" },
+    { label: "Loan", value: "LOAN_TAKEN" },
     { label: "Transfer", value: "FUNDS_TRANSFER" },
-    { label: "Other", value: "other" },
+    { label: "Vendor", value: "VENDOR_INVEST" },
   ];
 
-  // Define columns
+  // Account options
+  const accountOptions = [
+    { label: "All Accounts", value: "all" },
+    ...accounts.map((acc) => ({
+      label: acc.name,
+      value: acc.id,
+    })),
+  ];
+
+  // Define columns for desktop table
   const columns: ColumnDef<TransformedTransaction>[] = useMemo(
     () => [
       {
@@ -275,6 +313,23 @@ export default function TransactionsPage() {
         },
       },
       {
+        id: "type",
+        accessorKey: "transactionType",
+        header: "Type",
+        enableSorting: true,
+        meta: {
+          tooltip:
+            "Type of transaction (deposit, withdrawal, loan, transfer, etc.).",
+        },
+        cell: ({ row }) => {
+          return (
+            <div className="text-sm text-foreground">
+              {transactionTypeMap[row.original.transactionType]}
+            </div>
+          );
+        },
+      },
+      {
         id: "amount",
         accessorKey: "amount",
         header: "Amount",
@@ -301,26 +356,9 @@ export default function TransactionsPage() {
         },
       },
       {
-        id: "type",
-        accessorKey: "transactionType",
-        header: "Type",
-        enableSorting: true,
-        meta: {
-          tooltip:
-            "Type of transaction (deposit, withdrawal, loan, transfer, etc.).",
-        },
-        cell: ({ row }) => {
-          return (
-            <div className="text-sm text-foreground">
-              {transactionTypeMap[row.original.transactionType]}
-            </div>
-          );
-        },
-      },
-      {
         id: "occurred",
         accessorKey: "transactionAt",
-        header: "Occurred",
+        header: "Transaction At",
         enableSorting: true,
         meta: {
           tooltip: "When this transaction actually happened.",
@@ -336,7 +374,7 @@ export default function TransactionsPage() {
       {
         id: "recorded",
         accessorKey: "createdAt",
-        header: "Recorded",
+        header: "Created At",
         enableSorting: true,
         meta: {
           tooltip: "When this transaction was recorded in the system.",
@@ -372,12 +410,12 @@ export default function TransactionsPage() {
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
       {/* Desktop Header */}
       <div className="hidden lg:block">
         <PageHeader
           title="Transaction History"
-          subtitle="Review all deposits, withdrawals, transfers, and loan movements."
+          subtitle="Review all deposits, withdrawals, transfers, loans, and vendor movements."
           primaryAction={{
             label: "Add Transaction",
             icon: <Receipt className="h-4 w-4" />,
@@ -403,14 +441,21 @@ export default function TransactionsPage() {
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden space-y-2 px-4 pt-2">
-        <h1 className="text-2xl font-semibold text-foreground">
+      <div className="lg:hidden space-y-2">
+        <h1 className="text-xl font-semibold text-foreground">
           Transaction History
         </h1>
         <p className="text-sm text-muted-foreground">
-          Review all deposits, withdrawals, transfers, and loan movements.
+          Review all deposits, withdrawals, transfers, loans, and vendor
+          movements.
         </p>
       </div>
+
+      {/* Summary Card */}
+      <TransactionSummaryCard
+        inflow={summary.inflow}
+        outflow={summary.outflow}
+      />
 
       {/* Desktop Filter Bar */}
       <div className="hidden lg:block">
@@ -421,40 +466,77 @@ export default function TransactionsPage() {
             account: {
               value: accountFilter,
               onChange: setAccountFilter,
-              options: [
-                { label: "All Accounts", value: "all" },
-                ...accounts.map((acc) => ({
-                  label: acc.name,
-                  value: acc.id,
-                })),
-              ],
+              options: accountOptions,
             },
             type: {
               value: typeFilter,
               onChange: setTypeFilter,
-              options: transactionTypeOptions,
+              options: allTransactionTypeOptions,
             },
+          }}
+          dateRange={{
+            startDate,
+            endDate,
+            onStartDateChange: setStartDate,
+            onEndDateChange: setEndDate,
+          }}
+          pageSize={{
+            value: pageSize,
+            onChange: setPageSize,
+            options: [10, 25, 50],
           }}
           onReset={handleResetFilters}
         />
       </div>
 
-      {/* Summary */}
-      {transactions.length > 0 && (
-        <div className="flex items-center gap-6 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Inflow:</span>
-            <span className="font-medium text-green-600 dark:text-green-500">
-              {moneyFormat(summary.inflow)}
-            </span>
+      {/* Mobile Filters */}
+      <div className="lg:hidden space-y-3">
+        {/* Search Bar */}
+        <SearchBarMobile
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search transactions..."
+        />
+
+        {/* Filter Pills + Filter Button */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 overflow-x-auto">
+            <FilterChips
+              chips={mobileFilterChips}
+              selectedValue={typeFilter}
+              onChange={setTypeFilter}
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Outflow:</span>
-            <span className="font-medium text-destructive">
-              {moneyFormat(summary.outflow)}
-            </span>
-          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setFilterDrawerOpen(true)}
+            className="shrink-0"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            <span className="sr-only">Open filters</span>
+          </Button>
         </div>
+      </div>
+
+      {/* Error State */}
+      {isError && (
+        <Card className="border-destructive bg-destructive/10">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-destructive">
+                We couldn&apos;t load transactions. Try again.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.reload()}
+              >
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Desktop Table View */}
@@ -468,25 +550,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Mobile Card View */}
-      <div className="lg:hidden space-y-6 px-4 pb-24">
-        {/* Search Bar */}
-        <SearchBarMobile
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search transactions..."
-        />
-
-        {/* Filter Chips */}
-        <FilterChips
-          chips={transactionTypeOptions.slice(0, 4).map((opt) => ({
-            label: opt.label,
-            value: opt.value,
-          }))}
-          selectedValue={typeFilter}
-          onChange={setTypeFilter}
-        />
-
-        {/* Transaction List */}
+      <div className="lg:hidden space-y-4">
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
@@ -495,94 +559,49 @@ export default function TransactionsPage() {
           </div>
         ) : transactions.length > 0 ? (
           <div className="space-y-4">
-            {transactions.map((transaction) => {
-              const {
-                direction,
-                color,
-                icon: Icon,
-              } = getTransactionDirection(transaction);
-              return (
-                <div
-                  key={transaction.id}
-                  className="rounded-xl border border-border/50 bg-card p-4 shadow-sm"
-                  onClick={() => handleEditTransaction(transaction)}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        {transaction.from.link ? (
-                          <ClickableAvatar
-                            src={transaction.from.avatar}
-                            alt={transaction.from.name}
-                            name={transaction.from.name}
-                            href={transaction.from.link}
-                            size="sm"
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
-                            {transaction.from.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </div>
-                        )}
-                        <span className="text-sm font-medium text-foreground">
-                          {transaction.from.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 ml-10">
-                        <span className="text-xs text-muted-foreground">→</span>
-                        {transaction.to.link ? (
-                          <ClickableAvatar
-                            src={transaction.to.avatar}
-                            alt={transaction.to.name}
-                            name={transaction.to.name}
-                            href={transaction.to.link}
-                            size="sm"
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
-                            {transaction.to.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </div>
-                        )}
-                        <span className="text-sm font-medium text-foreground">
-                          {transaction.to.name}
-                        </span>
-                      </div>
-                    </div>
-                    <div className={`flex items-center gap-1.5 ${color}`}>
-                      {Icon && <Icon className="h-4 w-4" />}
-                      <span className="text-base font-semibold">
-                        {moneyFormat(transaction.amount)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-border">
-                    <span className="text-xs text-muted-foreground">
-                      {transactionTypeMap[transaction.transactionType]}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {dateFormat(newZoneDate(transaction.transactionAt))}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            {transactions.map((transaction) => (
+              <TransactionCardMobile
+                key={transaction.id}
+                transaction={transaction}
+                onClick={() => handleEditTransaction(transaction)}
+              />
+            ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-border/50 bg-card p-8 text-center text-muted-foreground">
-            No transactions found
-          </div>
+          <Card className="border-border/50 bg-card">
+            <CardContent className="p-8 text-center">
+              <p className="mb-4 text-sm font-medium text-muted-foreground">
+                No transactions match these filters yet.
+              </p>
+              <Button variant="outline" size="sm" onClick={handleResetFilters}>
+                Clear filters
+              </Button>
+            </CardContent>
+          </Card>
         )}
       </div>
 
+      {/* Filter Drawer (Mobile) */}
+      <TransactionFilterDrawer
+        open={filterDrawerOpen}
+        onOpenChange={setFilterDrawerOpen}
+        accountFilter={accountFilter}
+        onAccountFilterChange={setAccountFilter}
+        typeFilter={typeFilter}
+        onTypeFilterChange={setTypeFilter}
+        startDate={startDate}
+        onStartDateChange={setStartDate}
+        endDate={endDate}
+        onEndDateChange={setEndDate}
+        pageSize={pageSize}
+        onPageSizeChange={setPageSize}
+        accountOptions={accountOptions}
+        typeOptions={allTransactionTypeOptions}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
+      />
+
+      {/* Transaction Form Dialog */}
       <TransactionFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
