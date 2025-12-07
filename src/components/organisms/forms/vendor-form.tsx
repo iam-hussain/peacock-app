@@ -175,10 +175,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Start Date</FormLabel>
-                <DatePickerForm
-                  field={field}
-                  placeholder="Select start date"
-                />
+                <DatePickerForm field={field} placeholder="Select start date" />
                 <FormMessage />
               </FormItem>
             )}
