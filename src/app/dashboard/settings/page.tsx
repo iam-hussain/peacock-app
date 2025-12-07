@@ -538,7 +538,7 @@ export default function SettingsPage() {
               data but may update balances.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               onClick={() => setRecalculateReturnsDialogOpen(false)}
