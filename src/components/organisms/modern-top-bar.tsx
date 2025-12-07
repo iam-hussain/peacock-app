@@ -1,23 +1,26 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import {
+  Bell,
+  ChevronDown,
+  LogOut,
   Menu,
   Search,
-  Bell,
   Settings,
   User,
-  ChevronDown,
   X,
-  LogOut,
-} from 'lucide-react'
-import { toast } from 'sonner'
+} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
 
-import { Button } from '../ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { GlobalSearch } from "../molecules/global-search";
+import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,100 +28,100 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { ThemeModeToggle } from '../molecules/theme-mode-toggle'
-import { GlobalSearch } from '../molecules/global-search'
-import { RootState } from '@/store'
-import { openSideBar, setIsLoggedIn } from '@/store/pageSlice'
-import { useSelector, useDispatch } from 'react-redux'
-import { cn } from '@/lib/utils'
-import fetcher from '@/lib/fetcher'
+} from "../ui/dropdown-menu";
+
+import fetcher from "@/lib/fetcher";
+import { cn } from "@/lib/utils";
+import { RootState } from "@/store";
+import { openSideBar, setIsLoggedIn } from "@/store/pageSlice";
 
 const getPageTitle = (pathname: string): string => {
-  if (pathname === '/dashboard') return 'Dashboard'
-  if (pathname.startsWith('/dashboard/member')) return 'Members'
-  if (pathname.startsWith('/dashboard/vendor')) return 'Vendors'
-  if (pathname.startsWith('/dashboard/loan')) return 'Loans'
-  if (pathname.startsWith('/dashboard/transaction')) return 'Transactions'
-  if (pathname.startsWith('/dashboard/terms-and-conditions'))
-    return 'Terms & Conditions'
-  return 'Dashboard'
-}
+  if (pathname === "/dashboard") return "Dashboard";
+  if (pathname.startsWith("/dashboard/member")) return "Members";
+  if (pathname.startsWith("/dashboard/vendor")) return "Vendors";
+  if (pathname.startsWith("/dashboard/loan")) return "Loans";
+  if (pathname.startsWith("/dashboard/transaction")) return "Transactions";
+  if (pathname.startsWith("/dashboard/terms-and-conditions"))
+    return "Terms & Conditions";
+  return "Dashboard";
+};
 
 export function ModernTopBar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const dispatch = useDispatch()
-  const queryClient = useQueryClient()
-  const [searchOpen, setSearchOpen] = useState(false)
-  const searchBarRef = useRef<HTMLDivElement>(null)
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen)
+  const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchBarRef = useRef<HTMLDivElement>(null);
+  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
   const sideBarCollapsed = useSelector(
     (state: RootState) => state.page.sideBarCollapsed
-  )
+  );
 
   // Close mobile search on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      
+      const target = event.target as HTMLElement;
+
       // Don't close if clicking on the search button or inside the search bar
       if (
-        target.closest('[data-search-button]') ||
+        target.closest("[data-search-button]") ||
         (searchBarRef.current && searchBarRef.current.contains(target))
       ) {
-        return
+        return;
       }
 
       // Close if clicking outside
       if (searchOpen) {
-        setSearchOpen(false)
+        setSearchOpen(false);
       }
-    }
+    };
 
     if (searchOpen) {
       // Use a small delay to avoid closing immediately when opening
       const timeoutId = setTimeout(() => {
-        document.addEventListener('mousedown', handleClickOutside)
-      }, 100)
+        document.addEventListener("mousedown", handleClickOutside);
+      }, 100);
 
       return () => {
-        clearTimeout(timeoutId)
-        document.removeEventListener('mousedown', handleClickOutside)
-      }
+        clearTimeout(timeoutId);
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
     }
-  }, [searchOpen])
+  }, [searchOpen]);
 
   const logoutMutation = useMutation({
-    mutationFn: () => fetcher.post('/api/auth/logout'),
+    mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['authentication'] })
-      dispatch(setIsLoggedIn(false))
-      toast.success('Logged out successfully!')
-      router.push('/login')
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      dispatch(setIsLoggedIn(false));
+      toast.success("Logged out successfully!");
+      router.push("/login");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'An unexpected error occurred. Please try again.')
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
     },
-  })
+  });
 
   const handleLogout = () => {
-    logoutMutation.mutate()
-  }
+    logoutMutation.mutate();
+  };
 
-  const pageTitle = getPageTitle(pathname)
+  const pageTitle = getPageTitle(pathname);
 
   return (
     <motion.header
       initial={{ y: -64 }}
       animate={{ y: 0 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      transition={{ type: "spring", stiffness: 100, damping: 20 }}
       className={cn(
-        'fixed top-0 left-0 right-0 z-30 h-14',
-        'bg-background/80 backdrop-blur-md border-b border-border/50',
-        'shadow-sm',
-        'transition-all duration-300',
-        sideBarCollapsed ? 'lg:pl-[80px]' : 'lg:pl-[260px]'
+        "fixed top-0 left-0 right-0 z-30 h-14",
+        "bg-background/80 backdrop-blur-md border-b border-border/50",
+        "shadow-sm",
+        "transition-all duration-300",
+        sideBarCollapsed ? "lg:pl-[80px]" : "lg:pl-[260px]"
       )}
     >
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
@@ -131,7 +134,11 @@ export function ModernTopBar() {
             className="lg:hidden h-9 w-9"
             onClick={() => dispatch(openSideBar())}
           >
-            {sideBarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {sideBarOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
 
           {/* Page Title & Breadcrumb */}
@@ -168,13 +175,21 @@ export function ModernTopBar() {
         {/* Right Section */}
         <div className="flex items-center gap-2">
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="h-9 w-9 hidden sm:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 hidden sm:flex"
+          >
             <Bell className="h-5 w-5" />
             <span className="sr-only">Notifications</span>
           </Button>
 
           {/* Settings */}
-          <Button variant="ghost" size="icon" className="h-9 w-9 hidden sm:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 hidden sm:flex"
+          >
             <Settings className="h-5 w-5" />
             <span className="sr-only">Settings</span>
           </Button>
@@ -213,7 +228,10 @@ export function ModernTopBar() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={handleLogout}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>
@@ -227,14 +245,16 @@ export function ModernTopBar() {
         <motion.div
           ref={searchBarRef}
           initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
           className="lg:hidden border-t border-border/50 px-4 py-3 bg-background"
         >
-          <GlobalSearch onResultClick={() => setSearchOpen(false)} isMobile={true} />
+          <GlobalSearch
+            onResultClick={() => setSearchOpen(false)}
+            isMobile={true}
+          />
         </motion.div>
       )}
     </motion.header>
-  )
+  );
 }
-

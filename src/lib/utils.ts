@@ -22,23 +22,23 @@ export function formatIndianNumber(
   value: number,
   showCurrency: boolean = true
 ): string {
-  const absValue = Math.abs(value)
-  const prefix = value < 0 ? '-' : ''
-  const currency = showCurrency ? '₹' : ''
+  const absValue = Math.abs(value);
+  const prefix = value < 0 ? "-" : "";
+  const currency = showCurrency ? "₹" : "";
 
   if (absValue >= 10000000) {
     // Crores (1,00,00,000)
-    const crores = absValue / 10000000
-    return `${prefix}${currency}${crores.toFixed(1)}Cr`
+    const crores = absValue / 10000000;
+    return `${prefix}${currency}${crores.toFixed(1)}Cr`;
   } else if (absValue >= 100000) {
     // Lakhs (1,00,000)
-    const lakhs = absValue / 100000
-    return `${prefix}${currency}${lakhs.toFixed(1)}L`
+    const lakhs = absValue / 100000;
+    return `${prefix}${currency}${lakhs.toFixed(1)}L`;
   } else if (absValue >= 1000) {
     // Thousands
-    const thousands = absValue / 1000
-    return `${prefix}${currency}${thousands.toFixed(1)}K`
+    const thousands = absValue / 1000;
+    return `${prefix}${currency}${thousands.toFixed(1)}K`;
   } else {
-    return `${prefix}${currency}${absValue.toLocaleString('en-IN')}`
+    return `${prefix}${currency}${absValue.toLocaleString("en-IN")}`;
   }
 }

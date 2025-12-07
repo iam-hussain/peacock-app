@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       { isLoggedIn: true, user: decoded },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json({ isLoggedIn: false }, { status: 200 });
   }
 }

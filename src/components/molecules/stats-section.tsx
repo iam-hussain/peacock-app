@@ -1,187 +1,189 @@
-'use client'
+"use client";
 
 import {
-  Users,
-  CalendarDays,
-  Wallet,
   ArrowDownCircle,
-  SlidersHorizontal,
-  Hand,
-  Coins,
-  Scale,
   Banknote,
-  TrendingUp,
-  Clock,
   Briefcase,
-  Receipt,
-  Layers,
-  Crown,
+  CalendarDays,
   CircleDollarSign,
-} from 'lucide-react'
+  Clock,
+  Coins,
+  Crown,
+  Hand,
+  Layers,
+  Receipt,
+  Scale,
+  SlidersHorizontal,
+  TrendingUp,
+  Users,
+  Wallet,
+} from "lucide-react";
 
-import { ModernStatCard } from './modern-stat-card'
-import { clubAge } from '@/lib/date'
-import { TransformedStatistics } from '@/app/api/statistics/route'
+import { ModernStatCard } from "./modern-stat-card";
+
+import { TransformedStatistics } from "@/app/api/statistics/route";
+import { clubAge } from "@/lib/date";
 
 interface StatsSectionProps {
-  statistics: TransformedStatistics
+  statistics: TransformedStatistics;
 }
 
 export function StatsSection({ statistics }: StatsSectionProps) {
-  const club = clubAge()
+  const club = clubAge();
 
   const formatCurrency = (value: number) =>
-    value.toLocaleString('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+    value.toLocaleString("en-IN", {
+      style: "currency",
+      currency: "INR",
       maximumFractionDigits: 0,
-    })
+    });
 
   // Calculate derived values
-  const totalInvested = statistics.totalLoanBalance + statistics.totalVendorHolding
+  const totalInvested =
+    statistics.totalLoanBalance + statistics.totalVendorHolding;
   const pendingAmounts =
     statistics.totalInterestBalance +
     statistics.totalOffsetBalance +
-    statistics.totalMemberPeriodicDepositsBalance
+    statistics.totalMemberPeriodicDepositsBalance;
   // Current Portfolio Value should be the Net Value
-  const currentPortfolioValue = statistics.currentClubNetValue
+  const currentPortfolioValue = statistics.currentClubNetValue;
   // Net Value should be Current Portfolio Value + Pending Amounts
-  const netValue = currentPortfolioValue + pendingAmounts
+  const netValue = currentPortfolioValue + pendingAmounts;
 
   const kpiGroups = [
     {
-      title: 'MEMBERS OVERVIEW',
+      title: "MEMBERS OVERVIEW",
       cards: [
         {
-          title: 'Active Members',
+          title: "Active Members",
           value: `${statistics.membersCount}`,
           icon: <Users className="h-5 w-5" />,
-          iconBgColor: '#E3F2FD',
+          iconBgColor: "#E3F2FD",
         },
         {
-          title: 'Club Age',
+          title: "Club Age",
           value: `${club.inMonth} months`,
           icon: <CalendarDays className="h-5 w-5" />,
-          iconBgColor: '#EDE7F6',
+          iconBgColor: "#EDE7F6",
         },
       ],
     },
     {
-      title: 'MEMBER FUNDS',
+      title: "MEMBER FUNDS",
       cards: [
         {
-          title: 'Total Deposits',
+          title: "Total Deposits",
           value: formatCurrency(statistics.totalMemberPeriodicDeposits),
           icon: <CircleDollarSign className="h-5 w-5" />,
-          iconBgColor: '#E8F5E9',
+          iconBgColor: "#E8F5E9",
         },
         {
-          title: 'Member Balance',
+          title: "Member Balance",
           value: formatCurrency(statistics.totalMemberPeriodicDepositsBalance),
           icon: <Wallet className="h-5 w-5" />,
-          iconBgColor: '#FFF3E0',
+          iconBgColor: "#FFF3E0",
         },
       ],
     },
     {
-      title: 'MEMBER OUTFLOW',
+      title: "MEMBER OUTFLOW",
       cards: [
         {
-          title: 'Withdrawals',
+          title: "Withdrawals",
           value: formatCurrency(statistics.totalMemberProfitWithdrawals),
           icon: <ArrowDownCircle className="h-5 w-5" />,
-          iconBgColor: '#FBE9E7',
+          iconBgColor: "#FBE9E7",
         },
         {
-          title: 'Member Adjustments',
+          title: "Member Adjustments",
           value: formatCurrency(statistics.totalOffsetAmount),
           icon: <SlidersHorizontal className="h-5 w-5" />,
-          iconBgColor: '#E1F5FE',
+          iconBgColor: "#E1F5FE",
         },
       ],
     },
     {
-      title: 'LOAN SUMMARY',
+      title: "LOAN SUMMARY",
       cards: [
         {
-          title: 'Loan Taken',
+          title: "Loan Taken",
           value: formatCurrency(statistics.totalLoanBalance),
           icon: <Hand className="h-5 w-5" />,
-          iconBgColor: '#F3E5F5',
+          iconBgColor: "#F3E5F5",
         },
         {
-          title: 'Interest Collected',
+          title: "Interest Collected",
           value: formatCurrency(statistics.totalInterestPaid),
           icon: <Coins className="h-5 w-5" />,
-          iconBgColor: '#E8F5E9',
+          iconBgColor: "#E8F5E9",
         },
         {
-          title: 'Interest Balance',
+          title: "Interest Balance",
           value: formatCurrency(statistics.totalInterestBalance),
           icon: <Scale className="h-5 w-5" />,
-          iconBgColor: '#FFF8E1',
+          iconBgColor: "#FFF8E1",
         },
       ],
     },
     {
-      title: 'VENDOR TRANSACTIONS',
+      title: "VENDOR TRANSACTIONS",
       cards: [
         {
-          title: 'Vendor Investment',
+          title: "Vendor Investment",
           value: formatCurrency(statistics.totalVendorHolding || 0),
           icon: <Briefcase className="h-5 w-5" />,
-          iconBgColor: '#FFF3E0',
+          iconBgColor: "#FFF3E0",
         },
         {
-          title: 'Vendor Profit',
+          title: "Vendor Profit",
           value: formatCurrency(statistics.totalVendorProfit),
           icon: <Receipt className="h-5 w-5" />,
-          iconBgColor: '#E8F5E9',
+          iconBgColor: "#E8F5E9",
         },
       ],
     },
     {
-      title: 'CASH FLOW POSITION',
+      title: "CASH FLOW POSITION",
       cards: [
         {
-          title: 'Available Cash',
+          title: "Available Cash",
           value: formatCurrency(statistics.currentClubBalance),
           icon: <Banknote className="h-5 w-5" />,
-          iconBgColor: '#E3F2FD',
+          iconBgColor: "#E3F2FD",
         },
         {
-          title: 'Total Invested',
+          title: "Total Invested",
           value: formatCurrency(totalInvested),
           icon: <TrendingUp className="h-5 w-5" />,
-          iconBgColor: '#E8F5E9',
+          iconBgColor: "#E8F5E9",
         },
         {
-          title: 'Pending Amounts',
+          title: "Pending Amounts",
           value: formatCurrency(pendingAmounts),
           icon: <Clock className="h-5 w-5" />,
-          iconBgColor: '#F3E5F5',
+          iconBgColor: "#F3E5F5",
         },
       ],
     },
     {
-      title: 'PORTFOLIO SUMMARY',
+      title: "PORTFOLIO SUMMARY",
       cards: [
         {
-          title: 'Current Value',
+          title: "Current Value",
           value: formatCurrency(currentPortfolioValue),
           icon: <Layers className="h-5 w-5" />,
-          iconBgColor: '#E8F5E9',
+          iconBgColor: "#E8F5E9",
         },
         {
-          title: 'Total Value',
+          title: "Total Value",
           value: formatCurrency(netValue),
           icon: <Crown className="h-5 w-5" />,
-          iconBgColor: '#FFF8E1',
+          iconBgColor: "#FFF8E1",
           isHighlighted: true,
         },
       ],
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -205,5 +207,5 @@ export function StatsSection({ statistics }: StatsSectionProps) {
         </div>
       ))}
     </div>
-  )
+  );
 }

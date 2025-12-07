@@ -1,83 +1,80 @@
-'use client'
+"use client";
 
-import { useQuery } from '@tanstack/react-query'
-import { useState, useMemo } from 'react'
-import { Search } from 'lucide-react'
+import { useQuery } from "@tanstack/react-query";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Input } from '../ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { CustomLink } from "../ui/link";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
-import { CustomLink } from '../ui/link'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../ui/dialog'
-import { MemberDetails } from './member-details'
-import { MemberDash } from './member-dash'
-import { fetchMembers } from '@/lib/query-options'
-import { fetchMemberBySlug } from '@/lib/query-options'
-import { TransformedMember } from '@/transformers/account'
-import { moneyFormat } from '@/lib/utils'
+} from "../ui/select";
+
+import { MemberDash } from "./member-dash";
+import { MemberDetails } from "./member-details";
+
+import { fetchMembers } from "@/lib/query-options";
+import { fetchMemberBySlug } from "@/lib/query-options";
+import { moneyFormat } from "@/lib/utils";
+import { TransformedMember } from "@/transformers/account";
 
 interface MembersPreviewProps {
-  initialMembers?: TransformedMember[]
+  initialMembers?: TransformedMember[];
 }
 
 export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [selectedMemberSlug, setSelectedMemberSlug] = useState<string | null>(
     null
-  )
+  );
 
-  const { data } = useQuery(fetchMembers())
-  const members = data?.members || initialMembers
+  const { data } = useQuery(fetchMembers());
+  const members = data?.members || initialMembers;
 
   const { data: selectedMemberData } = useQuery({
-    ...fetchMemberBySlug(selectedMemberSlug || ''),
+    ...fetchMemberBySlug(selectedMemberSlug || ""),
     enabled: !!selectedMemberSlug,
-  })
+  });
 
   const filteredMembers = useMemo(() => {
-    let filtered = members
+    let filtered = members;
 
     // Filter by status
-    if (filterStatus === 'active') {
-      filtered = filtered.filter((m) => m.active)
-    } else if (filterStatus === 'inactive') {
-      filtered = filtered.filter((m) => !m.active)
+    if (filterStatus === "active") {
+      filtered = filtered.filter((m) => m.active);
+    } else if (filterStatus === "inactive") {
+      filtered = filtered.filter((m) => !m.active);
     }
 
     // Filter by search query
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (m) =>
           m.name.toLowerCase().includes(query) ||
           m.slug.toLowerCase().includes(query)
-      )
+      );
     }
 
     // Return all filtered members
-    return filtered
-  }, [members, filterStatus, searchQuery])
+    return filtered;
+  }, [members, filterStatus, searchQuery]);
 
   const handleMemberClick = (slug: string) => {
-    setSelectedMemberSlug(slug)
-  }
+    setSelectedMemberSlug(slug);
+  };
 
   const handleCloseDrawer = () => {
-    setSelectedMemberSlug(null)
-  }
+    setSelectedMemberSlug(null);
+  };
 
   return (
     <>
@@ -133,9 +130,9 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
                     <AvatarImage src={member.avatar} alt={member.name} />
                     <AvatarFallback className="bg-primary/10 text-primary">
                       {member.name
-                        .split(' ')
+                        .split(" ")
                         .map((n) => n[0])
-                        .join('')
+                        .join("")
                         .toUpperCase()
                         .slice(0, 2)}
                     </AvatarFallback>
@@ -199,6 +196,5 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
         </Dialog>
       )}
     </>
-  )
+  );
 }
-

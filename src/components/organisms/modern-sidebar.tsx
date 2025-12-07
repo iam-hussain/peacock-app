@@ -1,103 +1,102 @@
-'use client'
+"use client";
 
-import { useSelector, useDispatch } from 'react-redux'
-import { usePathname, useRouter } from 'next/navigation'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import Image from 'next/image'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  LayoutDashboard,
-  Users,
   Briefcase,
-  FolderSync,
-  Wallet,
-  FileText,
-  Settings,
-  LogOut,
   ChevronLeft,
   ChevronRight,
+  FileText,
+  FolderSync,
+  LayoutDashboard,
+  LogOut,
+  Settings,
   User,
-} from 'lucide-react'
-import { toast } from 'sonner'
+  Users,
+  Wallet,
+} from "lucide-react";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
 
-import { Button } from '../ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { ScrollArea } from '../ui/scroll-area'
-import { Separator } from '../ui/separator'
-import { CustomLink } from '../ui/link'
-import { RootState } from '@/store'
-import { toggleSideBarCollapse, setIsLoggedIn } from '@/store/pageSlice'
-import { clubAge } from '@/lib/date'
-import { cn } from '@/lib/utils'
-import fetcher from '@/lib/fetcher'
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { CustomLink } from "../ui/link";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
+
+import { clubAge } from "@/lib/date";
+import fetcher from "@/lib/fetcher";
+import { cn } from "@/lib/utils";
+import { RootState } from "@/store";
+import { setIsLoggedIn, toggleSideBarCollapse } from "@/store/pageSlice";
 
 interface NavItem {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  href: string
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
 }
 
 const mainNavItems: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: Users, label: 'Members', href: '/dashboard/member' },
-  { icon: Briefcase, label: 'Vendors', href: '/dashboard/vendor' },
-  { icon: FolderSync, label: 'Loans', href: '/dashboard/loan' },
-  { icon: Wallet, label: 'Transactions', href: '/dashboard/transaction' },
-]
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { icon: Users, label: "Members", href: "/dashboard/member" },
+  { icon: Briefcase, label: "Vendors", href: "/dashboard/vendor" },
+  { icon: FolderSync, label: "Loans", href: "/dashboard/loan" },
+  { icon: Wallet, label: "Transactions", href: "/dashboard/transaction" },
+];
 
 const secondaryNavItems: NavItem[] = [
-  { icon: FileText, label: 'Terms & Conditions', href: '/dashboard/terms-and-conditions' },
-]
+  {
+    icon: FileText,
+    label: "Terms & Conditions",
+    href: "/dashboard/terms-and-conditions",
+  },
+];
 
 export function ModernSidebar() {
-  const dispatch = useDispatch()
-  const router = useRouter()
-  const pathname = usePathname()
-  const queryClient = useQueryClient()
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
   const sideBarCollapsed = useSelector(
     (state: RootState) => state.page.sideBarCollapsed
-  )
-  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn)
-  const club = clubAge()
+  );
+  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
+  const club = clubAge();
 
   const logoutMutation = useMutation({
-    mutationFn: () => fetcher.post('/api/auth/logout'),
+    mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['authentication'] })
-      dispatch(setIsLoggedIn(false))
-      toast.success('Logged out successfully!')
-      router.push('/login')
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      dispatch(setIsLoggedIn(false));
+      toast.success("Logged out successfully!");
+      router.push("/login");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'An unexpected error occurred. Please try again.')
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
     },
-  })
+  });
 
   const handleLogout = () => {
-    logoutMutation.mutate()
-  }
+    logoutMutation.mutate();
+  };
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return pathname === '/dashboard'
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
     }
-    return pathname.startsWith(href)
-  }
+    return pathname.startsWith(href);
+  };
 
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen hidden lg:flex flex-col transition-all duration-300 ease-in-out',
-        'bg-background/95 backdrop-blur-sm border-r border-border/50',
-        'shadow-lg',
-        sideBarCollapsed ? 'w-[80px]' : 'w-[260px]'
+        "fixed left-0 top-0 z-40 h-screen hidden lg:flex flex-col transition-all duration-300 ease-in-out",
+        "bg-background/95 backdrop-blur-sm border-r border-border/50",
+        "shadow-lg",
+        sideBarCollapsed ? "w-[80px]" : "w-[260px]"
       )}
     >
       {/* Header */}
@@ -152,8 +151,8 @@ export function ModernSidebar() {
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-1">
           {mainNavItems.map((item) => {
-            const active = isActive(item.href)
-            const Icon = item.icon
+            const active = isActive(item.href);
+            const Icon = item.icon;
             return (
               <CustomLink
                 key={item.href}
@@ -161,21 +160,23 @@ export function ModernSidebar() {
                 variant="ghost"
                 size="auto"
                 className={cn(
-                  'w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all',
-                  'hover:bg-accent hover:text-accent-foreground',
-                  'active:scale-[0.98]',
+                  "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  "active:scale-[0.98]",
                   active &&
-                    'bg-primary/10 text-primary border-l-2 border-primary font-medium',
-                  sideBarCollapsed && 'justify-center px-2'
+                    "bg-primary/10 text-primary border-l-2 border-primary font-medium",
+                  sideBarCollapsed && "justify-center px-2"
                 )}
                 title={sideBarCollapsed ? item.label : undefined}
               >
-                <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                <Icon
+                  className={cn("h-5 w-5 shrink-0", active && "text-primary")}
+                />
                 {!sideBarCollapsed && (
                   <span className="text-sm font-medium">{item.label}</span>
                 )}
               </CustomLink>
-            )
+            );
           })}
         </nav>
 
@@ -183,8 +184,8 @@ export function ModernSidebar() {
 
         <nav className="space-y-1">
           {secondaryNavItems.map((item) => {
-            const active = isActive(item.href)
-            const Icon = item.icon
+            const active = isActive(item.href);
+            const Icon = item.icon;
             return (
               <CustomLink
                 key={item.href}
@@ -192,21 +193,23 @@ export function ModernSidebar() {
                 variant="ghost"
                 size="auto"
                 className={cn(
-                  'w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all',
-                  'hover:bg-accent hover:text-accent-foreground',
-                  'active:scale-[0.98]',
+                  "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  "active:scale-[0.98]",
                   active &&
-                    'bg-primary/10 text-primary border-l-2 border-primary font-medium',
-                  sideBarCollapsed && 'justify-center px-2'
+                    "bg-primary/10 text-primary border-l-2 border-primary font-medium",
+                  sideBarCollapsed && "justify-center px-2"
                 )}
                 title={sideBarCollapsed ? item.label : undefined}
               >
-                <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                <Icon
+                  className={cn("h-5 w-5 shrink-0", active && "text-primary")}
+                />
                 {!sideBarCollapsed && (
                   <span className="text-sm font-medium">{item.label}</span>
                 )}
               </CustomLink>
-            )
+            );
           })}
         </nav>
       </ScrollArea>
@@ -222,8 +225,12 @@ export function ModernSidebar() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">Admin</p>
-              <p className="text-xs text-muted-foreground truncate">Administrator</p>
+              <p className="text-sm font-semibold text-foreground truncate">
+                Admin
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                Administrator
+              </p>
             </div>
           </div>
         </div>
@@ -235,33 +242,36 @@ export function ModernSidebar() {
           variant="ghost"
           size="auto"
           className={cn(
-            'w-full justify-start gap-3 px-3 py-2.5 rounded-lg',
-            'hover:bg-accent hover:text-accent-foreground',
-            sideBarCollapsed && 'justify-center px-2'
+            "w-full justify-start gap-3 px-3 py-2.5 rounded-lg",
+            "hover:bg-accent hover:text-accent-foreground",
+            sideBarCollapsed && "justify-center px-2"
           )}
-          title={sideBarCollapsed ? 'Settings' : undefined}
+          title={sideBarCollapsed ? "Settings" : undefined}
         >
           <Settings className="h-5 w-5 shrink-0" />
-          {!sideBarCollapsed && <span className="text-sm font-medium">Settings</span>}
+          {!sideBarCollapsed && (
+            <span className="text-sm font-medium">Settings</span>
+          )}
         </Button>
         {isLoggedIn && (
           <Button
             variant="ghost"
             size="auto"
             className={cn(
-              'w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-destructive',
-              'hover:bg-destructive/10 hover:text-destructive',
-              sideBarCollapsed && 'justify-center px-2'
+              "w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-destructive",
+              "hover:bg-destructive/10 hover:text-destructive",
+              sideBarCollapsed && "justify-center px-2"
             )}
-            title={sideBarCollapsed ? 'Logout' : undefined}
+            title={sideBarCollapsed ? "Logout" : undefined}
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5 shrink-0" />
-            {!sideBarCollapsed && <span className="text-sm font-medium">Logout</span>}
+            {!sideBarCollapsed && (
+              <span className="text-sm font-medium">Logout</span>
+            )}
           </Button>
         )}
       </div>
     </aside>
-  )
+  );
 }
-

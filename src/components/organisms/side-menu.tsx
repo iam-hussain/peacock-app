@@ -1,25 +1,27 @@
-'use client'
+"use client";
 
-import { useSelector, useDispatch } from 'react-redux'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 
-import MenuItems from './menu-items'
-import { Button } from '../ui/button'
-import { RootState } from '@/store'
-import { toggleSideBarCollapse } from '@/store/pageSlice'
-import { cn } from '@/lib/utils'
+import { Button } from "../ui/button";
+
+import MenuItems from "./menu-items";
+
+import { cn } from "@/lib/utils";
+import { RootState } from "@/store";
+import { toggleSideBarCollapse } from "@/store/pageSlice";
 
 function SideMenu() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const sideBarCollapsed = useSelector(
     (state: RootState) => state.page.sideBarCollapsed
-  )
+  );
 
   return (
     <div
       className={cn(
-        'h-full min-h-svh hidden fixed lg:flex bg-background shadow-sm transition-all duration-300 p-6 pt-[90px]',
-        sideBarCollapsed ? 'w-[80px]' : 'w-[300px]'
+        "h-full min-h-svh hidden fixed lg:flex bg-background shadow-sm transition-all duration-300 p-6 pt-[90px]",
+        sideBarCollapsed ? "w-[80px]" : "w-[300px]"
       )}
     >
       <div className="relative flex h-full w-full flex-col">
@@ -38,7 +40,7 @@ function SideMenu() {
         <MenuItems collapsed={sideBarCollapsed} />
       </div>
     </div>
-  )
+  );
 }
 
-export default SideMenu
+export default SideMenu;

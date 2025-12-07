@@ -1,28 +1,29 @@
-'use client'
+"use client";
 
-import { Plus, Minus, ArrowRight } from 'lucide-react'
+import { ArrowRight, Minus, Plus } from "lucide-react";
 
-import { Card, CardContent } from '../ui/card'
-import { TransformedStatistics } from '@/app/api/statistics/route'
-import { moneyFormat } from '@/lib/utils'
-import { cn } from '@/lib/utils'
+import { Card, CardContent } from "../ui/card";
+
+import { TransformedStatistics } from "@/app/api/statistics/route";
+import { moneyFormat } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface NetValueBreakdownProps {
-  statistics: TransformedStatistics
+  statistics: TransformedStatistics;
 }
 
 export function NetValueBreakdown({ statistics }: NetValueBreakdownProps) {
-  const availableCash = statistics.currentClubBalance || 0
-  const invested = statistics.totalLoanBalance + statistics.totalVendorHolding
-  const loanTaken = statistics.totalLoanBalance
+  const availableCash = statistics.currentClubBalance || 0;
+  const invested = statistics.totalLoanBalance + statistics.totalVendorHolding;
+  const loanTaken = statistics.totalLoanBalance;
   const pending =
     statistics.totalInterestBalance +
     statistics.totalOffsetBalance +
-    statistics.totalMemberPeriodicDepositsBalance
+    statistics.totalMemberPeriodicDepositsBalance;
 
-  const assets = availableCash + invested
-  const liabilities = loanTaken + pending
-  const netValue = statistics.currentClubNetValue
+  const assets = availableCash + invested;
+  const liabilities = loanTaken + pending;
+  const netValue = statistics.currentClubNetValue;
 
   return (
     <div className="space-y-4">
@@ -48,11 +49,7 @@ export function NetValueBreakdown({ statistics }: NetValueBreakdownProps) {
                   color="green"
                 />
                 <Plus className="h-4 w-4 text-muted-foreground" />
-                <ValuePill
-                  label="Invested"
-                  value={invested}
-                  color="green"
-                />
+                <ValuePill label="Invested" value={invested} color="green" />
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 <ValuePill
                   label="Total Assets"
@@ -77,11 +74,7 @@ export function NetValueBreakdown({ statistics }: NetValueBreakdownProps) {
                   color="orange"
                 />
                 <Plus className="h-4 w-4 text-muted-foreground" />
-                <ValuePill
-                  label="Pending"
-                  value={pending}
-                  color="orange"
-                />
+                <ValuePill label="Pending" value={pending} color="orange" />
                 <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 <ValuePill
                   label="Total Liabilities"
@@ -122,15 +115,15 @@ export function NetValueBreakdown({ statistics }: NetValueBreakdownProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 interface ValuePillProps {
-  label: string
-  value: number
-  color: 'green' | 'orange' | 'primary'
-  isTotal?: boolean
-  isHighlight?: boolean
+  label: string;
+  value: number;
+  color: "green" | "orange" | "primary";
+  isTotal?: boolean;
+  isHighlight?: boolean;
 }
 
 function ValuePill({
@@ -141,20 +134,21 @@ function ValuePill({
   isHighlight = false,
 }: ValuePillProps) {
   const colorClasses = {
-    green: 'bg-green-50 border-green-200 text-green-900 dark:bg-green-950 dark:border-green-800 dark:text-green-100',
+    green:
+      "bg-green-50 border-green-200 text-green-900 dark:bg-green-950 dark:border-green-800 dark:text-green-100",
     orange:
-      'bg-orange-50 border-orange-200 text-orange-900 dark:bg-orange-950 dark:border-orange-800 dark:text-orange-100',
+      "bg-orange-50 border-orange-200 text-orange-900 dark:bg-orange-950 dark:border-orange-800 dark:text-orange-100",
     primary:
-      'bg-primary/10 border-primary/20 text-primary-foreground dark:bg-primary/20 dark:border-primary/30',
-  }
+      "bg-primary/10 border-primary/20 text-primary-foreground dark:bg-primary/20 dark:border-primary/30",
+  };
 
   return (
     <div
       className={cn(
-        'rounded-lg border px-4 py-3 text-center transition-shadow',
+        "rounded-lg border px-4 py-3 text-center transition-shadow",
         colorClasses[color],
-        isHighlight && 'ring-2 ring-primary/20 shadow-md',
-        isTotal && 'font-semibold'
+        isHighlight && "ring-2 ring-primary/20 shadow-md",
+        isTotal && "font-semibold"
       )}
     >
       <p className="text-[10px] font-medium uppercase tracking-wide opacity-80">
@@ -162,14 +156,13 @@ function ValuePill({
       </p>
       <p
         className={cn(
-          'mt-1 font-bold',
-          isTotal ? 'text-base' : 'text-sm',
-          isHighlight && 'text-lg'
+          "mt-1 font-bold",
+          isTotal ? "text-base" : "text-sm",
+          isHighlight && "text-lg"
         )}
       >
         {moneyFormat(value)}
       </p>
     </div>
-  )
+  );
 }
-

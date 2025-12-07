@@ -140,9 +140,9 @@ function MenuItems({
                 handleLogout();
                 handleOnItemClick();
               }}
-              title={collapsed ? 'Logout' : undefined}
+              title={collapsed ? "Logout" : undefined}
             >
-              <PiSignOutBold className="h-5 w-5" /> {!collapsed && 'Logout'}
+              <PiSignOutBold className="h-5 w-5" /> {!collapsed && "Logout"}
             </Button>
           )}
 
@@ -154,9 +154,9 @@ function MenuItems({
                 handleLogout();
                 handleOnItemClick();
               }}
-              title={collapsed ? 'Login' : undefined}
+              title={collapsed ? "Login" : undefined}
             >
-              <PiSignInBold className="h-5 w-5" /> {!collapsed && 'Login'}
+              <PiSignInBold className="h-5 w-5" /> {!collapsed && "Login"}
             </CustomLink>
           )}
         </Box>

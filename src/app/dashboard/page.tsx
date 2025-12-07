@@ -1,48 +1,47 @@
-'use client'
-import { useQuery } from '@tanstack/react-query'
+"use client";
 
-import { StatsSection } from '@/components/molecules/stats-section'
-import { MembersPreview } from '@/components/molecules/members-preview'
-import { EnhancedChartsSection } from '@/components/molecules/enhanced-charts-section'
-import { ActivityFeed } from '@/components/molecules/activity-feed'
-import Box from '@/components/ui/box'
-import { fetchStatistics } from '@/lib/query-options'
+import { useQuery } from "@tanstack/react-query";
+
+import { ActivityFeed } from "@/components/molecules/activity-feed";
+import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
+import { MembersPreview } from "@/components/molecules/members-preview";
+import { StatsSection } from "@/components/molecules/stats-section";
+import Box from "@/components/ui/box";
+import { fetchStatistics } from "@/lib/query-options";
 
 export default function DashboardPage() {
-  const { data, isLoading, isError } = useQuery(fetchStatistics())
-  const statistics = data?.statistics || null
-  const members = data?.members || []
+  const { data, isLoading } = useQuery(fetchStatistics());
 
   if (isLoading) {
     return (
-      <Box className="w-full max-w-6xl mx-auto">
-        <div className="space-y-6">
-          <div className="h-64 animate-pulse rounded-xl bg-muted" />
-          <div className="h-96 animate-pulse rounded-xl bg-muted" />
-          <div className="h-64 animate-pulse rounded-xl bg-muted" />
+      <div className="w-full max-w-6xl mx-auto space-y-6">
+        <div className="h-8 w-64 animate-pulse rounded bg-muted" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-lg bg-muted" />
+          ))}
         </div>
-      </Box>
-    )
+      </div>
+    );
   }
 
-  if (isError || !statistics) {
+  if (!data?.statistics) {
     return (
-      <Box className="w-full max-w-6xl mx-auto">
-        <div className="p-8 text-center w-full text-destructive">
-          Unexpected error on fetching the data
-        </div>
-      </Box>
-    )
+      <div className="w-full max-w-6xl mx-auto space-y-6">
+        <Box className="p-8 text-center text-muted-foreground">
+          No statistics available
+        </Box>
+      </div>
+    );
   }
+
+  const { statistics, members } = data;
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      {/* Welcome Section */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Dashboard
-        </h1>
-        <p className="text-sm text-muted-foreground">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Overview of your financial club management
         </p>
       </div>
@@ -50,18 +49,14 @@ export default function DashboardPage() {
       {/* Stats Section */}
       <StatsSection statistics={statistics} />
 
+      {/* Members Preview */}
+      <MembersPreview initialMembers={members || []} />
+
       {/* Charts Section */}
       <EnhancedChartsSection statistics={statistics} />
 
-      {/* Members Preview and Activity Feed */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <MembersPreview initialMembers={members} />
-        </div>
-        <div>
-          <ActivityFeed limit={8} />
-        </div>
-      </div>
+      {/* Activity Feed */}
+      <ActivityFeed limit={10} />
     </div>
-  )
+  );
 }

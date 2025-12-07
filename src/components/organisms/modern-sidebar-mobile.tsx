@@ -1,90 +1,97 @@
-'use client'
+"use client";
 
-import { usePathname, useRouter } from 'next/navigation'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { motion, AnimatePresence } from 'framer-motion'
-import Image from 'next/image'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  LayoutDashboard,
-  Users,
   Briefcase,
-  FolderSync,
-  Wallet,
   FileText,
-  Settings,
+  FolderSync,
+  LayoutDashboard,
   LogOut,
-  X,
+  Settings,
   User,
-} from 'lucide-react'
-import { toast } from 'sonner'
+  Users,
+  Wallet,
+  X,
+} from "lucide-react";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
 
-import { Button } from '../ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { ScrollArea } from '../ui/scroll-area'
-import { Separator } from '../ui/separator'
-import { CustomLink } from '../ui/link'
-import { RootState } from '@/store'
-import { openSideBar, setIsLoggedIn } from '@/store/pageSlice'
-import { useSelector, useDispatch } from 'react-redux'
-import { clubAge } from '@/lib/date'
-import { cn } from '@/lib/utils'
-import fetcher from '@/lib/fetcher'
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { CustomLink } from "../ui/link";
+import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
+
+import { clubAge } from "@/lib/date";
+import fetcher from "@/lib/fetcher";
+import { cn } from "@/lib/utils";
+import { RootState } from "@/store";
+import { openSideBar, setIsLoggedIn } from "@/store/pageSlice";
 
 interface NavItem {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  href: string
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
 }
 
 const mainNavItems: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: Users, label: 'Members', href: '/dashboard/member' },
-  { icon: Briefcase, label: 'Vendors', href: '/dashboard/vendor' },
-  { icon: FolderSync, label: 'Loans', href: '/dashboard/loan' },
-  { icon: Wallet, label: 'Transactions', href: '/dashboard/transaction' },
-]
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { icon: Users, label: "Members", href: "/dashboard/member" },
+  { icon: Briefcase, label: "Vendors", href: "/dashboard/vendor" },
+  { icon: FolderSync, label: "Loans", href: "/dashboard/loan" },
+  { icon: Wallet, label: "Transactions", href: "/dashboard/transaction" },
+];
 
 const secondaryNavItems: NavItem[] = [
-  { icon: FileText, label: 'Terms & Conditions', href: '/dashboard/terms-and-conditions' },
-]
+  {
+    icon: FileText,
+    label: "Terms & Conditions",
+    href: "/dashboard/terms-and-conditions",
+  },
+];
 
 export function ModernSidebarMobile() {
-  const dispatch = useDispatch()
-  const router = useRouter()
-  const pathname = usePathname()
-  const queryClient = useQueryClient()
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen)
-  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn)
-  const club = clubAge()
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
+  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
+  const club = clubAge();
 
   const logoutMutation = useMutation({
-    mutationFn: () => fetcher.post('/api/auth/logout'),
+    mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['authentication'] })
-      dispatch(setIsLoggedIn(false))
-      toast.success('Logged out successfully!')
-      router.push('/login')
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      dispatch(setIsLoggedIn(false));
+      toast.success("Logged out successfully!");
+      router.push("/login");
     },
     onError: (error: any) => {
-      toast.error(error.message || 'An unexpected error occurred. Please try again.')
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
     },
-  })
+  });
 
   const handleLogout = () => {
-    logoutMutation.mutate()
-    handleClose()
-  }
+    logoutMutation.mutate();
+    handleClose();
+  };
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return pathname === '/dashboard'
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
     }
-    return pathname.startsWith(href)
-  }
+    return pathname.startsWith(href);
+  };
 
   const handleClose = () => {
-    dispatch(openSideBar())
-  }
+    dispatch(openSideBar());
+  };
 
   return (
     <AnimatePresence>
@@ -102,10 +109,10 @@ export function ModernSidebarMobile() {
 
           {/* Sidebar */}
           <motion.aside
-            initial={{ x: '-100%' }}
+            initial={{ x: "-100%" }}
             animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed left-0 top-0 z-50 h-screen w-[280px] lg:hidden flex flex-col bg-background shadow-xl"
           >
             {/* Header */}
@@ -120,8 +127,12 @@ export function ModernSidebarMobile() {
                   />
                 </div>
                 <div>
-                  <h1 className="text-sm font-bold text-foreground">Peacock Club</h1>
-                  <p className="text-[10px] text-muted-foreground">{club.inYear}</p>
+                  <h1 className="text-sm font-bold text-foreground">
+                    Peacock Club
+                  </h1>
+                  <p className="text-[10px] text-muted-foreground">
+                    {club.inYear}
+                  </p>
                 </div>
               </div>
               <Button
@@ -138,8 +149,8 @@ export function ModernSidebarMobile() {
             <ScrollArea className="flex-1 px-3 py-4">
               <nav className="space-y-1">
                 {mainNavItems.map((item) => {
-                  const active = isActive(item.href)
-                  const Icon = item.icon
+                  const active = isActive(item.href);
+                  const Icon = item.icon;
                   return (
                     <CustomLink
                       key={item.href}
@@ -147,18 +158,23 @@ export function ModernSidebarMobile() {
                       variant="ghost"
                       size="auto"
                       className={cn(
-                        'w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all',
-                        'hover:bg-accent hover:text-accent-foreground',
-                        'active:scale-[0.98]',
+                        "w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        "active:scale-[0.98]",
                         active &&
-                          'bg-primary/10 text-primary border-l-2 border-primary font-medium'
+                          "bg-primary/10 text-primary border-l-2 border-primary font-medium"
                       )}
                       onClick={handleClose}
                     >
-                      <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                      <Icon
+                        className={cn(
+                          "h-5 w-5 shrink-0",
+                          active && "text-primary"
+                        )}
+                      />
                       <span className="text-sm font-medium">{item.label}</span>
                     </CustomLink>
-                  )
+                  );
                 })}
               </nav>
 
@@ -166,8 +182,8 @@ export function ModernSidebarMobile() {
 
               <nav className="space-y-1">
                 {secondaryNavItems.map((item) => {
-                  const active = isActive(item.href)
-                  const Icon = item.icon
+                  const active = isActive(item.href);
+                  const Icon = item.icon;
                   return (
                     <CustomLink
                       key={item.href}
@@ -175,18 +191,23 @@ export function ModernSidebarMobile() {
                       variant="ghost"
                       size="auto"
                       className={cn(
-                        'w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all',
-                        'hover:bg-accent hover:text-accent-foreground',
-                        'active:scale-[0.98]',
+                        "w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all",
+                        "hover:bg-accent hover:text-accent-foreground",
+                        "active:scale-[0.98]",
                         active &&
-                          'bg-primary/10 text-primary border-l-2 border-primary font-medium'
+                          "bg-primary/10 text-primary border-l-2 border-primary font-medium"
                       )}
                       onClick={handleClose}
                     >
-                      <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                      <Icon
+                        className={cn(
+                          "h-5 w-5 shrink-0",
+                          active && "text-primary"
+                        )}
+                      />
                       <span className="text-sm font-medium">{item.label}</span>
                     </CustomLink>
-                  )
+                  );
                 })}
               </nav>
             </ScrollArea>
@@ -233,6 +254,5 @@ export function ModernSidebarMobile() {
         </>
       )}
     </AnimatePresence>
-  )
+  );
 }
-

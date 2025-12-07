@@ -1,55 +1,55 @@
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-export const fetchCache = 'force-no-store'
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
-import { NextResponse } from 'next/server'
+import { Account, Passbook } from "@prisma/client";
+import { NextResponse } from "next/server";
 
-import prisma from '@/db'
-import { getMemberClubStats } from '@/lib/member-club-stats'
+import prisma from "@/db";
+import { chitCalculator } from "@/lib/helper";
+import { getMemberClubStats } from "@/lib/member-club-stats";
+import { VendorPassbookData } from "@/lib/type";
 import {
   membersTableTransform,
   transformLoanForTable,
-} from '@/transformers/account'
-import { VendorPassbookData } from '@/lib/type'
-import { chitCalculator } from '@/lib/helper'
-import { Account, Passbook } from '@prisma/client'
+} from "@/transformers/account";
 
-type VendorToTransform = Account & { passbook: Passbook }
+type VendorToTransform = Account & { passbook: Passbook };
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
-  const { passbook, ...vendor } = vendorInput
+  const { passbook, ...vendor } = vendorInput;
   const { totalInvestment = 0, totalReturns = 0 } =
-    passbook.payload as VendorPassbookData
+    passbook.payload as VendorPassbookData;
 
   const statusData: {
-    nextDueDate: number | null
-    monthsPassedString: string | null
-  } = { nextDueDate: null, monthsPassedString: null }
+    nextDueDate: number | null;
+    monthsPassedString: string | null;
+  } = { nextDueDate: null, monthsPassedString: null };
 
   if (vendor.active) {
-    const chitData = chitCalculator(vendor.startAt, vendor?.endAt)
-    statusData.nextDueDate = vendor.active ? chitData.nextDueDate : null
-    statusData.monthsPassedString = chitData.monthsPassedString
+    const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
+    statusData.nextDueDate = vendor.active ? chitData.nextDueDate : null;
+    statusData.monthsPassedString = chitData.monthsPassedString;
   }
 
   return {
     id: vendor.id,
-    name: `${vendor.firstName}${vendor.lastName ? ` ${vendor.lastName}` : ''}`,
+    name: `${vendor.firstName}${vendor.lastName ? ` ${vendor.lastName}` : ""}`,
     avatar: vendor.avatar ? `/image/${vendor.avatar}` : undefined,
     startAt: vendor.startAt.getTime(),
     endAt: vendor.endAt ? vendor.endAt.getTime() : null,
-    status: vendor.active ? 'Active' : 'Disabled',
+    status: vendor.active ? "Active" : "Disabled",
     active: vendor.active,
     totalInvestment,
     totalReturns,
     totalProfitAmount: Math.max(totalReturns - totalInvestment, 0),
     ...statusData,
-  }
+  };
 }
 
 export async function POST(request: Request) {
   try {
-    const { searchQuery } = await request.json()
+    const { searchQuery } = await request.json();
 
     if (!searchQuery || searchQuery.trim().length < 2) {
       return NextResponse.json({
@@ -57,10 +57,10 @@ export async function POST(request: Request) {
         vendors: [],
         loans: [],
         transactions: [],
-      })
+      });
     }
 
-    const query = searchQuery.toLowerCase().trim()
+    const query = searchQuery.toLowerCase().trim();
 
     // Fetch all data in parallel
     const [allMembers, allVendors, allTransactions] = await Promise.all([
@@ -96,17 +96,17 @@ export async function POST(request: Request) {
             },
           },
         },
-        orderBy: { transactionAt: 'desc' },
+        orderBy: { transactionAt: "desc" },
       }),
-    ])
+    ]);
 
     // Get stats for member transformations
-    const stats = await getMemberClubStats()
+    const stats = await getMemberClubStats();
     const {
       memberTotalDeposit,
       totalReturnPerMember,
       expectedLoanProfitPerMember,
-    } = stats
+    } = stats;
 
     // Transform members
     const transformedMembers = allMembers.map((member) =>
@@ -116,10 +116,10 @@ export async function POST(request: Request) {
         totalReturnPerMember,
         expectedLoanProfitPerMember
       )
-    )
+    );
 
     // Transform vendors
-    const transformedVendors = allVendors.map(transformVendorForTable)
+    const transformedVendors = allVendors.map(transformVendorForTable);
 
     // Transform loans
     const transformedLoans = allMembers
@@ -129,90 +129,120 @@ export async function POST(request: Request) {
           (Array.isArray(e.passbook.loanHistory) &&
             e.passbook.loanHistory.length > 0)
       )
-      .map(transformLoanForTable)
+      .map(transformLoanForTable);
 
     // Filter members - improved search to handle partial matches and normalize spaces
     // Also search on original account data for firstName/lastName separately
     const filteredMembers = transformedMembers.filter((member) => {
-      const normalizedName = member.name.toLowerCase().trim().replace(/\s+/g, ' ')
-      const normalizedQuery = query.trim().replace(/\s+/g, ' ')
-      const queryWords = normalizedQuery.split(' ').filter(w => w.length > 0)
-      
+      const normalizedName = member.name
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+      const normalizedQuery = query.trim().replace(/\s+/g, " ");
+      const queryWords = normalizedQuery
+        .split(" ")
+        .filter((w: string) => w.length > 0);
+
       // Find original account data
-      const originalMember = allMembers.find(m => m.id === member.id)
+      const originalMember = allMembers.find((m) => m.id === member.id);
       if (originalMember) {
-        const firstName = (originalMember.firstName || '').toLowerCase()
-        const lastName = (originalMember.lastName || '').toLowerCase()
-        
+        const firstName = (originalMember.firstName || "").toLowerCase();
+        const lastName = (originalMember.lastName || "").toLowerCase();
+
         // Check firstName and lastName separately
-        if (queryWords.some(word => firstName.includes(word) || lastName.includes(word))) {
-          return true
+        if (
+          queryWords.some(
+            (word) => firstName.includes(word) || lastName.includes(word)
+          )
+        ) {
+          return true;
         }
-        
+
         // Check if query matches firstName + lastName combination
         if (queryWords.length > 1) {
-          const matchesFirstName = queryWords.some(word => firstName.includes(word))
-          const matchesLastName = queryWords.some(word => lastName.includes(word))
+          const matchesFirstName = queryWords.some((word) =>
+            firstName.includes(word)
+          );
+          const matchesLastName = queryWords.some((word) =>
+            lastName.includes(word)
+          );
           if (matchesFirstName && matchesLastName) {
-            return true
+            return true;
           }
         }
       }
-      
+
       // Check full name match
       if (normalizedName.includes(normalizedQuery)) {
-        return true
+        return true;
       }
-      
+
       // Check if all query words are found in the name (for multi-word searches)
-      if (queryWords.length > 1 && queryWords.every(word => normalizedName.includes(word))) {
-        return true
+      if (
+        queryWords.length > 1 &&
+        queryWords.every((word) => normalizedName.includes(word))
+      ) {
+        return true;
       }
-      
+
       // Check individual word matches
-      if (queryWords.some(word => normalizedName.includes(word))) {
-        return true
+      if (queryWords.some((word) => normalizedName.includes(word))) {
+        return true;
       }
-      
+
       // Check slug and ID
-      if (member.slug.toLowerCase().includes(query) || member.id.toLowerCase().includes(query)) {
-        return true
+      if (
+        member.slug.toLowerCase().includes(query) ||
+        member.id.toLowerCase().includes(query)
+      ) {
+        return true;
       }
-      
-      return false
-    })
+
+      return false;
+    });
 
     // Filter vendors - improved search to handle partial matches
     const filteredVendors = transformedVendors.filter((vendor) => {
-      const normalizedName = vendor.name.toLowerCase().trim().replace(/\s+/g, ' ')
-      const normalizedQuery = query.trim().replace(/\s+/g, ' ')
-      
+      const normalizedName = vendor.name
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+      const normalizedQuery = query.trim().replace(/\s+/g, " ");
+
       return (
         normalizedName.includes(normalizedQuery) ||
-        normalizedQuery.split(' ').some((word) => normalizedName.includes(word)) ||
+        normalizedQuery
+          .split(" ")
+          .some((word) => normalizedName.includes(word)) ||
         vendor.id.toLowerCase().includes(query)
-      )
-    })
+      );
+    });
 
     // Filter loans (by member name) - improved search to handle partial matches
     const filteredLoans = transformedLoans.filter((loan) => {
-      const normalizedName = loan.name.toLowerCase().trim().replace(/\s+/g, ' ')
-      const normalizedQuery = query.trim().replace(/\s+/g, ' ')
-      
+      const normalizedName = loan.name
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ");
+      const normalizedQuery = query.trim().replace(/\s+/g, " ");
+
       return (
         normalizedName.includes(normalizedQuery) ||
-        normalizedQuery.split(' ').some((word) => normalizedName.includes(word)) ||
+        normalizedQuery
+          .split(" ")
+          .some((word) => normalizedName.includes(word)) ||
         loan.id.toLowerCase().includes(query)
-      )
-    })
+      );
+    });
 
     // Filter transactions (by member/vendor names or amount)
     const filteredTransactions = allTransactions
       .map((tx) => {
-        const fromName = `${tx.from.firstName || ''} ${
-          tx.from.lastName || ''
-        }`.trim()
-        const toName = `${tx.to.firstName || ''} ${tx.to.lastName || ''}`.trim()
+        const fromName = `${tx.from.firstName || ""} ${
+          tx.from.lastName || ""
+        }`.trim();
+        const toName =
+          `${tx.to.firstName || ""} ${tx.to.lastName || ""}`.trim();
         return {
           id: tx.id,
           fromName,
@@ -220,7 +250,7 @@ export async function POST(request: Request) {
           amount: tx.amount,
           transactionType: tx.transactionType,
           transactionAt: tx.transactionAt.getTime(),
-        }
+        };
       })
       .filter(
         (tx) =>
@@ -229,7 +259,7 @@ export async function POST(request: Request) {
           tx.amount.toString().includes(query) ||
           tx.id.toLowerCase().includes(query)
       )
-      .slice(0, 10) // Limit to 10 most recent matching transactions
+      .slice(0, 10); // Limit to 10 most recent matching transactions
 
     return NextResponse.json({
       members: filteredMembers.slice(0, 5).map((m) => ({
@@ -254,13 +284,12 @@ export async function POST(request: Request) {
         active: l.active,
       })),
       transactions: filteredTransactions,
-    })
+    });
   } catch (error) {
-    console.error('Search error:', error)
+    console.error("Search error:", error);
     return NextResponse.json(
-      { error: 'Failed to perform search' },
+      { error: "Failed to perform search" },
       { status: 500 }
-    )
+    );
   }
 }
-

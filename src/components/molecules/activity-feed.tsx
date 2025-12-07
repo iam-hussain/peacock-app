@@ -1,62 +1,62 @@
-'use client'
+"use client";
 
-import { useQuery } from '@tanstack/react-query'
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
   CreditCard,
   AlertCircle,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { fetchTransactions } from '@/lib/query-options'
-import { moneyFormat, cn } from '@/lib/utils'
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { fetchTransactions } from "@/lib/query-options";
+import { moneyFormat, cn } from "@/lib/utils";
 
 interface ActivityFeedProps {
-  limit?: number
+  limit?: number;
 }
 
 type TransactionType =
-  | 'PERIODIC_DEPOSIT'
-  | 'OFFSET_DEPOSIT'
-  | 'WITHDRAW'
-  | 'LOAN_TAKEN'
-  | 'LOAN_REPAY'
-  | 'LOAN_INTEREST'
-  | 'VENDOR_INVEST'
-  | 'VENDOR_RETURNS'
-  | 'FUNDS_TRANSFER'
-  | 'REJOIN'
+  | "PERIODIC_DEPOSIT"
+  | "OFFSET_DEPOSIT"
+  | "WITHDRAW"
+  | "LOAN_TAKEN"
+  | "LOAN_REPAY"
+  | "LOAN_INTEREST"
+  | "VENDOR_INVEST"
+  | "VENDOR_RETURNS"
+  | "FUNDS_TRANSFER"
+  | "REJOIN";
 
 interface ActivityItem {
-  id: string
-  type: TransactionType
-  amount: number
-  fromName?: string
-  toName?: string
-  fromSub?: string
-  toSub?: string
-  transactionAt: number
-  description?: string
+  id: string;
+  type: TransactionType;
+  amount: number;
+  fromName?: string;
+  toName?: string;
+  fromSub?: string;
+  toSub?: string;
+  transactionAt: number;
+  description?: string;
 }
 
 function getActivityIcon(type: TransactionType) {
   switch (type) {
-    case 'PERIODIC_DEPOSIT':
-    case 'OFFSET_DEPOSIT':
-    case 'VENDOR_RETURNS':
-    case 'REJOIN':
-      return <ArrowDownCircle className="h-4 w-4 text-green-600" />
-    case 'WITHDRAW':
-    case 'LOAN_TAKEN':
-    case 'VENDOR_INVEST':
-      return <ArrowUpCircle className="h-4 w-4 text-red-600" />
-    case 'LOAN_REPAY':
-    case 'LOAN_INTEREST':
-      return <CreditCard className="h-4 w-4 text-blue-600" />
+    case "PERIODIC_DEPOSIT":
+    case "OFFSET_DEPOSIT":
+    case "VENDOR_RETURNS":
+    case "REJOIN":
+      return <ArrowDownCircle className="h-4 w-4 text-green-600" />;
+    case "WITHDRAW":
+    case "LOAN_TAKEN":
+    case "VENDOR_INVEST":
+      return <ArrowUpCircle className="h-4 w-4 text-red-600" />;
+    case "LOAN_REPAY":
+    case "LOAN_INTEREST":
+      return <CreditCard className="h-4 w-4 text-blue-600" />;
     default:
-      return <AlertCircle className="h-4 w-4 text-muted-foreground" />
+      return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
   }
 }
 
@@ -69,78 +69,75 @@ function getActivityLabel(
 ) {
   // Helper to get member/vendor name, excluding Club Account but allowing Loan Account names
   const getMemberName = (name?: string, sub?: string) => {
-    if (sub === 'Club Account') {
-      return null // Don't show club account as names
+    if (sub === "Club Account") {
+      return null; // Don't show club account as names
     }
     // For Loan Account, still show the member name
-    return name?.trim() || null
-  }
+    return name?.trim() || null;
+  };
 
   switch (type) {
-    case 'PERIODIC_DEPOSIT':
+    case "PERIODIC_DEPOSIT":
       // Deposit FROM member TO club
-      return `Deposit from ${getMemberName(fromName, fromSub) || 'Member'}`
-    case 'OFFSET_DEPOSIT':
+      return `Deposit from ${getMemberName(fromName, fromSub) || "Member"}`;
+    case "OFFSET_DEPOSIT":
       // Offset deposit FROM member TO club
-      return `Offset deposit from ${getMemberName(fromName, fromSub) || 'Member'}`
-    case 'WITHDRAW':
+      return `Offset deposit from ${getMemberName(fromName, fromSub) || "Member"}`;
+    case "WITHDRAW":
       // Withdrawal FROM club TO member
-      return `Withdrawal by ${getMemberName(toName, toSub) || 'Member'}`
-    case 'LOAN_TAKEN':
+      return `Withdrawal by ${getMemberName(toName, toSub) || "Member"}`;
+    case "LOAN_TAKEN":
       // Loan FROM club TO member (loan account)
       // For loan taken, the member name is in toName even if toSub is "Loan Account"
-      const loanTakenMember = toName?.trim() && toSub !== 'Club Account' 
-        ? toName.trim() 
-        : null
-      return `Loan taken by ${loanTakenMember || 'Member'}`
-    case 'LOAN_REPAY':
+      const loanTakenMember =
+        toName?.trim() && toSub !== "Club Account" ? toName.trim() : null;
+      return `Loan taken by ${loanTakenMember || "Member"}`;
+    case "LOAN_REPAY":
       // Repayment FROM member TO club
       // For loan repay, the member name is in fromName even if fromSub is "Loan Account"
-      const loanRepayMember = fromName?.trim() && fromSub !== 'Club Account'
-        ? fromName.trim()
-        : null
-      return `Loan repayment by ${loanRepayMember || 'Member'}`
-    case 'LOAN_INTEREST':
+      const loanRepayMember =
+        fromName?.trim() && fromSub !== "Club Account" ? fromName.trim() : null;
+      return `Loan repayment by ${loanRepayMember || "Member"}`;
+    case "LOAN_INTEREST":
       // Interest FROM member TO club
-      const interestMember = fromName?.trim() && fromSub !== 'Club Account'
-        ? fromName.trim()
-        : null
-      return `Interest payment from ${interestMember || 'Member'}`
-    case 'VENDOR_INVEST':
+      const interestMember =
+        fromName?.trim() && fromSub !== "Club Account" ? fromName.trim() : null;
+      return `Interest payment from ${interestMember || "Member"}`;
+    case "VENDOR_INVEST":
       // Investment FROM club TO vendor
-      return `Investment to ${getMemberName(toName, toSub) || 'Vendor'}`
-    case 'VENDOR_RETURNS':
+      return `Investment to ${getMemberName(toName, toSub) || "Vendor"}`;
+    case "VENDOR_RETURNS":
       // Returns FROM vendor TO club
-      return `Returns from ${getMemberName(fromName, fromSub) || 'Vendor'}`
-    case 'FUNDS_TRANSFER':
+      return `Returns from ${getMemberName(fromName, fromSub) || "Vendor"}`;
+    case "FUNDS_TRANSFER":
       // Transfer between accounts
-      const from = getMemberName(fromName, fromSub) || fromSub || 'Account'
-      const to = getMemberName(toName, toSub) || toSub || 'Account'
-      return `Transfer: ${from} → ${to}`
-    case 'REJOIN':
+      const from = getMemberName(fromName, fromSub) || fromSub || "Account";
+      const to = getMemberName(toName, toSub) || toSub || "Account";
+      return `Transfer: ${from} → ${to}`;
+    case "REJOIN":
       // Rejoin FROM member TO club
-      return `Rejoin by ${getMemberName(fromName, fromSub) || 'Member'}`
+      return `Rejoin by ${getMemberName(fromName, fromSub) || "Member"}`;
     default:
-      return 'Transaction'
+      return "Transaction";
   }
 }
 
 function getActivityColor(type: TransactionType) {
   switch (type) {
-    case 'PERIODIC_DEPOSIT':
-    case 'OFFSET_DEPOSIT':
-    case 'VENDOR_RETURNS':
-    case 'REJOIN':
-      return 'text-green-600'
-    case 'WITHDRAW':
-    case 'LOAN_TAKEN':
-    case 'VENDOR_INVEST':
-      return 'text-red-600'
-    case 'LOAN_REPAY':
-    case 'LOAN_INTEREST':
-      return 'text-blue-600'
+    case "PERIODIC_DEPOSIT":
+    case "OFFSET_DEPOSIT":
+    case "VENDOR_RETURNS":
+    case "REJOIN":
+      return "text-green-600";
+    case "WITHDRAW":
+    case "LOAN_TAKEN":
+    case "VENDOR_INVEST":
+      return "text-red-600";
+    case "LOAN_REPAY":
+    case "LOAN_INTEREST":
+      return "text-blue-600";
     default:
-      return 'text-muted-foreground'
+      return "text-muted-foreground";
   }
 }
 
@@ -149,12 +146,12 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
     fetchTransactions({
       page: 1,
       limit,
-      accountId: '',
-      transactionType: '',
-      sortField: 'transactionAt',
-      sortOrder: 'desc',
+      accountId: "",
+      transactionType: "",
+      sortField: "transactionAt",
+      sortOrder: "desc",
     })
-  )
+  );
 
   const activities: ActivityItem[] =
     data?.transactions?.map((tx: any) => ({
@@ -167,13 +164,15 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
       toSub: tx.to?.sub,
       transactionAt: tx.transactionAt,
       description: tx.description,
-    })) || []
+    })) || [];
 
   if (isLoading) {
     return (
       <Card className="rounded-xl border-border/50 bg-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Recent Activity
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -189,7 +188,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -221,7 +220,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
                   <div className="mt-1 flex items-center gap-2">
                     <p
                       className={cn(
-                        'text-sm font-semibold',
+                        "text-sm font-semibold",
                         getActivityColor(activity.type)
                       )}
                     >
@@ -245,6 +244,5 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
-

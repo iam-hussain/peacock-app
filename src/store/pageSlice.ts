@@ -24,6 +24,7 @@ export const pageSlice = createSlice({
   },
 });
 
-export const { openSideBar, toggleSideBarCollapse, openModal, setIsLoggedIn } = pageSlice.actions;
+export const { openSideBar, toggleSideBarCollapse, openModal, setIsLoggedIn } =
+  pageSlice.actions;
 
 export default pageSlice.reducer;

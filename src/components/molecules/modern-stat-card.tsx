@@ -1,47 +1,49 @@
-'use client'
+"use client";
 
-import { ReactElement } from 'react'
+import { ReactElement } from "react";
 
-import { Card, CardContent } from '../ui/card'
-import { cn } from '@/lib/utils'
+import { Card, CardContent } from "../ui/card";
+
+import { cn } from "@/lib/utils";
 
 interface ModernStatCardProps {
-  title: string
-  value: string | number
-  icon: ReactElement
-  iconBgColor?: string
+  title: string;
+  value: string | number;
+  icon: ReactElement;
+  iconBgColor?: string;
   trend?: {
-    value: string
-    isPositive: boolean
-  }
-  className?: string
-  isHighlighted?: boolean
+    value: string;
+    isPositive: boolean;
+  };
+  className?: string;
+  isHighlighted?: boolean;
 }
 
 export function ModernStatCard({
   title,
   value,
   icon,
-  iconBgColor = 'bg-primary/10',
+  iconBgColor = "bg-primary/10",
   trend,
   className,
   isHighlighted = false,
 }: ModernStatCardProps) {
   // Check if iconBgColor is a hex color or a Tailwind class
-  const isHexColor = typeof iconBgColor === 'string' && iconBgColor.startsWith('#')
-  const iconBgStyle = isHexColor ? { backgroundColor: iconBgColor } : {}
-  const iconBgClass = isHexColor ? '' : iconBgColor
+  const isHexColor =
+    typeof iconBgColor === "string" && iconBgColor.startsWith("#");
+  const iconBgStyle = isHexColor ? { backgroundColor: iconBgColor } : {};
+  const iconBgClass = isHexColor ? "" : iconBgColor;
 
   return (
     <Card
       className={cn(
-        'rounded-lg border border-border/50 bg-card shadow-sm transition-all hover:shadow-md',
+        "rounded-lg border border-border/50 bg-card shadow-sm transition-all hover:shadow-md",
         isHighlighted &&
-          'ring-2 ring-primary/20 shadow-md border-primary/30 scale-[1.02]',
+          "ring-2 ring-primary/20 shadow-md border-primary/30 scale-[1.02]",
         className
       )}
     >
-      <CardContent className={cn('p-4', isHighlighted && 'p-5')}>
+      <CardContent className={cn("p-4", isHighlighted && "p-5")}>
         <div className="flex items-center justify-between gap-4">
           {/* Left: Label */}
           <div className="flex-1 min-w-0">
@@ -53,8 +55,8 @@ export function ModernStatCard({
           <div className="flex-1 text-center">
             <p
               className={cn(
-                'font-bold tracking-tight text-foreground',
-                isHighlighted ? 'text-2xl' : 'text-xl'
+                "font-bold tracking-tight text-foreground",
+                isHighlighted ? "text-2xl" : "text-xl"
               )}
             >
               {value}
@@ -62,19 +64,19 @@ export function ModernStatCard({
             {trend && (
               <p
                 className={cn(
-                  'mt-0.5 text-[10px] font-medium',
-                  trend.isPositive ? 'text-green-600' : 'text-red-600'
+                  "mt-0.5 text-[10px] font-medium",
+                  trend.isPositive ? "text-green-600" : "text-red-600"
                 )}
               >
-                {trend.isPositive ? '↑' : '↓'} {trend.value}
+                {trend.isPositive ? "↑" : "↓"} {trend.value}
               </p>
             )}
           </div>
           {/* Right: Icon */}
           <div
             className={cn(
-              'flex shrink-0 items-center justify-center rounded-full relative',
-              isHighlighted ? 'h-12 w-12' : 'h-10 w-10',
+              "flex shrink-0 items-center justify-center rounded-full relative",
+              isHighlighted ? "h-12 w-12" : "h-10 w-10",
               !isHexColor && iconBgClass
             )}
           >
@@ -92,8 +94,8 @@ export function ModernStatCard({
             {/* Icon content */}
             <div
               className={cn(
-                'relative z-10 text-foreground/70',
-                isHighlighted ? 'text-xl' : 'text-lg'
+                "relative z-10 text-foreground/70",
+                isHighlighted ? "text-xl" : "text-lg"
               )}
             >
               {icon}
@@ -102,5 +104,5 @@ export function ModernStatCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

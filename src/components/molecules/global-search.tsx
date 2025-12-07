@@ -1,129 +1,126 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { useDebounce } from 'react-use'
+import { useQuery } from "@tanstack/react-query";
 import {
-  Search,
-  Users,
   Briefcase,
   FolderSync,
+  Loader2,
+  Search,
+  Users,
   Wallet,
   X,
-  Loader2,
-} from 'lucide-react'
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDebounce } from "react-use";
 
-import { Input } from '../ui/input'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { ScrollArea } from '../ui/scroll-area'
-import { CustomLink } from '../ui/link'
-import { cn } from '@/lib/utils'
-import fetcher from '@/lib/fetcher'
-import { moneyFormat } from '@/lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Input } from "../ui/input";
+import { CustomLink } from "../ui/link";
+import { ScrollArea } from "../ui/scroll-area";
+
+import fetcher from "@/lib/fetcher";
+import { cn } from "@/lib/utils";
+import { moneyFormat } from "@/lib/utils";
 
 interface SearchResult {
   members: Array<{
-    id: string
-    name: string
-    slug: string
-    avatar?: string
-    link: string
-    active: boolean
-  }>
+    id: string;
+    name: string;
+    slug: string;
+    avatar?: string;
+    link: string;
+    active: boolean;
+  }>;
   vendors: Array<{
-    id: string
-    name: string
-    avatar?: string
-    active: boolean
-  }>
+    id: string;
+    name: string;
+    avatar?: string;
+    active: boolean;
+  }>;
   loans: Array<{
-    id: string
-    name: string
-    avatar?: string
-    link: string
-    active: boolean
-  }>
+    id: string;
+    name: string;
+    avatar?: string;
+    link: string;
+    active: boolean;
+  }>;
   transactions: Array<{
-    id: string
-    fromName: string
-    toName: string
-    amount: number
-    transactionType: string
-    transactionAt: number
-  }>
+    id: string;
+    fromName: string;
+    toName: string;
+    amount: number;
+    transactionType: string;
+    transactionAt: number;
+  }>;
 }
 
 interface GlobalSearchProps {
-  className?: string
-  onResultClick?: () => void
-  isMobile?: boolean
+  className?: string;
+  onResultClick?: () => void;
+  isMobile?: boolean;
 }
 
-export function GlobalSearch({ className, onResultClick, isMobile = false }: GlobalSearchProps) {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [debouncedQuery, setDebouncedQuery] = useState('')
-  const [isOpen, setIsOpen] = useState(false)
-  const searchRef = useRef<HTMLDivElement>(null)
+export function GlobalSearch({
+  className,
+  onResultClick,
+  isMobile = false,
+}: GlobalSearchProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   useDebounce(
     () => {
-      setDebouncedQuery(searchQuery)
+      setDebouncedQuery(searchQuery);
     },
     300,
     [searchQuery]
-  )
+  );
 
   const { data, isLoading } = useQuery({
-    queryKey: ['global-search', debouncedQuery],
+    queryKey: ["global-search", debouncedQuery],
     queryFn: () =>
-      fetcher.post('/api/search', { searchQuery: debouncedQuery }) as Promise<SearchResult>,
+      fetcher.post("/api/search", {
+        searchQuery: debouncedQuery,
+      }) as Promise<SearchResult>,
     enabled: debouncedQuery.length >= 2,
-  })
+  });
 
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const hasResults = useMemo(() => {
-    if (!data) return false
+    if (!data) return false;
     return (
       data.members.length > 0 ||
       data.vendors.length > 0 ||
       data.loans.length > 0 ||
       data.transactions.length > 0
-    )
-  }, [data])
-
-  const totalResults = useMemo(() => {
-    if (!data) return 0
-    return (
-      data.members.length +
-      data.vendors.length +
-      data.loans.length +
-      data.transactions.length
-    )
-  }, [data])
-
+    );
+  }, [data]);
   const handleResultClick = () => {
-    setIsOpen(false)
-    setSearchQuery('')
+    setIsOpen(false);
+    setSearchQuery("");
     if (onResultClick) {
-      onResultClick()
+      onResultClick();
     }
-  }
+  };
 
   return (
-    <div ref={searchRef} className={cn('relative w-full', className)}>
+    <div ref={searchRef} className={cn("relative w-full", className)}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         <Input
@@ -131,8 +128,8 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
           placeholder="Search members, loans, vendors..."
           value={searchQuery}
           onChange={(e) => {
-            setSearchQuery(e.target.value)
-            setIsOpen(true)
+            setSearchQuery(e.target.value);
+            setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
           className={cn(
@@ -143,8 +140,8 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
         {searchQuery && (
           <button
             onClick={() => {
-              setSearchQuery('')
-              setIsOpen(false)
+              setSearchQuery("");
+              setIsOpen(false);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground"
           >
@@ -183,9 +180,9 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
                           <AvatarImage src={member.avatar} alt={member.name} />
                           <AvatarFallback className="bg-primary/10 text-primary text-xs">
                             {member.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')
+                              .join("")
                               .toUpperCase()
                               .slice(0, 2)}
                           </AvatarFallback>
@@ -195,7 +192,7 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
                             {member.name}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {member.active ? 'Active' : 'Inactive'}
+                            {member.active ? "Active" : "Inactive"}
                           </p>
                         </div>
                       </CustomLink>
@@ -223,9 +220,9 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
                           <AvatarImage src={vendor.avatar} alt={vendor.name} />
                           <AvatarFallback className="bg-primary/10 text-primary text-xs">
                             {vendor.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')
+                              .join("")
                               .toUpperCase()
                               .slice(0, 2)}
                           </AvatarFallback>
@@ -235,7 +232,7 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
                             {vendor.name}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {vendor.active ? 'Active' : 'Inactive'}
+                            {vendor.active ? "Active" : "Inactive"}
                           </p>
                         </div>
                       </CustomLink>
@@ -263,9 +260,9 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
                           <AvatarImage src={loan.avatar} alt={loan.name} />
                           <AvatarFallback className="bg-primary/10 text-primary text-xs">
                             {loan.name
-                              .split(' ')
+                              .split(" ")
                               .map((n) => n[0])
-                              .join('')
+                              .join("")
                               .toUpperCase()
                               .slice(0, 2)}
                           </AvatarFallback>
@@ -274,7 +271,9 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
                           <p className="text-sm font-medium text-foreground truncate">
                             {loan.name}
                           </p>
-                          <p className="text-xs text-muted-foreground">Loan Account</p>
+                          <p className="text-xs text-muted-foreground">
+                            Loan Account
+                          </p>
                         </div>
                       </CustomLink>
                     ))}
@@ -319,6 +318,5 @@ export function GlobalSearch({ className, onResultClick, isMobile = false }: Glo
         </div>
       )}
     </div>
-  )
+  );
 }
-

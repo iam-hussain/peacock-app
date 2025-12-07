@@ -37,7 +37,9 @@ function TopMenu({ className }: { className?: string }) {
   const dispatch = useDispatch();
   const [scrollDirection, setScrollDirection] = useState("IDEAL");
   const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const sideBarCollapsed = useSelector((state: RootState) => state.page.sideBarCollapsed);
+  const sideBarCollapsed = useSelector(
+    (state: RootState) => state.page.sideBarCollapsed
+  );
 
   const callback = useCallback(
     (event: any) => {
