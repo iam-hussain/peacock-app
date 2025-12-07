@@ -3,12 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  Bell,
   ChevronDown,
   LogOut,
   Menu,
   Search,
-  Settings,
   User,
   X,
 } from "lucide-react";
@@ -173,26 +171,6 @@ export function ModernTopBar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Notifications */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 hidden sm:flex"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-          </Button>
-
-          {/* Settings */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 hidden sm:flex"
-          >
-            <Settings className="h-5 w-5" />
-            <span className="sr-only">Settings</span>
-          </Button>
-
           {/* Theme Toggle */}
           <ThemeModeToggle />
 

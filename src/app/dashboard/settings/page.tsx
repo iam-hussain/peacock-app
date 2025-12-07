@@ -568,7 +568,7 @@ export default function SettingsPage() {
               delete data but may update balances.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               onClick={() => setRecalculateLoansDialogOpen(false)}
