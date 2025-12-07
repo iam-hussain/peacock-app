@@ -93,7 +93,9 @@ export function useTableExport<TData>({
       let value: any = undefined;
 
       // If column has accessorKey, use it (supports nested paths like "user.name")
-      if (column.accessorKey) {
+      const accessorKey =
+        "accessorKey" in column ? (column.accessorKey as string) : undefined;
+      if (accessorKey) {
         const keys = String(column.accessorKey).split(".");
         value = row;
         for (const key of keys) {
