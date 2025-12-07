@@ -73,15 +73,26 @@ export function ModernStatCard({
           {/* Right: Icon */}
           <div
             className={cn(
-              'flex shrink-0 items-center justify-center rounded-full',
+              'flex shrink-0 items-center justify-center rounded-full relative',
               isHighlighted ? 'h-12 w-12' : 'h-10 w-10',
               !isHexColor && iconBgClass
             )}
-            style={iconBgStyle}
           >
+            {/* Light mode background (hex color) */}
+            {isHexColor && (
+              <div
+                className="absolute inset-0 rounded-full dark:hidden"
+                style={iconBgStyle}
+              />
+            )}
+            {/* Dark mode background */}
+            {isHexColor && (
+              <div className="absolute inset-0 rounded-full hidden dark:block bg-muted/60" />
+            )}
+            {/* Icon content */}
             <div
               className={cn(
-                'text-foreground/70',
+                'relative z-10 text-foreground/70',
                 isHighlighted ? 'text-xl' : 'text-lg'
               )}
             >

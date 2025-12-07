@@ -3,9 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import SideMenu from '@/components/organisms/side-menu'
-import SideMenuMobile from '@/components/organisms/side-menu-mobile'
-import TopMenu from '@/components/organisms/top-menu'
+import { ModernSidebar } from '@/components/organisms/modern-sidebar'
+import { ModernSidebarMobile } from '@/components/organisms/modern-sidebar-mobile'
+import { ModernTopBar } from '@/components/organisms/modern-top-bar'
+import { MobileBottomNav } from '@/components/organisms/mobile-bottom-nav'
 import { fetchAuthStatus } from '@/lib/query-options'
 import { setIsLoggedIn } from '@/store/pageSlice'
 import { RootState } from '@/store'
@@ -35,19 +36,20 @@ export default function DashboardLayout({
   return (
     <div className="main-wrapper">
       <main className={'page-main bg-paper'}>
-        <TopMenu className="fixed z-30 block w-full bg-background" />
-        <SideMenu />
+        <ModernTopBar />
+        <ModernSidebar />
         <div
           className={cn(
-            'h-full min-h-svh w-full transition-all duration-300 max-w-screen-3xl m-auto mt-0 pt-[48px]',
-            sideBarCollapsed ? 'lg:pl-[80px]' : 'lg:pl-[300px]'
+            'h-full min-h-svh w-full transition-all duration-300 max-w-screen-3xl m-auto mt-0 pt-[56px]',
+            sideBarCollapsed ? 'lg:pl-[80px]' : 'lg:pl-[260px]'
           )}
           id="dashboard-content"
         >
           <div className="w-full flex h-full p-6">{children}</div>
         </div>
       </main>
-      <SideMenuMobile />
+      <ModernSidebarMobile />
+      <MobileBottomNav />
     </div>
   )
 }
