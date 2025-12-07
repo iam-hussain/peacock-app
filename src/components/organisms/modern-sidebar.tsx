@@ -11,6 +11,7 @@ import {
   LogOut,
   Settings,
   User,
+  Users,
   Wallet,
 } from "lucide-react";
 import Image from "next/image";
