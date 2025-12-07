@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import fetcher from "@/lib/fetcher";
+
 import { Button } from "../ui/button";
 import {
   Card,
@@ -26,8 +28,6 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { CustomLink } from "../ui/link";
-
-import fetcher from "@/lib/fetcher";
 
 const loginFormSchema = z.object({
   email: z.string().optional(),
