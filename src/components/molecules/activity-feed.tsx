@@ -9,7 +9,7 @@ import {
   CreditCard,
 } from "lucide-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 
 import { fetchTransactions } from "@/lib/query-options";
 import { cn, moneyFormat } from "@/lib/utils";
@@ -170,12 +170,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
   if (isLoading) {
     return (
       <Card className="rounded-xl border-border/50 bg-card shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">
-            Recent Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
@@ -194,10 +189,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
 
   return (
     <Card className="rounded-xl border-border/50 bg-card shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">Recent Activity</CardTitle>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {activities.length > 0 ? (
           <div className="space-y-4">
             {activities.map((activity) => (

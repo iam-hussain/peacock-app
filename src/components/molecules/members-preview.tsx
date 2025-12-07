@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ClickableAvatar } from "../atoms/clickable-avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { CustomLink } from "../ui/link";
@@ -79,9 +79,8 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
   return (
     <>
       <Card className="rounded-xl border-border/50 bg-card shadow-sm">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">Members</CardTitle>
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center justify-end">
             <CustomLink
               href="/dashboard/member"
               variant="link"
@@ -91,8 +90,6 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
               View all →
             </CustomLink>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
           {/* Search and Filter */}
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
