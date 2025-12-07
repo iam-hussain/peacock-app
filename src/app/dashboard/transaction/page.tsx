@@ -485,26 +485,26 @@ export default function TransactionsPage() {
       </div>
 
       {/* Mobile Filters */}
-      <div className="lg:hidden space-y-3">
+      <div className="lg:hidden flex items-center gap-2">
         {/* Search Bar */}
-        <SearchBarMobile
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search transactions..."
-        />
-
-        {/* Filter Button Only */}
-        <div className="flex items-center justify-end">
-          <Button
-            variant="outline"
-            size="default"
-            onClick={() => setFilterDrawerOpen(true)}
-            className="gap-2"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            <span>Filter</span>
-          </Button>
+        <div className="flex-1">
+          <SearchBarMobile
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search transactions..."
+          />
         </div>
+
+        {/* Filter Button */}
+        <Button
+          variant="outline"
+          size="default"
+          onClick={() => setFilterDrawerOpen(true)}
+          className="gap-2 shrink-0"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          <span>Filter</span>
+        </Button>
       </div>
 
       {/* Error State */}
