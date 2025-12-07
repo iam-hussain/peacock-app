@@ -25,7 +25,6 @@ import { PaginationControls } from "@/components/molecules/pagination-controls";
 import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
 import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
-import { TransactionSummaryCard } from "@/components/molecules/transaction-summary-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTableExport } from "@/hooks/use-table-export";
@@ -452,11 +451,6 @@ export default function TransactionsPage() {
         </p>
       </div>
 
-      {/* Summary Card */}
-      <TransactionSummaryCard
-        inflow={summary.inflow}
-        outflow={summary.outflow}
-      />
 
       {/* Desktop Filter Bar */}
       <div className="hidden lg:block">
