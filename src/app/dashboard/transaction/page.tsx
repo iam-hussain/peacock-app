@@ -184,16 +184,6 @@ export default function TransactionsPage() {
     { label: "Loan Interest", value: "LOAN_INTEREST" },
   ];
 
-  // Mobile filter chips (simplified)
-  const mobileFilterChips = [
-    { label: "All Types", value: "all" },
-    { label: "Deposit", value: "PERIODIC_DEPOSIT" },
-    { label: "Withdrawal", value: "WITHDRAW" },
-    { label: "Loan", value: "LOAN_TAKEN" },
-    { label: "Transfer", value: "FUNDS_TRANSFER" },
-    { label: "Vendor", value: "VENDOR_INVEST" },
-  ];
-
   // Account options
   const accountOptions = [
     { label: "All Accounts", value: "all" },
