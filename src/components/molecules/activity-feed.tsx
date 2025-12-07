@@ -1,17 +1,18 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
 import {
+  AlertCircle,
   ArrowDownCircle,
   ArrowUpCircle,
   CreditCard,
-  AlertCircle,
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+
 import { fetchTransactions } from "@/lib/query-options";
-import { moneyFormat, cn } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/utils";
 
 interface ActivityFeedProps {
   limit?: number;
