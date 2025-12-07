@@ -69,11 +69,12 @@ export interface CustomLinkProps
   className?: string;
   children: any;
   onClick?: () => void;
+  title?: string;
 }
 
 const CustomLink = React.forwardRef<
   HTMLAnchorElement,
-  CustomLinkProps & LinkIconProps
+  CustomLinkProps & Partial<LinkIconProps>
 >(
   (
     {

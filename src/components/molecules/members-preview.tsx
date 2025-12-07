@@ -20,13 +20,13 @@ import {
 import { MemberDash } from "./member-dash";
 import { MemberDetails } from "./member-details";
 
-import { fetchMembers } from "@/lib/query-options";
-import { fetchMemberBySlug } from "@/lib/query-options";
+import { TransformedMemberStat } from "@/app/api/statistics/route";
+import { fetchMemberBySlug, fetchMembers } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
 interface MembersPreviewProps {
-  initialMembers?: TransformedMember[];
+  initialMembers?: (TransformedMember | TransformedMemberStat)[];
 }
 
 export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
@@ -154,11 +154,12 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
                         </span>
                       )}
                     </p>
-                    {member.totalDepositAmount > 0 && (
-                      <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-                        {moneyFormat(member.totalDepositAmount)}
-                      </p>
-                    )}
+                    {"totalDepositAmount" in member &&
+                      member.totalDepositAmount > 0 && (
+                        <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                          {moneyFormat(member.totalDepositAmount)}
+                        </p>
+                      )}
                   </div>
                 </button>
               ))}
@@ -180,7 +181,10 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
             </DialogHeader>
             <div className="overflow-y-auto max-h-[calc(90vh-80px)] pr-2">
               <div className="space-y-6">
-                <MemberDetails member={selectedMemberData.member} />
+                <MemberDetails
+                  member={selectedMemberData.member}
+                  captureMode={false}
+                />
                 <MemberDash member={selectedMemberData.member} />
                 <div className="flex justify-end pb-4">
                   <CustomLink

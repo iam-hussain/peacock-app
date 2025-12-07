@@ -156,7 +156,7 @@ export function ModernSidebarMobile() {
                       key={item.href}
                       href={item.href}
                       variant="ghost"
-                      size="auto"
+                      size="default"
                       className={cn(
                         "w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all",
                         "hover:bg-accent hover:text-accent-foreground",
@@ -189,7 +189,7 @@ export function ModernSidebarMobile() {
                       key={item.href}
                       href={item.href}
                       variant="ghost"
-                      size="auto"
+                      size="default"
                       className={cn(
                         "w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all",
                         "hover:bg-accent hover:text-accent-foreground",
@@ -233,7 +233,7 @@ export function ModernSidebarMobile() {
               <div className="p-4 border-t border-border/50 space-y-1">
                 <Button
                   variant="ghost"
-                  size="auto"
+                  size="default"
                   className="w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent"
                 >
                   <Settings className="h-5 w-5 shrink-0" />
@@ -241,7 +241,7 @@ export function ModernSidebarMobile() {
                 </Button>
                 <Button
                   variant="ghost"
-                  size="auto"
+                  size="default"
                   className="w-full justify-start gap-3 px-3 py-3 rounded-lg text-destructive hover:bg-destructive/10"
                   onClick={handleLogout}
                 >

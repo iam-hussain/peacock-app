@@ -82,7 +82,9 @@ export function GlobalSearch({
     queryKey: ["global-search", debouncedQuery],
     queryFn: () =>
       fetcher.post("/api/search", {
-        searchQuery: debouncedQuery,
+        body: {
+          searchQuery: debouncedQuery,
+        },
       }) as Promise<SearchResult>,
     enabled: debouncedQuery.length >= 2,
   });

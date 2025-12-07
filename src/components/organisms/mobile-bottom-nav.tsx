@@ -57,7 +57,7 @@ export function MobileBottomNav() {
               <Button
                 key="more"
                 variant="ghost"
-                size="auto"
+                size="default"
                 className={cn(
                   "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg",
                   "transition-all active:scale-95",
@@ -75,7 +75,7 @@ export function MobileBottomNav() {
               key={item.href}
               href={item.href}
               variant="ghost"
-              size="auto"
+              size="default"
               className={cn(
                 "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg",
                 "transition-all active:scale-95",

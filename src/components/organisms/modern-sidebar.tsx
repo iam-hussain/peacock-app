@@ -158,7 +158,7 @@ export function ModernSidebar() {
                 key={item.href}
                 href={item.href}
                 variant="ghost"
-                size="auto"
+                size="default"
                 className={cn(
                   "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all",
                   "hover:bg-accent hover:text-accent-foreground",
@@ -191,7 +191,7 @@ export function ModernSidebar() {
                 key={item.href}
                 href={item.href}
                 variant="ghost"
-                size="auto"
+                size="default"
                 className={cn(
                   "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all",
                   "hover:bg-accent hover:text-accent-foreground",
@@ -240,7 +240,7 @@ export function ModernSidebar() {
       <div className="p-4 border-t border-border/50 space-y-1">
         <Button
           variant="ghost"
-          size="auto"
+          size="default"
           className={cn(
             "w-full justify-start gap-3 px-3 py-2.5 rounded-lg",
             "hover:bg-accent hover:text-accent-foreground",
@@ -256,7 +256,7 @@ export function ModernSidebar() {
         {isLoggedIn && (
           <Button
             variant="ghost"
-            size="auto"
+            size="default"
             className={cn(
               "w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-destructive",
               "hover:bg-destructive/10 hover:text-destructive",
