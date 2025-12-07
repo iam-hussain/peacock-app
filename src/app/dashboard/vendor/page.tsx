@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import { Briefcase, Camera, Download, MoreHorizontal } from "lucide-react";
+import { Camera, Download, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -13,7 +13,6 @@ import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
-import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { dateFormat, newZoneDate } from "@/lib/date";
@@ -24,10 +23,6 @@ export default function VendorsPage() {
   const { data, isLoading } = useQuery(fetchVendors());
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedVendor, setSelectedVendor] = useState<
-    TransformedVendor["account"] | null
-  >(null);
 
   // Filter vendors
   const filteredVendors = useMemo(() => {
@@ -53,16 +48,6 @@ export default function VendorsPage() {
 
     return filtered;
   }, [data?.vendors, searchQuery, statusFilter]);
-
-  const handleAddVendor = () => {
-    setSelectedVendor(null);
-    setDialogOpen(true);
-  };
-
-  const handleEditVendor = (vendor: TransformedVendor) => {
-    setSelectedVendor(vendor.account);
-    setDialogOpen(true);
-  };
 
   const handleViewDetails = (vendor: TransformedVendor) => {
     // Navigate to vendor details if needed
@@ -249,7 +234,7 @@ export default function VendorsPage() {
           return (
             <RowActionsMenu
               onViewDetails={() => handleViewDetails(vendor)}
-              onEdit={() => handleEditVendor(vendor)}
+              onViewTransactions={() => handleViewDetails(vendor)}
             />
           );
         },
@@ -264,12 +249,7 @@ export default function VendorsPage() {
       <div className="hidden lg:block">
         <PageHeader
           title="Vendors Overview"
-          subtitle="Manage vendor investments, cycles, returns, and performance."
-          primaryAction={{
-            label: "Add Vendor",
-            icon: <Briefcase className="h-4 w-4" />,
-            onClick: handleAddVendor,
-          }}
+          subtitle="View vendor investments, cycles, returns, and performance."
           secondaryActions={[
             {
               label: "Export CSV",
@@ -295,7 +275,7 @@ export default function VendorsPage() {
           Vendors Overview
         </h1>
         <p className="text-sm text-muted-foreground">
-          Manage vendor investments, cycles, returns, and performance.
+          View vendor investments, cycles, returns, and performance.
         </p>
       </div>
 
@@ -362,7 +342,6 @@ export default function VendorsPage() {
               <div
                 key={vendor.id}
                 className="rounded-xl border border-border/50 bg-card p-4 shadow-sm"
-                onClick={() => handleEditVendor(vendor)}
               >
                 <div className="flex items-center gap-3">
                   <Avatar className="h-12 w-12 rounded-lg">
@@ -445,15 +424,6 @@ export default function VendorsPage() {
           </div>
         )}
       </div>
-
-      <VendorFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        selected={selectedVendor}
-        onSuccess={() => {
-          window.location.reload();
-        }}
-      />
     </div>
   );
 }

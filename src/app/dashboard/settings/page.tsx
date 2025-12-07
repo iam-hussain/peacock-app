@@ -1,9 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import {
+  Briefcase,
   Calculator,
   Database,
   Download,
@@ -15,11 +15,14 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { TransformedVendor } from "@/app/api/account/vendor/route";
 import { DataTable } from "@/components/atoms/data-table";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
+import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,9 +39,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { fileDateTime } from "@/lib/date";
+import { dateFormat, fileDateTime, newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
-import { fetchMembers } from "@/lib/query-options";
+import { fetchMembers, fetchVendors } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
@@ -46,9 +49,15 @@ export default function SettingsPage() {
   const queryClient = useQueryClient();
   const { data: membersData, isLoading: membersLoading } =
     useQuery(fetchMembers());
+  const { data: vendorsData, isLoading: vendorsLoading } =
+    useQuery(fetchVendors());
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<
     TransformedMember["account"] | null
+  >(null);
+  const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<
+    TransformedVendor["account"] | null
   >(null);
   const [recalculateReturnsDialogOpen, setRecalculateReturnsDialogOpen] =
     useState(false);
@@ -112,6 +121,16 @@ export default function SettingsPage() {
   const handleEditMember = (member: TransformedMember) => {
     setSelectedMember(member.account);
     setMemberDialogOpen(true);
+  };
+
+  const handleAddVendor = () => {
+    setSelectedVendor(null);
+    setVendorDialogOpen(true);
+  };
+
+  const handleEditVendor = (vendor: TransformedVendor) => {
+    setSelectedVendor(vendor.account);
+    setVendorDialogOpen(true);
   };
 
   // Member Management Table Columns
@@ -247,6 +266,161 @@ export default function SettingsPage() {
   );
 
   const members = membersData?.members || [];
+  const vendors = vendorsData?.vendors || [];
+
+  // Vendor Management Table Columns
+  const vendorColumns: ColumnDef<TransformedVendor>[] = useMemo(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Name",
+        enableSorting: true,
+        meta: {
+          tooltip: "Vendor name and code.",
+        },
+        cell: ({ row }) => {
+          const vendor = row.original;
+          return (
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={vendor.avatar} alt={vendor.name} />
+                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                  {vendor.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 text-primary text-xs font-medium"
+                  >
+                    {vendor.id}
+                  </Badge>
+                  <span className="text-sm font-semibold text-foreground">
+                    {vendor.name}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "startDate",
+        accessorKey: "startAt",
+        header: "Start Date",
+        enableSorting: true,
+        meta: {
+          tooltip: "Vendor investment cycle start date.",
+        },
+        cell: ({ row }) => (
+          <div className="text-sm text-foreground">
+            {dateFormat(newZoneDate(row.original.startAt))}
+          </div>
+        ),
+      },
+      {
+        id: "endDate",
+        accessorKey: "endAt",
+        header: "End Date",
+        enableSorting: true,
+        meta: {
+          tooltip: "Vendor investment cycle end date.",
+        },
+        cell: ({ row }) => (
+          <div className="text-sm text-foreground">
+            {row.original.endAt
+              ? dateFormat(newZoneDate(row.original.endAt))
+              : "-"}
+          </div>
+        ),
+      },
+      {
+        id: "invested",
+        accessorKey: "totalInvestment",
+        header: "Invested",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total amount invested in this vendor.",
+        },
+        cell: ({ row }) => (
+          <div className="text-right text-sm font-medium text-foreground">
+            {moneyFormat(row.original.totalInvestment || 0)}
+          </div>
+        ),
+      },
+      {
+        id: "profit",
+        accessorKey: "totalProfitAmount",
+        header: "Profit",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Net profit (returns - investment).",
+        },
+        cell: ({ row }) => {
+          const amount = row.original.totalProfitAmount || 0;
+          return (
+            <div
+              className={`text-right text-sm font-medium ${
+                amount > 0
+                  ? "text-green-600 dark:text-green-500"
+                  : "text-muted-foreground/50"
+              }`}
+            >
+              {amount === 0 ? "-" : moneyFormat(amount)}
+            </div>
+          );
+        },
+      },
+      {
+        id: "active",
+        accessorKey: "active",
+        header: "Active",
+        enableSorting: true,
+        meta: {
+          tooltip: "Vendor status (Active/Inactive).",
+        },
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <div
+              className={`h-1.5 w-1.5 rounded-full ${
+                row.original.active ? "bg-green-500" : "bg-gray-400"
+              }`}
+            />
+            <span className="text-sm text-muted-foreground">
+              {row.original.active ? "Active" : "Inactive"}
+            </span>
+          </div>
+        ),
+      },
+      {
+        id: "actions",
+        header: () => <MoreHorizontal className="h-4 w-4" />,
+        enableSorting: false,
+        meta: {
+          tooltip: "More vendor actions.",
+        },
+        cell: ({ row }) => {
+          const vendor = row.original;
+          return (
+            <RowActionsMenu
+              onViewDetails={() => handleEditVendor(vendor)}
+              onEdit={() => handleEditVendor(vendor)}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-24">
@@ -404,6 +578,32 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* Vendor Management Section */}
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Vendor Management</CardTitle>
+              <CardDescription>
+                Admin-only controls to add, edit, or manage vendors
+              </CardDescription>
+            </div>
+            <Button onClick={handleAddVendor} size="sm" className="gap-2">
+              <Briefcase className="h-4 w-4" />
+              Add Vendor
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={vendorColumns}
+            data={vendors}
+            frozenColumnKey="name"
+            isLoading={vendorsLoading}
+          />
+        </CardContent>
+      </Card>
+
       {/* User & Access Management Section */}
       <Card className="border-border/50 shadow-sm">
         <CardHeader>
@@ -486,6 +686,16 @@ export default function SettingsPage() {
         open={memberDialogOpen}
         onOpenChange={setMemberDialogOpen}
         selected={selectedMember}
+        onSuccess={() => {
+          window.location.reload();
+        }}
+      />
+
+      {/* Vendor Form Dialog */}
+      <VendorFormDialog
+        open={vendorDialogOpen}
+        onOpenChange={setVendorDialogOpen}
+        selected={selectedVendor}
         onSuccess={() => {
           window.location.reload();
         }}
