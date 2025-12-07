@@ -1,14 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { nanoid } from "nanoid";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { Switch } from "../../ui/switch";
-import { Button } from "../../ui/button";
-
 import {
   Form,
   FormControl,
@@ -16,37 +14,40 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "../../ui/form";
+import { Input } from "../../ui/input";
+import { Switch } from "../../ui/switch";
+import { Button } from "../../ui/button";
+
 import { newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { accountFormSchema, AccountFromSchema } from "@/lib/form-schema";
 
-type VendorFormProps = {
-  selected?: any; // existing vendor object, if updating
+type MemberFormProps = {
+  selected?: any;
   onSuccess: () => void;
   onCancel?: () => void;
 };
 
-export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
-  const queryClient = useQueryClient();
-
+export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
   const form = useForm({
     resolver: zodResolver(accountFormSchema),
     defaultValues: selected
       ? {
           firstName: selected.firstName,
           lastName: selected.lastName || "",
+          slug: selected.slug || "",
           phone: selected.phone || "",
           email: selected.email || "",
           avatar: selected.avatar || "",
           active: selected.active ?? true,
           startAt: newZoneDate(selected.startAt || undefined),
-          endAt: newZoneDate(selected.endAt || undefined),
+          endAt: undefined,
         }
       : {
           firstName: "",
           lastName: "",
+          slug: nanoid(8),
           phone: "",
           email: "",
           avatar: "",
@@ -59,22 +60,20 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
   const mutation = useMutation({
     mutationFn: (body: any) =>
       fetcher.post("/api/account", {
-        body: { id: selected?.id, ...body, isMember: false },
+        body: { id: selected?.id, ...body, isMember: true },
       }),
     onSuccess: async (data: any) => {
-      await queryClient.invalidateQueries({ queryKey: ["vendor"] });
-
       toast.success(
         selected
-          ? "Vendor updated successfully 🌟"
-          : "Vendor created successfully 🚀"
+          ? "Member updated successfully"
+          : "Member created successfully"
       );
-      form.reset(data?.account || {}); // Reset form after submission
+      form.reset(data?.account || {});
       if (onSuccess) {
         onSuccess();
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(
         error.message || "An unexpected error occurred. Please try again."
       );
@@ -87,20 +86,37 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full space-y-6"
+      >
+        {/* System ID (Slug) - Readonly */}
+        {selected && selected.slug && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                System ID
+              </span>
+              <span className="text-sm font-mono text-foreground">
+                {selected.slug}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Two-column grid on desktop, single on mobile */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* Vendor Name (First Name) */}
+          {/* First Name */}
           <FormField
             control={form.control}
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Vendor Name *</FormLabel>
+                <FormLabel>First Name *</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="Vendor name"
+                    placeholder="First name"
                     className="h-10"
                   />
                 </FormControl>
@@ -109,37 +125,17 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             )}
           />
 
-          {/* Last Name (Optional) */}
+          {/* Last Name */}
           <FormField
             control={form.control}
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Additional Name</FormLabel>
+                <FormLabel>Last Name</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="Additional name (optional)"
-                    className="h-10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Phone */}
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="tel"
-                    placeholder="+91..."
+                    placeholder="Last name"
                     className="h-10"
                   />
                 </FormControl>
@@ -168,45 +164,49 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             )}
           />
 
-          {/* Start Date */}
+          {/* Phone */}
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="tel"
+                    placeholder="+91..."
+                    className="h-10"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Joined Date */}
           <FormField
             control={form.control}
             name="startAt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>Joined Date</FormLabel>
                 <DatePickerForm
                   field={field}
-                  placeholder="Select start date"
+                  placeholder="Select joined date"
                 />
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* End Date (Optional) */}
-          <FormField
-            control={form.control}
-            name="endAt"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>End Date (Optional)</FormLabel>
-                <DatePickerForm
-                  field={field}
-                  placeholder="Select end date (optional)"
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Avatar URL (Optional) */}
+          {/* Avatar URL */}
           <FormField
             control={form.control}
             name="avatar"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Avatar URL (Optional)</FormLabel>
+                <FormLabel>Avatar URL</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -226,7 +226,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
           <div className="space-y-0.5">
             <FormLabel className="text-base">Status</FormLabel>
             <p className="text-sm text-muted-foreground">
-              Active vendors are included in investment cycles
+              Active members can participate in club activities
             </p>
           </div>
           <FormControl>
@@ -261,10 +261,11 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
               ? "Saving..."
               : selected
                 ? "Save Changes"
-                : "Add Vendor"}
+                : "Add Member"}
           </Button>
         </div>
       </form>
     </Form>
   );
 }
+

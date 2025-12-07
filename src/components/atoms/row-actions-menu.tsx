@@ -1,6 +1,13 @@
 "use client";
 
-import { Edit, Eye, MoreHorizontal, Receipt, Trash2 } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Receipt,
+  SlidersHorizontal,
+  Trash2,
+} from "lucide-react";
 
 import { Button } from "../ui/button";
 import {
@@ -18,6 +25,7 @@ interface RowActionsMenuProps {
   onDeactivate?: () => void;
   onRemove?: () => void;
   onAddRepayment?: () => void;
+  onAdjustOffset?: () => void;
 }
 
 export function RowActionsMenu({
@@ -27,6 +35,7 @@ export function RowActionsMenu({
   onDeactivate,
   onRemove,
   onAddRepayment,
+  onAdjustOffset,
 }: RowActionsMenuProps) {
   return (
     <DropdownMenu>
@@ -59,6 +68,12 @@ export function RowActionsMenu({
           <DropdownMenuItem onClick={onViewTransactions}>
             <Receipt className="mr-2 h-4 w-4" />
             View Transactions
+          </DropdownMenuItem>
+        )}
+        {onAdjustOffset && (
+          <DropdownMenuItem onClick={onAdjustOffset}>
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            Adjustments
           </DropdownMenuItem>
         )}
         {(onDeactivate || onRemove) && <DropdownMenuSeparator />}

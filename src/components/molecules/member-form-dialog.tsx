@@ -1,9 +1,14 @@
 "use client";
 
 import { MemberForm } from "../organisms/forms/member-form";
-import { OffsetForm } from "../organisms/forms/offset-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
 import { TransformedMember } from "@/transformers/account";
 
@@ -27,40 +32,24 @@ export function MemberFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{selected ? "Update Member" : "Add Member"}</DialogTitle>
+          <DialogTitle>
+            {selected
+              ? `Edit Member – ${selected.firstName} ${selected.lastName || ""}`.trim()
+              : "Add Member"}
+          </DialogTitle>
+          <DialogDescription>
+            {selected
+              ? "Update member details and information."
+              : "Create a new member account for the club."}
+          </DialogDescription>
         </DialogHeader>
-        {selected && selected.id ? (
-          <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="account">Offset</TabsTrigger>
-            </TabsList>
-            <TabsContent value="details">
-              <MemberForm
-                selected={selected}
-                onSuccess={handleSuccess}
-                onCancel={handleSuccess}
-              />
-            </TabsContent>
-            <TabsContent value="account">
-              <OffsetForm
-                onSuccess={handleSuccess}
-                onCancel={handleSuccess}
-                passbookId={selected.passbookId || ""}
-                joiningOffset={selected.joiningOffset || 0}
-                delayOffset={selected.delayOffset || 0}
-              />
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <MemberForm
-            selected={selected}
-            onSuccess={handleSuccess}
-            onCancel={handleSuccess}
-          />
-        )}
+        <MemberForm
+          selected={selected}
+          onSuccess={handleSuccess}
+          onCancel={handleSuccess}
+        />
       </DialogContent>
     </Dialog>
   );

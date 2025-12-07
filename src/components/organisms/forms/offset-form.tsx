@@ -47,7 +47,7 @@ export function OffsetForm({
   const mutation = useMutation({
     mutationFn: (body: any) => fetcher.post("/api/account/offset", { body }),
     onSuccess: async (data) => {
-      toast.success("Member offset updated successfully 🌟");
+      toast.success("Member adjustments updated successfully");
       if (!data) reset(data); // Reset form after submission
       if (onSuccess) {
         onSuccess();
@@ -78,7 +78,7 @@ export function OffsetForm({
               name="joiningOffset"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Late Join Offset Amount</FormLabel>
+                  <FormLabel>Late Join Adjustment Amount</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -99,7 +99,7 @@ export function OffsetForm({
               name="delayOffset"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Delay Paying Offset Amount</FormLabel>
+                  <FormLabel>Delayed Payment Adjustment Amount</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -115,7 +115,7 @@ export function OffsetForm({
         </Box>
 
         <GenericModalFooter
-          actionLabel={"Update Offset"}
+          actionLabel={"Update Adjustments"}
           onCancel={onCancel}
           isSubmitting={form.formState.isSubmitting || mutation.isPending}
         />

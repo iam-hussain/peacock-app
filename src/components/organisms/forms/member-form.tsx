@@ -7,9 +7,8 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { GenericModalFooter } from "../../atoms/generic-modal";
-import Box from "../../ui/box";
 import { Switch } from "../../ui/switch";
+import { Button } from "../../ui/button";
 
 import {
   Form,
@@ -87,20 +86,32 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full max-w-2xl space-y-4"
-      >
-        <Box preset={"grid-split"}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        {/* System ID (Slug) - Readonly */}
+        {selected && selected.slug && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                System ID
+              </span>
+              <span className="text-sm font-mono text-foreground">
+                {selected.slug}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Two-column grid on desktop, single on mobile */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* First Name */}
           <FormField
             control={form.control}
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel>First Name *</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="First name" />
+                  <Input {...field} placeholder="First name" className="h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,24 +126,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Last name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Box>
-
-        <Box preset={"grid-split"}>
-          {/* Phone */}
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Phone" />
+                  <Input {...field} placeholder="Last name" className="h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -147,27 +141,55 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Email" />
+                  <Input
+                    {...field}
+                    type="email"
+                    placeholder="name@example.com"
+                    className="h-10"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </Box>
 
-        <Box preset={"grid-split"}>
+          {/* Phone */}
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="tel"
+                    placeholder="+91..."
+                    className="h-10"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Joined Date */}
           <FormField
             control={form.control}
             name="startAt"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Joined Date</FormLabel>
-                <DatePickerForm field={field} placeholder="Joined date" />
+                <DatePickerForm
+                  field={field}
+                  placeholder="Select joined date"
+                />
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* Avatar */}
+
+          {/* Avatar URL */}
           <FormField
             control={form.control}
             name="avatar"
@@ -175,55 +197,62 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
               <FormItem>
                 <FormLabel>Avatar URL</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Avatar URL" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Box>
-
-        <Box preset={"grid-split"}>
-          {/* Active */}
-          <FormItem className="flex items-center justify-between align-bottom border border-input px-3 min-h-[36px] mt-auto w-full rounded-md">
-            <FormLabel>Active</FormLabel>
-            <FormControl>
-              <Controller
-                name={`active`}
-                control={form.control}
-                render={({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    defaultChecked={selected?.active ?? true}
+                  <Input
+                    {...field}
+                    type="url"
+                    placeholder="https://..."
+                    className="h-10"
                   />
-                )}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-
-          {/* Last Name */}
-          <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Slug</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Slug" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </Box>
+        </div>
 
-        <GenericModalFooter
-          actionLabel={selected ? "Update Member" : "Add Member"}
-          onCancel={onCancel}
-          isSubmitting={form.formState.isSubmitting || mutation.isPending}
-        />
+        {/* Status Toggle - Full width */}
+        <FormItem className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
+          <div className="space-y-0.5">
+            <FormLabel className="text-base">Status</FormLabel>
+            <p className="text-sm text-muted-foreground">
+              Active members can participate in club activities
+            </p>
+          </div>
+          <FormControl>
+            <Controller
+              name="active"
+              control={form.control}
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+          </FormControl>
+        </FormItem>
+
+        {/* Footer Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              form.reset();
+              onCancel?.();
+            }}
+            disabled={mutation.isPending}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending
+              ? "Saving..."
+              : selected
+                ? "Save Changes"
+                : "Add Member"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
