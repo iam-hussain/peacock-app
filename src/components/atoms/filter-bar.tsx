@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 interface FilterBarProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
+  searchPlaceholder?: string;
   filters?: {
     status?: {
       value: string;
@@ -60,6 +61,7 @@ interface FilterBarProps {
 export function FilterBar({
   searchValue,
   onSearchChange,
+  searchPlaceholder = "Search items...",
   filters,
   dateRange,
   pageSize,
@@ -88,10 +90,10 @@ export function FilterBar({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search transactions..."
+            placeholder={searchPlaceholder}
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9"
+            className="h-10 pl-9"
           />
         </div>
 

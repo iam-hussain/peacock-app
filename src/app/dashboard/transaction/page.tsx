@@ -470,6 +470,7 @@ export default function TransactionsPage() {
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
+          searchPlaceholder="Search transactions..."
           filters={{
             account: {
               value: accountFilter,

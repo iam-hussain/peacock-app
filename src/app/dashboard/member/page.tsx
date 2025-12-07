@@ -272,35 +272,47 @@ export default function MembersPage() {
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      <PageHeader
-        title="Members Overview"
-        subtitle="View member details, funds managed, balances, and performance."
-        secondaryActions={[
-          {
-            label: "Export CSV",
-            icon: <Download className="h-4 w-4" />,
-            onClick: () => {
-              // TODO: Implement CSV export
-              console.log("Export CSV");
+    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
+      {/* Desktop Header */}
+      <div className="hidden lg:block">
+        <PageHeader
+          title="Members Overview"
+          subtitle="View member details, funds managed, balances, and performance."
+          secondaryActions={[
+            {
+              label: "Export CSV",
+              icon: <Download className="h-4 w-4" />,
+              onClick: () => {
+                // TODO: Implement CSV export
+                console.log("Export CSV");
+              },
             },
-          },
-          {
-            label: "Screenshot",
-            icon: <Camera className="h-4 w-4" />,
-            onClick: () => {
-              // TODO: Implement screenshot
-              console.log("Screenshot");
+            {
+              label: "Screenshot",
+              icon: <Camera className="h-4 w-4" />,
+              onClick: () => {
+                // TODO: Implement screenshot
+                console.log("Screenshot");
+              },
             },
-          },
-        ]}
-      />
+          ]}
+        />
+      </div>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden">
+        <PageHeader
+          title="Members Overview"
+          subtitle="View member details, funds managed, balances, and performance."
+        />
+      </div>
 
       {/* Desktop Filter Bar */}
       <div className="hidden lg:block">
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
+          searchPlaceholder="Search members..."
           filters={{
             status: {
               value: statusFilter,
@@ -337,7 +349,7 @@ export default function MembersPage() {
       </div>
 
       {/* Mobile Card View */}
-      <div className="lg:hidden space-y-6 px-4 pb-24">
+      <div className="lg:hidden space-y-4">
         {/* Search Bar */}
         <SearchBarMobile
           value={searchQuery}

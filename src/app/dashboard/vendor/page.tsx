@@ -282,6 +282,7 @@ export default function VendorsPage() {
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
+          searchPlaceholder="Search vendors..."
           filters={{
             status: {
               value: statusFilter,

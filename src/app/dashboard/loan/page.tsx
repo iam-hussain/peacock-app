@@ -309,6 +309,7 @@ export default function LoansPage() {
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
+          searchPlaceholder="Search loans..."
           filters={{
             status: {
               value: statusFilter,

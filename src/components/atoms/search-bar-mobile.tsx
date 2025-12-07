@@ -16,7 +16,7 @@ interface SearchBarMobileProps {
 export function SearchBarMobile({
   value,
   onChange,
-  placeholder = "Search members...",
+  placeholder = "Search items...",
   className,
 }: SearchBarMobileProps) {
   return (
@@ -27,7 +27,7 @@ export function SearchBarMobile({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-11 rounded-full border-border/50 bg-background pl-11 pr-4 shadow-sm transition-all focus:border-border focus:shadow-md"
+        className="h-12 rounded-xl border border-border bg-background pl-11 pr-4 shadow-sm transition-all focus:border-border focus:shadow-md"
       />
     </div>
   );
