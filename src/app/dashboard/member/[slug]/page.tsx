@@ -361,15 +361,30 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
 
         {/* Loan Transactions Tab */}
         <TabsContent value="loan-transactions" className="space-y-4">
-          {member.loanHistory && member.loanHistory.length > 0 ? (
+          {member.loanHistory &&
+          Array.isArray(member.loanHistory) &&
+          member.loanHistory.length > 0 ? (
             <div className="space-y-4">
-              {member.loanHistory.map((transaction, index) => (
-                <LoanTransactionCard
-                  key={index}
-                  transaction={transaction}
-                  index={index + 1}
-                />
-              ))}
+              {member.loanHistory
+                .sort((a, b) => {
+                  // Sort by startDate descending (newest first)
+                  const dateA =
+                    typeof a.startDate === "number"
+                      ? a.startDate
+                      : new Date(a.startDate).getTime();
+                  const dateB =
+                    typeof b.startDate === "number"
+                      ? b.startDate
+                      : new Date(b.startDate).getTime();
+                  return dateB - dateA;
+                })
+                .map((transaction, index) => (
+                  <LoanTransactionCard
+                    key={`${transaction.startDate}-${index}`}
+                    transaction={transaction}
+                    index={index + 1}
+                  />
+                ))}
             </div>
           ) : (
             <Card className="border-border/50 bg-card">
