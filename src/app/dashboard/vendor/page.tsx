@@ -60,13 +60,6 @@ export default function VendorsPage() {
     setStatusFilter("all");
   };
 
-  // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
-    tableName: "vendors",
-    columns,
-    data: filteredVendors,
-  });
-
   // Calculate cycle duration
   const getCycleDuration = (vendor: TransformedVendor) => {
     if (!vendor.startAt || !vendor.endAt) return null;
@@ -248,6 +241,13 @@ export default function VendorsPage() {
     ],
     []
   );
+
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "vendors",
+    columns,
+    data: filteredVendors,
+  });
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
