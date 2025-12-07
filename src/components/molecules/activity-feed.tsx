@@ -67,11 +67,12 @@ function getActivityLabel(
   fromSub?: string,
   toSub?: string
 ) {
-  // Helper to get member/vendor name, excluding Club Account and Loan Account labels
+  // Helper to get member/vendor name, excluding Club Account but allowing Loan Account names
   const getMemberName = (name?: string, sub?: string) => {
-    if (sub === 'Club Account' || sub === 'Loan Account') {
-      return null // Don't show club/loan account as names
+    if (sub === 'Club Account') {
+      return null // Don't show club account as names
     }
+    // For Loan Account, still show the member name
     return name?.trim() || null
   }
 
@@ -87,13 +88,24 @@ function getActivityLabel(
       return `Withdrawal by ${getMemberName(toName, toSub) || 'Member'}`
     case 'LOAN_TAKEN':
       // Loan FROM club TO member (loan account)
-      return `Loan taken by ${getMemberName(toName, toSub) || 'Member'}`
+      // For loan taken, the member name is in toName even if toSub is "Loan Account"
+      const loanTakenMember = toName?.trim() && toSub !== 'Club Account' 
+        ? toName.trim() 
+        : null
+      return `Loan taken by ${loanTakenMember || 'Member'}`
     case 'LOAN_REPAY':
       // Repayment FROM member TO club
-      return `Loan repayment by ${getMemberName(fromName, fromSub) || 'Member'}`
+      // For loan repay, the member name is in fromName even if fromSub is "Loan Account"
+      const loanRepayMember = fromName?.trim() && fromSub !== 'Club Account'
+        ? fromName.trim()
+        : null
+      return `Loan repayment by ${loanRepayMember || 'Member'}`
     case 'LOAN_INTEREST':
       // Interest FROM member TO club
-      return `Interest payment from ${getMemberName(fromName, fromSub) || 'Member'}`
+      const interestMember = fromName?.trim() && fromSub !== 'Club Account'
+        ? fromName.trim()
+        : null
+      return `Interest payment from ${interestMember || 'Member'}`
     case 'VENDOR_INVEST':
       // Investment FROM club TO vendor
       return `Investment to ${getMemberName(toName, toSub) || 'Vendor'}`
