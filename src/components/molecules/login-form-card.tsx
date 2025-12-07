@@ -92,7 +92,9 @@ export function LoginFormCard() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Email (Optional)</FormLabel>
+                  <FormLabel className="text-sm font-medium">
+                    Email (Optional)
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -111,7 +113,9 @@ export function LoginFormCard() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Password</FormLabel>
+                  <FormLabel className="text-sm font-medium">
+                    Password
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -149,4 +153,3 @@ export function LoginFormCard() {
     </Card>
   );
 }
-
