@@ -13,7 +13,6 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchLoans } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -150,12 +149,9 @@ export default function LoansPage() {
                 {dateFormat(newZoneDate(loan.startAt))}
               </div>
               {duration && (
-                <Badge
-                  variant="secondary"
-                  className="mt-1 w-fit bg-muted text-xs font-normal"
-                >
+                <div className="mt-1 text-xs font-normal text-slate-500 dark:text-slate-400">
                   {duration}
-                </Badge>
+                </div>
               )}
             </div>
           );
@@ -180,16 +176,16 @@ export default function LoansPage() {
         },
       },
       {
-        id: "totalPaid",
-        accessorKey: "totalLoanRepay",
-        header: "Total Paid",
+        id: "interestPaid",
+        accessorKey: "totalInterestPaid",
+        header: "Interest Paid",
         enableSorting: true,
         meta: {
           align: "right",
-          tooltip: "Total amount repaid by this member.",
+          tooltip: "Total interest paid by this member.",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalLoanRepay || 0;
+          const amount = row.original.totalInterestPaid || 0;
           return (
             <div className="text-right text-sm font-medium text-green-600 dark:text-green-500">
               {amount === 0 ? (
@@ -202,16 +198,16 @@ export default function LoansPage() {
         },
       },
       {
-        id: "outstanding",
-        accessorKey: "totalLoanBalance",
-        header: "Outstanding",
+        id: "interestOutstanding",
+        accessorKey: "totalInterestBalance",
+        header: "Interest Outstanding",
         enableSorting: true,
         meta: {
           align: "right",
-          tooltip: "Outstanding loan balance (amount taken - amount paid).",
+          tooltip: "Remaining interest amount to be paid.",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalLoanBalance || 0;
+          const amount = row.original.totalInterestBalance || 0;
           return (
             <div
               className={`text-right text-sm font-medium ${
@@ -416,28 +412,28 @@ export default function LoansPage() {
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">
-                        Total Paid
+                        Interest Paid
                       </div>
                       <div className="text-sm font-medium text-green-600 dark:text-green-500">
-                        {loan.totalLoanRepay === 0
+                        {loan.totalInterestPaid === 0
                           ? "-"
-                          : moneyFormat(loan.totalLoanRepay)}
+                          : moneyFormat(loan.totalInterestPaid)}
                       </div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">
-                        Outstanding
+                        Interest Outstanding
                       </div>
                       <div
                         className={`text-sm font-medium ${
-                          loan.totalLoanBalance > 0
+                          loan.totalInterestBalance > 0
                             ? "text-destructive"
                             : "text-muted-foreground/50"
                         }`}
                       >
-                        {loan.totalLoanBalance === 0
+                        {loan.totalInterestBalance === 0
                           ? "-"
-                          : moneyFormat(loan.totalLoanBalance)}
+                          : moneyFormat(loan.totalInterestBalance)}
                       </div>
                     </div>
                     {loan.startAt && loan.totalLoanBalance > 0 && (
