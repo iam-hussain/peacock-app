@@ -37,14 +37,15 @@ export function ModernStatCard({
   return (
     <Card
       className={cn(
-        "rounded-lg border border-border/50 bg-card shadow-sm transition-all hover:shadow-md",
-        isHighlighted &&
-          "ring-2 ring-primary/20 shadow-md border-primary/30 scale-[1.02]",
+        "h-full flex flex-col rounded-lg border border-border/50 bg-card shadow-sm transition-all hover:shadow-md",
+        isHighlighted && "ring-2 ring-primary/20 shadow-md border-primary/30",
         className
       )}
     >
-      <CardContent className={cn("p-4", isHighlighted && "p-5")}>
-        <div className="flex items-center justify-between gap-4">
+      <CardContent
+        className={cn("flex flex-1 flex-col p-4", isHighlighted && "p-5")}
+      >
+        <div className="flex flex-1 items-center justify-between gap-4">
           {/* Left: Label */}
           <div className="flex-1 min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">

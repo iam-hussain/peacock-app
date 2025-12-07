@@ -47,8 +47,17 @@ export function MobileBottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-md border-t border-border/50 shadow-lg">
-      <div className="flex items-center justify-around h-16 px-2">
+    <nav
+      className={cn(
+        "fixed bottom-0 left-0 right-0 z-40 lg:hidden",
+        "bg-background border-t border-border",
+        "shadow-[0_-2px_8px_rgba(0,0,0,0.06)]"
+      )}
+      style={{
+        paddingBottom: `max(0.5rem, env(safe-area-inset-bottom))`,
+      }}
+    >
+      <div className="flex items-center justify-between h-16 px-2 max-w-md mx-auto">
         {bottomNavItems.map((item) => {
           const active = isActive(item.href);
           const Icon = item.icon;
@@ -57,16 +66,18 @@ export function MobileBottomNav() {
               <Button
                 key="more"
                 variant="ghost"
-                size="default"
+                size="icon"
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg",
-                  "transition-all active:scale-95",
+                  "flex flex-col items-center justify-center gap-0.5 h-full w-full",
+                  "transition-colors",
                   "text-muted-foreground hover:text-foreground"
                 )}
                 onClick={handleMoreClick}
               >
                 <Icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[10px] font-medium leading-none">
+                  {item.label}
+                </span>
               </Button>
             );
           }
@@ -75,17 +86,35 @@ export function MobileBottomNav() {
               key={item.href}
               href={item.href}
               variant="ghost"
-              size="default"
+              size="icon"
               className={cn(
-                "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg",
-                "transition-all active:scale-95",
+                "flex flex-col items-center justify-center gap-0.5 h-full w-full",
+                "transition-colors relative",
                 active
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Icon className={cn("h-5 w-5", active && "text-primary")} />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <Icon
+                className={cn(
+                  "h-5 w-5 transition-all",
+                  active && "text-primary scale-110"
+                )}
+              />
+              <span
+                className={cn(
+                  "text-[10px] font-medium leading-none transition-all",
+                  active && "font-semibold"
+                )}
+              >
+                {item.label}
+              </span>
+              {active && (
+                <>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 h-1 w-8 rounded-full bg-primary" />
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-primary" />
+                </>
+              )}
             </CustomLink>
           );
         })}

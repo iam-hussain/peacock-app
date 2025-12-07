@@ -1,0 +1,157 @@
+"use client";
+
+import { MoreHorizontal } from "lucide-react";
+
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+
+import { dateFormat, newZoneDate } from "@/lib/date";
+import { moneyFormat } from "@/lib/utils";
+import { TransformedMember } from "@/transformers/account";
+
+interface MemberCardMobileProps {
+  member: TransformedMember;
+  onViewDetails?: () => void;
+  onEdit?: () => void;
+  onViewTransactions?: () => void;
+}
+
+export function MemberCardMobile({
+  member,
+  onViewDetails,
+  onEdit,
+  onViewTransactions,
+}: MemberCardMobileProps) {
+  return (
+    <div className="rounded-xl border border-border bg-card shadow-sm px-4 py-5 space-y-4">
+      {/* Member Header Row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-12 w-12 rounded-lg">
+            <AvatarImage src={member.avatar} alt={member.name} />
+            <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
+              {member.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <p className="text-base font-semibold text-foreground">
+              {member.name}
+            </p>
+            <div className="flex items-center gap-1 mt-0.5">
+              <div
+                className={`h-1.5 w-1.5 rounded-full ${
+                  member.active ? "bg-green-500" : "bg-gray-400"
+                }`}
+              />
+              <span className="text-xs text-muted-foreground">
+                {member.status}
+              </span>
+            </div>
+          </div>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[180px]">
+            {onViewDetails && (
+              <DropdownMenuItem onClick={onViewDetails}>
+                View Details
+              </DropdownMenuItem>
+            )}
+            {onEdit && (
+              <DropdownMenuItem onClick={onEdit}>Edit Member</DropdownMenuItem>
+            )}
+            {onViewTransactions && (
+              <DropdownMenuItem onClick={onViewTransactions}>
+                View Transactions
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Values Section - Metrics Grid */}
+      <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-2 border-t border-border">
+        <div className="space-y-1">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Funds Managed
+          </div>
+          <div className="text-sm font-medium text-foreground">
+            {moneyFormat(member.clubHeldAmount || 0)}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Total Deposits
+          </div>
+          <div className="text-sm font-medium text-foreground">
+            {moneyFormat(member.totalDepositAmount)}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Member Adjustments
+          </div>
+          <div className="text-sm font-medium text-foreground">
+            {moneyFormat(member.totalOffsetAmount)}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Outstanding Balance
+          </div>
+          <div
+            className={`text-sm font-medium ${
+              member.totalBalanceAmount > 0
+                ? "text-destructive"
+                : "text-green-600"
+            }`}
+          >
+            {moneyFormat(member.totalBalanceAmount)}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Profit Earned
+          </div>
+          <div className="text-sm font-medium text-green-600">
+            {moneyFormat(member.totalReturnAmount)}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Current Value
+          </div>
+          <div className="text-sm font-semibold text-foreground">
+            {moneyFormat(member.netValue)}
+          </div>
+        </div>
+      </div>
+
+      {/* Date Row */}
+      <div className="pt-2 border-t border-border">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Joined On</span>
+          <span className="text-xs font-medium text-foreground">
+            {dateFormat(newZoneDate(member.startAt))}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
