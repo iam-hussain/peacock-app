@@ -336,7 +336,7 @@ export default function LoansPage() {
       </div>
 
       {/* Mobile Card View */}
-      <div className="lg:hidden space-y-6 px-4 pb-24">
+      <div className="lg:hidden space-y-4">
         {/* Search Bar */}
         <SearchBarMobile
           value={searchQuery}
