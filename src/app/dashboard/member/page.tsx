@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
+import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -76,6 +77,13 @@ export default function MembersPage() {
     setStatusFilter("all");
     setBalanceFilter("all");
   };
+
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "members",
+    columns,
+    data: filteredMembers,
+  });
 
   // Define columns
   const columns: ColumnDef<TransformedMember>[] = useMemo(
@@ -282,18 +290,12 @@ export default function MembersPage() {
             {
               label: "Export CSV",
               icon: <Download className="h-4 w-4" />,
-              onClick: () => {
-                // TODO: Implement CSV export
-                console.log("Export CSV");
-              },
+              onClick: handleExportCsv,
             },
             {
               label: "Screenshot",
               icon: <Camera className="h-4 w-4" />,
-              onClick: () => {
-                // TODO: Implement screenshot
-                console.log("Screenshot");
-              },
+              onClick: handleScreenshot,
             },
           ]}
         />
@@ -339,7 +341,7 @@ export default function MembersPage() {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block">
+      <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
           data={filteredMembers}

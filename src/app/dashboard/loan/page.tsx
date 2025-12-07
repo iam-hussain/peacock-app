@@ -13,6 +13,7 @@ import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
+import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchLoans } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -77,6 +78,13 @@ export default function LoansPage() {
     setSearchQuery("");
     setStatusFilter("all");
   };
+
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "loans",
+    columns,
+    data: filteredLoans,
+  });
 
   // Calculate loan duration
   const getLoanDuration = (loan: TransformedLoan) => {
@@ -264,7 +272,7 @@ export default function LoansPage() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
       {/* Desktop Header */}
-      <div className="hidden lg:block">
+      <div ref={tableRef} className="hidden lg:block">
         <PageHeader
           title="Loans Overview"
           subtitle="Track member loans, repayments, and outstanding balances."
@@ -305,7 +313,7 @@ export default function LoansPage() {
       </div>
 
       {/* Desktop Filter Bar */}
-      <div className="hidden lg:block">
+      <div ref={tableRef} className="hidden lg:block">
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
@@ -326,7 +334,7 @@ export default function LoansPage() {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block">
+      <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
           data={filteredLoans}

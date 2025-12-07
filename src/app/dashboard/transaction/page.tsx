@@ -30,6 +30,7 @@ import { TransactionSummaryCard } from "@/components/molecules/transaction-summa
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { transactionTypeMap } from "@/lib/config";
+import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchAccountSelect, fetchTransactions } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -168,6 +169,13 @@ export default function TransactionsPage() {
     setPageSize(size);
     setCurrentPage(1); // Reset to first page when changing page size
   };
+
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "transactions",
+    columns,
+    data: transactions,
+  });
 
   // All transaction type options (for filter drawer)
   const allTransactionTypeOptions = [
@@ -433,16 +441,12 @@ export default function TransactionsPage() {
             {
               label: "Export CSV",
               icon: <Download className="h-4 w-4" />,
-              onClick: () => {
-                console.log("Export CSV");
-              },
+              onClick: handleExportCsv,
             },
             {
               label: "Screenshot",
               icon: <Camera className="h-4 w-4" />,
-              onClick: () => {
-                console.log("Screenshot");
-              },
+              onClick: handleScreenshot,
             },
           ]}
         />
