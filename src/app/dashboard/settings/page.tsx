@@ -191,7 +191,7 @@ export default function SettingsPage() {
       },
       {
         id: "currentValue",
-        accessorKey: "currentValue",
+        accessorKey: "netValue",
         header: "Current Value",
         enableSorting: true,
         meta: {
@@ -200,7 +200,7 @@ export default function SettingsPage() {
         },
         cell: ({ row }) => (
           <div className="text-right text-sm font-medium text-foreground">
-            {moneyFormat(row.original.currentValue || 0)}
+            {moneyFormat(row.original.netValue || 0)}
           </div>
         ),
       },
