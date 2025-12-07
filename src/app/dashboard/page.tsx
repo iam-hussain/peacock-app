@@ -125,8 +125,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI Row - 2 Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* KPI Row - 2 Cards with 1 placeholder */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <ModernStatCard
           title="Active Members"
           value={statistics.membersCount}
@@ -139,6 +139,8 @@ export default function DashboardPage() {
           icon={<CalendarDays className="h-5 w-5" />}
           iconBgColor="#EDE7F6"
         />
+        {/* Invisible placeholder for 3-column alignment */}
+        <div className="hidden xl:block" aria-hidden="true" />
       </div>
 
       {/* Financial Summary Sections */}
@@ -148,7 +150,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Member Funds
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Total Deposits"
               value={formatCurrency(statistics.totalMemberPeriodicDeposits)}
@@ -163,6 +165,8 @@ export default function DashboardPage() {
               icon={<Wallet className="h-5 w-5" />}
               iconBgColor="#FFF3E0"
             />
+            {/* Invisible placeholder for 3-column alignment */}
+            <div className="hidden xl:block" aria-hidden="true" />
           </div>
         </div>
 
@@ -171,7 +175,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Member Outflow
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Withdrawals"
               value={formatCurrency(statistics.totalMemberProfitWithdrawals)}
@@ -184,6 +188,8 @@ export default function DashboardPage() {
               icon={<SlidersHorizontal className="h-5 w-5" />}
               iconBgColor="#F3E5F5"
             />
+            {/* Invisible placeholder for 3-column alignment */}
+            <div className="hidden xl:block" aria-hidden="true" />
           </div>
         </div>
 
@@ -192,7 +198,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Loan Summary
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Loan Taken"
               value={formatCurrency(statistics.totalLoanTaken)}
@@ -219,7 +225,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Vendor Transactions
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Vendor Investment"
               value={formatCurrency(statistics.totalVendorHolding)}
@@ -232,6 +238,8 @@ export default function DashboardPage() {
               icon={<TrendingUp className="h-5 w-5" />}
               iconBgColor="#E8F5E9"
             />
+            {/* Invisible placeholder for 3-column alignment */}
+            <div className="hidden xl:block" aria-hidden="true" />
           </div>
         </div>
 
@@ -240,7 +248,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Cash Flow Position
           </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Available Cash"
               value={formatCurrency(availableCash)}
@@ -263,12 +271,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* PORTFOLIO SUMMARY - 2 Large Cards */}
+      {/* PORTFOLIO SUMMARY - 2 Large Cards with 1 placeholder */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Portfolio Summary
         </h3>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <ModernStatCard
             title="Current Value"
             value={formatCurrency(currentPortfolioValue)}
@@ -282,6 +290,8 @@ export default function DashboardPage() {
             iconBgColor="#FFF3E0"
             isHighlighted={true}
           />
+          {/* Invisible placeholder for 3-column alignment */}
+          <div className="hidden xl:block" aria-hidden="true" />
         </div>
       </div>
 
