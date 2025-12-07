@@ -22,7 +22,7 @@ import { TransformedLoan } from "@/transformers/account";
 export default function LoansPage() {
   const { data, isLoading } = useQuery(fetchLoans());
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
 
   // Determine loan status
   const getLoanStatus = (loan: TransformedLoan) => {

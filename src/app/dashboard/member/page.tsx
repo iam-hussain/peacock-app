@@ -24,7 +24,7 @@ import { TransformedMember } from "@/transformers/account";
 export default function MembersPage() {
   const { data, isLoading } = useQuery(fetchMembers());
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
   const [balanceFilter, setBalanceFilter] = useState("all");
 
   // Filter members
