@@ -13,7 +13,7 @@ import { MemberCardSkeleton } from "@/components/atoms/member-card-skeleton";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
-import { MemberCardGrid } from "@/components/molecules/member-card-grid";
+import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
@@ -360,20 +360,21 @@ export default function MembersPage() {
           onChange={setStatusFilter}
         />
 
-        {/* Member Grid */}
+        {/* Member List */}
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="space-y-4">
             {[...Array(6)].map((_, i) => (
               <MemberCardSkeleton key={i} />
             ))}
           </div>
         ) : filteredMembers.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
             {filteredMembers.map((member) => (
-              <MemberCardGrid
+              <MemberCardMobile
                 key={member.id}
                 member={member}
-                onClick={() => handleViewDetails(member)}
+                onViewDetails={() => handleViewDetails(member)}
+                onViewTransactions={() => handleViewTransactions(member)}
               />
             ))}
           </div>

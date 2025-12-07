@@ -85,37 +85,37 @@ export function MemberCardMobile({
         </DropdownMenu>
       </div>
 
-      {/* Values Section - Metrics Grid */}
-      <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-2 border-t border-border">
-        <div className="space-y-1">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Funds Managed
-          </div>
-          <div className="text-sm font-medium text-foreground">
+      {/* Values Section - List Layout */}
+      <div className="space-y-3 pt-3 border-t border-border">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Managed
+          </span>
+          <span className="text-sm font-medium text-foreground">
             {moneyFormat(member.clubHeldAmount || 0)}
-          </div>
+          </span>
         </div>
-        <div className="space-y-1">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Total Deposits
-          </div>
-          <div className="text-sm font-medium text-foreground">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Deposits
+          </span>
+          <span className="text-sm font-medium text-foreground">
             {moneyFormat(member.totalDepositAmount)}
-          </div>
+          </span>
         </div>
-        <div className="space-y-1">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Member Adjustments
-          </div>
-          <div className="text-sm font-medium text-foreground">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Adjustments
+          </span>
+          <span className="text-sm font-medium text-foreground">
             {moneyFormat(member.totalOffsetAmount)}
-          </div>
+          </span>
         </div>
-        <div className="space-y-1">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Outstanding Balance
-          </div>
-          <div
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Balance
+          </span>
+          <span
             className={`text-sm font-medium ${
               member.totalBalanceAmount > 0
                 ? "text-destructive"
@@ -123,30 +123,28 @@ export function MemberCardMobile({
             }`}
           >
             {moneyFormat(member.totalBalanceAmount)}
-          </div>
+          </span>
         </div>
-        <div className="space-y-1">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Profit Earned
-          </div>
-          <div className="text-sm font-medium text-green-600">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Profit
+          </span>
+          <span className="text-sm font-medium text-green-600">
             {moneyFormat(member.totalReturnAmount)}
-          </div>
+          </span>
         </div>
-        <div className="space-y-1">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground">
-            Current Value
-          </div>
-          <div className="text-sm font-semibold text-foreground">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Value
+          </span>
+          <span className="text-sm font-semibold text-foreground">
             {moneyFormat(member.netValue)}
-          </div>
+          </span>
         </div>
-      </div>
-
-      {/* Date Row */}
-      <div className="pt-2 border-t border-border">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Joined On</span>
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <span className="text-xs uppercase tracking-wide text-muted-foreground">
+            Joined
+          </span>
           <span className="text-xs font-medium text-foreground">
             {dateFormat(newZoneDate(member.startAt))}
           </span>
