@@ -161,7 +161,7 @@ export default function SettingsPage() {
       },
       {
         id: "fundsManaged",
-        accessorKey: "fundsManaged",
+        accessorKey: "clubHeldAmount",
         header: "Funds Managed",
         enableSorting: true,
         meta: {
@@ -170,7 +170,7 @@ export default function SettingsPage() {
         },
         cell: ({ row }) => (
           <div className="text-right text-sm font-medium text-foreground">
-            {moneyFormat(row.original.fundsManaged || 0)}
+            {moneyFormat(row.original.clubHeldAmount || 0)}
           </div>
         ),
       },
