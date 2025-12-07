@@ -279,17 +279,13 @@ export default function SettingsPage() {
           const vendor = row.original;
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={vendor.avatar} alt={vendor.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                  {vendor.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              <ClickableAvatar
+                src={vendor.avatar}
+                alt={vendor.name}
+                name={vendor.name}
+                href={`/dashboard/vendor`}
+                size="md"
+              />
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <Badge

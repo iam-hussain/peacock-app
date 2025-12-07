@@ -352,11 +352,7 @@ export default function TransactionsPage() {
         },
         cell: ({ row }) => {
           const transaction = row.original;
-          const {
-            direction,
-            color,
-            icon: Icon,
-          } = getTransactionDirection(transaction);
+          const { color, icon: Icon } = getTransactionDirection(transaction);
           return (
             <div className={`flex items-center justify-end gap-1.5 ${color}`}>
               {Icon && <Icon className="h-3 w-3" />}
