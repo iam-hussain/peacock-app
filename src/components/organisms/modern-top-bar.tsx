@@ -210,26 +210,27 @@ export function ModernTopBar() {
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden sm:inline-block text-sm font-medium">
-                  Admin
-                </span>
                 <ChevronDown className="h-4 w-4 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/profile")}
+                className="cursor-pointer"
+              >
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/settings")}
+                className="cursor-pointer"
+              >
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-destructive"
+                className="text-destructive focus:text-destructive cursor-pointer"
                 onClick={handleLogout}
               >
                 <LogOut className="mr-2 h-4 w-4" />
