@@ -7,6 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { Button } from "../../ui/button";
 import {
   Form,
   FormControl,
@@ -17,7 +18,6 @@ import {
 } from "../../ui/form";
 import { Input } from "../../ui/input";
 import { Switch } from "../../ui/switch";
-import { Button } from "../../ui/button";
 
 import { newZoneDate } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
@@ -64,9 +64,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       }),
     onSuccess: async (data: any) => {
       toast.success(
-        selected
-          ? "Member updated successfully"
-          : "Member created successfully"
+        selected ? "Member updated successfully" : "Member created successfully"
       );
       form.reset(data?.account || {});
       if (onSuccess) {
@@ -86,10 +84,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full space-y-6"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         {/* System ID (Slug) - Readonly */}
         {selected && selected.slug && (
           <div className="rounded-lg border border-border bg-muted/30 p-3">
@@ -114,11 +109,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
               <FormItem>
                 <FormLabel>First Name *</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="First name"
-                    className="h-10"
-                  />
+                  <Input {...field} placeholder="First name" className="h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,11 +124,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Last name"
-                    className="h-10"
-                  />
+                  <Input {...field} placeholder="Last name" className="h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -268,4 +255,3 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     </Form>
   );
 }
-
