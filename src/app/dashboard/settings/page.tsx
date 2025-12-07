@@ -192,7 +192,7 @@ export default function SettingsPage() {
         },
         cell: ({ row }) => (
           <div className="text-sm text-muted-foreground">
-            Managed Funds: {moneyFormat(row.original.clubHeldAmount || 0)}
+            {moneyFormat(row.original.clubHeldAmount || 0)}
           </div>
         ),
       },

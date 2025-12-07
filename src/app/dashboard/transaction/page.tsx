@@ -18,7 +18,6 @@ import { TransformedTransaction } from "@/app/api/transaction/route";
 import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { FilterBar } from "@/components/atoms/filter-bar";
-import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
@@ -511,23 +510,16 @@ export default function TransactionsPage() {
           placeholder="Search transactions..."
         />
 
-        {/* Filter Pills + Filter Button */}
-        <div className="flex items-center gap-2">
-          <div className="flex-1 overflow-x-auto">
-            <FilterChips
-              chips={mobileFilterChips}
-              selectedValue={typeFilter}
-              onChange={setTypeFilter}
-            />
-          </div>
+        {/* Filter Button Only */}
+        <div className="flex items-center justify-end">
           <Button
             variant="outline"
-            size="icon"
+            size="default"
             onClick={() => setFilterDrawerOpen(true)}
-            className="shrink-0"
+            className="gap-2"
           >
             <SlidersHorizontal className="h-4 w-4" />
-            <span className="sr-only">Open filters</span>
+            <span>Filter</span>
           </Button>
         </div>
       </div>
@@ -595,7 +587,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
+      {totalPages > 0 && (
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
@@ -606,7 +598,6 @@ export default function TransactionsPage() {
           isLoading={isLoading}
           showPageSize={true}
           scrollToTop={true}
-          className="mt-6"
         />
       )}
 

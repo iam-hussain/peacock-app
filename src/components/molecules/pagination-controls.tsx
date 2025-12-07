@@ -128,19 +128,14 @@ export function PaginationControls({
       ref={paginationRef}
       data-pagination="true"
       className={cn(
-        "sticky bottom-0 z-10 flex flex-col gap-3 border-t border-border bg-background/95 backdrop-blur-sm py-3 px-4 md:flex-row md:items-center md:justify-between",
+        "flex flex-col gap-4 rounded-xl border border-border/50 bg-card p-4 shadow-sm",
         className
       )}
     >
-      {/* Left: Page Info & Controls */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-        {/* Page Info Text */}
-        <div className="hidden text-sm text-muted-foreground md:block">
-          Page {currentPage} of {totalPages}
-        </div>
-
-        {/* Pagination Buttons */}
-        <div className="flex items-center gap-1">
+      {/* Desktop Layout */}
+      <div className="hidden md:flex md:items-center md:justify-between md:gap-4">
+        {/* Left: Pagination Buttons */}
+        <div className="flex items-center gap-2">
           {/* First Page */}
           <Button
             variant="outline"
@@ -159,57 +154,15 @@ export function PaginationControls({
             size="sm"
             onClick={() => onPageChange(currentPage - 1)}
             disabled={!canGoPrevious}
-            className="h-9 px-3"
+            className="h-9 w-9 p-0"
             aria-label="Previous page"
           >
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            <span className="hidden sm:inline">Previous</span>
+            <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          {/* Page Numbers - Desktop */}
-          <div className="hidden items-center gap-1 md:flex">
-            {pageNumbers.map((page, index) => {
-              if (page === "ellipsis") {
-                return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="px-2 text-sm text-muted-foreground"
-                  >
-                    ...
-                  </span>
-                );
-              }
-
-              const isCurrentPage = page === currentPage;
-              return (
-                <Button
-                  key={page}
-                  variant={isCurrentPage ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(page)}
-                  disabled={isLoading}
-                  className={cn(
-                    "h-9 min-w-[36px] px-3",
-                    isCurrentPage &&
-                      "bg-primary text-primary-foreground font-semibold"
-                  )}
-                  aria-label={`Go to page ${page}`}
-                  aria-current={isCurrentPage ? "page" : undefined}
-                >
-                  {page}
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Current Page - Mobile */}
-          <div className="flex items-center gap-2 md:hidden">
-            <span className="text-sm font-medium text-foreground">
-              {currentPage}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              of {totalPages}
-            </span>
+          {/* Page Info */}
+          <div className="px-3 text-sm text-muted-foreground">
+            {currentPage} of {totalPages}
           </div>
 
           {/* Next Page */}
@@ -218,11 +171,10 @@ export function PaginationControls({
             size="sm"
             onClick={() => onPageChange(currentPage + 1)}
             disabled={!canGoNext}
-            className="h-9 px-3"
+            className="h-9 w-9 p-0"
             aria-label="Next page"
           >
-            <span className="hidden sm:inline">Next</span>
-            <ChevronRight className="ml-1 h-4 w-4" />
+            <ChevronRight className="h-4 w-4" />
           </Button>
 
           {/* Last Page */}
@@ -237,44 +189,137 @@ export function PaginationControls({
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Right: Item Count & Page Size */}
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground">
+            Showing {startItem}–{endItem} of {totalItems.toLocaleString()}{" "}
+            transactions
+          </div>
+          {showPageSize && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="page-size-select"
+                className="text-sm text-muted-foreground"
+              >
+                Per page:
+              </label>
+              <Select
+                value={pageSize.toString()}
+                onValueChange={(value) => onPageSizeChange(parseInt(value))}
+                disabled={isLoading}
+              >
+                <SelectTrigger
+                  id="page-size-select"
+                  className="h-9 w-[100px] text-sm"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Right: Page Size & Item Count */}
-      <div className="flex flex-col gap-2 border-t border-border pt-3 md:flex-row md:items-center md:gap-4 md:border-0 md:pt-0">
-        {/* Item Count */}
-        <div className="text-xs text-muted-foreground md:text-sm">
-          Showing {startItem}–{endItem} of {totalItems.toLocaleString()}{" "}
-          transactions
+      {/* Mobile Layout */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {/* Pagination Buttons - Centered */}
+        <div className="flex items-center justify-center gap-2">
+          {/* First Page */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(1)}
+            disabled={!canGoPrevious}
+            className="h-9 w-9 p-0"
+            aria-label="First page"
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+
+          {/* Previous Page */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={!canGoPrevious}
+            className="h-9 w-9 p-0"
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          {/* Current Page Info */}
+          <div className="px-3 text-sm font-medium text-foreground">
+            {currentPage} of {totalPages}
+          </div>
+
+          {/* Next Page */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={!canGoNext}
+            className="h-9 w-9 p-0"
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+
+          {/* Last Page */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(totalPages)}
+            disabled={!canGoNext}
+            className="h-9 w-9 p-0"
+            aria-label="Last page"
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
         </div>
 
-        {/* Page Size Selector */}
-        {showPageSize && (
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="page-size-select"
-              className="text-xs text-muted-foreground md:text-sm"
-            >
-              Per page:
-            </label>
-            <Select
-              value={pageSize.toString()}
-              onValueChange={(value) => onPageSizeChange(parseInt(value))}
-              disabled={isLoading}
-            >
-              <SelectTrigger
-                id="page-size-select"
-                className="h-9 w-[100px] text-xs md:text-sm"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Item Count & Page Size - Below */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-xs text-muted-foreground">
+            Showing {startItem}–{endItem} of {totalItems.toLocaleString()}{" "}
+            transactions
           </div>
-        )}
+          {showPageSize && (
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="page-size-select-mobile"
+                className="text-xs text-muted-foreground"
+              >
+                Per page:
+              </label>
+              <Select
+                value={pageSize.toString()}
+                onValueChange={(value) => onPageSizeChange(parseInt(value))}
+                disabled={isLoading}
+              >
+                <SelectTrigger
+                  id="page-size-select-mobile"
+                  className="h-9 w-[100px] text-xs"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

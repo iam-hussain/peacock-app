@@ -14,33 +14,30 @@ export function TransactionSummaryCard({
   outflow,
 }: TransactionSummaryCardProps) {
   return (
-    <Card className="border-border/50 bg-card shadow-sm">
-      <CardContent className="p-4 md:p-5">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">
-              Inflow
-            </p>
-            <p className="text-lg font-bold text-green-600 dark:text-green-500 md:text-xl">
-              {moneyFormat(inflow)}
-            </p>
+    <div className="w-full flex justify-center">
+      <Card className="w-full max-w-md border-border/50 bg-card shadow-sm rounded-xl">
+        <CardContent className="p-4 md:p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1 text-center">
+              <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Inflow
+              </p>
+              <p className="text-lg font-bold text-green-600 dark:text-green-500 md:text-xl">
+                {moneyFormat(inflow)}
+              </p>
+            </div>
+            <div className="h-12 w-px bg-border" />
+            <div className="flex-1 text-center">
+              <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Outflow
+              </p>
+              <p className="text-lg font-bold text-destructive md:text-xl">
+                {moneyFormat(outflow)}
+              </p>
+            </div>
           </div>
-          <div className="h-12 w-px bg-border" />
-          <div className="flex-1">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">
-              Outflow
-            </p>
-            <p className="text-lg font-bold text-destructive md:text-xl">
-              {moneyFormat(outflow)}
-            </p>
-          </div>
-          <div className="hidden items-center gap-2 md:flex">
-            <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
-              This period
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
