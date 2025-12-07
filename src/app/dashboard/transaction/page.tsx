@@ -451,7 +451,6 @@ export default function TransactionsPage() {
         </p>
       </div>
 
-
       {/* Desktop Filter Bar */}
       <div className="hidden lg:block">
         <FilterBar
