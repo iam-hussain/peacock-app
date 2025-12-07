@@ -152,7 +152,8 @@ export async function POST(request: Request) {
         // Check firstName and lastName separately
         if (
           queryWords.some(
-            (word) => firstName.includes(word) || lastName.includes(word)
+            (word: string) =>
+              firstName.includes(word) || lastName.includes(word)
           )
         ) {
           return true;
@@ -160,10 +161,10 @@ export async function POST(request: Request) {
 
         // Check if query matches firstName + lastName combination
         if (queryWords.length > 1) {
-          const matchesFirstName = queryWords.some((word) =>
+          const matchesFirstName = queryWords.some((word: string) =>
             firstName.includes(word)
           );
-          const matchesLastName = queryWords.some((word) =>
+          const matchesLastName = queryWords.some((word: string) =>
             lastName.includes(word)
           );
           if (matchesFirstName && matchesLastName) {
@@ -180,13 +181,13 @@ export async function POST(request: Request) {
       // Check if all query words are found in the name (for multi-word searches)
       if (
         queryWords.length > 1 &&
-        queryWords.every((word) => normalizedName.includes(word))
+        queryWords.every((word: string) => normalizedName.includes(word))
       ) {
         return true;
       }
 
       // Check individual word matches
-      if (queryWords.some((word) => normalizedName.includes(word))) {
+      if (queryWords.some((word: string) => normalizedName.includes(word))) {
         return true;
       }
 
@@ -213,7 +214,7 @@ export async function POST(request: Request) {
         normalizedName.includes(normalizedQuery) ||
         normalizedQuery
           .split(" ")
-          .some((word) => normalizedName.includes(word)) ||
+          .some((word: string) => normalizedName.includes(word)) ||
         vendor.id.toLowerCase().includes(query)
       );
     });
@@ -230,7 +231,7 @@ export async function POST(request: Request) {
         normalizedName.includes(normalizedQuery) ||
         normalizedQuery
           .split(" ")
-          .some((word) => normalizedName.includes(word)) ||
+          .some((word: string) => normalizedName.includes(word)) ||
         loan.id.toLowerCase().includes(query)
       );
     });
