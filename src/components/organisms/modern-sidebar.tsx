@@ -9,7 +9,6 @@ import {
   FolderSync,
   LayoutDashboard,
   LogOut,
-  Settings,
   User,
   Users,
   Wallet,
@@ -50,11 +49,6 @@ const secondaryNavItems: NavItem[] = [
     icon: FileText,
     label: "Terms & Conditions",
     href: "/dashboard/terms-and-conditions",
-  },
-  {
-    icon: Settings,
-    label: "Settings",
-    href: "/dashboard/settings",
   },
 ];
 
@@ -243,24 +237,6 @@ export function ModernSidebar() {
           <User className="h-5 w-5 shrink-0" />
           {!sideBarCollapsed && (
             <span className="text-sm font-medium">Profile</span>
-          )}
-        </CustomLink>
-        <CustomLink
-          href="/dashboard/settings"
-          variant="ghost"
-          size="default"
-          className={cn(
-            "w-full justify-start gap-3 px-3 py-2.5 rounded-lg",
-            "hover:bg-accent hover:text-accent-foreground",
-            sideBarCollapsed && "justify-center px-2",
-            isActive("/dashboard/settings") &&
-              "bg-primary/10 text-primary border-l-2 border-primary font-medium"
-          )}
-          title={sideBarCollapsed ? "Settings" : undefined}
-        >
-          <Settings className="h-5 w-5 shrink-0" />
-          {!sideBarCollapsed && (
-            <span className="text-sm font-medium">Settings</span>
           )}
         </CustomLink>
         {isLoggedIn && (

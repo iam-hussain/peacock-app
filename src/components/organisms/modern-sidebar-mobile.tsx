@@ -8,7 +8,6 @@ import {
   FolderSync,
   LayoutDashboard,
   LogOut,
-  Settings,
   User,
   Users,
   Wallet,
@@ -50,11 +49,6 @@ const secondaryNavItems: NavItem[] = [
     icon: FileText,
     label: "Terms & Conditions",
     href: "/dashboard/terms-and-conditions",
-  },
-  {
-    icon: Settings,
-    label: "Settings",
-    href: "/dashboard/settings",
   },
 ];
 
@@ -237,20 +231,6 @@ export function ModernSidebarMobile() {
                 >
                   <User className="h-5 w-5 shrink-0" />
                   <span className="text-sm font-medium">Profile</span>
-                </CustomLink>
-                <CustomLink
-                  href="/dashboard/settings"
-                  variant="ghost"
-                  size="default"
-                  className={cn(
-                    "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
-                    isActive("/dashboard/settings") &&
-                      "bg-primary/10 text-primary font-medium"
-                  )}
-                  onClick={handleClose}
-                >
-                  <Settings className="h-5 w-5 shrink-0" />
-                  <span className="text-sm font-medium">Settings</span>
                 </CustomLink>
                 <Button
                   variant="ghost"

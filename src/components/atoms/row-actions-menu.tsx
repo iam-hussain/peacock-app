@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Edit,
   Eye,
   Key,
   MoreHorizontal,
@@ -20,7 +21,9 @@ import {
 
 interface RowActionsMenuProps {
   onViewDetails?: () => void;
+  onEdit?: () => void;
   onViewTransactions?: () => void;
+  onDeactivate?: () => void;
   onRemove?: () => void;
   onAddRepayment?: () => void;
   onAdjustOffset?: () => void;
@@ -29,7 +32,9 @@ interface RowActionsMenuProps {
 
 export function RowActionsMenu({
   onViewDetails,
+  onEdit,
   onViewTransactions,
+  onDeactivate,
   onRemove,
   onAddRepayment,
   onAdjustOffset,
@@ -74,14 +79,24 @@ export function RowActionsMenu({
             Change Password
           </DropdownMenuItem>
         )}
+        {onEdit && (
+          <DropdownMenuItem onClick={onEdit}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit
+          </DropdownMenuItem>
+        )}
+        {(onDeactivate || onRemove) && <DropdownMenuSeparator />}
+        {onDeactivate && (
+          <DropdownMenuItem onClick={onDeactivate} className="text-destructive">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Deactivate
+          </DropdownMenuItem>
+        )}
         {onRemove && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onRemove} className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Remove Member
-            </DropdownMenuItem>
-          </>
+          <DropdownMenuItem onClick={onRemove} className="text-destructive">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Remove Member
+          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
