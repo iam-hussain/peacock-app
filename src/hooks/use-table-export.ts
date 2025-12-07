@@ -96,8 +96,8 @@ export function useTableExport<TData>({
       const accessorKey =
         "accessorKey" in column ? (column.accessorKey as string) : undefined;
       if (accessorKey) {
-        const keys = String(column.accessorKey).split(".");
-        value = row;
+        const keys = String(accessorKey).split(".");
+        value = row as any;
         for (const key of keys) {
           value = value?.[key];
           if (value === undefined || value === null) break;
