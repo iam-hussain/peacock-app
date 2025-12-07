@@ -60,6 +60,13 @@ export default function VendorsPage() {
     setStatusFilter("all");
   };
 
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "vendors",
+    columns,
+    data: filteredVendors,
+  });
+
   // Calculate cycle duration
   const getCycleDuration = (vendor: TransformedVendor) => {
     if (!vendor.startAt || !vendor.endAt) return null;
