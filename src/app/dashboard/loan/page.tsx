@@ -66,12 +66,8 @@ export default function LoansPage() {
     window.location.href = `/dashboard/transaction?member=${loan.slug}&type=LOAN_REPAY`;
   };
 
-  const handleEditLoan = (loan: TransformedLoan) => {
-    console.log("Edit loan", loan);
-  };
-
-  const handleDeleteLoan = (loan: TransformedLoan) => {
-    console.log("Delete loan", loan);
+  const handleChangePassword = () => {
+    window.location.href = "/dashboard/profile";
   };
 
   const handleResetFilters = () => {
@@ -251,9 +247,8 @@ export default function LoansPage() {
           return (
             <RowActionsMenu
               onViewDetails={() => handleViewLoan(loan)}
-              onEdit={() => handleEditLoan(loan)}
               onViewTransactions={() => handleAddRepayment(loan)}
-              onDeactivate={() => handleDeleteLoan(loan)}
+              onChangePassword={handleChangePassword}
             />
           );
         },

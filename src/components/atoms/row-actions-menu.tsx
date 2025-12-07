@@ -3,6 +3,7 @@
 import {
   Edit,
   Eye,
+  Key,
   MoreHorizontal,
   Receipt,
   SlidersHorizontal,
@@ -26,6 +27,7 @@ interface RowActionsMenuProps {
   onRemove?: () => void;
   onAddRepayment?: () => void;
   onAdjustOffset?: () => void;
+  onChangePassword?: () => void;
 }
 
 export function RowActionsMenu({
@@ -36,6 +38,7 @@ export function RowActionsMenu({
   onRemove,
   onAddRepayment,
   onAdjustOffset,
+  onChangePassword,
 }: RowActionsMenuProps) {
   return (
     <DropdownMenu>
@@ -74,6 +77,12 @@ export function RowActionsMenu({
           <DropdownMenuItem onClick={onAdjustOffset}>
             <SlidersHorizontal className="mr-2 h-4 w-4" />
             Adjustments
+          </DropdownMenuItem>
+        )}
+        {onChangePassword && (
+          <DropdownMenuItem onClick={onChangePassword}>
+            <Key className="mr-2 h-4 w-4" />
+            Change Password
           </DropdownMenuItem>
         )}
         {(onDeactivate || onRemove) && <DropdownMenuSeparator />}
