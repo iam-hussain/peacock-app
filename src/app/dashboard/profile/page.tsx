@@ -81,7 +81,7 @@ export default function ProfilePage() {
 
   const profileMutation = useMutation({
     mutationFn: (data: ProfileFormValues) =>
-      fetcher.post("/api/user/profile", data),
+      fetcher.post("/api/user/profile", { body: data }),
     onSuccess: () => {
       toast.success("Profile updated successfully");
     },
@@ -94,7 +94,7 @@ export default function ProfilePage() {
 
   const passwordMutation = useMutation({
     mutationFn: (data: PasswordFormValues) =>
-      fetcher.post("/api/user/password", data),
+      fetcher.post("/api/user/password", { body: data }),
     onSuccess: () => {
       toast.success("Password changed successfully");
       setPasswordDialogOpen(false);
