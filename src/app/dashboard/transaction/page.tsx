@@ -21,6 +21,7 @@ import { FilterBar } from "@/components/atoms/filter-bar";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
+import { FloatingActionButton } from "@/components/molecules/floating-action-button";
 import { PaginationControls } from "@/components/molecules/pagination-controls";
 import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
 import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
@@ -603,6 +604,9 @@ export default function TransactionsPage() {
         onApply={handleApplyFilters}
         onReset={handleResetFilters}
       />
+
+      {/* Mobile FAB */}
+      <FloatingActionButton onClick={handleAddTransaction} />
 
       {/* Transaction Form Dialog */}
       <TransactionFormDialog
