@@ -18,7 +18,6 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 
 import { ActivityFeed } from "@/components/molecules/activity-feed";
 import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
