@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import { Camera, Download, MoreHorizontal, UserPlus } from "lucide-react";
+import { Camera, Download, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -14,7 +14,6 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardGrid } from "@/components/molecules/member-card-grid";
-import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
@@ -26,10 +25,6 @@ export default function MembersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [balanceFilter, setBalanceFilter] = useState("all");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<
-    TransformedMember["account"] | null
-  >(null);
 
   // Filter members
   const filteredMembers = useMemo(() => {
@@ -67,16 +62,6 @@ export default function MembersPage() {
 
     return filtered;
   }, [data?.members, searchQuery, statusFilter, balanceFilter]);
-
-  const handleAddMember = () => {
-    setSelectedMember(null);
-    setDialogOpen(true);
-  };
-
-  const handleEditMember = (member: TransformedMember) => {
-    setSelectedMember(member.account);
-    setDialogOpen(true);
-  };
 
   const handleViewDetails = (member: TransformedMember) => {
     window.location.href = member.link;
@@ -281,7 +266,6 @@ export default function MembersPage() {
           return (
             <RowActionsMenu
               onViewDetails={() => handleViewDetails(member)}
-              onEdit={() => handleEditMember(member)}
               onViewTransactions={() => handleViewTransactions(member)}
             />
           );
@@ -295,12 +279,7 @@ export default function MembersPage() {
     <div className="w-full max-w-7xl mx-auto space-y-6">
       <PageHeader
         title="Members Overview"
-        subtitle="Manage member details, funds managed, balances, and performance."
-        primaryAction={{
-          label: "Add Member",
-          icon: <UserPlus className="h-4 w-4" />,
-          onClick: handleAddMember,
-        }}
+        subtitle="View member details, funds managed, balances, and performance."
         secondaryActions={[
           {
             label: "Export CSV",
@@ -404,16 +383,6 @@ export default function MembersPage() {
           </div>
         )}
       </div>
-
-      <MemberFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        selected={selectedMember}
-        onSuccess={() => {
-          // Refetch members data
-          window.location.reload();
-        }}
-      />
     </div>
   );
 }

@@ -51,6 +51,11 @@ const secondaryNavItems: NavItem[] = [
     label: "Terms & Conditions",
     href: "/dashboard/terms-and-conditions",
   },
+  {
+    icon: Settings,
+    label: "Settings",
+    href: "/dashboard/settings",
+  },
 ];
 
 export function ModernSidebarMobile() {
@@ -213,12 +218,34 @@ export function ModernSidebarMobile() {
             </ScrollArea>
 
             {/* User Card */}
-            <div className="p-4 border-t border-border/50">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <div className="p-4 border-t border-border/50 space-y-2">
+              <CustomLink
+                href="/dashboard/profile"
+                variant="ghost"
+                size="default"
+                className={cn(
+                  "w-full justify-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors",
+                  isActive("/dashboard/profile") &&
+                    "bg-primary/10 text-primary font-medium"
+                )}
+              >
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    My Profile
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    View & Edit Profile
+                  </p>
+                </div>
+              </CustomLink>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src="" alt="Admin" />
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    <User className="h-5 w-5" />
+                    <Users className="h-5 w-5" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
@@ -231,14 +258,19 @@ export function ModernSidebarMobile() {
             {/* Footer Actions */}
             {isLoggedIn && (
               <div className="p-4 border-t border-border/50 space-y-1">
-                <Button
+                <CustomLink
+                  href="/dashboard/settings"
                   variant="ghost"
                   size="default"
-                  className="w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent"
+                  className={cn(
+                    "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent",
+                    isActive("/dashboard/settings") &&
+                      "bg-primary/10 text-primary font-medium"
+                  )}
                 >
                   <Settings className="h-5 w-5 shrink-0" />
                   <span className="text-sm font-medium">Settings</span>
-                </Button>
+                </CustomLink>
                 <Button
                   variant="ghost"
                   size="default"
