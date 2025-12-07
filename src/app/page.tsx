@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { clubAge } from "@/lib/date";
 import { fetchAuthStatus, fetchStatistics } from "@/lib/query-options";
 
@@ -201,6 +202,17 @@ export default function Home() {
         <p className="mb-8 max-w-2xl text-center text-lg text-muted-foreground md:text-xl">
           A transparent, community-managed savings and lending club.
         </p>
+
+        {/* Login Form - Show when not logged in */}
+        {!isLoggedIn && (
+          <div className="mb-8 w-full flex justify-center px-4">
+            <div className="w-full max-w-[400px]">
+              <LoginFormCard />
+            </div>
+          </div>
+        )}
+
+        {/* CTA Buttons */}
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <Button size="lg" asChild>
             <Link href="/dashboard">
@@ -208,11 +220,6 @@ export default function Home() {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
-          {!isLoggedIn && (
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/login">Login</Link>
-            </Button>
-          )}
         </div>
         <Link
           href="/dashboard/terms-and-conditions"

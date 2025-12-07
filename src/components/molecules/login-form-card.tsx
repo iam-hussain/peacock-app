@@ -1,0 +1,152 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { CustomLink } from "../ui/link";
+
+import fetcher from "@/lib/fetcher";
+
+const loginFormSchema = z.object({
+  email: z.string().optional(),
+  password: z.string().min(1, "Password is required."),
+});
+
+type LoginFormSchema = z.infer<typeof loginFormSchema>;
+
+export function LoginFormCard() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [error, setError] = useState<string | null>(null);
+
+  const form = useForm<LoginFormSchema>({
+    resolver: zodResolver(loginFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: (data: LoginFormSchema) =>
+      fetcher.post("/api/auth/login", { body: { password: data.password } }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      toast.success("Logged in successfully!");
+      router.push("/dashboard");
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error.message || "Invalid email or password. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    },
+  });
+
+  async function onSubmit(data: LoginFormSchema) {
+    setError(null);
+    return await mutation.mutateAsync(data);
+  }
+
+  return (
+    <Card className="w-full max-w-[400px] border-border/50 bg-card shadow-sm">
+      <CardHeader className="space-y-1 pb-4">
+        <CardTitle className="text-xl font-semibold">Login</CardTitle>
+        <CardDescription className="text-sm text-muted-foreground">
+          Access your club dashboard securely.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Email (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      className="h-11 rounded-lg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      className="h-11 rounded-lg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex items-center justify-between">
+              <CustomLink
+                href="#forgot-password"
+                variant="link"
+                size="sm"
+                className="text-xs text-muted-foreground hover:text-primary"
+              >
+                Forgot password?
+              </CustomLink>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 rounded-lg"
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? "Logging in..." : "Login"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
+
