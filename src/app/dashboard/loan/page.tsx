@@ -262,6 +262,13 @@ export default function LoansPage() {
     []
   );
 
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "loans",
+    columns,
+    data: filteredLoans,
+  });
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
       {/* Desktop Header */}
