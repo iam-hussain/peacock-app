@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -121,7 +122,11 @@ export function ModernSidebarMobile() {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/50">
-              <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+                onClick={handleClose}
+              >
                 <div className="relative h-10 w-10 shrink-0">
                   <Image
                     src="/peacock.svg"
@@ -138,7 +143,7 @@ export function ModernSidebarMobile() {
                     {club.inYear}
                   </p>
                 </div>
-              </div>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"

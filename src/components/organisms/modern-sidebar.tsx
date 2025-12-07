@@ -15,6 +15,7 @@ import {
   Wallet,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -106,7 +107,10 @@ export function ModernSidebar() {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/50">
         {!sideBarCollapsed && (
-          <div className="flex items-center gap-3 flex-1">
+          <Link
+            href="/"
+            className="flex items-center gap-3 flex-1 hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <div className="relative h-10 w-10 shrink-0">
               <Image
                 src="/peacock.svg"
@@ -123,10 +127,13 @@ export function ModernSidebar() {
                 {club.inYear}
               </p>
             </div>
-          </div>
+          </Link>
         )}
         {sideBarCollapsed && (
-          <div className="flex items-center justify-center w-full">
+          <Link
+            href="/"
+            className="flex items-center justify-center w-full hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <div className="relative h-8 w-8">
               <Image
                 src="/peacock.svg"
@@ -135,7 +142,7 @@ export function ModernSidebar() {
                 className="object-contain"
               />
             </div>
-          </div>
+          </Link>
         )}
         <Button
           variant="ghost"
