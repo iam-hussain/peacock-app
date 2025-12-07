@@ -79,7 +79,9 @@ export function useTableExport<TData>({
     }
 
     // Fallback
-    return (column.accessorKey as string) || (column.id as string) || "Column";
+    const accessorKey =
+      "accessorKey" in column ? (column.accessorKey as string) : undefined;
+    return accessorKey || (column.id as string) || "Column";
   }, []);
 
   /**
