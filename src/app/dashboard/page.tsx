@@ -27,19 +27,11 @@ import { ActivityFeed } from "@/components/molecules/activity-feed";
 import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
 import { MembersPreview } from "@/components/molecules/members-preview";
 import { ModernStatCard } from "@/components/molecules/modern-stat-card";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { clubAge } from "@/lib/date";
 import { fetchStatistics } from "@/lib/query-options";
 
 export default function DashboardPage() {
   const { data, isLoading } = useQuery(fetchStatistics());
-  const { theme, setTheme } = useTheme();
   const statistics = data?.statistics;
   const members = data?.members || [];
 
@@ -92,37 +84,11 @@ export default function DashboardPage() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Overview of your financial club management
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Export Data</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Overview of your financial club management
+        </p>
       </div>
 
       {/* KPI Row - 2 Cards with 1 placeholder */}
