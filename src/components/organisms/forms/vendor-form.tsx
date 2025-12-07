@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { Switch } from "../../ui/switch";
 import { Button } from "../../ui/button";
+import { Switch } from "../../ui/switch";
 
 import {
   Form,

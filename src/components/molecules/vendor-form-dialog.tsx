@@ -1,7 +1,13 @@
 "use client";
 
 import { VendorForm } from "../organisms/forms/vendor-form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
 import { TransformedVendor } from "@/app/api/account/vendor/route";
 
