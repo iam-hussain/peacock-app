@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { ClickableAvatar } from "../atoms/clickable-avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -126,17 +126,13 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
                   onClick={() => handleMemberClick(member.slug)}
                   className="group flex flex-col items-center gap-2 rounded-lg p-3 transition-colors hover:bg-muted/50"
                 >
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {member.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <ClickableAvatar
+                    src={member.avatar}
+                    alt={member.name}
+                    name={member.name}
+                    href={member.link}
+                    size="lg"
+                  />
                   <div className="text-center">
                     <p className="text-xs font-medium text-foreground line-clamp-1">
                       {member.name}

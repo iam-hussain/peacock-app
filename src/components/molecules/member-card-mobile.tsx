@@ -2,7 +2,7 @@
 
 import { MoreHorizontal } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { ClickableAvatar } from "../atoms/clickable-avatar";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -33,17 +33,14 @@ export function MemberCardMobile({
       {/* Member Header Row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12 rounded-lg">
-            <AvatarImage src={member.avatar} alt={member.name} />
-            <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
-              {member.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2)}
-            </AvatarFallback>
-          </Avatar>
+          <ClickableAvatar
+            src={member.avatar}
+            alt={member.name}
+            name={member.name}
+            href={member.link}
+            size="lg"
+            className="rounded-lg"
+          />
           <div className="flex flex-col">
             <p className="text-base font-semibold text-foreground">
               {member.name}

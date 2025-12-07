@@ -6,13 +6,13 @@ import { Camera, Download, FolderSync, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchLoans } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -100,17 +100,13 @@ export default function LoansPage() {
           const status = getLoanStatus(loan);
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={loan.avatar} alt={loan.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                  {loan.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              <ClickableAvatar
+                src={loan.avatar}
+                alt={loan.name}
+                name={loan.name}
+                href={loan.link}
+                size="md"
+              />
               <div className="flex flex-col">
                 <Link
                   href={loan.link}
@@ -376,17 +372,14 @@ export default function LoansPage() {
                   onClick={() => handleViewLoan(loan)}
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <Avatar className="h-12 w-12 rounded-lg">
-                      <AvatarImage src={loan.avatar} alt={loan.name} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
-                        {loan.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <ClickableAvatar
+                      src={loan.avatar}
+                      alt={loan.name}
+                      name={loan.name}
+                      href={loan.link}
+                      size="lg"
+                      className="rounded-lg"
+                    />
                     <div className="flex-1">
                       <p className="text-base font-semibold text-foreground">
                         {loan.name}

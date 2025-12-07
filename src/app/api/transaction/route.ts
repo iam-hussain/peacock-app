@@ -16,6 +16,7 @@ type TransactionToTransform = Transaction & {
 
 type AccountDetails = {
   id: string;
+  slug: string;
   firstName: string;
   lastName: string | null;
   avatar: string | null;
@@ -137,6 +138,7 @@ function fetchTransactions(
       from: {
         select: {
           id: true,
+          slug: true,
           firstName: true,
           lastName: true,
           avatar: true,
@@ -147,6 +149,7 @@ function fetchTransactions(
       to: {
         select: {
           id: true,
+          slug: true,
           firstName: true,
           lastName: true,
           avatar: true,
@@ -170,6 +173,9 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       avatar: transaction.from.avatar
         ? `/image/${transaction.from.avatar}`
         : undefined,
+      link: transaction.from.isMember
+        ? `/dashboard/member/${transaction.from.slug}`
+        : undefined,
     },
     to: {
       ...transaction.to,
@@ -177,6 +183,9 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       sub: "",
       avatar: transaction.to.avatar
         ? `/image/${transaction.to.avatar}`
+        : undefined,
+      link: transaction.to.isMember
+        ? `/dashboard/member/${transaction.to.slug}`
         : undefined,
     },
   };

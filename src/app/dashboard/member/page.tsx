@@ -6,6 +6,7 @@ import { Camera, Download, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { FilterChips } from "@/components/atoms/filter-chips";
@@ -14,7 +15,6 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchMembers } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
@@ -92,17 +92,13 @@ export default function MembersPage() {
           const member = row.original;
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={member.avatar} alt={member.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                  {member.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              <ClickableAvatar
+                src={member.avatar}
+                alt={member.name}
+                name={member.name}
+                href={member.link}
+                size="md"
+              />
               <div className="flex flex-col">
                 <Link
                   href={member.link}

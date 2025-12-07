@@ -13,7 +13,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "react-use";
 
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { ClickableAvatar } from "../atoms/clickable-avatar";
 import { Input } from "../ui/input";
 import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
@@ -178,17 +178,13 @@ export function GlobalSearch({
                         className="w-full justify-start gap-3 px-3 py-2 rounded-lg hover:bg-accent"
                         onClick={handleResultClick}
                       >
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={member.avatar} alt={member.name} />
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {member.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <ClickableAvatar
+                          src={member.avatar}
+                          alt={member.name}
+                          name={member.name}
+                          href={member.link}
+                          size="sm"
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
                             {member.name}

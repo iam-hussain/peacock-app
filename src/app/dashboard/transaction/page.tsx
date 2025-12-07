@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { TransformedTransaction } from "@/app/api/transaction/route";
+import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { FilterChips } from "@/components/atoms/filter-chips";
@@ -21,7 +22,6 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { transactionTypeMap } from "@/lib/config";
 import { dateFormat, newZoneDate } from "@/lib/date";
 import { fetchAccountSelect, fetchTransactions } from "@/lib/query-options";
@@ -167,26 +167,44 @@ export default function TransactionsPage() {
         cell: ({ row }) => {
           const transaction = row.original;
           const account = transaction.from;
+          const memberLink =
+            account.link ||
+            (account.isMember
+              ? `/dashboard/member/${account.slug}`
+              : undefined);
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={account.avatar} alt={account.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+              {memberLink ? (
+                <ClickableAvatar
+                  src={account.avatar}
+                  alt={account.name}
+                  name={account.name}
+                  href={memberLink}
+                  size="md"
+                />
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
                   {account.name
                     .split(" ")
                     .map((n) => n[0])
                     .join("")
                     .toUpperCase()
                     .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+                </div>
+              )}
               <div className="flex flex-col">
-                <Link
-                  href="#"
-                  className="text-sm font-semibold text-foreground hover:underline"
-                >
-                  {account.name}
-                </Link>
+                {memberLink ? (
+                  <Link
+                    href={memberLink}
+                    className="text-sm font-semibold text-foreground hover:underline"
+                  >
+                    {account.name}
+                  </Link>
+                ) : (
+                  <span className="text-sm font-semibold text-foreground">
+                    {account.name}
+                  </span>
+                )}
                 {account.sub && (
                   <span className="text-xs text-muted-foreground">
                     {account.sub}
@@ -208,26 +226,44 @@ export default function TransactionsPage() {
         cell: ({ row }) => {
           const transaction = row.original;
           const account = transaction.to;
+          const memberLink =
+            account.link ||
+            (account.isMember
+              ? `/dashboard/member/${account.slug}`
+              : undefined);
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={account.avatar} alt={account.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+              {memberLink ? (
+                <ClickableAvatar
+                  src={account.avatar}
+                  alt={account.name}
+                  name={account.name}
+                  href={memberLink}
+                  size="md"
+                />
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
                   {account.name
                     .split(" ")
                     .map((n) => n[0])
                     .join("")
                     .toUpperCase()
                     .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+                </div>
+              )}
               <div className="flex flex-col">
-                <Link
-                  href="#"
-                  className="text-sm font-semibold text-foreground hover:underline"
-                >
-                  {account.name}
-                </Link>
+                {memberLink ? (
+                  <Link
+                    href={memberLink}
+                    className="text-sm font-semibold text-foreground hover:underline"
+                  >
+                    {account.name}
+                  </Link>
+                ) : (
+                  <span className="text-sm font-semibold text-foreground">
+                    {account.name}
+                  </span>
+                )}
                 {account.sub && (
                   <span className="text-xs text-muted-foreground">
                     {account.sub}
@@ -474,40 +510,48 @@ export default function TransactionsPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage
+                        {transaction.from.link ? (
+                          <ClickableAvatar
                             src={transaction.from.avatar}
                             alt={transaction.from.name}
+                            name={transaction.from.name}
+                            href={transaction.from.link}
+                            size="sm"
                           />
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
                             {transaction.from.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")
                               .toUpperCase()
                               .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                          </div>
+                        )}
                         <span className="text-sm font-medium text-foreground">
                           {transaction.from.name}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 ml-10">
                         <span className="text-xs text-muted-foreground">→</span>
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage
+                        {transaction.to.link ? (
+                          <ClickableAvatar
                             src={transaction.to.avatar}
                             alt={transaction.to.name}
+                            name={transaction.to.name}
+                            href={transaction.to.link}
+                            size="sm"
                           />
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
                             {transaction.to.name
                               .split(" ")
                               .map((n) => n[0])
                               .join("")
                               .toUpperCase()
                               .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                          </div>
+                        )}
                         <span className="text-sm font-medium text-foreground">
                           {transaction.to.name}
                         </span>

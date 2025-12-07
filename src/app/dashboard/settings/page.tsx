@@ -16,12 +16,12 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { TransformedVendor } from "@/app/api/account/vendor/route";
+import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
 import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -148,17 +148,13 @@ export default function SettingsPage() {
           const member = row.original;
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={member.avatar} alt={member.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                  {member.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase()
-                    .slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
+              <ClickableAvatar
+                src={member.avatar}
+                alt={member.name}
+                name={member.name}
+                href={member.link}
+                size="md"
+              />
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-foreground">
                   {member.name}
