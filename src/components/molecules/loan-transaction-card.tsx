@@ -97,8 +97,8 @@ export function LoanTransactionCard({
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Months Passed:</span>
                 <span className="font-medium text-slate-500 dark:text-slate-400">
-                  {transaction.monthsPassed} months{" "}
-                  {transaction.daysPassed} days
+                  {transaction.monthsPassed} months {transaction.daysPassed}{" "}
+                  days
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -124,12 +124,13 @@ export function LoanTransactionCard({
                     : "Ongoing"}
                 </span>
               </div>
-              {transaction.active && transaction.daysPassed > transaction.daysInMonth * 0.8 && (
-                <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span>Approaching due date</span>
-                </div>
-              )}
+              {transaction.active &&
+                transaction.daysPassed > transaction.daysInMonth * 0.8 && (
+                  <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span>Approaching due date</span>
+                  </div>
+                )}
             </div>
           </div>
         </CardContent>
@@ -137,4 +138,3 @@ export function LoanTransactionCard({
     </Card>
   );
 }
-

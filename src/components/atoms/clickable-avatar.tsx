@@ -44,7 +44,8 @@ export function ClickableAvatar({
     .toUpperCase()
     .slice(0, 2);
 
-  const isRounded = className?.includes("rounded-lg") || className?.includes("rounded-xl");
+  const isRounded =
+    className?.includes("rounded-lg") || className?.includes("rounded-xl");
   const roundedClass = isRounded ? "" : "rounded-full";
 
   return (
@@ -77,4 +78,3 @@ export function ClickableAvatar({
     </Link>
   );
 }
-

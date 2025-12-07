@@ -214,17 +214,14 @@ export function GlobalSearch({
                         className="w-full justify-start gap-3 px-3 py-2 rounded-lg hover:bg-accent"
                         onClick={handleResultClick}
                       >
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={vendor.avatar} alt={vendor.name} />
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {vendor.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                          {vendor.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .toUpperCase()
+                            .slice(0, 2)}
+                        </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
                             {vendor.name}
@@ -254,17 +251,13 @@ export function GlobalSearch({
                         className="w-full justify-start gap-3 px-3 py-2 rounded-lg hover:bg-accent"
                         onClick={handleResultClick}
                       >
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={loan.avatar} alt={loan.name} />
-                          <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                            {loan.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .toUpperCase()
-                              .slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
+                        <ClickableAvatar
+                          src={loan.avatar}
+                          alt={loan.name}
+                          name={loan.name}
+                          href={loan.link}
+                          size="sm"
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
                             {loan.name}

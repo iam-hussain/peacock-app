@@ -116,7 +116,9 @@ export function LoanSummaryCard({
         {/* Interest Progress */}
         <div className="space-y-2 pt-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Interest Payment Progress</span>
+            <span className="text-muted-foreground">
+              Interest Payment Progress
+            </span>
             <span className="font-medium text-foreground">
               {interestProgress.toFixed(1)}%
             </span>
@@ -127,4 +129,3 @@ export function LoanSummaryCard({
     </Card>
   );
 }
-

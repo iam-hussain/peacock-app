@@ -22,6 +22,7 @@ import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
+import { PaginationControls } from "@/components/molecules/pagination-controls";
 import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
 import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
@@ -68,6 +69,8 @@ export default function TransactionsPage() {
 
   // Use transactions directly from API (filtering is done server-side)
   const transactions = data?.transactions || [];
+  const totalTransactions = data?.total || 0;
+  const totalPages = data?.totalPages || 1;
 
   // Calculate inflow/outflow summary
   const summary = useMemo(() => {
@@ -155,6 +158,15 @@ export default function TransactionsPage() {
   const handleApplyFilters = () => {
     setFilterDrawerOpen(false);
     setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to first page when changing page size
   };
 
   // All transaction type options (for filter drawer)
@@ -550,7 +562,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Mobile Card View */}
-      <div className="lg:hidden space-y-4">
+      <div className="lg:hidden space-y-4 pb-20">
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
@@ -580,6 +592,22 @@ export default function TransactionsPage() {
           </Card>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={totalTransactions}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          isLoading={isLoading}
+          showPageSize={true}
+          scrollToTop={true}
+          className="mt-6"
+        />
+      )}
 
       {/* Filter Drawer (Mobile) */}
       <TransactionFilterDrawer
