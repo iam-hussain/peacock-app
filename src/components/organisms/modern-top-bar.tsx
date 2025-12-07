@@ -2,14 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import {
-  ChevronDown,
-  LogOut,
-  Menu,
-  Search,
-  User,
-  X,
-} from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search, User, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
