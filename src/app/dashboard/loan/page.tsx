@@ -272,7 +272,7 @@ export default function LoansPage() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
       {/* Desktop Header */}
-      <div ref={tableRef} className="hidden lg:block">
+      <div className="hidden lg:block">
         <PageHeader
           title="Loans Overview"
           subtitle="Track member loans, repayments, and outstanding balances."
@@ -287,16 +287,12 @@ export default function LoansPage() {
             {
               label: "Export CSV",
               icon: <Download className="h-4 w-4" />,
-              onClick: () => {
-                console.log("Export CSV");
-              },
+              onClick: handleExportCsv,
             },
             {
               label: "Screenshot",
               icon: <Camera className="h-4 w-4" />,
-              onClick: () => {
-                console.log("Screenshot");
-              },
+              onClick: handleScreenshot,
             },
           ]}
         />
@@ -313,7 +309,7 @@ export default function LoansPage() {
       </div>
 
       {/* Desktop Filter Bar */}
-      <div ref={tableRef} className="hidden lg:block">
+      <div className="hidden lg:block">
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}
