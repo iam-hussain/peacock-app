@@ -79,13 +79,6 @@ export default function LoansPage() {
     setStatusFilter("all");
   };
 
-  // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
-    tableName: "loans",
-    columns,
-    data: filteredLoans,
-  });
-
   // Calculate loan duration
   const getLoanDuration = (loan: TransformedLoan) => {
     if (!loan.startAt) return null;
