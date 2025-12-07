@@ -1,254 +1,67 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
-import { FaBalanceScale, FaPiggyBank, FaUsers } from "react-icons/fa";
-import { FaMoneyBillTrendUp } from "react-icons/fa6";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
-import { FaScaleUnbalancedFlip } from "react-icons/fa6";
-import { GiPayMoney } from "react-icons/gi";
-import { GiReceiveMoney } from "react-icons/gi";
-import { GiHandBandage } from "react-icons/gi";
-import { RiMoneyRupeeCircleFill } from "react-icons/ri";
+'use client'
+import { useQuery } from '@tanstack/react-query'
 
-import { AvatarGroup } from "@/components/atoms/avatar-group";
-import { DashboardCard } from "@/components/atoms/dashboard-card";
-import { DoughnutChart } from "@/components/molecules/doughnut-chart";
-import { PieChart } from "@/components/molecules/pie-chart";
-import Box from "@/components/ui/box";
-import { clubAge } from "@/lib/date";
-import { fetchStatistics } from "@/lib/query-options";
+import { StatsSection } from '@/components/molecules/stats-section'
+import { MembersPreview } from '@/components/molecules/members-preview'
+import { EnhancedChartsSection } from '@/components/molecules/enhanced-charts-section'
+import { ActivityFeed } from '@/components/molecules/activity-feed'
+import Box from '@/components/ui/box'
+import { fetchStatistics } from '@/lib/query-options'
 
 export default function DashboardPage() {
-  const club = clubAge();
-  const { data, isLoading, isError } = useQuery(fetchStatistics());
-  const statistics = data?.statistics || null;
-  const members = data?.members || [];
+  const { data, isLoading, isError } = useQuery(fetchStatistics())
+  const statistics = data?.statistics || null
+  const members = data?.members || []
 
   if (isLoading) {
     return (
-      <Box>
-        <p className="p-8">Loading...</p>
+      <Box className="w-full max-w-6xl mx-auto">
+        <div className="space-y-6">
+          <div className="h-64 animate-pulse rounded-xl bg-muted" />
+          <div className="h-96 animate-pulse rounded-xl bg-muted" />
+          <div className="h-64 animate-pulse rounded-xl bg-muted" />
+        </div>
       </Box>
-    );
+    )
   }
 
   if (isError || !statistics) {
     return (
-      <Box>
-        <p className="p-8 text-center w-full text-destructive">
+      <Box className="w-full max-w-6xl mx-auto">
+        <div className="p-8 text-center w-full text-destructive">
           Unexpected error on fetching the data
-        </p>
+        </div>
       </Box>
-    );
+    )
   }
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      {/* Statistics Grid with Icons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <DashboardCard
-          title="Members / Months"
-          value={`${statistics.membersCount} / ${club.inMonth}`}
-          icon={<FaUsers className="text-3xl text-blue-600" />}
-        />
-        <DashboardCard
-          title="Members Deposit"
-          value={statistics.totalMemberPeriodicDeposits.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<FaPiggyBank className="text-3xl text-green-600" />}
-        />
-        <DashboardCard
-          title="Members Balance"
-          value={statistics.totalMemberPeriodicDepositsBalance.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<FaBalanceScale className="text-3xl text-yellow-600" />}
-        />
-        <DashboardCard
-          title="Member Withdrawal"
-          value={statistics.totalMemberProfitWithdrawals.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<FaScaleUnbalancedFlip className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Loan Taken For"
-          value={statistics.totalLoanBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Loan Interest Collected"
-          value={statistics.totalInterestPaid.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Loan Interest Balance"
-          value={statistics.totalInterestBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Loan Interest Total"
-          value={statistics.expectedTotalLoanInterestAmount.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Vendor Profit"
-          value={statistics.totalVendorProfit.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaMoneyBillTrendUp className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Offset Deposit"
-          value={statistics.totalOffsetPaid.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaBalanceScale className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Offset Balance"
-          value={statistics.totalOffsetBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaBalanceScale className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Offset Total"
-          value={statistics.totalOffsetAmount.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaBalanceScale className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Liquidity Amount"
-          value={statistics.currentClubBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiReceiveMoney className="text-3xl text-orange-600" />}
-        />
-        <DashboardCard
-          title="Net Value"
-          value={statistics.currentClubNetValue.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiPayMoney className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Expected Net Value"
-          value={statistics.expectedClubNetValue.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<RiMoneyRupeeCircleFill className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Expected Member Value"
-          value={(
-            statistics.expectedClubNetValue / statistics.membersCount
-          ).toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaMoneyBillTransfer className="text-3xl text-indigo-600" />}
-        />
-        {/* <DashboardCard
-          title="Club Net Amount"
-          value={statistics.netAmount.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<RiMoneyRupeeCircleFill className="text-3xl text-teal-600" />}
-        />
- 
-        <DashboardCard
-          title="Club Value"
-          value={statistics.netValue.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaMoneyBillTrendUp className="text-3xl text-teal-600" />}
-        /> */}
-      </div>
-      <div className="flex bg-background flex-col gap-6 justify-center align-middle items-center p-4">
-        <h1 className="text-xl uppercase">Members</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 justify-center align-middle items-center">
-          {members.map((member) => (
-            <div
-              className="gap-0 p-2 rounded-md flex flex-col justify-center align-middle items-center"
-              key={member.slug}
-            >
-              <AvatarGroup
-                className={"px-6"}
-                src={member.avatar || ""}
-                name={member.name}
-                isLarge={true}
-                link={member.link}
-              />
-              <p className="text-sm">{member.name}</p>
-            </div>
-          ))}
-        </div>
+    <div className="w-full max-w-6xl mx-auto space-y-6">
+      {/* Welcome Section */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Overview of your financial club management
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <PieChart
-          available={parseInt(
-            Number(statistics.currentClubBalance || 0).toString()
-          )}
-          invested={parseInt(
-            Number(
-              statistics.totalLoanBalance + statistics.totalVendorHolding
-            ).toString()
-          )}
-          pending={parseInt(
-            Number(
-              statistics.totalInterestBalance +
-                statistics.totalOffsetBalance +
-                statistics.totalMemberPeriodicDepositsBalance
-            ).toString()
-          )}
-        />
-        <DoughnutChart
-          deposit={parseInt(
-            Number(statistics.totalMemberPeriodicDeposits).toString()
-          )}
-          offset={parseInt(Number(statistics.totalOffsetPaid).toString())}
-          returns={parseInt(Number(statistics.totalInterestPaid).toString())}
-        />
+      {/* Stats Section */}
+      <StatsSection statistics={statistics} />
+
+      {/* Charts Section */}
+      <EnhancedChartsSection statistics={statistics} />
+
+      {/* Members Preview and Activity Feed */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <MembersPreview initialMembers={members} />
+        </div>
+        <div>
+          <ActivityFeed limit={8} />
+        </div>
       </div>
     </div>
-  );
+  )
 }

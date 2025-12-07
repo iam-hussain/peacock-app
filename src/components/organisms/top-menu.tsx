@@ -37,6 +37,7 @@ function TopMenu({ className }: { className?: string }) {
   const dispatch = useDispatch();
   const [scrollDirection, setScrollDirection] = useState("IDEAL");
   const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
+  const sideBarCollapsed = useSelector((state: RootState) => state.page.sideBarCollapsed);
 
   const callback = useCallback(
     (event: any) => {
@@ -64,7 +65,8 @@ function TopMenu({ className }: { className?: string }) {
   return (
     <motion.nav
       className={clsx(
-        "w-full h-[48px] align-middle items-center fixed px-4 lg:px-0 lg:pl-[300px] flex justify-between lg:justify-center shadow-sm",
+        "w-full h-[48px] align-middle items-center fixed px-4 lg:px-0 flex justify-between lg:justify-center shadow-sm transition-all duration-300",
+        sideBarCollapsed ? "lg:pl-[80px]" : "lg:pl-[300px]",
         className
       )}
       initial="show"

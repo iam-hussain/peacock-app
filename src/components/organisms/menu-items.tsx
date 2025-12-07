@@ -45,9 +45,11 @@ const appMenus: Menu[] = [
 function MenuItems({
   onItemClick,
   hasCloseButton = false,
+  collapsed = false,
 }: {
   onItemClick?: () => {};
   hasCloseButton?: boolean;
+  collapsed?: boolean;
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -94,13 +96,17 @@ function MenuItems({
         <Image
           src={"/peacock.svg"}
           alt={"Peacock Club"}
-          width={60}
-          height={60}
+          width={collapsed ? 40 : 60}
+          height={collapsed ? 40 : 60}
         />
-        <Typography variant={"brandMini"} className="w-full text-center">
-          Peacock Club
-        </Typography>
-        <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
+        {!collapsed && (
+          <>
+            <Typography variant={"brandMini"} className="w-full text-center">
+              Peacock Club
+            </Typography>
+            <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
+          </>
+        )}
       </Box>
       <Separator className="my-2" />
 
@@ -112,8 +118,9 @@ function MenuItems({
               variant={"menu"}
               href={each.link as any}
               onClick={() => handleOnItemClick()}
+              title={collapsed ? each.label : undefined}
             >
-              <Icon className="h-5 w-5" /> {each.label}
+              <Icon className="h-5 w-5" /> {!collapsed && each.label}
             </CustomLink>
           ))}
 
@@ -133,8 +140,9 @@ function MenuItems({
                 handleLogout();
                 handleOnItemClick();
               }}
+              title={collapsed ? 'Logout' : undefined}
             >
-              <PiSignOutBold className="h-5 w-5" /> Logout
+              <PiSignOutBold className="h-5 w-5" /> {!collapsed && 'Logout'}
             </Button>
           )}
 
@@ -146,8 +154,9 @@ function MenuItems({
                 handleLogout();
                 handleOnItemClick();
               }}
+              title={collapsed ? 'Login' : undefined}
             >
-              <PiSignInBold className="h-5 w-5" /> Login
+              <PiSignInBold className="h-5 w-5" /> {!collapsed && 'Login'}
             </CustomLink>
           )}
         </Box>
