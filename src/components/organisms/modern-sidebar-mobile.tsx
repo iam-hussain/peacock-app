@@ -1,0 +1,238 @@
+'use client'
+
+import { usePathname, useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
+import {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  FolderSync,
+  Wallet,
+  FileText,
+  Settings,
+  LogOut,
+  X,
+  User,
+} from 'lucide-react'
+import { toast } from 'sonner'
+
+import { Button } from '../ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { ScrollArea } from '../ui/scroll-area'
+import { Separator } from '../ui/separator'
+import { CustomLink } from '../ui/link'
+import { RootState } from '@/store'
+import { openSideBar, setIsLoggedIn } from '@/store/pageSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import { clubAge } from '@/lib/date'
+import { cn } from '@/lib/utils'
+import fetcher from '@/lib/fetcher'
+
+interface NavItem {
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  href: string
+}
+
+const mainNavItems: NavItem[] = [
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+  { icon: Users, label: 'Members', href: '/dashboard/member' },
+  { icon: Briefcase, label: 'Vendors', href: '/dashboard/vendor' },
+  { icon: FolderSync, label: 'Loans', href: '/dashboard/loan' },
+  { icon: Wallet, label: 'Transactions', href: '/dashboard/transaction' },
+]
+
+const secondaryNavItems: NavItem[] = [
+  { icon: FileText, label: 'Terms & Conditions', href: '/dashboard/terms-and-conditions' },
+]
+
+export function ModernSidebarMobile() {
+  const dispatch = useDispatch()
+  const router = useRouter()
+  const pathname = usePathname()
+  const queryClient = useQueryClient()
+  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen)
+  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn)
+  const club = clubAge()
+
+  const logoutMutation = useMutation({
+    mutationFn: () => fetcher.post('/api/auth/logout'),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['authentication'] })
+      dispatch(setIsLoggedIn(false))
+      toast.success('Logged out successfully!')
+      router.push('/login')
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'An unexpected error occurred. Please try again.')
+    },
+  })
+
+  const handleLogout = () => {
+    logoutMutation.mutate()
+    handleClose()
+  }
+
+  const isActive = (href: string) => {
+    if (href === '/dashboard') {
+      return pathname === '/dashboard'
+    }
+    return pathname.startsWith(href)
+  }
+
+  const handleClose = () => {
+    dispatch(openSideBar())
+  }
+
+  return (
+    <AnimatePresence>
+      {sideBarOpen && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+            onClick={handleClose}
+          />
+
+          {/* Sidebar */}
+          <motion.aside
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed left-0 top-0 z-50 h-screen w-[280px] lg:hidden flex flex-col bg-background shadow-xl"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border/50">
+              <div className="flex items-center gap-3">
+                <div className="relative h-10 w-10 shrink-0">
+                  <Image
+                    src="/peacock.svg"
+                    alt="Peacock Club"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-sm font-bold text-foreground">Peacock Club</h1>
+                  <p className="text-[10px] text-muted-foreground">{club.inYear}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleClose}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Navigation */}
+            <ScrollArea className="flex-1 px-3 py-4">
+              <nav className="space-y-1">
+                {mainNavItems.map((item) => {
+                  const active = isActive(item.href)
+                  const Icon = item.icon
+                  return (
+                    <CustomLink
+                      key={item.href}
+                      href={item.href}
+                      variant="ghost"
+                      size="auto"
+                      className={cn(
+                        'w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all',
+                        'hover:bg-accent hover:text-accent-foreground',
+                        'active:scale-[0.98]',
+                        active &&
+                          'bg-primary/10 text-primary border-l-2 border-primary font-medium'
+                      )}
+                      onClick={handleClose}
+                    >
+                      <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </CustomLink>
+                  )
+                })}
+              </nav>
+
+              <Separator className="my-4" />
+
+              <nav className="space-y-1">
+                {secondaryNavItems.map((item) => {
+                  const active = isActive(item.href)
+                  const Icon = item.icon
+                  return (
+                    <CustomLink
+                      key={item.href}
+                      href={item.href}
+                      variant="ghost"
+                      size="auto"
+                      className={cn(
+                        'w-full justify-start gap-3 px-3 py-3 rounded-lg transition-all',
+                        'hover:bg-accent hover:text-accent-foreground',
+                        'active:scale-[0.98]',
+                        active &&
+                          'bg-primary/10 text-primary border-l-2 border-primary font-medium'
+                      )}
+                      onClick={handleClose}
+                    >
+                      <Icon className={cn('h-5 w-5 shrink-0', active && 'text-primary')} />
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </CustomLink>
+                  )
+                })}
+              </nav>
+            </ScrollArea>
+
+            {/* User Card */}
+            <div className="p-4 border-t border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="" alt="Admin" />
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">Admin</p>
+                  <p className="text-xs text-muted-foreground">Administrator</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            {isLoggedIn && (
+              <div className="p-4 border-t border-border/50 space-y-1">
+                <Button
+                  variant="ghost"
+                  size="auto"
+                  className="w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent"
+                >
+                  <Settings className="h-5 w-5 shrink-0" />
+                  <span className="text-sm font-medium">Settings</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="auto"
+                  className="w-full justify-start gap-3 px-3 py-3 rounded-lg text-destructive hover:bg-destructive/10"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="h-5 w-5 shrink-0" />
+                  <span className="text-sm font-medium">Logout</span>
+                </Button>
+              </div>
+            )}
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  )
+}
+
