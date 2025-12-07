@@ -84,7 +84,7 @@ export default function VendorsPage() {
         cell: ({ row }) => {
           const vendor = row.original;
           return (
-            <div className="flex items-center gap-3">
+            <div className="flex items-start gap-3">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={vendor.avatar} alt={vendor.name} />
                 <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
@@ -96,22 +96,20 @@ export default function VendorsPage() {
                     .slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-1">
+                <Badge
+                  variant="secondary"
+                  className="w-fit bg-primary/10 text-primary text-xs font-medium"
+                >
+                  {vendor.id}
+                </Badge>
+                <Link
+                  href="#"
+                  className="text-sm font-semibold text-foreground hover:underline"
+                >
+                  {vendor.name}
+                </Link>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-primary/10 text-primary text-xs font-medium"
-                  >
-                    {vendor.id}
-                  </Badge>
-                  <Link
-                    href="#"
-                    className="text-sm font-semibold text-foreground hover:underline"
-                  >
-                    {vendor.name}
-                  </Link>
-                </div>
-                <div className="flex items-center gap-2 mt-0.5">
                   <div
                     className={`h-1.5 w-1.5 rounded-full ${
                       vendor.active ? "bg-green-500" : "bg-gray-400"
@@ -343,8 +341,8 @@ export default function VendorsPage() {
                 key={vendor.id}
                 className="rounded-xl border border-border/50 bg-card p-4 shadow-sm"
               >
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-12 w-12 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <Avatar className="h-12 w-12 rounded-lg shrink-0">
                     <AvatarImage src={vendor.avatar} alt={vendor.name} />
                     <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
                       {vendor.name
@@ -355,27 +353,27 @@ export default function VendorsPage() {
                         .slice(0, 2)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col gap-1">
                       <Badge
                         variant="secondary"
-                        className="bg-primary/10 text-primary text-xs font-medium"
+                        className="w-fit bg-primary/10 text-primary text-xs font-medium"
                       >
                         {vendor.id}
                       </Badge>
                       <p className="text-base font-semibold text-foreground">
                         {vendor.name}
                       </p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          vendor.active ? "bg-green-500" : "bg-gray-400"
-                        }`}
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        {vendor.status}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <div
+                          className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                            vendor.active ? "bg-green-500" : "bg-gray-400"
+                          }`}
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {vendor.status}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
