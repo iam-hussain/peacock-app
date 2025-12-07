@@ -91,13 +91,40 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
 
       {/* Detail Area with Tabs */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="deposits">Deposits</TabsTrigger>
-          <TabsTrigger value="offsets">Offsets</TabsTrigger>
-          <TabsTrigger value="loan-summary">Loan Summary</TabsTrigger>
-          <TabsTrigger value="loan-transactions">Loan Transactions</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex h-10 items-center justify-start rounded-lg bg-muted p-1 text-muted-foreground min-w-full">
+            <TabsTrigger
+              value="overview"
+              className="whitespace-nowrap px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="deposits"
+              className="whitespace-nowrap px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              Deposits
+            </TabsTrigger>
+            <TabsTrigger
+              value="offsets"
+              className="whitespace-nowrap px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              Offsets
+            </TabsTrigger>
+            <TabsTrigger
+              value="loan-summary"
+              className="whitespace-nowrap px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              Loan Summary
+            </TabsTrigger>
+            <TabsTrigger
+              value="loan-transactions"
+              className="whitespace-nowrap px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              Loan Transactions
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4 md:space-y-6">

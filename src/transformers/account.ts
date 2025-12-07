@@ -30,9 +30,9 @@ export function transformLoanForTable(vendorInput: ToTransform) {
       acc.loanHistory.push({
         ...interestCalc,
         amount: loan.amount,
-        // add other properties from LoanHistoryEntry as needed
+        active: !loan.endDate, // Loan is active if there's no end date
         startDate: newZoneDate(loan.startDate).getTime(),
-        endDate: newZoneDate(loan.endDate || undefined).getTime(),
+        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
         totalInterestAmount: acc.totalInterestAmount,
       });
       // Store the most recent monthsPassedString
