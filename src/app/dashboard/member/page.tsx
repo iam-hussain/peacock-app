@@ -78,13 +78,6 @@ export default function MembersPage() {
     setBalanceFilter("all");
   };
 
-  // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
-    tableName: "members",
-    columns,
-    data: filteredMembers,
-  });
-
   // Define columns
   const columns: ColumnDef<TransformedMember>[] = useMemo(
     () => [
@@ -278,6 +271,13 @@ export default function MembersPage() {
     ],
     []
   );
+
+  // Table export functionality
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+    tableName: "members",
+    columns,
+    data: filteredMembers,
+  });
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
