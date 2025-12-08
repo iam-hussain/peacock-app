@@ -9,6 +9,7 @@ import {
   HandCoins,
   LineChart,
   Moon,
+  Shield,
   Sun,
   Users,
   Wallet,
@@ -55,7 +56,7 @@ export default function Home() {
       color: "#FFF3E0",
     },
     {
-      icon: <CheckCircle2 className="h-6 w-6" />,
+      icon: <Shield className="h-6 w-6" />,
       title: "Full Visibility",
       description:
         "Complete transparency into club finances and member positions.",
@@ -67,19 +68,22 @@ export default function Home() {
     {
       icon: <Wallet className="h-8 w-8" />,
       title: "Deposit Monthly",
-      description: "Contribute your monthly savings to the club fund.",
+      description:
+        "Contribute your monthly savings to the club fund. Build your financial future with consistent contributions.",
       color: "#E3F2FD",
     },
     {
       icon: <HandCoins className="h-8 w-8" />,
       title: "Borrow Based on Rules",
-      description: "Access loans following our transparent club policies.",
+      description:
+        "Access loans following our transparent club policies. Fair eligibility criteria for all members.",
       color: "#E8F5E9",
     },
     {
       icon: <LineChart className="h-8 w-8" />,
       title: "Track Everything",
-      description: "Monitor your position and club performance in real-time.",
+      description:
+        "Monitor your position and club performance in real-time. View balances, statements, and loan details anytime.",
       color: "#FFF3E0",
     },
   ];
@@ -87,7 +91,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation Bar */}
-      <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
@@ -103,30 +107,8 @@ export default function Home() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden items-center gap-6 md:flex">
-            <Link
-              href="#overview"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Overview
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              How It Works
-            </Link>
-            <Link
-              href="#faq"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              FAQ
-            </Link>
-          </div>
-
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Theme Toggle */}
             {mounted && (
               <Button
@@ -147,7 +129,7 @@ export default function Home() {
             {/* Auth Buttons */}
             {isLoggedIn ? (
               <>
-                <Button variant="ghost" size="sm" asChild>
+                <Button size="sm" asChild>
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
@@ -156,68 +138,99 @@ export default function Home() {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="outline" size="sm" asChild>
                   <Link href="/login">Login</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link href="/dashboard">Dashboard</Link>
                 </Button>
               </>
             )}
           </div>
-        </div>
+      </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="container mx-auto flex flex-col items-center justify-center px-4 py-20 md:py-32">
-        <div className="mb-8 flex items-center justify-center">
-          <Image
-            src="/peacock.svg"
-            alt="Peacock Club"
-            width={120}
-            height={120}
-            className="h-24 w-24 md:h-32 md:w-32"
-          />
-        </div>
-        <h1 className="mb-4 text-center text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-          Peacock Club
-        </h1>
-        <p className="mb-8 max-w-2xl text-center text-lg text-muted-foreground md:text-xl">
-          A transparent, community-managed savings and lending club.
-        </p>
+      {/* Hero + Login Section */}
+      <section className="container mx-auto px-4 py-12 md:py-20 lg:py-24">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 items-center max-w-6xl mx-auto">
+          {/* Left Column - Hero Content */}
+          <div className="flex flex-col space-y-6 text-center lg:text-left">
+            <div className="flex justify-center lg:justify-start">
+        <Image
+                src="/peacock.svg"
+                alt="Peacock Club"
+                width={80}
+                height={80}
+                className="h-20 w-20 md:h-24 md:w-24"
+              />
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+              Peacock Club
+            </h1>
+            <p className="text-lg font-medium text-muted-foreground md:text-xl">
+              A transparent, community-managed savings and lending club.
+            </p>
+            <p className="text-base text-muted-foreground leading-relaxed">
+              Join a trusted financial community where members save together,
+              borrow responsibly, and grow their wealth through transparent
+              processes and fair policies.
+            </p>
 
-        {/* Login Form - Show when not logged in */}
-        {!isLoggedIn && (
-          <div className="mb-8 w-full flex justify-center px-4">
-            <div className="w-full max-w-[400px]">
-              <LoginFormCard />
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <Button size="lg" asChild className="w-full sm:w-auto">
+                <Link href="/dashboard">
+                  Request Membership Access
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="lg" asChild className="w-full sm:w-auto">
+                <Link href="/dashboard/terms-and-conditions">
+                  View Terms & Conditions
+                </Link>
+              </Button>
             </div>
           </div>
-        )}
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <Button size="lg" asChild>
-            <Link href="/dashboard">
-              Join the Club
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+          {/* Right Column - Login Card */}
+          {!isLoggedIn && (
+            <div className="flex justify-center lg:justify-end">
+              <div className="w-full max-w-[420px]">
+                <LoginFormCard />
+              </div>
+            </div>
+          )}
         </div>
-        <Link
-          href="/dashboard/terms-and-conditions"
-          className="mt-6 text-sm text-primary hover:underline"
-        >
-          View Terms & Conditions
-        </Link>
       </section>
 
-      {/* Why Join Us Section */}
-      <section id="overview" className="container mx-auto px-4 py-16 md:py-24">
-        <h2 className="mb-12 text-center text-3xl font-bold text-foreground md:text-4xl">
-          Why Join Us
+      {/* CTA Reminder Band */}
+      {!isLoggedIn && (
+        <section className="border-y border-border/50 bg-muted/30">
+          <div className="container mx-auto px-4 py-6">
+            <p className="text-center text-sm text-muted-foreground">
+              Already a member?{" "}
+              <Link
+                href="/login"
+                className="font-medium text-primary hover:underline"
+              >
+                Login
+              </Link>{" "}
+              to view your balances and loans in real time.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* Why Members Love Peacock Club Section */}
+      <section
+        id="overview"
+        className="container mx-auto px-4 py-16 md:py-24"
+      >
+        <h2 className="mb-4 text-center text-3xl font-bold text-foreground md:text-4xl">
+          Why Members Love Peacock Club
         </h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <p className="mb-12 text-center text-muted-foreground max-w-2xl mx-auto">
+          Experience financial management built on trust, transparency, and
+          community values.
+        </p>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-7xl mx-auto">
           {features.map((feature, index) => (
             <Card
               key={index}
@@ -225,10 +238,10 @@ export default function Home() {
             >
               <CardContent className="p-6">
                 <div
-                  className="mb-4 flex h-12 w-12 items-center justify-center rounded-full relative"
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl relative"
                   style={{ backgroundColor: feature.color }}
                 >
-                  <div className="absolute inset-0 rounded-full hidden dark:block bg-muted/60" />
+                  <div className="absolute inset-0 rounded-xl hidden dark:block bg-muted/60" />
                   <div className="relative z-10 text-foreground/70">
                     {feature.icon}
                   </div>
@@ -236,7 +249,7 @@ export default function Home() {
                 <h3 className="mb-2 text-lg font-semibold text-foreground">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
               </CardContent>
@@ -250,36 +263,71 @@ export default function Home() {
         id="how-it-works"
         className="container mx-auto px-4 py-16 md:py-24"
       >
-        <h2 className="mb-12 text-center text-3xl font-bold text-foreground md:text-4xl">
+        <h2 className="mb-4 text-center text-3xl font-bold text-foreground md:text-4xl">
           How It Works
         </h2>
-        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:gap-12">
+        <p className="mb-12 text-center text-muted-foreground max-w-2xl mx-auto">
+          Simple steps to start your financial journey with Peacock Club.
+        </p>
+
+        {/* Desktop: Horizontal Timeline */}
+        <div className="hidden lg:flex items-start justify-center gap-8 max-w-5xl mx-auto">
           {steps.map((step, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center text-center md:max-w-xs"
-            >
-              <div
-                className="mb-4 flex h-16 w-16 items-center justify-center rounded-full relative"
-                style={{ backgroundColor: step.color }}
-              >
-                <div className="absolute inset-0 rounded-full hidden dark:block bg-muted/60" />
-                <div className="relative z-10 text-foreground/70">
-                  {step.icon}
+            <div key={index} className="flex-1 flex flex-col items-center">
+              <div className="relative w-full">
+                {/* Connector Line */}
+                {index < steps.length - 1 && (
+                  <div className="absolute top-8 left-[60%] right-0 h-0.5 bg-border" />
+                )}
+
+                {/* Step Content */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative mb-4">
+                    <div className="absolute -inset-1 rounded-full bg-primary/20 blur" />
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                      <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                        {index + 1}
+                      </span>
+                      <div className="text-primary">{step.icon}</div>
+                    </div>
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold text-foreground">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {step.description}
+                  </p>
                 </div>
               </div>
-              <div className="mb-2 text-2xl font-bold text-muted-foreground">
-                {index + 1}
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile/Tablet: Vertical Stack */}
+        <div className="flex flex-col gap-8 lg:hidden max-w-md mx-auto">
+          {steps.map((step, index) => (
+            <div key={index} className="flex gap-4">
+              <div className="flex-shrink-0">
+                <div className="relative">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                    <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                      {index + 1}
+                    </span>
+                    <div className="text-primary">{step.icon}</div>
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className="absolute top-12 left-1/2 h-full w-0.5 -translate-x-1/2 bg-border" />
+                  )}
+                </div>
               </div>
-              <h3 className="mb-2 text-xl font-semibold text-foreground">
-                {step.title}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {step.description}
-              </p>
-              {index < steps.length - 1 && (
-                <ArrowRight className="mt-4 hidden h-6 w-6 rotate-90 text-muted-foreground md:block md:rotate-0" />
-              )}
+              <div className="flex-1 pt-1">
+                <h3 className="mb-2 text-lg font-semibold text-foreground">
+                  {step.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -289,14 +337,10 @@ export default function Home() {
       <footer className="border-t border-border/50 bg-muted/30">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground md:justify-start">
-              <Link
-                href="/"
-                className="hover:text-foreground transition-colors"
-              >
-                Home
-              </Link>
-              <span>•</span>
+            <p className="text-sm text-muted-foreground">
+              © Peacock Club — Community Financial Group
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
               <Link
                 href="/dashboard"
                 className="hover:text-foreground transition-colors"
@@ -318,9 +362,6 @@ export default function Home() {
                 Privacy
               </Link>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © Peacock Club — Community Financial Group
-            </p>
           </div>
         </div>
       </footer>

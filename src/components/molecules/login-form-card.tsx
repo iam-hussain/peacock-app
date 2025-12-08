@@ -93,7 +93,7 @@ export function LoginFormCard() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    Username
+                    Username or email
                   </FormLabel>
                   <FormControl>
                     <Input
