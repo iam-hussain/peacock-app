@@ -174,9 +174,8 @@ export default function SettingsPage() {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <div
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      member.active ? "bg-green-500" : "bg-gray-400"
-                    }`}
+                    className={`h-1.5 w-1.5 rounded-full ${member.active ? "bg-green-500" : "bg-gray-400"
+                      }`}
                   />
                   <span className="text-xs text-muted-foreground">
                     {member.active ? "Active" : "Inactive"}
@@ -214,11 +213,10 @@ export default function SettingsPage() {
           return (
             <div className="flex items-center justify-center">
               <span
-                className={`text-xs font-medium ${
-                  member.account.readAccess
-                    ? "text-green-600 dark:text-green-500"
-                    : "text-muted-foreground"
-                }`}
+                className={`text-xs font-medium ${member.account.readAccess
+                  ? "text-green-600 dark:text-green-500"
+                  : "text-muted-foreground"
+                  }`}
               >
                 {member.account.readAccess ? "Yes" : "No"}
               </span>
@@ -240,11 +238,10 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${
-                    member.account.writeAccess
-                      ? "text-green-600 dark:text-green-500"
-                      : "text-muted-foreground"
-                  }`}
+                  className={`text-xs font-medium ${member.account.writeAccess
+                    ? "text-green-600 dark:text-green-500"
+                    : "text-muted-foreground"
+                    }`}
                 >
                   {member.account.writeAccess ? "Yes" : "No"}
                 </span>
@@ -272,20 +269,9 @@ export default function SettingsPage() {
           const member = row.original;
           return (
             <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => handleEditMember(member)}
-                className="h-8"
-              >
-                Edit Member
-              </Button>
               <RowActionsMenu
                 onEdit={() => handleEditMember(member)}
                 onAdjustOffset={() => handleAdjustments(member)}
-                onDeactivate={() => {
-                  // TODO: Implement deactivate
-                }}
               />
             </div>
           );
@@ -348,9 +334,8 @@ export default function SettingsPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <div
-              className={`h-1.5 w-1.5 rounded-full ${
-                row.original.active ? "bg-green-500" : "bg-gray-400"
-              }`}
+              className={`h-1.5 w-1.5 rounded-full ${row.original.active ? "bg-green-500" : "bg-gray-400"
+                }`}
             />
             <span className="text-sm text-muted-foreground">
               {row.original.active ? "Active" : "Inactive"}
@@ -369,19 +354,8 @@ export default function SettingsPage() {
           const vendor = row.original;
           return (
             <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => handleEditVendor(vendor)}
-                className="h-8"
-              >
-                Edit Vendor
-              </Button>
               <RowActionsMenu
                 onEdit={() => handleEditVendor(vendor)}
-                onDeactivate={() => {
-                  // TODO: Implement deactivate
-                }}
               />
             </div>
           );
