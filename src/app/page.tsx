@@ -21,8 +21,7 @@ import { useEffect, useState } from "react";
 import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { clubAge } from "@/lib/date";
-import { fetchAuthStatus, fetchStatistics } from "@/lib/query-options";
+import { fetchAuthStatus } from "@/lib/query-options";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
@@ -37,13 +36,6 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const formatCurrency = (value: number) =>
-    (value || 0).toLocaleString("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    });
 
   const features = [
     {
@@ -127,12 +119,6 @@ export default function Home() {
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               How It Works
-            </Link>
-            <Link
-              href="#club-rules"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Club Rules
             </Link>
             <Link
               href="#faq"
@@ -300,88 +286,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Club Snapshot Stats */}
-      {statistics && (
-        <section className="container mx-auto px-4 py-16 md:py-24">
-          <h2 className="mb-12 text-center text-3xl font-bold text-foreground md:text-4xl">
-            Club Snapshot
-          </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <Card className="border-border/50 bg-card shadow-sm">
-              <CardContent className="p-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Active Members
-                  </p>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-3xl font-bold text-foreground">
-                  {statistics.membersCount}
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-border/50 bg-card shadow-sm">
-              <CardContent className="p-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Club Age
-                  </p>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <LineChart className="h-5 w-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-3xl font-bold text-foreground">
-                  {club.inMonth} months
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-border/50 bg-card shadow-sm">
-              <CardContent className="p-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Total Deposits
-                  </p>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Wallet className="h-5 w-5 text-primary" />
-                  </div>
-                </div>
-                <p className="text-3xl font-bold text-foreground">
-                  {formatCurrency(statistics.totalMemberPeriodicDeposits)}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-      )}
-
-      {/* Club Rules Preview */}
-      <section
-        id="club-rules"
-        className="container mx-auto px-4 py-16 md:py-24"
-      >
-        <Card className="border-border/50 bg-card shadow-sm">
-          <CardContent className="p-8 md:p-12">
-            <h2 className="mb-4 text-2xl font-bold text-foreground md:text-3xl">
-              Club Rules
-            </h2>
-            <p className="mb-6 text-muted-foreground">
-              Our club operates on clear, transparent rules designed to ensure
-              fairness and sustainability for all members. Key policies include
-              equal member rights, monthly contribution requirements, loan
-              eligibility criteria, and transparent financial tracking.
-            </p>
-            <Button variant="outline" asChild>
-              <Link href="/dashboard/terms-and-conditions">
-                Read Full Terms & Conditions
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
       </section>
 
       {/* Footer */}
