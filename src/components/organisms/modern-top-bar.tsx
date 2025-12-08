@@ -81,7 +81,7 @@ export function ModernTopBar() {
   }, [searchOpen]);
 
   const logoutMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/auth/logout"),
+    mutationFn: () => fetcher.post("/api/auth/logout", { body: {} }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
       dispatch(setIsLoggedIn(false));

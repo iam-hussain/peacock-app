@@ -25,10 +25,13 @@ type AccountDetails = {
 };
 
 export async function POST(request: Request) {
-  const queryParams = getQueryParams(request.url);
-  const filters = createFilters(queryParams);
-
   try {
+    const { requireAuth } = await import("@/lib/auth");
+    await requireAuth();
+
+    const queryParams = getQueryParams(request.url);
+    const filters = createFilters(queryParams);
+
     const transactions = await fetchTransactions(
       filters,
       queryParams.page,
@@ -46,10 +49,13 @@ export async function POST(request: Request) {
       page: queryParams.page,
       totalPages: Math.ceil(totalTransactions / queryParams.limit),
     });
-  } catch (error) {
-    console.error("Error fetching vendor transactions:", error);
+  } catch (error: any) {
+    console.error("Error fetching transactions:", error);
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.json(
-      { error: "Failed to fetch vendor transactions" },
+      { error: "Failed to fetch transactions" },
       { status: 500 }
     );
   }

@@ -45,7 +45,10 @@ import { fetchMembers, fetchVendors } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
+import { useAuth } from "@/hooks/use-auth";
+
 export default function SettingsPage() {
+  const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { data: membersData, isLoading: membersLoading } =
     useQuery(fetchMembers());
@@ -492,10 +495,12 @@ export default function SettingsPage() {
                 Admin-only controls to add, edit, or manage vendors
               </CardDescription>
             </div>
-            <Button onClick={handleAddVendor} size="sm" className="gap-2">
-              <Briefcase className="h-4 w-4" />
-              Add Vendor
-            </Button>
+            {isAdmin && (
+              <Button onClick={handleAddVendor} size="sm" className="gap-2">
+                <Briefcase className="h-4 w-4" />
+                Add Vendor
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>

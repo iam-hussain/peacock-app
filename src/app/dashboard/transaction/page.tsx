@@ -1,6 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+
+import { useAuth } from "@/hooks/use-auth";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowDown,
@@ -421,11 +423,15 @@ export default function TransactionsPage() {
         <PageHeader
           title="Transaction History"
           subtitle="Review all deposits, withdrawals, transfers, loans, and vendor movements."
-          primaryAction={{
-            label: "Add Transaction",
-            icon: <Receipt className="h-4 w-4" />,
-            onClick: handleAddTransaction,
-          }}
+          primaryAction={
+            canWrite
+              ? {
+                  label: "Add Transaction",
+                  icon: <Receipt className="h-4 w-4" />,
+                  onClick: handleAddTransaction,
+                }
+              : undefined
+          }
           secondaryActions={[
             {
               label: "Export CSV",
@@ -606,7 +612,9 @@ export default function TransactionsPage() {
       />
 
       {/* Mobile FAB */}
-      <FloatingActionButton onClick={handleAddTransaction} />
+      {canWrite && (
+        <FloatingActionButton onClick={handleAddTransaction} />
+      )}
 
       {/* Transaction Form Dialog */}
       <TransactionFormDialog

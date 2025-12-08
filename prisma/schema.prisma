@@ -10,23 +10,36 @@ datasource db {
 }
 
 model Account {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  firstName       String
-  lastName        String?
-  slug            String        @unique
-  phone           String?
-  email           String?
-  avatar          String?
-  startAt         DateTime      @default(now())
-  endAt           DateTime?
-  active          Boolean       @default(true)
-  isMember        Boolean       @default(true)
-  passbook        Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
-  passbookId      String        @unique @db.ObjectId
-  fromTransaction Transaction[] @relation("FromAccount")
-  toTransaction   Transaction[] @relation("ToAccount")
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
+  firstName           String
+  lastName            String?
+  slug                String        @unique
+  username            String?       @unique // for login, optional for vendor/club
+  passwordHash        String? // bcrypt or argon2 hash
+  phone               String?
+  email               String?
+  avatar              String?
+  startAt             DateTime      @default(now())
+  endAt               DateTime?
+  active              Boolean       @default(true)
+  isMember            Boolean       @default(true)
+  canRead             Boolean       @default(true)
+  canWrite            Boolean       @default(false)
+  passbook            Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
+  passbookId          String        @unique @db.ObjectId
+  fromTransaction     Transaction[] @relation("FromAccount")
+  toTransaction       Transaction[] @relation("ToAccount")
+  // Audit relations
+  createdTransactions Transaction[] @relation("TransactionCreatedBy")
+  updatedTransactions Transaction[] @relation("TransactionUpdatedBy")
+  lastLoginAt         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+enum AUDIT_ACTOR {
+  MEMBER
+  ADMIN
 }
 
 model Transaction {
@@ -40,6 +53,13 @@ model Transaction {
   to              Account            @relation("ToAccount", fields: [toId], references: [id], onDelete: Cascade)
   toId            String             @db.ObjectId
   note            String?
+  // Audit info
+  createdByActor  AUDIT_ACTOR
+  createdById     String?            @db.ObjectId
+  createdBy       Account?           @relation("TransactionCreatedBy", fields: [createdById], references: [id])
+  updatedByActor  AUDIT_ACTOR?
+  updatedById     String?            @db.ObjectId
+  updatedBy       Account?           @relation("TransactionUpdatedBy", fields: [updatedById], references: [id])
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
 }

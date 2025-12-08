@@ -30,7 +30,7 @@ import { CustomLink } from "../ui/link";
 import fetcher from "@/lib/fetcher";
 
 const loginFormSchema = z.object({
-  email: z.string().optional(),
+  username: z.string().min(1, "Username is required."),
   password: z.string().min(1, "Password is required."),
 });
 
@@ -44,14 +44,14 @@ export function LoginFormCard() {
   const form = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
   const mutation = useMutation({
     mutationFn: (data: LoginFormSchema) =>
-      fetcher.post("/api/auth/login", { body: { password: data.password } }),
+      fetcher.post("/api/auth/login", { body: data }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
       toast.success("Logged in successfully!");
@@ -59,7 +59,7 @@ export function LoginFormCard() {
     },
     onError: (error: any) => {
       const errorMessage =
-        error.message || "Invalid email or password. Please try again.";
+        error.message || "Invalid username or password. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     },
@@ -89,16 +89,14 @@ export function LoginFormCard() {
 
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Email (Optional)
-                  </FormLabel>
+                  <FormLabel className="text-sm font-medium">Username</FormLabel>
                   <FormControl>
                     <Input
-                      type="email"
-                      placeholder="Enter your email"
+                      type="text"
+                      placeholder="Enter username or email"
                       className="h-11 rounded-lg"
                       {...field}
                     />
