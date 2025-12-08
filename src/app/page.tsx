@@ -26,12 +26,9 @@ import { fetchAuthStatus } from "@/lib/query-options";
 export default function Home() {
   const { theme, setTheme } = useTheme();
   const { data: authData } = useQuery(fetchAuthStatus());
-  const { data: statsData } = useQuery(fetchStatistics());
   const [mounted, setMounted] = useState(false);
 
   const isLoggedIn = authData?.isLoggedIn ?? false;
-  const statistics = statsData?.statistics;
-  const club = clubAge();
 
   useEffect(() => {
     setMounted(true);
