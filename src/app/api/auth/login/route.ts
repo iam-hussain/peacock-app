@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
 
+    // Validate input
     if (!username || !password) {
       return NextResponse.json(
         { error: "Username and password are required" },
@@ -18,9 +19,11 @@ export async function POST(request: Request) {
       );
     }
 
+    const adminUsername = process.env.ADMIN_USERNAME || "admin";
+    const adminPassword = process.env.ADMIN_PASSWORD || process.env.SUPER_ADMIN_PASSWORD;
+
     // Super admin login
-    if (username === "admin") {
-      const adminPassword = process.env.SUPER_ADMIN_PASSWORD;
+    if (username === adminUsername) {
       if (!adminPassword) {
         return NextResponse.json(
           { error: "Admin authentication not configured" },
@@ -37,44 +40,38 @@ export async function POST(request: Request) {
 
       await createSessionCookie({
         sub: "admin",
-        role: "ADMIN",
+        role: "SUPER_ADMIN",
         canWrite: true,
         canRead: true,
       });
 
       return NextResponse.json(
-        { message: "Login successful", user: { kind: "admin" } },
+        {
+          message: "Login successful",
+          user: { kind: "admin", username: "admin", role: "SUPER_ADMIN" },
+        },
         { status: 200 }
       );
     }
 
-    // Member login - try username first, then fallback to slug/email/phone
+    // Member login - try username first, then email
     let account = await prisma.account.findFirst({
       where: {
-        username: username,
+        OR: [{ username: username }, { email: username }],
         isMember: true,
         active: true,
       },
     });
 
-    // If not found by username, try slug/email/phone
     if (!account) {
-      account = await prisma.account.findFirst({
-        where: {
-          OR: [{ slug: username }, { email: username }, { phone: username }],
-          isMember: true,
-          active: true,
-        },
-      });
-    }
-
-    if (!account) {
+      // Don't reveal if account exists - security best practice
       return NextResponse.json(
         { error: "Invalid username or password" },
         { status: 401 }
       );
     }
 
+    // Check if account has password set
     if (!account.passwordHash) {
       return NextResponse.json(
         { error: "Account not set up for login. Please contact admin." },
@@ -82,6 +79,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check read access
     if (!account.canRead) {
       return NextResponse.json(
         { error: "Account does not have read access" },
@@ -89,6 +87,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify password
     const isValidPassword = await verifyPassword(
       password,
       account.passwordHash
@@ -107,6 +106,7 @@ export async function POST(request: Request) {
       data: { lastLoginAt: new Date() },
     });
 
+    // Create session
     await createSessionCookie({
       sub: account.id,
       role: "MEMBER",
@@ -120,6 +120,7 @@ export async function POST(request: Request) {
         user: {
           kind: "member",
           accountId: account.id,
+          role: "MEMBER",
           canRead: account.canRead,
           canWrite: account.canWrite,
         },

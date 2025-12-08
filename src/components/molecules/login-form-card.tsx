@@ -30,7 +30,7 @@ import { CustomLink } from "../ui/link";
 import fetcher from "@/lib/fetcher";
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, "Username is required."),
+  username: z.string().min(1, "Username or email is required."),
   password: z.string().min(1, "Password is required."),
 });
 

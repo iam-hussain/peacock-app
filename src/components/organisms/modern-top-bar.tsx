@@ -81,17 +81,19 @@ export function ModernTopBar() {
   }, [searchOpen]);
 
   const logoutMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/auth/logout", { body: {} }),
+    mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
       dispatch(setIsLoggedIn(false));
       toast.success("Logged out successfully!");
-      router.push("/login");
+      router.push("/");
     },
     onError: (error: any) => {
       toast.error(
         error.message || "An unexpected error occurred. Please try again."
       );
+      // Still redirect to home even on error
+      router.push("/");
     },
   });
 
@@ -190,6 +192,13 @@ export function ModernTopBar() {
               >
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/settings")}
+                className="cursor-pointer"
+              >
+                <User className="mr-2 h-4 w-4" />
+                <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

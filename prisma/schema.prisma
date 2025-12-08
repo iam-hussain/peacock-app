@@ -9,20 +9,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum USER_ROLE {
+  SUPER_ADMIN
+  MEMBER
+}
+
 model Account {
   id                  String        @id @default(auto()) @map("_id") @db.ObjectId
   firstName           String
   lastName            String?
   slug                String        @unique
-  username            String? // for login, optional for vendor/club (enforce uniqueness in app logic)
-  passwordHash        String? // bcrypt or argon2 hash
+  username            String?       @unique // for login, unique constraint
+  email               String?       @unique // for login, unique constraint
+  passwordHash        String?       // bcrypt hash
   phone               String?
-  email               String?
   avatar              String?
   startAt             DateTime      @default(now())
   endAt               DateTime?
   active              Boolean       @default(true)
   isMember            Boolean       @default(true)
+  role                USER_ROLE    @default(MEMBER)
   canRead             Boolean       @default(true)
   canWrite            Boolean       @default(false)
   passbook            Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
@@ -61,7 +67,7 @@ model Transaction {
   updatedById     String?            @db.ObjectId
   updatedBy       Account?           @relation("TransactionUpdatedBy", fields: [updatedById], references: [id])
   createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  updatedAt       DateTime          @updatedAt
 }
 
 model Passbook {

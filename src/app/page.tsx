@@ -134,13 +134,14 @@ export default function Home() {
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/dashboard/profile">Profile</Link>
                 </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/login">Login</Link>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/dashboard/settings">Settings</Link>
                 </Button>
               </>
+            ) : (
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
             )}
           </div>
         </div>
@@ -176,7 +177,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <Button size="lg" asChild className="w-full sm:w-auto">
                 <Link href="/dashboard">
-                  Request Membership Access
+                  View Members Dashboard
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

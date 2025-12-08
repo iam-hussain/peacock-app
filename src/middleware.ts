@@ -1,5 +1,3 @@
-// File: middleware.ts
-
 import { NextRequest, NextResponse } from "next/server";
 
 const allowedOrigins = [
@@ -11,48 +9,12 @@ const corsOptions = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-async function verifyJwt(token: string, secretKey: string) {
-  const [header, payload, signature] = token.split(".");
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secretKey),
-    { name: "HMAC", hash: "SHA-256" },
-    true,
-    ["verify"]
-  );
-
-  const data = encoder.encode(`${header}.${payload}`);
-  const signatureBytes = Uint8Array.from(
-    atob(signature.replace(/-/g, "+").replace(/_/g, "/")),
-    (c) => c.charCodeAt(0)
-  );
-
-  const isValid = await crypto.subtle.verify("HMAC", key, signatureBytes, data);
-
-  if (!isValid) {
-    throw new Error("Invalid token");
-  }
-
-  return JSON.parse(atob(payload));
-}
-
-export const matcher = [
-  "/api/action/backup",
-  "/api/action/recalculate",
-  "/api/action/recalculate/loan",
-  "/api/auth/logout",
-  "/api/account",
-  "/api/account/offset",
-  "/api/transaction/add",
-];
-
-export function middleware(request: NextRequest) {
   // CORS Handling
   const origin = request.headers.get("origin") ?? "";
   const isAllowedOrigin = allowedOrigins.includes(origin);
-
   const isPreflight = request.method === "OPTIONS";
 
   if (isPreflight) {
@@ -63,30 +25,36 @@ export function middleware(request: NextRequest) {
     return NextResponse.json({}, { headers: preflightHeaders });
   }
 
-  // Token Validation for Protected Methods and Paths
-  const path = request.nextUrl.pathname;
-  const isProtectedPath = matcher.includes(path);
+  // Route protection for /dashboard routes
+  if (pathname.startsWith("/dashboard")) {
+    const sessionCookie = request.cookies.get("session")?.value;
 
-  if (isProtectedPath && ["POST", "PUT", "DELETE"].includes(request.method)) {
-    const token = request.cookies.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { message: "You need to log in to continue this action." },
-        { status: 401 }
-      );
+    if (!sessionCookie) {
+      // Redirect to home page if no session
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
     }
 
+    // Verify JWT token
     try {
-      verifyJwt(token, process.env.JWT_SECRET!);
-    } catch (error) {
-      return NextResponse.json(
-        {
-          message:
-            "Invalid login. Please try logging out and then logging in again.",
-        },
-        { status: 401 }
+      const { jwtVerify } = await import("jose");
+      const JWT_SECRET = new TextEncoder().encode(
+        process.env.JWT_SECRET || "default-secret-change-in-production"
       );
+
+      await jwtVerify(sessionCookie, JWT_SECRET);
+    } catch {
+      // Invalid or expired token - redirect to home
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      // Clear invalid cookie
+      const response = NextResponse.redirect(url);
+      response.cookies.set("session", "", {
+        maxAge: 0,
+        path: "/",
+      });
+      return response;
     }
   }
 
@@ -103,3 +71,7 @@ export function middleware(request: NextRequest) {
 
   return response;
 }
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/api/:path*"],
+};

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -18,8 +19,11 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
   const dispatch = useDispatch();
-  const { data, isLoading, isError } = useQuery(fetchAuthStatus());
+  const { data, isLoading, isError } = useQuery(
+    fetchAuthStatus()
+  );
   const sideBarCollapsed = useSelector(
     (state: RootState) => state.page.sideBarCollapsed
   );
@@ -27,12 +31,32 @@ export default function DashboardLayout({
   useEffect(() => {
     if (data) {
       dispatch(setIsLoggedIn(data.isLoggedIn));
+
+      // Redirect to home if not logged in
+      if (!data.isLoggedIn) {
+        router.push("/");
+      }
     }
 
-    if (isError) {
+    if (isError || (!isLoading && !data?.isLoggedIn)) {
       dispatch(setIsLoggedIn(false));
+      router.push("/");
     }
-  }, [data, isError, isLoading, dispatch]);
+  }, [data, isError, isLoading, dispatch, router]);
+
+  // Show loading state or nothing while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  // Don't render dashboard if not logged in (will redirect)
+  if (!data?.isLoggedIn) {
+    return null;
+  }
 
   return (
     <div className="main-wrapper">

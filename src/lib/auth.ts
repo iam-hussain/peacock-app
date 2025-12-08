@@ -10,22 +10,26 @@ const COOKIE_NAME = "session";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export type CurrentUser =
-  | { kind: "admin"; username: "admin" }
+  | { kind: "admin"; username: "admin"; role: "SUPER_ADMIN" }
   | {
       kind: "member";
       accountId: string;
+      role: "MEMBER";
       canRead: boolean;
       canWrite: boolean;
     };
 
 type JWTPayload = {
   sub: string; // "admin" or accountId
-  role: "ADMIN" | "MEMBER";
+  role: "SUPER_ADMIN" | "MEMBER";
   canWrite: boolean;
   canRead: boolean;
   exp?: number;
 };
 
+/**
+ * Creates a session cookie with JWT token
+ */
 export async function createSessionCookie(payload: Omit<JWTPayload, "exp">) {
   const cookieStore = await cookies();
   const expiresAt = new Date(Date.now() + COOKIE_MAX_AGE * 1000);
@@ -50,11 +54,24 @@ export async function createSessionCookie(payload: Omit<JWTPayload, "exp">) {
   });
 }
 
+/**
+ * Clears the session cookie by setting it to empty with maxAge: 0
+ */
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  cookieStore.set(COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
 }
 
+/**
+ * Gets the current user from the session cookie
+ * Returns null if no valid session exists
+ */
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   try {
     const cookieStore = await cookies();
@@ -66,25 +83,30 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
     const { payload } = await jwtVerify<JWTPayload>(token, JWT_SECRET);
 
-    if (payload.role === "ADMIN") {
-      return { kind: "admin", username: "admin" };
+    if (payload.role === "SUPER_ADMIN") {
+      return { kind: "admin", username: "admin", role: "SUPER_ADMIN" };
     }
 
     if (payload.role === "MEMBER" && payload.sub) {
       return {
         kind: "member",
         accountId: payload.sub,
+        role: "MEMBER",
         canRead: payload.canRead ?? true,
         canWrite: payload.canWrite ?? false,
       };
     }
 
     return null;
-  } catch {
+  } catch (error) {
+    // Invalid token, expired, or malformed
     return null;
   }
 }
 
+/**
+ * Requires authentication - throws if no user
+ */
 export async function requireAuth(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) {
@@ -93,6 +115,9 @@ export async function requireAuth(): Promise<CurrentUser> {
   return user;
 }
 
+/**
+ * Requires write access - throws if user doesn't have write permission
+ */
 export async function requireWriteAccess(): Promise<CurrentUser> {
   const user = await requireAuth();
 
@@ -107,7 +132,14 @@ export async function requireWriteAccess(): Promise<CurrentUser> {
   throw new Error("Forbidden: Write access required");
 }
 
-export async function requireSuperAdmin(): Promise<{ kind: "admin" }> {
+/**
+ * Requires super admin access - throws if not super admin
+ */
+export async function requireSuperAdmin(): Promise<{
+  kind: "admin";
+  username: "admin";
+  role: "SUPER_ADMIN";
+}> {
   const user = await requireAuth();
 
   if (user.kind === "admin") {
