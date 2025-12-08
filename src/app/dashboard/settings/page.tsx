@@ -7,13 +7,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   Briefcase,
   Calculator,
+  Copy,
   Database,
   Download,
   FileSpreadsheet,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { TransformedVendor } from "@/app/api/account/vendor/route";
@@ -23,7 +24,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { MemberAdjustmentsDialog } from "@/components/molecules/member-adjustments-dialog";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
-import { MemberPermissionToggle } from "@/components/molecules/member-permission-toggle";
+import { SmartAccessToggle } from "@/components/molecules/smart-access-toggle";
 import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,12 +51,31 @@ import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, canManageAccounts } = useAuth();
   const queryClient = useQueryClient();
+
+  // Track access state for each member to handle optimistic updates
+  const [memberAccessState, setMemberAccessState] = useState<
+    Record<
+      string,
+      {
+        read: boolean;
+        write: boolean;
+        admin: boolean;
+      }
+    >
+  >({});
   const { data: membersData, isLoading: membersLoading } =
     useQuery(fetchMembers());
   const { data: vendorsData, isLoading: vendorsLoading } =
     useQuery(fetchVendors());
+
+  // Clear optimistic state when members data is refetched
+  useEffect(() => {
+    if (membersData?.members) {
+      setMemberAccessState({});
+    }
+  }, [membersData]);
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<
     TransformedMember["account"] | null
@@ -67,6 +87,10 @@ export default function SettingsPage() {
   const [adjustmentsDialogOpen, setAdjustmentsDialogOpen] = useState(false);
   const [selectedMemberForAdjustments, setSelectedMemberForAdjustments] =
     useState<TransformedMember | null>(null);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [selectedMemberForPasswordReset, setSelectedMemberForPasswordReset] =
+    useState<TransformedMember | null>(null);
+  const [newPassword, setNewPassword] = useState<string | null>(null);
   const [recalculateReturnsDialogOpen, setRecalculateReturnsDialogOpen] =
     useState(false);
   const [recalculateLoansDialogOpen, setRecalculateLoansDialogOpen] =
@@ -126,24 +150,50 @@ export default function SettingsPage() {
     setMemberDialogOpen(true);
   };
 
-  const handleEditMember = (member: TransformedMember) => {
+  const handleEditMember = useCallback((member: TransformedMember) => {
     setSelectedMember(member.account);
     setMemberDialogOpen(true);
-  };
+  }, []);
 
   const handleAddVendor = () => {
     setSelectedVendor(null);
     setVendorDialogOpen(true);
   };
 
-  const handleEditVendor = (vendor: TransformedVendor) => {
+  const handleEditVendor = useCallback((vendor: TransformedVendor) => {
     setSelectedVendor(vendor.account);
     setVendorDialogOpen(true);
-  };
+  }, []);
 
-  const handleAdjustments = (member: TransformedMember) => {
+  const handleAdjustments = useCallback((member: TransformedMember) => {
     setSelectedMemberForAdjustments(member);
     setAdjustmentsDialogOpen(true);
+  }, []);
+
+  const handleResetPassword = useCallback((member: TransformedMember) => {
+    setSelectedMemberForPasswordReset(member);
+    setResetPasswordDialogOpen(true);
+    setNewPassword(null);
+  }, []);
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (memberId: string) =>
+      fetcher.post(`/api/admin/members/${memberId}/reset-password`),
+    onSuccess: async (data: { newPassword: string }) => {
+      setNewPassword(data.newPassword);
+      await queryClient.invalidateQueries({ queryKey: ["all"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.message || "Failed to reset password. Please try again."
+      );
+    },
+  });
+
+  const handleConfirmResetPassword = () => {
+    if (selectedMemberForPasswordReset) {
+      resetPasswordMutation.mutate(selectedMemberForPasswordReset.account.id);
+    }
   };
 
   // Member Management Table Columns
@@ -174,8 +224,9 @@ export default function SettingsPage() {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <div
-                    className={`h-1.5 w-1.5 rounded-full ${member.active ? "bg-green-500" : "bg-gray-400"
-                      }`}
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      member.active ? "bg-green-500" : "bg-gray-400"
+                    }`}
                   />
                   <span className="text-xs text-muted-foreground">
                     {member.active ? "Active" : "Inactive"}
@@ -206,21 +257,49 @@ export default function SettingsPage() {
         header: "Read",
         enableSorting: true,
         meta: {
-          tooltip: "Member can view dashboard and data.",
+          tooltip:
+            "Read-only access. Can view dashboard and data but cannot create or edit anything.",
+          align: "center",
         },
         cell: ({ row }) => {
           const member = row.original;
-          return (
-            <div className="flex items-center justify-center">
-              <span
-                className={`text-xs font-medium ${member.account.readAccess
-                  ? "text-green-600 dark:text-green-500"
-                  : "text-muted-foreground"
+          const memberState = memberAccessState[member.account.id];
+          const currentRead = memberState?.read ?? member.account.readAccess;
+          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentAdmin =
+            memberState?.admin ?? member.account.role === "ADMIN";
+
+          if (!isAdmin) {
+            return (
+              <div className="flex items-center justify-center">
+                <span
+                  className={`text-xs font-medium ${
+                    currentRead
+                      ? "text-green-600 dark:text-green-500"
+                      : "text-muted-foreground"
                   }`}
-              >
-                {member.account.readAccess ? "Yes" : "No"}
-              </span>
-            </div>
+                >
+                  {currentRead ? "Yes" : "No"}
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <SmartAccessToggle
+              memberId={member.account.id}
+              memberName={member.name}
+              currentRead={currentRead}
+              currentWrite={currentWrite}
+              currentAdmin={currentAdmin}
+              accessType="read"
+              onStateChange={(newState) => {
+                setMemberAccessState((prev) => ({
+                  ...prev,
+                  [member.account.id]: newState,
+                }));
+              }}
+            />
           );
         },
       },
@@ -230,30 +309,100 @@ export default function SettingsPage() {
         header: "Write",
         enableSorting: true,
         meta: {
-          tooltip: "Member can create and edit transactions.",
+          tooltip:
+            "Write access is restricted to creating and updating transactions only. It does not provide permissions to modify users, vendors, members, or system configurations. Write access includes Read permission.",
+          align: "center",
         },
         cell: ({ row }) => {
           const member = row.original;
+          const memberState = memberAccessState[member.account.id];
+          const currentRead = memberState?.read ?? member.account.readAccess;
+          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentAdmin =
+            memberState?.admin ?? member.account.role === "ADMIN";
+
           if (!isAdmin) {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${member.account.writeAccess
-                    ? "text-green-600 dark:text-green-500"
-                    : "text-muted-foreground"
-                    }`}
+                  className={`text-xs font-medium ${
+                    currentWrite
+                      ? "text-green-600 dark:text-green-500"
+                      : "text-muted-foreground"
+                  }`}
                 >
-                  {member.account.writeAccess ? "Yes" : "No"}
+                  {currentWrite ? "Yes" : "No"}
                 </span>
               </div>
             );
           }
 
           return (
-            <MemberPermissionToggle
+            <SmartAccessToggle
               memberId={member.account.id}
-              currentValue={member.account.writeAccess}
-              permissionType="writeAccess"
+              memberName={member.name}
+              currentRead={currentRead}
+              currentWrite={currentWrite}
+              currentAdmin={currentAdmin}
+              accessType="write"
+              onStateChange={(newState) => {
+                setMemberAccessState((prev) => ({
+                  ...prev,
+                  [member.account.id]: newState,
+                }));
+              }}
+            />
+          );
+        },
+      },
+      {
+        id: "adminAccess",
+        accessorKey: "account.role",
+        header: "Admin",
+        enableSorting: true,
+        meta: {
+          tooltip:
+            "Admin (Full Access). Full access to the entire system. Can create, update, and delete members, vendors, users, transactions, and adjustments. Can manage role assignments and reset passwords. Includes Read and Write permissions.",
+          align: "center",
+        },
+        cell: ({ row }) => {
+          const member = row.original;
+          const memberState = memberAccessState[member.account.id];
+          const currentRead = memberState?.read ?? member.account.readAccess;
+          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentAdmin =
+            memberState?.admin ?? member.account.role === "ADMIN";
+
+          if (!isAdmin) {
+            return (
+              <div className="flex items-center justify-center">
+                <span
+                  className={`text-xs font-medium ${
+                    currentAdmin
+                      ? "text-green-600 dark:text-green-500"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {currentAdmin ? "Yes" : "No"}
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <SmartAccessToggle
+              memberId={member.account.id}
+              memberName={member.name}
+              currentRead={currentRead}
+              currentWrite={currentWrite}
+              currentAdmin={currentAdmin}
+              accessType="admin"
+              onStateChange={(newState) => {
+                setMemberAccessState((prev) => ({
+                  ...prev,
+                  [member.account.id]: newState,
+                }));
+              }}
             />
           );
         },
@@ -270,15 +419,31 @@ export default function SettingsPage() {
           return (
             <div className="flex items-center justify-end gap-2">
               <RowActionsMenu
-                onEdit={() => handleEditMember(member)}
-                onAdjustOffset={() => handleAdjustments(member)}
+                onEdit={
+                  canManageAccounts ? () => handleEditMember(member) : undefined
+                }
+                onAdjustOffset={
+                  canManageAccounts
+                    ? () => handleAdjustments(member)
+                    : undefined
+                }
+                onResetPassword={
+                  isAdmin ? () => handleResetPassword(member) : undefined
+                }
               />
             </div>
           );
         },
       },
     ],
-    [isAdmin]
+    [
+      isAdmin,
+      memberAccessState,
+      canManageAccounts,
+      handleEditMember,
+      handleAdjustments,
+      handleResetPassword,
+    ]
   );
 
   const members = membersData?.members || [];
@@ -334,8 +499,9 @@ export default function SettingsPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <div
-              className={`h-1.5 w-1.5 rounded-full ${row.original.active ? "bg-green-500" : "bg-gray-400"
-                }`}
+              className={`h-1.5 w-1.5 rounded-full ${
+                row.original.active ? "bg-green-500" : "bg-gray-400"
+              }`}
             />
             <span className="text-sm text-muted-foreground">
               {row.original.active ? "Active" : "Inactive"}
@@ -355,14 +521,16 @@ export default function SettingsPage() {
           return (
             <div className="flex items-center justify-end gap-2">
               <RowActionsMenu
-                onEdit={() => handleEditVendor(vendor)}
+                onEdit={
+                  canManageAccounts ? () => handleEditVendor(vendor) : undefined
+                }
               />
             </div>
           );
         },
       },
     ],
-    []
+    [canManageAccounts, handleEditVendor]
   );
 
   return (
@@ -500,15 +668,22 @@ export default function SettingsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Member Management</CardTitle>
+              <CardTitle>Member & Access Management</CardTitle>
               <CardDescription>
-                Admin-only controls to add, edit, or adjust members
+                Admin-only controls to manage members, access, and login.
               </CardDescription>
+              <p className="text-xs text-muted-foreground mt-1">
+                Write access is restricted to creating and updating transactions
+                only. It does not provide permissions to modify users, vendors,
+                members, or system configurations.
+              </p>
             </div>
-            <Button onClick={handleAddMember} size="sm" className="gap-2">
-              <UserPlus className="h-4 w-4" />
-              Add Member
-            </Button>
+            {canManageAccounts && (
+              <Button onClick={handleAddMember} size="sm" className="gap-2">
+                <UserPlus className="h-4 w-4" />
+                Add Member
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -546,23 +721,6 @@ export default function SettingsPage() {
             frozenColumnKey="name"
             isLoading={vendorsLoading}
           />
-        </CardContent>
-      </Card>
-
-      {/* User & Access Management Section */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader>
-          <CardTitle>User & Access Management</CardTitle>
-          <CardDescription>
-            Control user accounts and passwords (Super Admin only)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <p className="text-sm">
-              User management features will be available soon.
-            </p>
-          </div>
         </CardContent>
       </Card>
 
@@ -665,6 +823,80 @@ export default function SettingsPage() {
           }}
         />
       )}
+
+      {/* Reset Password Dialog */}
+      <Dialog
+        open={resetPasswordDialogOpen}
+        onOpenChange={(open) => {
+          setResetPasswordDialogOpen(open);
+          if (!open) {
+            setNewPassword(null);
+            setSelectedMemberForPasswordReset(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {newPassword
+                ? "Password Reset Successfully"
+                : `Reset Password for ${selectedMemberForPasswordReset?.name || "Member"}?`}
+            </DialogTitle>
+            <DialogDescription>
+              {newPassword
+                ? "The new password has been generated. Share it securely with the member. This password will not be shown again."
+                : "This will generate a new password and invalidate the old one. Share it securely with the member."}
+            </DialogDescription>
+          </DialogHeader>
+          {newPassword ? (
+            <div className="space-y-4 py-4">
+              <div className="flex items-center gap-2">
+                <code className="flex-1 rounded-lg border border-border bg-muted px-4 py-3 text-sm font-mono">
+                  {newPassword}
+                </code>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    navigator.clipboard.writeText(newPassword);
+                    toast.success("Password copied to clipboard");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={() => {
+                    setResetPasswordDialogOpen(false);
+                    setNewPassword(null);
+                    setSelectedMemberForPasswordReset(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </div>
+          ) : (
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setResetPasswordDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmResetPassword}
+                disabled={resetPasswordMutation.isPending}
+              >
+                {resetPasswordMutation.isPending
+                  ? "Resetting..."
+                  : "Reset Password"}
+              </Button>
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

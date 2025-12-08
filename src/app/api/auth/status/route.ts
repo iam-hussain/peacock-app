@@ -17,7 +17,7 @@ export async function POST() {
       );
     }
 
-    // Ensure admin user has username property
+    // Format user response
     const responseUser =
       user.kind === "admin"
         ? {
@@ -26,7 +26,16 @@ export async function POST() {
             role: "SUPER_ADMIN" as const,
             id: "admin" as const,
           }
-        : user;
+        : user.kind === "admin-member"
+          ? {
+              kind: "admin-member" as const,
+              accountId: user.accountId,
+              id: user.id,
+              role: "ADMIN" as const,
+              readAccess: user.readAccess,
+              writeAccess: user.writeAccess,
+            }
+          : user;
 
     return NextResponse.json(
       { isLoggedIn: true, user: responseUser },

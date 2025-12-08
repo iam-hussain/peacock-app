@@ -7,11 +7,12 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 
-// PATCH Request to update the member's vendor connections
+// POST Request to update the member's offset adjustments
+// Only admins can adjust member offsets (Write users cannot edit members)
 export async function POST(request: Request) {
   try {
-    const { requireSuperAdmin } = await import("@/lib/auth");
-    await requireSuperAdmin();
+    const { requireAdmin } = await import("@/lib/auth");
+    await requireAdmin();
 
     const { passbookId, joiningOffset, delayOffset } = await request.json();
 

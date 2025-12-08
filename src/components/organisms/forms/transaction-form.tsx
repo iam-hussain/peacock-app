@@ -205,7 +205,7 @@ export function TransactionForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm font-medium">
-                Transaction Type
+                Transaction Type *
               </FormLabel>
               <FormControl>
                 <Select
@@ -240,7 +240,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[0]}
+                    {formToLabels[0]} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -273,7 +273,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[1]}
+                    {formToLabels[1]} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -308,7 +308,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[0]}
+                    {formToLabels[0]} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -341,7 +341,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[1]}
+                    {formToLabels[1]} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -377,7 +377,9 @@ export function TransactionForm({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Amount</FormLabel>
+                  <FormLabel className="text-sm font-medium">
+                    Amount *
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -404,7 +406,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    Transaction Date
+                    Transaction Date (Optional)
                   </FormLabel>
                   <FormControl>
                     <DatePickerForm
@@ -428,7 +430,9 @@ export function TransactionForm({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Amount</FormLabel>
+                  <FormLabel className="text-sm font-medium">
+                    Amount *
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -455,7 +459,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    Transaction Date
+                    Transaction Date (Optional)
                   </FormLabel>
                   <FormControl>
                     <DatePickerForm
@@ -479,7 +483,9 @@ export function TransactionForm({
           name="note"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Note</FormLabel>
+              <FormLabel className="text-sm font-medium">
+                Note (Optional)
+              </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Optional note"

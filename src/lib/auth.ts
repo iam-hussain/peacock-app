@@ -13,9 +13,10 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export type AuthUser = {
   id: string;
-  role: "SUPER_ADMIN" | "MEMBER";
+  role: "SUPER_ADMIN" | "ADMIN" | "MEMBER";
   readAccess: boolean;
   writeAccess: boolean;
+  canLogin: boolean;
 };
 
 export type CurrentUser =
@@ -24,6 +25,18 @@ export type CurrentUser =
       username: "admin";
       role: "SUPER_ADMIN";
       id: "admin";
+      canLogin: true;
+      readAccess: true;
+      writeAccess: true;
+    }
+  | {
+      kind: "admin-member";
+      accountId: string;
+      id: string;
+      role: "ADMIN";
+      canLogin: boolean;
+      readAccess: boolean;
+      writeAccess: boolean;
     }
   | {
       kind: "member";
@@ -32,13 +45,15 @@ export type CurrentUser =
       role: "MEMBER";
       readAccess: boolean;
       writeAccess: boolean;
+      canLogin: boolean;
     };
 
 type JWTPayload = {
   sub: string; // "admin" or accountId
-  role: "SUPER_ADMIN" | "MEMBER";
+  role: "SUPER_ADMIN" | "ADMIN" | "MEMBER";
   readAccess: boolean;
   writeAccess: boolean;
+  canLogin: boolean;
   exp?: number;
 };
 
@@ -54,6 +69,7 @@ export async function createSessionCookie(payload: Omit<JWTPayload, "exp">) {
     role: payload.role,
     readAccess: payload.readAccess,
     writeAccess: payload.writeAccess,
+    canLogin: payload.canLogin,
   } as JWTPayload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -104,6 +120,21 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         username: "admin",
         role: "SUPER_ADMIN",
         id: "admin",
+        canLogin: true,
+        readAccess: true,
+        writeAccess: true,
+      };
+    }
+
+    if (payload.role === "ADMIN" && payload.sub) {
+      return {
+        kind: "admin-member",
+        accountId: payload.sub,
+        id: payload.sub,
+        role: "ADMIN",
+        readAccess: payload.readAccess ?? true,
+        writeAccess: payload.writeAccess ?? true,
+        canLogin: payload.canLogin ?? true,
       };
     }
 
@@ -115,6 +146,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         role: "MEMBER",
         readAccess: payload.readAccess ?? true,
         writeAccess: payload.writeAccess ?? false,
+        canLogin: payload.canLogin ?? false,
       };
     }
 
@@ -138,6 +170,17 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       role: "SUPER_ADMIN",
       readAccess: true,
       writeAccess: true,
+      canLogin: true,
+    };
+  }
+
+  if (user.kind === "admin-member") {
+    return {
+      id: user.accountId,
+      role: "ADMIN",
+      readAccess: user.readAccess,
+      writeAccess: user.writeAccess,
+      canLogin: user.canLogin,
     };
   }
 
@@ -146,6 +189,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     role: "MEMBER",
     readAccess: user.readAccess,
     writeAccess: user.writeAccess,
+    canLogin: user.canLogin,
   };
 }
 
@@ -162,11 +206,16 @@ export async function requireAuth(): Promise<CurrentUser> {
 
 /**
  * Requires write access - throws if user doesn't have write permission
+ * Note: Write access is restricted to transactions only, not account/member management
  */
 export async function requireWriteAccess(): Promise<CurrentUser> {
   const user = await requireAuth();
 
   if (user.kind === "admin") {
+    return user;
+  }
+
+  if (user.kind === "admin-member") {
     return user;
   }
 
@@ -178,9 +227,46 @@ export async function requireWriteAccess(): Promise<CurrentUser> {
 }
 
 /**
- * Requires super admin access - throws if not super admin
+ * Helper to check if user can manage accounts (members/vendors)
+ * Only admins can manage accounts - Write users cannot
  */
-export async function requireAdmin(): Promise<{
+export function canManageAccounts(user: CurrentUser): boolean {
+  return user.kind === "admin" || user.kind === "admin-member";
+}
+
+/**
+ * Helper to check if user can edit transactions
+ * Admins and Write users can edit transactions
+ */
+export function canManageTransactions(user: CurrentUser): boolean {
+  if (user.kind === "admin" || user.kind === "admin-member") {
+    return true;
+  }
+  if (user.kind === "member" && user.writeAccess) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Requires admin access (SUPER_ADMIN or ADMIN role) - throws if not admin
+ * Allows creating/editing accounts, members, vendors, etc.
+ */
+export async function requireAdmin(): Promise<CurrentUser> {
+  const user = await requireAuth();
+
+  if (user.kind === "admin" || user.kind === "admin-member") {
+    return user;
+  }
+
+  throw new Error("FORBIDDEN_ADMIN");
+}
+
+/**
+ * Requires super admin access only - throws if not super admin
+ * Only SUPER_ADMIN (from ENV) can access this
+ */
+export async function requireSuperAdmin(): Promise<{
   kind: "admin";
   username: "admin";
   role: "SUPER_ADMIN";
@@ -192,19 +278,7 @@ export async function requireAdmin(): Promise<{
     return user;
   }
 
-  throw new Error("FORBIDDEN_ADMIN");
-}
-
-/**
- * Alias for requireAdmin (backward compatibility)
- */
-export async function requireSuperAdmin(): Promise<{
-  kind: "admin";
-  username: "admin";
-  role: "SUPER_ADMIN";
-  id: "admin";
-}> {
-  return requireAdmin();
+  throw new Error("FORBIDDEN_SUPER_ADMIN");
 }
 
 // Password hashing utilities

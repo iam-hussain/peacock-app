@@ -11,7 +11,7 @@ import fetcher from "@/lib/fetcher";
 interface MemberPermissionToggleProps {
   memberId: string;
   currentValue: boolean;
-  permissionType: "readAccess" | "writeAccess";
+  permissionType: "canRead" | "canWrite" | "canLogin";
   disabled?: boolean;
 }
 
@@ -26,7 +26,7 @@ export function MemberPermissionToggle({
 
   const permissionMutation = useMutation({
     mutationFn: (value: boolean) =>
-      fetcher.patch(`/api/admin/members/${memberId}/permissions`, {
+      fetcher.patch(`/api/admin/members/${memberId}/access`, {
         body: { [permissionType]: value },
       }),
     onSuccess: async () => {

@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         role: "SUPER_ADMIN",
         writeAccess: true,
         readAccess: true,
+        canLogin: true,
       });
 
       return NextResponse.json(
@@ -55,12 +56,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Member login - try username first, then email
+    // Member/Admin login - try username first, then email
     let account = await prisma.account.findFirst({
       where: {
         OR: [{ username: username }, { email: username }],
         isMember: true,
         active: true,
+      },
+      select: {
+        id: true,
+        role: true,
+        passwordHash: true,
+        canLogin: true,
+        readAccess: true,
+        writeAccess: true,
       },
     });
 
@@ -69,6 +78,21 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Invalid username or password" },
         { status: 401 }
+      );
+    }
+
+    // Check if login is enabled (computed from access flags)
+    // Login is allowed if user has Read, Write, or Admin access
+    const canLogin =
+      account.readAccess || account.writeAccess || account.role === "ADMIN";
+
+    if (!canLogin) {
+      return NextResponse.json(
+        {
+          error:
+            "Login is disabled for this account. Please contact the club admin.",
+        },
+        { status: 403 }
       );
     }
 
@@ -107,23 +131,34 @@ export async function POST(request: Request) {
       data: { lastLoginAt: new Date() },
     });
 
+    // Determine role - use account role from DB, default to MEMBER
+    const accountRole: "ADMIN" | "MEMBER" =
+      account.role === "ADMIN" ? "ADMIN" : "MEMBER";
+
+    // For ADMIN role, ensure they have full access
+    const isAdmin = accountRole === "ADMIN";
+    const finalWriteAccess = isAdmin ? true : account.writeAccess;
+    const finalReadAccess = isAdmin ? true : account.readAccess;
+
     // Create session
     await createSessionCookie({
       sub: account.id,
-      role: "MEMBER",
-      writeAccess: account.writeAccess,
-      readAccess: account.readAccess,
+      role: accountRole,
+      writeAccess: finalWriteAccess,
+      readAccess: finalReadAccess,
+      canLogin: account.canLogin,
     });
 
     return NextResponse.json(
       {
         message: "Login successful",
         user: {
-          kind: "member",
+          kind: isAdmin ? ("admin-member" as const) : ("member" as const),
           accountId: account.id,
-          role: "MEMBER",
-          readAccess: account.readAccess,
-          writeAccess: account.writeAccess,
+          role: accountRole,
+          readAccess: finalReadAccess,
+          writeAccess: finalWriteAccess,
+          canLogin: account.canLogin,
         },
       },
       { status: 200 }

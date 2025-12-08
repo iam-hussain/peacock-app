@@ -12,10 +12,10 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireAdmin();
+    const currentUser = await requireAdmin();
 
     const { id } = params;
-    const { readAccess, writeAccess } = await request.json();
+    const { readAccess, writeAccess, canLogin } = await request.json();
 
     const account = await prisma.account.findUnique({
       where: { id },
@@ -33,7 +33,10 @@ export async function PATCH(
       );
     }
 
-    const updateData: any = {};
+    const updateData: any = {
+      accessUpdatedAt: new Date(),
+      accessUpdatedBy: currentUser.id === "admin" ? null : currentUser.id,
+    };
 
     if (typeof readAccess === "boolean") {
       updateData.readAccess = readAccess;
@@ -43,24 +46,35 @@ export async function PATCH(
       updateData.writeAccess = writeAccess;
     }
 
+    if (typeof canLogin === "boolean") {
+      updateData.canLogin = canLogin;
+    }
+
     const updated = await prisma.account.update({
       where: { id },
       data: updateData,
+      select: {
+        id: true,
+        readAccess: true,
+        writeAccess: true,
+        canLogin: true,
+      },
     });
 
     return NextResponse.json(
       {
-        message: "Permissions updated successfully",
+        message: "Access updated successfully",
         account: {
           id: updated.id,
           readAccess: updated.readAccess,
           writeAccess: updated.writeAccess,
+          canLogin: updated.canLogin,
         },
       },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Error updating permissions:", error);
+    console.error("Error updating access:", error);
     if (
       error.message === "UNAUTHORIZED" ||
       error.message === "FORBIDDEN_ADMIN"
@@ -68,7 +82,7 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
     return NextResponse.json(
-      { error: "Failed to update permissions" },
+      { error: "Failed to update access" },
       { status: 500 }
     );
   }

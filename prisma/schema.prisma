@@ -11,6 +11,7 @@ datasource db {
 
 enum ROLE {
   SUPER_ADMIN
+  ADMIN
   MEMBER
 }
 
@@ -27,6 +28,10 @@ model Account {
   role                ROLE          @default(MEMBER)
   readAccess          Boolean       @default(true)
   writeAccess         Boolean       @default(false)
+  canLogin            Boolean       @default(false)
+  // Audit fields for access control
+  accessUpdatedAt     DateTime?
+  accessUpdatedBy     String?       @db.ObjectId
   phone               String?
   avatar              String?
   startAt             DateTime      @default(now())

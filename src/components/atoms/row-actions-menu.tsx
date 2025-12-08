@@ -28,6 +28,7 @@ interface RowActionsMenuProps {
   onAddRepayment?: () => void;
   onAdjustOffset?: () => void;
   onChangePassword?: () => void;
+  onResetPassword?: () => void;
 }
 
 export function RowActionsMenu({
@@ -39,7 +40,26 @@ export function RowActionsMenu({
   onAddRepayment,
   onAdjustOffset,
   onChangePassword,
+  onResetPassword,
 }: RowActionsMenuProps) {
+  // Check if there are any actions available
+  const hasActions = !!(
+    onViewDetails ||
+    onEdit ||
+    onViewTransactions ||
+    onDeactivate ||
+    onRemove ||
+    onAddRepayment ||
+    onAdjustOffset ||
+    onChangePassword ||
+    onResetPassword
+  );
+
+  // Don't render if no actions are available
+  if (!hasActions) {
+    return null;
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -77,6 +97,12 @@ export function RowActionsMenu({
           <DropdownMenuItem onClick={onChangePassword}>
             <Key className="mr-2 h-4 w-4" />
             Change Password
+          </DropdownMenuItem>
+        )}
+        {onResetPassword && (
+          <DropdownMenuItem onClick={onResetPassword}>
+            <Key className="mr-2 h-4 w-4" />
+            Reset Password
           </DropdownMenuItem>
         )}
         {onEdit && (

@@ -52,7 +52,11 @@ export function transformLoanForTable(vendorInput: ToTransform) {
     slug: member.slug,
     link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+    avatar: member.avatar
+      ? member.avatar.startsWith("/image/")
+        ? member.avatar
+        : `/image/${member.avatar}`
+      : undefined,
     joined: calculateMonthsDifference(
       newZoneDate(),
       newZoneDate(member.startAt)
@@ -137,7 +141,11 @@ export function membersTableTransform(
     slug: member.slug,
     link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+    avatar: member.avatar
+      ? member.avatar.startsWith("/image/")
+        ? member.avatar
+        : `/image/${member.avatar}`
+      : undefined,
     joined: calculateMonthsDifference(
       newZoneDate(),
       newZoneDate(member.startAt)

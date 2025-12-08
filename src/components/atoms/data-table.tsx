@@ -113,7 +113,9 @@ export function DataTable<TData, TValue>({
                             "h-12 px-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
                             isFrozen && "sticky left-0 z-20 bg-card border-r",
                             header.column.columnDef.meta?.align === "right" &&
-                              "text-right"
+                              "text-right",
+                            header.column.columnDef.meta?.align === "center" &&
+                              "text-center"
                           )}
                           style={
                             isFrozen
@@ -132,7 +134,10 @@ export function DataTable<TData, TValue>({
                                   header.column.columnDef.meta?.align ===
                                     "right"
                                     ? "justify-end"
-                                    : "justify-start"
+                                    : header.column.columnDef.meta?.align ===
+                                        "center"
+                                      ? "justify-center"
+                                      : "justify-start"
                                 )}
                               >
                                 {header.column.columnDef.meta?.tooltip ? (
@@ -232,7 +237,9 @@ export function DataTable<TData, TValue>({
                               "px-4 py-3 text-sm",
                               isFrozen && "sticky left-0 z-10 bg-card border-r",
                               cell.column.columnDef.meta?.align === "right" &&
-                                "text-right"
+                                "text-right",
+                              cell.column.columnDef.meta?.align === "center" &&
+                                "text-center"
                             )}
                             style={
                               isFrozen

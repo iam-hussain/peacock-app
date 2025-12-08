@@ -2,10 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { AvatarUpload } from "../../atoms/avatar-upload";
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { PhoneInput } from "../../atoms/phone-input";
 import { Button } from "../../ui/button";
 import { Switch } from "../../ui/switch";
 
@@ -30,12 +33,14 @@ type VendorFormProps = {
 
 export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
   const queryClient = useQueryClient();
+  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
 
   const form = useForm({
     resolver: zodResolver(accountFormSchema),
     defaultValues: selected
       ? {
           firstName: selected.firstName,
+          slug: selected.slug || "",
           lastName: selected.lastName || "",
           phone: selected.phone || "",
           email: selected.email || "",
@@ -46,6 +51,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
         }
       : {
           firstName: "",
+          slug: "",
           lastName: "",
           phone: "",
           email: "",
@@ -81,6 +87,47 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
     },
   });
 
+  const handleAvatarUpload = async (file: File) => {
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Pass old image URL for deletion if updating existing vendor
+      const currentAvatar = selected?.avatar || form.getValues("avatar");
+      if (currentAvatar && selected) {
+        // Extract filename from avatar URL
+        const oldImageUrl = currentAvatar.startsWith("/image/")
+          ? currentAvatar
+          : currentAvatar.startsWith("/")
+            ? currentAvatar
+            : `/image/${currentAvatar}`;
+        formData.append("oldImageUrl", oldImageUrl);
+      }
+
+      const response = await fetch("/api/upload/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to upload avatar");
+      }
+
+      const data = await response.json();
+      // Extract filename from URL (e.g., /image/avatar_123.jpg -> avatar_123.jpg)
+      const filename = data.url.replace("/image/", "").replace(/^\//, "");
+      form.setValue("avatar", filename);
+      toast.success("Avatar uploaded successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload avatar");
+      throw error;
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   async function onSubmit(variables: AccountFromSchema) {
     return await mutation.mutateAsync(variables as any);
   }
@@ -115,11 +162,11 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Additional Name</FormLabel>
+                <FormLabel>Additional Name (Optional)</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="Additional name (optional)"
+                    placeholder="Additional name"
                     className="h-10"
                   />
                 </FormControl>
@@ -134,12 +181,12 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>Phone (Optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="tel"
-                    placeholder="+91..."
+                  <PhoneInput
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
                     className="h-10"
                   />
                 </FormControl>
@@ -154,7 +201,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email (Optional)</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -174,7 +221,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             name="startAt"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>Start Date (Optional)</FormLabel>
                 <DatePickerForm field={field} placeholder="Select start date" />
                 <FormMessage />
               </FormItem>
@@ -188,28 +235,26 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>End Date (Optional)</FormLabel>
-                <DatePickerForm
-                  field={field}
-                  placeholder="Select end date (optional)"
-                />
+                <DatePickerForm field={field} placeholder="Select end date" />
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          {/* Avatar URL (Optional) */}
+          {/* Avatar Upload */}
           <FormField
             control={form.control}
             name="avatar"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Avatar URL (Optional)</FormLabel>
+                <FormLabel>Avatar (Optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="url"
-                    placeholder="https://..."
-                    className="h-10"
+                  <AvatarUpload
+                    value={field.value || ""}
+                    onChange={field.onChange}
+                    onFileSelect={handleAvatarUpload}
+                    disabled={mutation.isPending || isUploadingAvatar}
+                    oldImageUrl={selected?.avatar || null}
                   />
                 </FormControl>
                 <FormMessage />
@@ -249,11 +294,14 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
               form.reset();
               onCancel?.();
             }}
-            disabled={mutation.isPending}
+            disabled={mutation.isPending || isUploadingAvatar}
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={mutation.isPending}>
+          <Button
+            type="submit"
+            disabled={mutation.isPending || isUploadingAvatar}
+          >
             {mutation.isPending
               ? "Saving..."
               : selected

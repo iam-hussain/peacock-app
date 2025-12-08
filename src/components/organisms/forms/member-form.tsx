@@ -2,11 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { nanoid } from "nanoid";
+import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { AvatarUpload } from "../../atoms/avatar-upload";
 import { DatePickerForm } from "../../atoms/date-picker-form";
+import { PhoneInput } from "../../atoms/phone-input";
 import { Button } from "../../ui/button";
 import { Switch } from "../../ui/switch";
 
@@ -30,6 +32,8 @@ type MemberFormProps = {
 };
 
 export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
+  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
+
   const form = useForm({
     resolver: zodResolver(accountFormSchema),
     defaultValues: selected
@@ -47,7 +51,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       : {
           firstName: "",
           lastName: "",
-          slug: nanoid(8),
+          slug: "",
           phone: "",
           email: "",
           avatar: "",
@@ -80,6 +84,47 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     },
   });
 
+  const handleAvatarUpload = async (file: File) => {
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Pass old image URL for deletion if updating existing member
+      const currentAvatar = selected?.avatar || form.getValues("avatar");
+      if (currentAvatar && selected) {
+        // Extract filename from avatar URL
+        const oldImageUrl = currentAvatar.startsWith("/image/")
+          ? currentAvatar
+          : currentAvatar.startsWith("/")
+            ? currentAvatar
+            : `/image/${currentAvatar}`;
+        formData.append("oldImageUrl", oldImageUrl);
+      }
+
+      const response = await fetch("/api/upload/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to upload avatar");
+      }
+
+      const data = await response.json();
+      // Extract filename from URL (e.g., /image/avatar_123.jpg -> avatar_123.jpg)
+      const filename = data.url.replace("/image/", "").replace(/^\//, "");
+      form.setValue("avatar", filename);
+      toast.success("Avatar uploaded successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload avatar");
+      throw error;
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   async function onSubmit(variables: AccountFromSchema) {
     return await mutation.mutateAsync(variables as any);
   }
@@ -87,127 +132,148 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
-        {/* System ID (Slug) - Readonly */}
-        {selected && selected.slug && (
-          <div className="rounded-lg border border-border bg-muted/30 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                System ID
-              </span>
-              <span className="text-sm font-mono text-foreground">
-                {selected.slug}
-              </span>
-            </div>
+        <div className="space-y-4">
+          {/* Username - Full width */}
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username *</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="username"
+                    className="h-10 font-mono"
+                    disabled={mutation.isPending}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Used for login. Lowercase letters, numbers, hyphens, and
+                  underscores only.
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* First Name and Last Name - One row */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="First name"
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Last name"
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-        )}
 
-        {/* Two-column grid on desktop, single on mobile */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* First Name */}
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name *</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="First name" className="h-10" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Email and Phone - One row */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="name@example.com"
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Last Name */}
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Last name" className="h-10" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone (Optional)</FormLabel>
+                  <FormControl>
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          {/* Email */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="email"
-                    placeholder="name@example.com"
-                    className="h-10"
+          {/* Joined Date and Avatar - One row */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="startAt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Joined Date (Optional)</FormLabel>
+                  <DatePickerForm
+                    field={field}
+                    placeholder="Select joined date"
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Phone */}
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="tel"
-                    placeholder="+91..."
-                    className="h-10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Joined Date */}
-          <FormField
-            control={form.control}
-            name="startAt"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Joined Date</FormLabel>
-                <DatePickerForm
-                  field={field}
-                  placeholder="Select joined date"
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Avatar URL */}
-          <FormField
-            control={form.control}
-            name="avatar"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Avatar URL</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="url"
-                    placeholder="https://..."
-                    className="h-10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="avatar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar (Optional)</FormLabel>
+                  <FormControl>
+                    <AvatarUpload
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onFileSelect={handleAvatarUpload}
+                      disabled={mutation.isPending || isUploadingAvatar}
+                      oldImageUrl={selected?.avatar || null}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Status Toggle - Full width */}

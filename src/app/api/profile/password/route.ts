@@ -11,6 +11,14 @@ export async function PATCH(request: Request) {
   try {
     const user = await requireAuth();
 
+    // Explicitly reject super-admin password changes
+    if (user.kind === "admin") {
+      return NextResponse.json(
+        { error: "Super Admin password cannot be changed from the dashboard" },
+        { status: 403 }
+      );
+    }
+
     if (user.kind !== "member") {
       return NextResponse.json(
         { error: "Only members can change password" },

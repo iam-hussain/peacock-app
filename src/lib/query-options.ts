@@ -31,6 +31,14 @@ export const fetchAuthStatus = () =>
               id: "admin";
             }
           | {
+              kind: "admin-member";
+              accountId: string;
+              id: string;
+              role: "ADMIN";
+              readAccess: boolean;
+              writeAccess: boolean;
+            }
+          | {
               kind: "member";
               accountId: string;
               id: string;

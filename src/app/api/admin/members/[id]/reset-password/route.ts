@@ -6,20 +6,20 @@ import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { hashPassword, requireSuperAdmin } from "@/lib/auth";
+import { hashPassword, requireAdmin } from "@/lib/auth";
 
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    await requireSuperAdmin();
+    await requireAdmin();
 
     const { id } = params;
 
     const account = await prisma.account.findUnique({
       where: { id },
-      select: { id: true, isMember: true },
+      select: { id: true, isMember: true, phone: true },
     });
 
     if (!account) {
@@ -33,8 +33,16 @@ export async function POST(
       );
     }
 
-    // Generate secure random password (9 bytes = ~12 base64 characters)
-    const plainPassword = randomBytes(9).toString("base64");
+    // Use phone number as password if available, otherwise generate random password
+    let plainPassword: string;
+    if (account.phone && account.phone.trim()) {
+      // Remove +91 prefix if present, use only the digits
+      plainPassword = account.phone.replace(/^\+91/, "").trim();
+    } else {
+      // Generate secure random password (9 bytes = ~12 base64 characters)
+      plainPassword = randomBytes(9).toString("base64");
+    }
+
     const passwordHash = await hashPassword(plainPassword);
 
     await prisma.account.update({

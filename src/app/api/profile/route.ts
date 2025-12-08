@@ -11,6 +11,31 @@ export async function GET() {
   try {
     const user = await requireAuth();
 
+    // Return virtual profile for super-admin
+    if (user.kind === "admin") {
+      return NextResponse.json(
+        {
+          account: {
+            id: "admin",
+            firstName: "Super",
+            lastName: "Admin",
+            phone: null,
+            email: null,
+            avatar: null,
+            username: "admin",
+            slug: "admin",
+            readAccess: true,
+            writeAccess: true,
+            active: true,
+            lastLoginAt: null,
+            createdAt: null,
+            updatedAt: null,
+          },
+        },
+        { status: 200 }
+      );
+    }
+
     if (user.kind !== "member") {
       return NextResponse.json(
         { error: "Only members can access profile" },
@@ -28,6 +53,7 @@ export async function GET() {
         email: true,
         avatar: true,
         username: true,
+        slug: true,
         readAccess: true,
         writeAccess: true,
         active: true,
@@ -58,6 +84,14 @@ export async function PATCH(request: Request) {
   try {
     const user = await requireAuth();
 
+    // Explicitly reject super-admin profile updates
+    if (user.kind === "admin") {
+      return NextResponse.json(
+        { error: "Super Admin profile cannot be updated from the dashboard" },
+        { status: 403 }
+      );
+    }
+
     if (user.kind !== "member") {
       return NextResponse.json(
         { error: "Only members can update profile" },
@@ -65,7 +99,44 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const { firstName, lastName, phone, email, avatar } = await request.json();
+    const { firstName, lastName, phone, email, avatar, slug } =
+      await request.json();
+
+    // Validate slug if provided
+    if (slug) {
+      // Check slug format
+      if (!/^[a-z0-9_-]+$/.test(slug)) {
+        return NextResponse.json(
+          {
+            error:
+              "Username can only contain lowercase letters, numbers, hyphens, and underscores",
+          },
+          { status: 400 }
+        );
+      }
+      if (slug.length < 3 || slug.length > 30) {
+        return NextResponse.json(
+          { error: "Username must be between 3 and 30 characters" },
+          { status: 400 }
+        );
+      }
+
+      // Check slug uniqueness (excluding current account)
+      const existingAccount = await prisma.account.findUnique({
+        where: { slug },
+        select: { id: true },
+      });
+
+      if (existingAccount && existingAccount.id !== user.accountId) {
+        return NextResponse.json(
+          {
+            error:
+              "Username already exists. Please choose a different username.",
+          },
+          { status: 400 }
+        );
+      }
+    }
 
     const account = await prisma.account.update({
       where: { id: user.accountId },
@@ -75,6 +146,9 @@ export async function PATCH(request: Request) {
         phone: phone ?? undefined,
         email: email ?? undefined,
         avatar: avatar ?? undefined,
+        slug: slug ?? undefined,
+        // Set username = slug for login
+        username: slug ? slug : undefined,
       },
       select: {
         id: true,
@@ -84,6 +158,7 @@ export async function PATCH(request: Request) {
         email: true,
         avatar: true,
         username: true,
+        slug: true,
         readAccess: true,
         writeAccess: true,
         active: true,

@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
@@ -42,7 +41,6 @@ import { setIsLoggedIn } from "@/store/pageSlice";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
-  const router = useRouter();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const { data: authData, isLoading: isAuthLoading } =
@@ -264,7 +262,7 @@ export default function Home() {
                         ? `Admin: ${authData.user.username}`
                         : profileData?.account
                           ? `${profileData.account.firstName || ""} ${profileData.account.lastName || ""}`.trim() ||
-                          profileData.account.username
+                            profileData.account.username
                           : "Access your club dashboard and manage your account."}
                     </CardDescription>
                   </CardHeader>
