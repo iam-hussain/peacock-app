@@ -48,19 +48,29 @@ export async function POST(request: Request) {
       );
     }
 
-    // Member login
-    const account = await prisma.account.findFirst({
+    // Member login - try username first, then fallback to slug/email/phone
+    let account = await prisma.account.findFirst({
       where: {
-        OR: [
-          { username: username },
-          { slug: username },
-          { email: username },
-          { phone: username },
-        ],
+        username: username,
         isMember: true,
         active: true,
       },
     });
+
+    // If not found by username, try slug/email/phone
+    if (!account) {
+      account = await prisma.account.findFirst({
+        where: {
+          OR: [
+            { slug: username },
+            { email: username },
+            { phone: username },
+          ],
+          isMember: true,
+          active: true,
+        },
+      });
+    }
 
     if (!account) {
       return NextResponse.json(

@@ -14,7 +14,7 @@ model Account {
   firstName           String
   lastName            String?
   slug                String        @unique
-  username            String?       @unique // for login, optional for vendor/club
+  username            String?       // for login, optional for vendor/club (enforce uniqueness in app logic)
   passwordHash        String? // bcrypt or argon2 hash
   phone               String?
   email               String?
