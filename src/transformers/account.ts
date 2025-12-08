@@ -30,9 +30,9 @@ export function transformLoanForTable(vendorInput: ToTransform) {
       acc.loanHistory.push({
         ...interestCalc,
         amount: loan.amount,
-        // add other properties from LoanHistoryEntry as needed
+        active: !loan.endDate, // Loan is active if there's no end date
         startDate: newZoneDate(loan.startDate).getTime(),
-        endDate: newZoneDate(loan.endDate || undefined).getTime(),
+        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
         totalInterestAmount: acc.totalInterestAmount,
       });
       // Store the most recent monthsPassedString
@@ -52,7 +52,11 @@ export function transformLoanForTable(vendorInput: ToTransform) {
     slug: member.slug,
     link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+    avatar: member.avatar
+      ? member.avatar.startsWith("/image/")
+        ? member.avatar
+        : `/image/${member.avatar}`
+      : undefined,
     joined: calculateMonthsDifference(
       newZoneDate(),
       newZoneDate(member.startAt)
@@ -137,7 +141,11 @@ export function membersTableTransform(
     slug: member.slug,
     link: `/dashboard/member/${member.slug}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar ? `/image/${member.avatar}` : undefined,
+    avatar: member.avatar
+      ? member.avatar.startsWith("/image/")
+        ? member.avatar
+        : `/image/${member.avatar}`
+      : undefined,
     joined: calculateMonthsDifference(
       newZoneDate(),
       newZoneDate(member.startAt)

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-type TableLayoutProps<T> = {
+type TableLayoutProps<_T> = {
   table: any;
   columns: any[];
   isLoading: boolean;

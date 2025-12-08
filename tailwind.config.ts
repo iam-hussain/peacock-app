@@ -7,37 +7,13 @@ const config = {
   theme: {
     screens: {
       sm: "640px",
-      // => @media (min-width: 640px) { ... }
-      // Small devices (phones, 640px and up)
-
       md: "768px",
-      // => @media (min-width: 768px) { ... }
-      // Medium devices (tablets, 768px and up)
-
       lg: "1024px",
-      // => @media (min-width: 1024px) { ... }
-      // Large devices (laptops/desktops, 1024px and up)
-
       xl: "1280px",
-      // => @media (min-width: 1280px) { ... }
-      // Extra large devices (large desktops, 1280px and up)
-
       "2xl": "1536px",
-      // => @media (min-width: 1536px) { ... }
-      // 2X large devices (larger desktops, 1536px and up)
-
       "3xl": "1920px",
-      // => @media (min-width: 1920px) { ... }
-      // 3X large devices (ultra wide desktops, 1920px and up)
-
       "4xl": "2560px",
-      // => @media (min-width: 2560px) { ... }
-      // 4X large devices (4K resolution, 2560px and up)
-
       "5xl": "3200px",
-      // => @media (min-width: 3200px) { ... }
-      // 5X large devices (5K resolution, 3200px and up)
-      // "no-touch": { raw: "(hover: hover) and (pointer: fine)" },
     },
     extend: {
       colors: {
@@ -99,12 +75,20 @@ const config = {
       },
       keyframes: {
         "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
         },
         "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
         },
       },
       animation: {

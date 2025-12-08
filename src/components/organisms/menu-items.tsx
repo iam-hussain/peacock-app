@@ -8,7 +8,6 @@ import { GoLaw } from "react-icons/go";
 import { HiBriefcase } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
-import { PiSignInBold } from "react-icons/pi";
 import { PiSignOutBold } from "react-icons/pi";
 import { RiFolderTransferFill } from "react-icons/ri";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
@@ -45,9 +44,11 @@ const appMenus: Menu[] = [
 function MenuItems({
   onItemClick,
   hasCloseButton = false,
+  collapsed = false,
 }: {
   onItemClick?: () => {};
   hasCloseButton?: boolean;
+  collapsed?: boolean;
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -68,7 +69,7 @@ function MenuItems({
 
       dispatch(setIsLoggedIn(false));
       toast.success("Logged out successfully!");
-      router.push("/login"); // Redirect to the dashboard or any protected route
+      router.push("/");
     },
     onError: (error) => {
       toast.error(
@@ -94,13 +95,17 @@ function MenuItems({
         <Image
           src={"/peacock.svg"}
           alt={"Peacock Club"}
-          width={60}
-          height={60}
+          width={collapsed ? 40 : 60}
+          height={collapsed ? 40 : 60}
         />
-        <Typography variant={"brandMini"} className="w-full text-center">
-          Peacock Club
-        </Typography>
-        <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
+        {!collapsed && (
+          <>
+            <Typography variant={"brandMini"} className="w-full text-center">
+              Peacock Club
+            </Typography>
+            <p className="text-xs text-foreground/70">{clubAge().inYear}</p>
+          </>
+        )}
       </Box>
       <Separator className="my-2" />
 
@@ -112,8 +117,9 @@ function MenuItems({
               variant={"menu"}
               href={each.link as any}
               onClick={() => handleOnItemClick()}
+              title={collapsed ? each.label : undefined}
             >
-              <Icon className="h-5 w-5" /> {each.label}
+              <Icon className="h-5 w-5" /> {!collapsed && each.label}
             </CustomLink>
           ))}
 
@@ -133,21 +139,21 @@ function MenuItems({
                 handleLogout();
                 handleOnItemClick();
               }}
+              title={collapsed ? "Logout" : undefined}
             >
-              <PiSignOutBold className="h-5 w-5" /> Logout
+              <PiSignOutBold className="h-5 w-5" /> {!collapsed && "Logout"}
             </Button>
           )}
 
           {!isLoggedIn && (
             <CustomLink
               variant={"menu"}
-              href={"/login"}
-              onClick={() => {
-                handleLogout();
-                handleOnItemClick();
-              }}
+              href={"/"}
+              onClick={handleOnItemClick}
+              title={collapsed ? "Dashboard" : undefined}
             >
-              <PiSignInBold className="h-5 w-5" /> Login
+              <TbLayoutDashboardFilled className="h-5 w-5" />{" "}
+              {!collapsed && "Dashboard"}
             </CustomLink>
           )}
         </Box>

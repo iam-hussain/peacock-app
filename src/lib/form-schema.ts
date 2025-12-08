@@ -24,9 +24,30 @@ const transactionMethods = [
 
 export const accountFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
-  slug: z.string().optional(),
+  slug: z
+    .string()
+    .min(1, "Username is required")
+    .regex(
+      /^[a-z0-9_-]+$/,
+      "Username can only contain lowercase letters, numbers, hyphens, and underscores"
+    )
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be at most 30 characters"),
   lastName: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val || val === "") return true; // Optional field
+        // Remove +91 prefix if present and check if exactly 10 digits remain
+        const digits = val.replace(/^\+91/, "").replace(/\D/g, "");
+        return digits.length === 10;
+      },
+      {
+        message: "Phone number must be exactly 10 digits",
+      }
+    ),
   email: z.union([z.literal(""), z.string().email()]),
   avatar: z.string().optional(),
   active: z.boolean().optional(),

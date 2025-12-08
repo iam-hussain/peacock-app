@@ -23,10 +23,16 @@ const fetcher = async (
       cache: "no-store",
     });
 
-    const responseData = await response.json();
+    const responseData = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      throw new Error(responseData?.message || "Failed to fetch transactions");
+      const errorMessage =
+        responseData?.message ||
+        responseData?.error ||
+        `Request failed with status ${response.status}`;
+      const error = new Error(errorMessage);
+      (error as any).response = { data: responseData, status: response.status };
+      throw error;
     }
 
     return responseData;

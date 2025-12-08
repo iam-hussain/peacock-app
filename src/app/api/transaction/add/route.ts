@@ -6,11 +6,14 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { requireWriteAccess } from "@/lib/auth";
 import { newZoneDate } from "@/lib/date";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function POST(request: Request) {
   try {
+    const user = await requireWriteAccess();
+
     const {
       createdAt,
       transactionAt,
@@ -32,6 +35,7 @@ export async function POST(request: Request) {
         note: note ?? undefined,
         transactionAt: newZoneDate(transactionAt || undefined),
         createdAt: createdAt || undefined,
+        createdById: user.kind === "member" ? user.accountId : null,
       },
     });
     if (transaction) await transactionEntryHandler(transaction);
@@ -39,8 +43,16 @@ export async function POST(request: Request) {
     revalidatePath("*");
     revalidateTag("api");
     return NextResponse.json({ success: true, transaction }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to create transaction", error);
+    const { handleAuthError } = await import("@/lib/error-handler");
+    if (
+      error.message === "UNAUTHORIZED" ||
+      error.message === "FORBIDDEN_WRITE" ||
+      error.message === "FORBIDDEN_ADMIN"
+    ) {
+      return handleAuthError(error);
+    }
     return NextResponse.json(
       { error: "Failed to create transaction" },
       { status: 500 }

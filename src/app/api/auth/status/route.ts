@@ -2,26 +2,50 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-// File: app/api/auth/status/route.ts
-
-import { verify } from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
 
-export async function POST(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
+import { getCurrentUser } from "@/lib/auth";
 
-  if (!token) {
-    return NextResponse.json({ isLoggedIn: false }, { status: 200 });
-  }
-
+export async function POST() {
   try {
-    const decoded = verify(token, process.env.JWT_SECRET!);
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { isLoggedIn: false, user: null },
+        { status: 200 }
+      );
+    }
+
+    // Format user response
+    const responseUser =
+      user.kind === "admin"
+        ? {
+            kind: "admin" as const,
+            username: "admin" as const,
+            role: "SUPER_ADMIN" as const,
+            id: "admin" as const,
+          }
+        : user.kind === "admin-member"
+          ? {
+              kind: "admin-member" as const,
+              accountId: user.accountId,
+              id: user.id,
+              role: "ADMIN" as const,
+              readAccess: user.readAccess,
+              writeAccess: user.writeAccess,
+            }
+          : user;
+
     return NextResponse.json(
-      { isLoggedIn: true, user: decoded },
+      { isLoggedIn: true, user: responseUser },
       { status: 200 }
     );
-  } catch (error) {
-    return NextResponse.json({ isLoggedIn: false }, { status: 200 });
+  } catch (error: any) {
+    console.error("Auth status error:", error);
+    return NextResponse.json(
+      { isLoggedIn: false, user: null },
+      { status: 200 }
+    );
   }
 }

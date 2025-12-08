@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { requireWriteAccess } from "@/lib/auth";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function DELETE(
@@ -15,12 +16,14 @@ export async function DELETE(
   const { id } = params;
 
   try {
+    const _user = await requireWriteAccess();
+
     // Check if the transaction exists
     const transaction = await prisma.transaction.findUnique({ where: { id } });
 
     if (!transaction) {
       return NextResponse.json(
-        { message: "Vendor transaction not found." },
+        { message: "Transaction not found." },
         { status: 404 }
       );
     }
@@ -34,8 +37,16 @@ export async function DELETE(
       { message: "Transaction deleted successfully." },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting transaction:", error);
+    const { handleAuthError } = await import("@/lib/error-handler");
+    if (
+      error.message === "UNAUTHORIZED" ||
+      error.message === "FORBIDDEN_WRITE" ||
+      error.message === "FORBIDDEN_ADMIN"
+    ) {
+      return handleAuthError(error);
+    }
     return NextResponse.json(
       { message: "Failed to delete transaction." },
       { status: 500 }

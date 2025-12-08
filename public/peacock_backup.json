@@ -14787,18 +14787,6 @@
       "updatedAt": "2025-06-21T14:00:50.003Z"
     },
     {
-      "id": "6856bb3d59c8fa126ff5b316",
-      "amount": 10000,
-      "transactionType": "PERIODIC_DEPOSIT",
-      "transactionAt": "2025-06-16T21:30:00.000Z",
-      "method": "ACCOUNT",
-      "fromId": "66d95de89ff85b6e7c1106be",
-      "toId": "66d95de79ff85b6e7c1106b0",
-      "note": "",
-      "createdAt": "2025-06-21T14:01:33.209Z",
-      "updatedAt": "2025-06-21T14:01:33.209Z"
-    },
-    {
       "id": "6856bc8f59c8fa126ff5b317",
       "amount": 50000,
       "transactionType": "LOAN_REPAY",
@@ -14833,18 +14821,6 @@
       "note": "",
       "createdAt": "2025-06-21T14:09:21.947Z",
       "updatedAt": "2025-06-21T14:09:21.947Z"
-    },
-    {
-      "id": "6856be3459c8fa126ff5b31c",
-      "amount": 35800,
-      "transactionType": "WITHDRAW",
-      "transactionAt": "2025-06-21T20:10:13.299Z",
-      "method": "ACCOUNT",
-      "fromId": "66d95de69ff85b6e7c110692",
-      "toId": "66d95de89ff85b6e7c1106bc",
-      "note": "",
-      "createdAt": "2025-06-21T17:10:13.299Z",
-      "updatedAt": "2025-06-21T14:14:12.593Z"
     },
     {
       "id": "6857473a9790cc78683d70f1",
@@ -14905,6 +14881,858 @@
       "note": "Profit withdraw",
       "createdAt": "2025-06-22T09:04:44.814Z",
       "updatedAt": "2025-06-22T09:04:44.814Z"
+    },
+    {
+      "id": "6857d42301e5325768402660",
+      "amount": 6000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-06-17T00:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106be",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-06-16T21:30:00.000Z",
+      "updatedAt": "2025-06-22T10:00:03.175Z"
+    },
+    {
+      "id": "6857d43d01e5325768402661",
+      "amount": 4000,
+      "transactionType": "LOAN_INTEREST",
+      "transactionAt": "2025-06-16T21:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106be",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-06-22T10:00:29.800Z",
+      "updatedAt": "2025-06-22T10:00:29.800Z"
+    },
+    {
+      "id": "6857ee91d9679446878d5780",
+      "amount": 31790,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-04-21T01:30:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a6",
+      "toId": "66d95de79ff85b6e7c1106a6",
+      "note": "",
+      "createdAt": "2025-06-22T11:52:49.280Z",
+      "updatedAt": "2025-06-22T11:52:49.280Z"
+    },
+    {
+      "id": "6857f31801e5325768402663",
+      "amount": 38600,
+      "transactionType": "WITHDRAW",
+      "transactionAt": "2025-06-22T02:10:13.299Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de89ff85b6e7c1106bc",
+      "note": "",
+      "createdAt": "2025-06-21T23:10:13.299Z",
+      "updatedAt": "2025-06-22T12:12:08.947Z"
+    },
+    {
+      "id": "6858012f48af6edf6ff06e64",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2024-10-03T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-06-22T13:12:15.131Z",
+      "updatedAt": "2025-06-22T13:12:15.131Z"
+    },
+    {
+      "id": "685801885d8d4f9051cf1534",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-06-22T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-06-23T00:12:50.044Z",
+      "updatedAt": "2025-06-22T13:13:44.334Z"
+    },
+    {
+      "id": "6858019c5d8d4f9051cf1535",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-06-22T18:43:53.950Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106aa",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-06-22T13:14:04.922Z",
+      "updatedAt": "2025-06-22T13:14:04.922Z"
+    },
+    {
+      "id": "685801eb5d8d4f9051cf1536",
+      "amount": 6000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-06-22T18:45:13.323Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-06-22T13:15:23.442Z",
+      "updatedAt": "2025-06-22T13:15:23.442Z"
+    },
+    {
+      "id": "68c93294f97d74e70513d1c1",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-06-30T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T09:49:08.138Z",
+      "updatedAt": "2025-09-16T09:49:08.138Z"
+    },
+    {
+      "id": "68c932b3f97d74e70513d1c2",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-07-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T09:49:39.952Z",
+      "updatedAt": "2025-09-16T09:49:39.952Z"
+    },
+    {
+      "id": "68c932d1f97d74e70513d1c3",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-07-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11068e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T09:50:09.366Z",
+      "updatedAt": "2025-09-16T09:50:09.366Z"
+    },
+    {
+      "id": "68c93309f97d74e70513d1c4",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-07-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T09:51:05.816Z",
+      "updatedAt": "2025-09-16T09:51:05.816Z"
+    },
+    {
+      "id": "68c93357f97d74e70513d1c5",
+      "amount": 11600,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-07-04T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "6856b28a59c8fa126ff5b2f6",
+      "note": "",
+      "createdAt": "2025-09-16T09:52:23.009Z",
+      "updatedAt": "2025-09-16T09:52:23.009Z"
+    },
+    {
+      "id": "68c93381f97d74e70513d1c6",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-07-06T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c1106a2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T09:53:05.885Z",
+      "updatedAt": "2025-09-16T09:53:05.885Z"
+    },
+    {
+      "id": "68c933cdf97d74e70513d1c7",
+      "amount": 100000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-07-10T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106c0",
+      "toId": "66d95de79ff85b6e7c1106b4",
+      "note": "",
+      "createdAt": "2025-09-16T09:54:21.183Z",
+      "updatedAt": "2025-09-16T09:54:21.183Z"
+    },
+    {
+      "id": "68c93407e1aba3cea7359e40",
+      "amount": 100000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-07-10T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b4",
+      "note": "",
+      "createdAt": "2025-09-16T09:55:19.336Z",
+      "updatedAt": "2025-09-16T09:55:19.336Z"
+    },
+    {
+      "id": "68c9347af97d74e70513d1c8",
+      "amount": 50000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-07-11T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069a",
+      "toId": "66d95de79ff85b6e7c1106b4",
+      "note": "",
+      "createdAt": "2025-09-16T09:57:14.100Z",
+      "updatedAt": "2025-09-16T09:57:14.100Z"
+    },
+    {
+      "id": "68c93496f97d74e70513d1c9",
+      "amount": 50000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-07-11T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b4",
+      "note": "",
+      "createdAt": "2025-09-16T09:57:42.372Z",
+      "updatedAt": "2025-09-16T09:57:42.372Z"
+    },
+    {
+      "id": "68c934ebf97d74e70513d1ca",
+      "amount": 7000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-07-26T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110698",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-16T09:59:07.815Z",
+      "updatedAt": "2025-09-16T09:59:07.815Z"
+    },
+    {
+      "id": "68c93519f97d74e70513d1cb",
+      "amount": 11700,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-07-28T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "6856b28a59c8fa126ff5b2f6",
+      "note": "",
+      "createdAt": "2025-09-16T09:59:53.092Z",
+      "updatedAt": "2025-09-16T09:59:53.092Z"
+    },
+    {
+      "id": "68c9353df97d74e70513d1cc",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-07-31T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:00:29.874Z",
+      "updatedAt": "2025-09-16T10:00:29.874Z"
+    },
+    {
+      "id": "68c9355af97d74e70513d1cd",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:00:58.517Z",
+      "updatedAt": "2025-09-16T10:00:58.517Z"
+    },
+    {
+      "id": "68c9357ef97d74e70513d1ce",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-02T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:01:34.742Z",
+      "updatedAt": "2025-09-16T10:01:34.742Z"
+    },
+    {
+      "id": "68c9359bf97d74e70513d1cf",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-02T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11068e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:02:03.727Z",
+      "updatedAt": "2025-09-16T10:02:03.727Z"
+    },
+    {
+      "id": "68c935eff97d74e70513d1d0",
+      "amount": 150000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-08-06T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a8",
+      "toId": "66d95de79ff85b6e7c1106b4",
+      "note": "",
+      "createdAt": "2025-09-16T10:03:27.708Z",
+      "updatedAt": "2025-09-16T10:03:27.708Z"
+    },
+    {
+      "id": "68c9360ff97d74e70513d1d1",
+      "amount": 150000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-08-06T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b4",
+      "note": "",
+      "createdAt": "2025-09-16T10:03:59.465Z",
+      "updatedAt": "2025-09-16T10:03:59.465Z"
+    },
+    {
+      "id": "68c93639f97d74e70513d1d2",
+      "amount": 14000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-06T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a8",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-16T10:04:41.808Z",
+      "updatedAt": "2025-09-16T10:04:41.808Z"
+    },
+    {
+      "id": "68c93656f97d74e70513d1d3",
+      "amount": 9000,
+      "transactionType": "LOAN_INTEREST",
+      "transactionAt": "2025-08-06T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a8",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-16T10:05:10.386Z",
+      "updatedAt": "2025-09-16T10:05:10.386Z"
+    },
+    {
+      "id": "68c9368bf97d74e70513d1d4",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-14T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b6",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:06:03.436Z",
+      "updatedAt": "2025-09-16T10:06:03.436Z"
+    },
+    {
+      "id": "68c9379af97d74e70513d1d5",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-27T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c1106a2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:10:34.607Z",
+      "updatedAt": "2025-09-16T10:10:34.607Z"
+    },
+    {
+      "id": "68c937cbf97d74e70513d1d6",
+      "amount": 11800,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-08-27T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "6856b28a59c8fa126ff5b2f6",
+      "note": "",
+      "createdAt": "2025-09-16T10:11:23.810Z",
+      "updatedAt": "2025-09-16T10:11:23.810Z"
+    },
+    {
+      "id": "68c937eaf97d74e70513d1d7",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-09-02T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:11:54.333Z",
+      "updatedAt": "2025-09-16T10:11:54.333Z"
+    },
+    {
+      "id": "68c93810f97d74e70513d1d8",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-09-02T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:12:32.367Z",
+      "updatedAt": "2025-09-16T10:12:32.367Z"
+    },
+    {
+      "id": "68c9383ef97d74e70513d1d9",
+      "amount": 150000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-09-16T15:43:18.419Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-16T10:13:18.420Z",
+      "updatedAt": "2025-09-16T10:13:18.420Z"
+    },
+    {
+      "id": "68c93862f97d74e70513d1da",
+      "amount": 7900,
+      "transactionType": "LOAN_INTEREST",
+      "transactionAt": "2025-09-16T15:43:29.873Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-16T10:13:54.876Z",
+      "updatedAt": "2025-09-16T10:13:54.876Z"
+    },
+    {
+      "id": "68c938b0f97d74e70513d1db",
+      "amount": 15000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-08-20T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069a",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-16T10:15:12.898Z",
+      "updatedAt": "2025-09-16T10:15:12.898Z"
+    },
+    {
+      "id": "68d7a6d8d08d3785d0ae5188",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-09-16T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c1106a2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-27T08:56:56.562Z",
+      "updatedAt": "2025-09-27T08:56:56.562Z"
+    },
+    {
+      "id": "68d7a726d08d3785d0ae5189",
+      "amount": 150000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-09-25T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069e",
+      "toId": "66d95de89ff85b6e7c1106be",
+      "note": "",
+      "createdAt": "2025-09-27T08:58:14.934Z",
+      "updatedAt": "2025-09-27T08:58:14.934Z"
+    },
+    {
+      "id": "68d7a74438e2aa6c9dde79be",
+      "amount": 150000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-09-25T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106be",
+      "toId": "66d95de89ff85b6e7c1106be",
+      "note": "",
+      "createdAt": "2025-09-27T08:58:44.772Z",
+      "updatedAt": "2025-09-27T08:58:44.772Z"
+    },
+    {
+      "id": "68d7a76838e2aa6c9dde79bf",
+      "amount": 6800,
+      "transactionType": "LOAN_INTEREST",
+      "transactionAt": "2025-09-25T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-27T08:59:20.463Z",
+      "updatedAt": "2025-09-27T08:59:20.463Z"
+    },
+    {
+      "id": "68d7a7ac38e2aa6c9dde79c0",
+      "amount": 150000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-09-26T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de89ff85b6e7c1106be",
+      "note": "",
+      "createdAt": "2025-09-27T09:00:28.421Z",
+      "updatedAt": "2025-09-27T09:00:28.421Z"
+    },
+    {
+      "id": "68d7a7f338e2aa6c9dde79c2",
+      "amount": 150000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-09-26T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106be",
+      "toId": "66d95de89ff85b6e7c1106be",
+      "note": "",
+      "createdAt": "2025-09-27T09:01:39.877Z",
+      "updatedAt": "2025-09-27T09:01:39.877Z"
+    },
+    {
+      "id": "68d7a87438e2aa6c9dde79c3",
+      "amount": 8000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-09-27T14:33:48.146Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-27T09:03:48.147Z",
+      "updatedAt": "2025-09-27T09:03:48.147Z"
+    },
+    {
+      "id": "68d7a88b38e2aa6c9dde79c4",
+      "amount": 7000,
+      "transactionType": "LOAN_INTEREST",
+      "transactionAt": "2025-09-27T14:34:11.355Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-27T09:04:11.357Z",
+      "updatedAt": "2025-09-27T09:04:11.357Z"
+    },
+    {
+      "id": "68d7a8f338e2aa6c9dde79c5",
+      "amount": 22500,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-07-22T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "67cb123b43dce1b56e2c62cd",
+      "note": "",
+      "createdAt": "2025-09-27T09:05:55.736Z",
+      "updatedAt": "2025-09-27T09:05:55.736Z"
+    },
+    {
+      "id": "68d7a96838e2aa6c9dde79c6",
+      "amount": 22750,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-08-21T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "67cb123b43dce1b56e2c62cd",
+      "note": "",
+      "createdAt": "2025-09-27T09:07:52.399Z",
+      "updatedAt": "2025-09-27T09:07:52.399Z"
+    },
+    {
+      "id": "68d7a9b538e2aa6c9dde79c7",
+      "amount": 23000,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-09-18T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "67cb123b43dce1b56e2c62cd",
+      "note": "",
+      "createdAt": "2025-09-27T09:09:09.173Z",
+      "updatedAt": "2025-09-27T09:09:09.173Z"
+    },
+    {
+      "id": "68d7ab46bb2211e13ccdcb35",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-09-27T14:45:26.993Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106be",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-27T09:15:50.599Z",
+      "updatedAt": "2025-09-27T09:15:50.599Z"
+    },
+    {
+      "id": "68d7af17d5f7388b28835033",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-09-27T15:01:46.513Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11069e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-09-27T09:32:07.391Z",
+      "updatedAt": "2025-09-27T09:32:07.391Z"
+    },
+    {
+      "id": "68d7b9877292c199eba29db8",
+      "amount": 150000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-09-27T15:46:18.541Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-27T10:16:39.645Z",
+      "updatedAt": "2025-09-27T10:16:39.645Z"
+    },
+    {
+      "id": "68d7b9ad7292c199eba29db9",
+      "amount": 10350,
+      "transactionType": "LOAN_INTEREST",
+      "transactionAt": "2025-09-27T15:46:50.835Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-09-27T10:17:17.382Z",
+      "updatedAt": "2025-09-27T10:17:17.382Z"
+    },
+    {
+      "id": "69293678d05d2bb94f7f44c9",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-10-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11068e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:43:20.084Z",
+      "updatedAt": "2025-11-28T05:43:20.084Z"
+    },
+    {
+      "id": "69293695d05d2bb94f7f44ca",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-10-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:43:49.950Z",
+      "updatedAt": "2025-11-28T05:43:49.950Z"
+    },
+    {
+      "id": "692936d8d05d2bb94f7f44cb",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-10-01T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:44:56.404Z",
+      "updatedAt": "2025-11-28T05:44:56.404Z"
+    },
+    {
+      "id": "6929370ad05d2bb94f7f44cc",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-10-04T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:45:46.351Z",
+      "updatedAt": "2025-11-28T05:45:46.351Z"
+    },
+    {
+      "id": "6929375ad05d2bb94f7f44cd",
+      "amount": 100000,
+      "transactionType": "FUNDS_TRANSFER",
+      "transactionAt": "2025-10-14T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106b6",
+      "note": "",
+      "createdAt": "2025-11-28T05:47:06.397Z",
+      "updatedAt": "2025-11-28T05:47:06.397Z"
+    },
+    {
+      "id": "69293782d05d2bb94f7f44ce",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-10-23T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de89ff85b6e7c1106c0",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "By mohan",
+      "createdAt": "2025-11-28T05:47:46.511Z",
+      "updatedAt": "2025-11-28T05:47:46.511Z"
+    },
+    {
+      "id": "692937c3d05d2bb94f7f44cf",
+      "amount": 12250,
+      "transactionType": "VENDOR_INVEST",
+      "transactionAt": "2025-10-27T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "6856b28a59c8fa126ff5b2f6",
+      "note": "",
+      "createdAt": "2025-11-28T05:48:51.828Z",
+      "updatedAt": "2025-11-28T05:48:51.828Z"
+    },
+    {
+      "id": "692937f0d05d2bb94f7f44d0",
+      "amount": 4000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-10-27T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c1106a2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:49:36.143Z",
+      "updatedAt": "2025-11-28T05:49:36.143Z"
+    },
+    {
+      "id": "69293813d05d2bb94f7f44d1",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-02T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106a4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:50:11.227Z",
+      "updatedAt": "2025-11-28T05:50:11.227Z"
+    },
+    {
+      "id": "69293831d05d2bb94f7f44d2",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-02T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:50:41.657Z",
+      "updatedAt": "2025-11-28T05:50:41.657Z"
+    },
+    {
+      "id": "69293847d05d2bb94f7f44d3",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-03T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c11068e",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:51:03.766Z",
+      "updatedAt": "2025-11-28T05:51:03.766Z"
+    },
+    {
+      "id": "692938b7d05d2bb94f7f44d4",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-05T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c1106a2",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:52:55.244Z",
+      "updatedAt": "2025-11-28T05:52:55.244Z"
+    },
+    {
+      "id": "692938d3d05d2bb94f7f44d5",
+      "amount": 2000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-06T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b4",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:53:23.516Z",
+      "updatedAt": "2025-11-28T05:53:23.516Z"
+    },
+    {
+      "id": "69293909d05d2bb94f7f44d6",
+      "amount": 150000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-10-25T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106a4",
+      "note": "",
+      "createdAt": "2025-11-28T05:54:17.982Z",
+      "updatedAt": "2025-11-28T05:54:17.982Z"
+    },
+    {
+      "id": "69293947d05d2bb94f7f44d7",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-08T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106aa",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T05:55:19.512Z",
+      "updatedAt": "2025-11-28T05:55:19.512Z"
+    },
+    {
+      "id": "69293989d05d2bb94f7f44d8",
+      "amount": 100000,
+      "transactionType": "FUNDS_TRANSFER",
+      "transactionAt": "2025-11-22T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b6",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-11-28T05:56:25.002Z",
+      "updatedAt": "2025-11-28T05:56:25.002Z"
+    },
+    {
+      "id": "692939dfd05d2bb94f7f44d9",
+      "amount": 200000,
+      "transactionType": "LOAN_REPAY",
+      "transactionAt": "2025-11-22T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b6",
+      "toId": "66d95de69ff85b6e7c110692",
+      "note": "",
+      "createdAt": "2025-11-28T05:57:51.372Z",
+      "updatedAt": "2025-11-28T05:57:51.372Z"
+    },
+    {
+      "id": "69293a12d05d2bb94f7f44da",
+      "amount": 300000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-11-23T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106b2",
+      "note": "",
+      "createdAt": "2025-11-28T05:58:42.830Z",
+      "updatedAt": "2025-11-28T05:58:42.830Z"
+    },
+    {
+      "id": "69293a8ea650621b9a64c356",
+      "amount": 100000,
+      "transactionType": "LOAN_TAKEN",
+      "transactionAt": "2025-11-12T00:00:00.000Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de69ff85b6e7c110692",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T06:00:46.537Z",
+      "updatedAt": "2025-11-28T06:00:46.537Z"
+    },
+    {
+      "id": "69293b2ed05d2bb94f7f44db",
+      "amount": 10000,
+      "transactionType": "PERIODIC_DEPOSIT",
+      "transactionAt": "2025-11-28T11:33:26.821Z",
+      "method": "ACCOUNT",
+      "fromId": "66d95de79ff85b6e7c1106b0",
+      "toId": "66d95de79ff85b6e7c1106b0",
+      "note": "",
+      "createdAt": "2025-11-28T06:03:26.822Z",
+      "updatedAt": "2025-11-28T06:03:26.822Z"
     }
   ],
   "passbook": [
@@ -14929,23 +15757,23 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:11.623Z"
+      "updatedAt": "2025-11-29T14:52:18.212Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bd",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 85629,
+        "periodicDepositAmount": 91629,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 85629,
+        "totalDepositAmount": 91629,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 85629,
+        "accountBalance": 91629,
         "clubHeldAmount": 0,
-        "totalLoanTaken": 200000,
+        "totalLoanTaken": 500000,
         "totalLoanRepay": 200000,
-        "totalLoanBalance": 0,
-        "totalInterestPaid": 3000
+        "totalLoanBalance": 300000,
+        "totalInterestPaid": 7000
       },
       "loanHistory": [
         {
@@ -14986,13 +15814,32 @@
           "daysInMonth": 30,
           "interestForDays": 0,
           "interestPerDay": 16.67
+        },
+        {
+          "active": false,
+          "amount": 150000,
+          "startDate": 1758769200000,
+          "endDate": 1758850200000,
+          "monthsPassed": 0,
+          "daysPassed": 0,
+          "interestAmount": 0,
+          "monthsPassedString": "",
+          "daysInMonth": 30,
+          "interestForDays": 0,
+          "interestPerDay": 50
+        },
+        {
+          "active": true,
+          "amount": 300000,
+          "startDate": 1758850200000,
+          "interestAmount": 0
         }
       ],
       "joiningOffset": 1629,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:11.623Z"
+      "updatedAt": "2025-11-29T14:52:18.212Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c5",
@@ -15008,7 +15855,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:01.026Z"
+      "updatedAt": "2025-11-29T14:51:32.302Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106cd",
@@ -15024,23 +15871,23 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:01.026Z"
+      "updatedAt": "2025-11-29T14:51:32.302Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a3",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 78000,
+        "periodicDepositAmount": 90000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 78000,
+        "totalDepositAmount": 90000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 78000,
+        "accountBalance": 90000,
         "clubHeldAmount": 0,
-        "totalLoanTaken": 150000,
-        "totalLoanRepay": 0,
+        "totalLoanTaken": 300000,
+        "totalLoanRepay": 150000,
         "totalLoanBalance": 150000,
-        "totalInterestPaid": 0
+        "totalInterestPaid": 7900
       },
       "loanHistory": [
         {
@@ -15057,9 +15904,22 @@
           "interestPerDay": 33.33
         },
         {
+          "active": false,
+          "amount": 150000,
+          "startDate": 1744081200000,
+          "endDate": 1758042798419,
+          "monthsPassed": 5,
+          "daysPassed": 8,
+          "interestAmount": 7900,
+          "monthsPassedString": "5 mons 8 d",
+          "daysInMonth": 30,
+          "interestForDays": 400,
+          "interestPerDay": 50
+        },
+        {
           "active": true,
           "amount": 150000,
-          "startDate": 1744075800000,
+          "startDate": 1761355800000,
           "interestAmount": 0
         }
       ],
@@ -15067,25 +15927,25 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:11.623Z"
+      "updatedAt": "2025-11-29T14:52:18.212Z"
     },
     {
       "id": "66d95dea9ff85b6e7c1106e7",
       "type": "CLUB",
       "payload": {
-        "totalMemberPeriodicDeposits": 1499992,
+        "totalMemberPeriodicDeposits": 1667992,
         "totalMemberOffsetDeposits": 3699,
         "totalMemberWithdrawals": 302000,
-        "totalMemberProfitWithdrawals": 15493,
-        "currentClubBalance": 62560,
-        "netClubBalance": 1186198,
-        "totalInvestment": 1311675,
+        "totalMemberProfitWithdrawals": 18293,
+        "currentClubBalance": 139000,
+        "netClubBalance": 1351398,
+        "totalInvestment": 1427275,
         "totalReturns": 1248940,
         "totalProfit": 0,
-        "totalLoanTaken": 3415000,
-        "totalLoanRepay": 2283210,
-        "totalLoanBalance": 1131790,
-        "totalInterestPaid": 70887,
+        "totalLoanTaken": 4565000,
+        "totalLoanRepay": 3415000,
+        "totalLoanBalance": 1150000,
+        "totalInterestPaid": 115937,
         "totalVendorProfit": 0
       },
       "loanHistory": [],
@@ -15093,7 +15953,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:11.623Z"
+      "updatedAt": "2025-11-29T14:52:18.212Z"
     },
     {
       "id": "66d95de69ff85b6e7c110695",
@@ -15116,7 +15976,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:11.623Z"
+      "updatedAt": "2025-11-29T14:52:18.212Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c9",
@@ -15132,18 +15992,18 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:02.020Z"
+      "updatedAt": "2025-11-29T14:51:33.530Z"
     },
     {
       "id": "66d95de69ff85b6e7c110697",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 73000,
+        "periodicDepositAmount": 80000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 73000,
+        "totalDepositAmount": 80000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 73000,
+        "accountBalance": 80000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 0,
         "totalLoanRepay": 0,
@@ -15155,7 +16015,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:12.540Z"
+      "updatedAt": "2025-11-29T14:52:19.742Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c1",
@@ -15178,37 +16038,57 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:12.540Z"
+      "updatedAt": "2025-11-29T14:52:19.742Z"
     },
     {
       "id": "66d95de69ff85b6e7c110691",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 76000,
+        "periodicDepositAmount": 88000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 76000,
+        "totalDepositAmount": 88000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 76000,
-        "clubHeldAmount": 19200,
+        "accountBalance": 88000,
+        "clubHeldAmount": 21750,
         "totalLoanTaken": 300000,
-        "totalLoanRepay": 0,
-        "totalLoanBalance": 300000,
-        "totalInterestPaid": 0
+        "totalLoanRepay": 300000,
+        "totalLoanBalance": 0,
+        "totalInterestPaid": 17350
       },
       "loanHistory": [
         {
-          "active": true,
+          "active": false,
           "amount": 300000,
-          "startDate": 1743568200000,
-          "interestAmount": 0
+          "startDate": 1743573600000,
+          "endDate": 1758850200000,
+          "monthsPassed": 5,
+          "daysPassed": 23,
+          "interestAmount": 17300,
+          "monthsPassedString": "5 mons 23 d",
+          "daysInMonth": 30,
+          "interestForDays": 2300,
+          "interestPerDay": 100
+        },
+        {
+          "active": false,
+          "amount": 150000,
+          "startDate": 1758855600000,
+          "endDate": 1758993378541,
+          "monthsPassed": 0,
+          "daysPassed": 1,
+          "interestAmount": 50,
+          "monthsPassedString": " 1 d",
+          "daysInMonth": 30,
+          "interestForDays": 50,
+          "interestPerDay": 50
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:12.540Z"
+      "updatedAt": "2025-11-29T14:52:19.742Z"
     },
     {
       "id": "66d95de69ff85b6e7c110693",
@@ -15231,18 +16111,18 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:12.540Z"
+      "updatedAt": "2025-11-29T14:52:19.742Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a9",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 76000,
+        "periodicDepositAmount": 90000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 76000,
+        "totalDepositAmount": 90000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 76000,
+        "accountBalance": 90000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 0,
         "totalLoanRepay": 0,
@@ -15254,23 +16134,23 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:12.540Z"
+      "updatedAt": "2025-11-29T14:52:19.742Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069d",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 64000,
+        "periodicDepositAmount": 74000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 64000,
+        "totalDepositAmount": 74000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 64000,
+        "accountBalance": 74000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 250000,
-        "totalLoanRepay": 100000,
-        "totalLoanBalance": 150000,
-        "totalInterestPaid": 5484
+        "totalLoanRepay": 250000,
+        "totalLoanBalance": 0,
+        "totalInterestPaid": 12284
       },
       "loanHistory": [
         {
@@ -15300,17 +16180,24 @@
           "interestPerDay": 33.33
         },
         {
-          "active": true,
+          "active": false,
           "amount": 150000,
-          "startDate": 1746745200000,
-          "interestAmount": 0
+          "startDate": 1746750600000,
+          "endDate": 1758763800000,
+          "monthsPassed": 4,
+          "daysPassed": 16,
+          "interestAmount": 6800,
+          "monthsPassedString": "4 mons 16 d",
+          "daysInMonth": 30,
+          "interestForDays": 800,
+          "interestPerDay": 50
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:13.450Z"
+      "updatedAt": "2025-11-29T14:52:21.005Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ad",
@@ -15333,22 +16220,22 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:13.450Z"
+      "updatedAt": "2025-11-29T14:52:21.005Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106af",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 74000,
+        "periodicDepositAmount": 90000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 74000,
+        "totalDepositAmount": 90000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 74000,
-        "clubHeldAmount": 43360,
-        "totalLoanTaken": 200000,
+        "accountBalance": 90000,
+        "clubHeldAmount": 85460,
+        "totalLoanTaken": 300000,
         "totalLoanRepay": 200000,
-        "totalLoanBalance": 0,
+        "totalLoanBalance": 100000,
         "totalInterestPaid": 10000
       },
       "loanHistory": [
@@ -15377,24 +16264,30 @@
           "daysInMonth": 31,
           "interestForDays": 322.6,
           "interestPerDay": 32.26
+        },
+        {
+          "active": true,
+          "amount": 100000,
+          "startDate": 1762911000000,
+          "interestAmount": 0
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:13.450Z"
+      "updatedAt": "2025-11-29T14:52:21.005Z"
     },
     {
       "id": "66d95de69ff85b6e7c1106a1",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 78000,
+        "periodicDepositAmount": 90000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 78000,
+        "totalDepositAmount": 90000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 78000,
+        "accountBalance": 90000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 100000,
         "totalLoanRepay": 100000,
@@ -15420,22 +16313,22 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:13.450Z"
+      "updatedAt": "2025-11-29T14:52:21.005Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bf",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 72000,
+        "periodicDepositAmount": 82000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 72000,
+        "totalDepositAmount": 82000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 72000,
+        "accountBalance": 82000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 300000,
-        "totalLoanRepay": 200000,
-        "totalLoanBalance": 100000,
+        "totalLoanRepay": 300000,
+        "totalLoanBalance": 0,
         "totalInterestPaid": 6742
       },
       "loanHistory": [
@@ -15466,17 +16359,24 @@
           "interestPerDay": 32.26
         },
         {
-          "active": true,
+          "active": false,
           "amount": 100000,
-          "startDate": 1741743000000,
-          "interestAmount": 0
+          "startDate": 1741748400000,
+          "endDate": 1752111000000,
+          "monthsPassed": 3,
+          "daysPassed": 27,
+          "interestAmount": 3900,
+          "monthsPassedString": "3 mons 27 d",
+          "daysInMonth": 30,
+          "interestForDays": 899.91,
+          "interestPerDay": 33.33
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:13.450Z"
+      "updatedAt": "2025-11-29T14:52:21.005Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a5",
@@ -15488,10 +16388,10 @@
         "withdrawalAmount": 64000,
         "profitWithdrawalAmount": 4210,
         "accountBalance": -4210,
-        "clubHeldAmount": 0,
+        "clubHeldAmount": 31790,
         "totalLoanTaken": 315000,
-        "totalLoanRepay": 283210,
-        "totalLoanBalance": 31790,
+        "totalLoanRepay": 315000,
+        "totalLoanBalance": 0,
         "totalInterestPaid": 6500
       },
       "loanHistory": [
@@ -15548,17 +16448,24 @@
           "interestPerDay": 32.26
         },
         {
-          "active": true,
+          "active": false,
           "amount": 31790,
-          "startDate": 1745204400000,
-          "interestAmount": 0
+          "startDate": 1745209800000,
+          "endDate": 1745204400000,
+          "monthsPassed": 0,
+          "daysPassed": 0,
+          "interestAmount": 0,
+          "monthsPassedString": "",
+          "daysInMonth": 30,
+          "interestForDays": 0,
+          "interestPerDay": 10.6
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:14.402Z"
+      "updatedAt": "2025-11-29T14:52:22.305Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106ab",
@@ -15581,22 +16488,22 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:14.402Z"
+      "updatedAt": "2025-11-29T14:52:22.305Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b1",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 80000,
+        "periodicDepositAmount": 90000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 80000,
+        "totalDepositAmount": 90000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 80000,
+        "accountBalance": 90000,
         "clubHeldAmount": 0,
-        "totalLoanTaken": 200000,
+        "totalLoanTaken": 500000,
         "totalLoanRepay": 200000,
-        "totalLoanBalance": 0,
+        "totalLoanBalance": 300000,
         "totalInterestPaid": 3500
       },
       "loanHistory": [
@@ -15651,28 +16558,34 @@
           "daysInMonth": 28,
           "interestForDays": 267.9,
           "interestPerDay": 17.86
+        },
+        {
+          "active": true,
+          "amount": 300000,
+          "startDate": 1763861400000,
+          "interestAmount": 0
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:14.402Z"
+      "updatedAt": "2025-11-29T14:52:22.305Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b5",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 72000,
+        "periodicDepositAmount": 82000,
         "offsetDepositAmount": 1629,
-        "totalDepositAmount": 73629,
+        "totalDepositAmount": 83629,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 73629,
+        "accountBalance": 83629,
         "clubHeldAmount": 0,
         "totalLoanTaken": 450000,
-        "totalLoanRepay": 250000,
-        "totalLoanBalance": 200000,
+        "totalLoanRepay": 450000,
+        "totalLoanBalance": 0,
         "totalInterestPaid": 12806
       },
       "loanHistory": [
@@ -15742,17 +16655,24 @@
           "interestPerDay": 48.39
         },
         {
-          "active": true,
+          "active": false,
           "amount": 200000,
-          "startDate": 1747177200000,
-          "interestAmount": 0
+          "startDate": 1747182600000,
+          "endDate": 1763775000000,
+          "monthsPassed": 6,
+          "daysPassed": 8,
+          "interestAmount": 12533,
+          "monthsPassedString": "6 mons 8 d",
+          "daysInMonth": 30,
+          "interestForDays": 533.36,
+          "interestPerDay": 66.67
         }
       ],
       "joiningOffset": 1629,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:14.402Z"
+      "updatedAt": "2025-11-29T14:52:22.305Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b7",
@@ -15789,7 +16709,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:14.402Z"
+      "updatedAt": "2025-11-29T14:52:22.305Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c3",
@@ -15823,23 +16743,23 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:15.376Z"
+      "updatedAt": "2025-11-29T14:52:23.581Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106a7",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 70000,
+        "periodicDepositAmount": 84000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 70000,
+        "totalDepositAmount": 84000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 70000,
+        "accountBalance": 84000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 250000,
-        "totalLoanRepay": 100000,
-        "totalLoanBalance": 150000,
-        "totalInterestPaid": 5000
+        "totalLoanRepay": 250000,
+        "totalLoanBalance": 0,
+        "totalInterestPaid": 14000
       },
       "loanHistory": [
         {
@@ -15869,17 +16789,24 @@
           "interestPerDay": 35.71
         },
         {
-          "active": true,
+          "active": false,
           "amount": 150000,
-          "startDate": 1738623600000,
-          "interestAmount": 0
+          "startDate": 1738629000000,
+          "endDate": 1754443800000,
+          "monthsPassed": 6,
+          "daysPassed": 2,
+          "interestAmount": 9097,
+          "monthsPassedString": "6 mons 2 d",
+          "daysInMonth": 31,
+          "interestForDays": 96.78,
+          "interestPerDay": 48.39
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:15.376Z"
+      "updatedAt": "2025-11-29T14:52:23.581Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106c7",
@@ -15895,18 +16822,18 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:06.290Z"
+      "updatedAt": "2025-11-29T14:51:38.376Z"
     },
     {
       "id": "66d95de59ff85b6e7c11068d",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 80000,
+        "periodicDepositAmount": 90000,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 80000,
+        "totalDepositAmount": 90000,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 80000,
+        "accountBalance": 90000,
         "clubHeldAmount": 0,
         "totalLoanTaken": 50000,
         "totalLoanRepay": 50000,
@@ -15932,7 +16859,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:15.376Z"
+      "updatedAt": "2025-11-29T14:52:23.581Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106b9",
@@ -15955,7 +16882,7 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:15.376Z"
+      "updatedAt": "2025-11-29T14:52:23.581Z"
     },
     {
       "id": "66d95de89ff85b6e7c1106bb",
@@ -15965,8 +16892,8 @@
         "offsetDepositAmount": 0,
         "totalDepositAmount": 78000,
         "withdrawalAmount": 78000,
-        "profitWithdrawalAmount": 8025,
-        "accountBalance": -8025,
+        "profitWithdrawalAmount": 10825,
+        "accountBalance": -10825,
         "clubHeldAmount": 0,
         "totalLoanTaken": 200000,
         "totalLoanRepay": 200000,
@@ -16070,22 +16997,22 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:15.376Z"
+      "updatedAt": "2025-11-29T14:52:23.581Z"
     },
     {
       "id": "66d95de69ff85b6e7c110699",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 64000,
+        "periodicDepositAmount": 79000,
         "offsetDepositAmount": 441,
-        "totalDepositAmount": 64441,
+        "totalDepositAmount": 79441,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 64441,
+        "accountBalance": 79441,
         "clubHeldAmount": 0,
         "totalLoanTaken": 250000,
-        "totalLoanRepay": 200000,
-        "totalLoanBalance": 50000,
+        "totalLoanRepay": 250000,
+        "totalLoanBalance": 0,
         "totalInterestPaid": 4000
       },
       "loanHistory": [
@@ -16142,17 +17069,24 @@
           "interestPerDay": 32.26
         },
         {
-          "active": true,
+          "active": false,
           "amount": 50000,
-          "startDate": 1747263600000,
-          "interestAmount": 0
+          "startDate": 1747269000000,
+          "endDate": 1752197400000,
+          "monthsPassed": 1,
+          "daysPassed": 26,
+          "interestAmount": 933,
+          "monthsPassedString": "1 mons 26 d",
+          "daysInMonth": 30,
+          "interestForDays": 433.42,
+          "interestPerDay": 16.67
         }
       ],
       "joiningOffset": 0,
       "delayOffset": 441,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:16.295Z"
+      "updatedAt": "2025-11-29T14:52:25.006Z"
     },
     {
       "id": "66d95de69ff85b6e7c11069b",
@@ -16175,38 +17109,71 @@
       "delayOffset": 0,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:16.295Z"
+      "updatedAt": "2025-11-29T14:52:25.006Z"
     },
     {
       "id": "66d95de79ff85b6e7c1106b3",
       "type": "MEMBER",
       "payload": {
-        "periodicDepositAmount": 83363,
+        "periodicDepositAmount": 93363,
         "offsetDepositAmount": 0,
-        "totalDepositAmount": 83363,
+        "totalDepositAmount": 93363,
         "withdrawalAmount": 0,
         "profitWithdrawalAmount": 0,
-        "accountBalance": 83363,
+        "accountBalance": 93363,
         "clubHeldAmount": 0,
-        "totalLoanTaken": 0,
+        "totalLoanTaken": 300000,
         "totalLoanRepay": 0,
-        "totalLoanBalance": 0,
+        "totalLoanBalance": 300000,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
+      "loanHistory": [
+        {
+          "active": false,
+          "amount": 100000,
+          "startDate": 1752116400000,
+          "endDate": 1752197400000,
+          "monthsPassed": 0,
+          "daysPassed": 0,
+          "interestAmount": 0,
+          "monthsPassedString": "",
+          "daysInMonth": 31,
+          "interestForDays": 0,
+          "interestPerDay": 32.26
+        },
+        {
+          "active": false,
+          "amount": 150000,
+          "startDate": 1752202800000,
+          "endDate": 1754443800000,
+          "monthsPassed": 0,
+          "daysPassed": 25,
+          "interestAmount": 1210,
+          "monthsPassedString": " 25 d",
+          "daysInMonth": 31,
+          "interestForDays": 1209.75,
+          "interestPerDay": 48.39
+        },
+        {
+          "active": true,
+          "amount": 300000,
+          "startDate": 1754443800000,
+          "interestAmount": 0
+        }
+      ],
       "joiningOffset": 1629,
       "delayOffset": 1734,
       "isChit": false,
       "createdAt": "2024-11-22T11:53:59.422Z",
-      "updatedAt": "2025-06-22T09:37:16.295Z"
+      "updatedAt": "2025-11-29T14:52:25.006Z"
     },
     {
       "id": "67cb123b43dce1b56e2c62cc",
       "type": "VENDOR",
       "payload": {
-        "totalInvestment": 104350,
+        "totalInvestment": 172600,
         "totalReturns": 0,
-        "accountBalance": 104350,
+        "accountBalance": 172600,
         "totalProfitAmount": 0
       },
       "loanHistory": [],
@@ -16214,15 +17181,15 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2025-03-07T15:35:22.542Z",
-      "updatedAt": "2025-06-22T09:37:07.256Z"
+      "updatedAt": "2025-11-29T14:51:39.642Z"
     },
     {
       "id": "6856b28a59c8fa126ff5b2f5",
       "type": "VENDOR",
       "payload": {
-        "totalInvestment": 26600,
+        "totalInvestment": 73950,
         "totalReturns": 0,
-        "accountBalance": 26600,
+        "accountBalance": 73950,
         "totalProfitAmount": 0
       },
       "loanHistory": [],
@@ -16230,7 +17197,7 @@
       "delayOffset": 0,
       "isChit": true,
       "createdAt": "2025-06-21T13:24:26.641Z",
-      "updatedAt": "2025-06-22T09:37:07.256Z"
+      "updatedAt": "2025-11-29T14:51:39.642Z"
     }
   ]
 }

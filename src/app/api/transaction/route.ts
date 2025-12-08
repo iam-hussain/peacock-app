@@ -9,13 +9,9 @@ import prisma from "@/db";
 import { clubData } from "@/lib/config";
 import { newZoneDate } from "@/lib/date";
 
-type TransactionToTransform = Transaction & {
-  from: AccountDetails;
-  to: AccountDetails;
-};
-
 type AccountDetails = {
   id: string;
+  slug: string;
   firstName: string;
   lastName: string | null;
   avatar: string | null;
@@ -23,11 +19,27 @@ type AccountDetails = {
   isMember: boolean;
 };
 
-export async function POST(request: Request) {
-  const queryParams = getQueryParams(request.url);
-  const filters = createFilters(queryParams);
+type AuditAccountDetails = {
+  id: string;
+  firstName: string;
+  lastName: string | null;
+};
 
+type TransactionToTransform = Transaction & {
+  from: AccountDetails;
+  to: AccountDetails;
+  createdBy: AuditAccountDetails | null;
+  updatedBy: AuditAccountDetails | null;
+};
+
+export async function POST(request: Request) {
   try {
+    const { requireAuth } = await import("@/lib/auth");
+    await requireAuth();
+
+    const queryParams = getQueryParams(request.url);
+    const filters = createFilters(queryParams);
+
     const transactions = await fetchTransactions(
       filters,
       queryParams.page,
@@ -45,10 +57,13 @@ export async function POST(request: Request) {
       page: queryParams.page,
       totalPages: Math.ceil(totalTransactions / queryParams.limit),
     });
-  } catch (error) {
-    console.error("Error fetching vendor transactions:", error);
+  } catch (error: any) {
+    console.error("Error fetching transactions:", error);
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     return NextResponse.json(
-      { error: "Failed to fetch vendor transactions" },
+      { error: "Failed to fetch transactions" },
       { status: 500 }
     );
   }
@@ -137,6 +152,7 @@ function fetchTransactions(
       from: {
         select: {
           id: true,
+          slug: true,
           firstName: true,
           lastName: true,
           avatar: true,
@@ -147,11 +163,26 @@ function fetchTransactions(
       to: {
         select: {
           id: true,
+          slug: true,
           firstName: true,
           lastName: true,
           avatar: true,
           active: true,
           isMember: true,
+        },
+      },
+      createdBy: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      updatedBy: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
         },
       },
     },
@@ -170,6 +201,9 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       avatar: transaction.from.avatar
         ? `/image/${transaction.from.avatar}`
         : undefined,
+      link: transaction.from.isMember
+        ? `/dashboard/member/${transaction.from.slug}`
+        : undefined,
     },
     to: {
       ...transaction.to,
@@ -177,6 +211,9 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       sub: "",
       avatar: transaction.to.avatar
         ? `/image/${transaction.to.avatar}`
+        : undefined,
+      link: transaction.to.isMember
+        ? `/dashboard/member/${transaction.to.slug}`
         : undefined,
     },
   };
@@ -213,7 +250,23 @@ function transactionTableTransform(transaction: TransactionToTransform) {
     updated.to.avatar = clubData.avatar;
   }
 
-  return { ...transaction, ...updated };
+  const createdByName = transaction.createdBy
+    ? `${transaction.createdBy.firstName} ${transaction.createdBy.lastName || ""}`.trim()
+    : null;
+  const updatedByName = transaction.updatedBy
+    ? `${transaction.updatedBy.firstName} ${transaction.updatedBy.lastName || ""}`.trim()
+    : null;
+
+  return {
+    ...transaction,
+    ...updated,
+    createdByName,
+    updatedByName,
+    createdById: transaction.createdById,
+    updatedById: transaction.updatedById,
+    createdAt: transaction.createdAt,
+    updatedAt: transaction.updatedAt,
+  };
 }
 
 export type GetTransactionResponse = {

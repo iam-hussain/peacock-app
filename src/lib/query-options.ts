@@ -21,7 +21,33 @@ export const fetchAuthStatus = () =>
   queryOptions({
     queryKey: ["authentication"],
     queryFn: () =>
-      fetcher.post("/api/auth/status") as never as { isLoggedIn: boolean },
+      fetcher.post("/api/auth/status") as never as {
+        isLoggedIn: boolean;
+        user:
+          | {
+              kind: "admin";
+              username: "admin";
+              role: "SUPER_ADMIN";
+              id: "admin";
+            }
+          | {
+              kind: "admin-member";
+              accountId: string;
+              id: string;
+              role: "ADMIN";
+              readAccess: boolean;
+              writeAccess: boolean;
+            }
+          | {
+              kind: "member";
+              accountId: string;
+              id: string;
+              role: "MEMBER";
+              readAccess: boolean;
+              writeAccess: boolean;
+            }
+          | null;
+      },
     ...noRefetchConfigs,
   });
 

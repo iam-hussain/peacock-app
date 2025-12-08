@@ -1,4 +1,6 @@
 export const fetchCache = "force-no-store";
+export const dynamic = "force-dynamic";
+
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 

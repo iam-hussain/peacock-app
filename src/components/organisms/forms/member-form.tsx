@@ -2,13 +2,14 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { nanoid } from "nanoid";
+import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { AvatarUpload } from "../../atoms/avatar-upload";
 import { DatePickerForm } from "../../atoms/date-picker-form";
-import { GenericModalFooter } from "../../atoms/generic-modal";
-import Box from "../../ui/box";
+import { PhoneInput } from "../../atoms/phone-input";
+import { Button } from "../../ui/button";
 import { Switch } from "../../ui/switch";
 
 import {
@@ -31,6 +32,8 @@ type MemberFormProps = {
 };
 
 export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
+  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
+
   const form = useForm({
     resolver: zodResolver(accountFormSchema),
     defaultValues: selected
@@ -48,7 +51,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       : {
           firstName: "",
           lastName: "",
-          slug: nanoid(8),
+          slug: "",
           phone: "",
           email: "",
           avatar: "",
@@ -81,149 +84,241 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     },
   });
 
+  const handleAvatarUpload = async (file: File) => {
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Pass old image URL for deletion if updating existing member
+      const currentAvatar = selected?.avatar || form.getValues("avatar");
+      if (currentAvatar && selected) {
+        // Extract filename from avatar URL
+        const oldImageUrl = currentAvatar.startsWith("/image/")
+          ? currentAvatar
+          : currentAvatar.startsWith("/")
+            ? currentAvatar
+            : `/image/${currentAvatar}`;
+        formData.append("oldImageUrl", oldImageUrl);
+      }
+
+      const response = await fetch("/api/upload/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to upload avatar");
+      }
+
+      const data = await response.json();
+      // Extract filename from URL (e.g., /image/avatar_123.jpg -> avatar_123.jpg)
+      const filename = data.url.replace("/image/", "").replace(/^\//, "");
+      form.setValue("avatar", filename);
+      toast.success("Avatar uploaded successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload avatar");
+      throw error;
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   async function onSubmit(variables: AccountFromSchema) {
     return await mutation.mutateAsync(variables as any);
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full max-w-2xl space-y-4"
-      >
-        <Box preset={"grid-split"}>
-          {/* First Name */}
-          <FormField
-            control={form.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="First name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Last Name */}
-          <FormField
-            control={form.control}
-            name="lastName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Last name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Box>
-
-        <Box preset={"grid-split"}>
-          {/* Phone */}
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Phone" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Email */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Email" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Box>
-
-        <Box preset={"grid-split"}>
-          <FormField
-            control={form.control}
-            name="startAt"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Joined Date</FormLabel>
-                <DatePickerForm field={field} placeholder="Joined date" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* Avatar */}
-          <FormField
-            control={form.control}
-            name="avatar"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Avatar URL</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Avatar URL" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </Box>
-
-        <Box preset={"grid-split"}>
-          {/* Active */}
-          <FormItem className="flex items-center justify-between align-bottom border border-input px-3 min-h-[36px] mt-auto w-full rounded-md">
-            <FormLabel>Active</FormLabel>
-            <FormControl>
-              <Controller
-                name={`active`}
-                control={form.control}
-                render={({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    defaultChecked={selected?.active ?? true}
-                  />
-                )}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-
-          {/* Last Name */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+        <div className="space-y-4">
+          {/* Username - Full width */}
           <FormField
             control={form.control}
             name="slug"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Slug</FormLabel>
+                <FormLabel>Username *</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Slug" />
+                  <Input
+                    {...field}
+                    placeholder="username"
+                    className="h-10 font-mono"
+                    disabled={mutation.isPending}
+                  />
                 </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Used for login. Lowercase letters, numbers, hyphens, and
+                  underscores only.
+                </p>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </Box>
 
-        <GenericModalFooter
-          actionLabel={selected ? "Update Member" : "Add Member"}
-          onCancel={onCancel}
-          isSubmitting={form.formState.isSubmitting || mutation.isPending}
-        />
+          {/* First Name and Last Name - One row */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name *</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="First name"
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Last name"
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Email and Phone - One row */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="name@example.com"
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone (Optional)</FormLabel>
+                  <FormControl>
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      className="h-10"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Joined Date and Avatar - One row */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="startAt"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Joined Date (Optional)</FormLabel>
+                  <DatePickerForm
+                    field={field}
+                    placeholder="Select joined date"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="avatar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar (Optional)</FormLabel>
+                  <FormControl>
+                    <AvatarUpload
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onFileSelect={handleAvatarUpload}
+                      disabled={mutation.isPending || isUploadingAvatar}
+                      oldImageUrl={selected?.avatar || null}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        {/* Status Toggle - Full width */}
+        <FormItem className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
+          <div className="space-y-0.5">
+            <FormLabel className="text-base">Status</FormLabel>
+            <p className="text-sm text-muted-foreground">
+              Active members can participate in club activities
+            </p>
+          </div>
+          <FormControl>
+            <Controller
+              name="active"
+              control={form.control}
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+          </FormControl>
+        </FormItem>
+
+        {/* Footer Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              form.reset();
+              onCancel?.();
+            }}
+            disabled={mutation.isPending}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending
+              ? "Saving..."
+              : selected
+                ? "Save Changes"
+                : "Add Member"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

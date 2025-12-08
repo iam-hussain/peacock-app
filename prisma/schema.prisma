@@ -9,24 +9,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ROLE {
+  SUPER_ADMIN
+  ADMIN
+  MEMBER
+}
+
 model Account {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  firstName       String
-  lastName        String?
-  slug            String        @unique
-  phone           String?
-  email           String?
-  avatar          String?
-  startAt         DateTime      @default(now())
-  endAt           DateTime?
-  active          Boolean       @default(true)
-  isMember        Boolean       @default(true)
-  passbook        Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
-  passbookId      String        @unique @db.ObjectId
-  fromTransaction Transaction[] @relation("FromAccount")
-  toTransaction   Transaction[] @relation("ToAccount")
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
+  firstName           String
+  lastName            String?
+  slug                String        @unique
+  // Auth
+  username            String?       // for login (enforce uniqueness in app logic for non-null values)
+  email               String?       // for login (enforce uniqueness in app logic for non-null values)
+  passwordHash        String? // bcrypt hash; null for vendor-only accounts
+  // Access control
+  role                ROLE          @default(MEMBER)
+  readAccess          Boolean       @default(true)
+  writeAccess         Boolean       @default(false)
+  canLogin            Boolean       @default(false)
+  // Audit fields for access control
+  accessUpdatedAt     DateTime?
+  accessUpdatedBy     String?       @db.ObjectId
+  phone               String?
+  avatar              String?
+  startAt             DateTime      @default(now())
+  endAt               DateTime?
+  active              Boolean       @default(true)
+  isMember            Boolean       @default(true)
+  passbook            Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
+  passbookId          String        @unique @db.ObjectId
+  fromTransaction     Transaction[] @relation("FromAccount")
+  toTransaction       Transaction[] @relation("ToAccount")
+  // Audit relations
+  createdTransactions Transaction[] @relation("CreatedBy")
+  updatedTransactions Transaction[] @relation("UpdatedBy")
+  lastLoginAt         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
 
 model Transaction {
@@ -39,6 +60,11 @@ model Transaction {
   fromId          String             @db.ObjectId
   to              Account            @relation("ToAccount", fields: [toId], references: [id], onDelete: Cascade)
   toId            String             @db.ObjectId
+  // Audit trail
+  createdBy       Account?           @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById     String?            @db.ObjectId
+  updatedBy       Account?           @relation("UpdatedBy", fields: [updatedById], references: [id])
+  updatedById     String?            @db.ObjectId
   note            String?
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt

@@ -1,253 +1,281 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-import { FaBalanceScale, FaPiggyBank, FaUsers } from "react-icons/fa";
-import { FaMoneyBillTrendUp } from "react-icons/fa6";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
-import { FaScaleUnbalancedFlip } from "react-icons/fa6";
-import { GiPayMoney } from "react-icons/gi";
-import { GiReceiveMoney } from "react-icons/gi";
-import { GiHandBandage } from "react-icons/gi";
-import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 
-import { AvatarGroup } from "@/components/atoms/avatar-group";
-import { DashboardCard } from "@/components/atoms/dashboard-card";
-import { DoughnutChart } from "@/components/molecules/doughnut-chart";
-import { PieChart } from "@/components/molecules/pie-chart";
-import Box from "@/components/ui/box";
+export const dynamic = "force-dynamic";
+
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowDownCircle,
+  Banknote,
+  Briefcase,
+  CalendarDays,
+  CircleDollarSign,
+  Clock,
+  Coins,
+  Crown,
+  Hand,
+  Layers,
+  Scale,
+  SlidersHorizontal,
+  TrendingUp,
+  Users,
+  Wallet,
+} from "lucide-react";
+
+import { ActivityFeed } from "@/components/molecules/activity-feed";
+import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
+import { MembersPreview } from "@/components/molecules/members-preview";
+import { ModernStatCard } from "@/components/molecules/modern-stat-card";
 import { clubAge } from "@/lib/date";
 import { fetchStatistics } from "@/lib/query-options";
 
 export default function DashboardPage() {
-  const club = clubAge();
-  const { data, isLoading, isError } = useQuery(fetchStatistics());
-  const statistics = data?.statistics || null;
+  const { data, isLoading } = useQuery(fetchStatistics());
+  const statistics = data?.statistics;
   const members = data?.members || [];
 
   if (isLoading) {
     return (
-      <Box>
-        <p className="p-8">Loading...</p>
-      </Box>
-    );
-  }
-
-  if (isError || !statistics) {
-    return (
-      <Box>
-        <p className="p-8 text-center w-full text-destructive">
-          Unexpected error on fetching the data
-        </p>
-      </Box>
-    );
-  }
-
-  return (
-    <div className="w-full flex flex-col gap-4">
-      {/* Statistics Grid with Icons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        <DashboardCard
-          title="Members / Months"
-          value={`${statistics.membersCount} / ${club.inMonth}`}
-          icon={<FaUsers className="text-3xl text-blue-600" />}
-        />
-        <DashboardCard
-          title="Members Deposit"
-          value={statistics.totalMemberPeriodicDeposits.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<FaPiggyBank className="text-3xl text-green-600" />}
-        />
-        <DashboardCard
-          title="Members Balance"
-          value={statistics.totalMemberPeriodicDepositsBalance.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<FaBalanceScale className="text-3xl text-yellow-600" />}
-        />
-        <DashboardCard
-          title="Member Withdrawal"
-          value={statistics.totalMemberProfitWithdrawals.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<FaScaleUnbalancedFlip className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Loan Taken For"
-          value={statistics.totalLoanBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Loan Interest Collected"
-          value={statistics.totalInterestPaid.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Loan Interest Balance"
-          value={statistics.totalInterestBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Loan Interest Total"
-          value={statistics.expectedTotalLoanInterestAmount.toLocaleString(
-            "en-IN",
-            {
-              style: "currency",
-              currency: "INR",
-            }
-          )}
-          icon={<GiHandBandage className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Vendor Profit"
-          value={statistics.totalVendorProfit.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaMoneyBillTrendUp className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Offset Deposit"
-          value={statistics.totalOffsetPaid.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaBalanceScale className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Offset Balance"
-          value={statistics.totalOffsetBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaBalanceScale className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Offset Total"
-          value={statistics.totalOffsetAmount.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaBalanceScale className="text-3xl text-red-600" />}
-        />
-        <DashboardCard
-          title="Liquidity Amount"
-          value={statistics.currentClubBalance.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiReceiveMoney className="text-3xl text-orange-600" />}
-        />
-        <DashboardCard
-          title="Net Value"
-          value={statistics.currentClubNetValue.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<GiPayMoney className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Expected Net Value"
-          value={statistics.expectedClubNetValue.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<RiMoneyRupeeCircleFill className="text-3xl text-purple-600" />}
-        />
-        <DashboardCard
-          title="Expected Member Value"
-          value={(
-            statistics.expectedClubNetValue / statistics.membersCount
-          ).toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaMoneyBillTransfer className="text-3xl text-indigo-600" />}
-        />
-        {/* <DashboardCard
-          title="Club Net Amount"
-          value={statistics.netAmount.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<RiMoneyRupeeCircleFill className="text-3xl text-teal-600" />}
-        />
- 
-        <DashboardCard
-          title="Club Value"
-          value={statistics.netValue.toLocaleString("en-IN", {
-            style: "currency",
-            currency: "INR",
-          })}
-          icon={<FaMoneyBillTrendUp className="text-3xl text-teal-600" />}
-        /> */}
-      </div>
-      <div className="flex bg-background flex-col gap-6 justify-center align-middle items-center p-4">
-        <h1 className="text-xl uppercase">Members</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2 justify-center align-middle items-center">
-          {members.map((member) => (
-            <div
-              className="gap-0 p-2 rounded-md flex flex-col justify-center align-middle items-center"
-              key={member.slug}
-            >
-              <AvatarGroup
-                className={"px-6"}
-                src={member.avatar || ""}
-                name={member.name}
-                isLarge={true}
-                link={member.link}
-              />
-              <p className="text-sm">{member.name}</p>
-            </div>
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        <div className="h-8 w-64 animate-pulse rounded bg-muted" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-lg bg-muted" />
           ))}
         </div>
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <PieChart
-          available={parseInt(
-            Number(statistics.currentClubBalance || 0).toString()
-          )}
-          invested={parseInt(
-            Number(
-              statistics.totalLoanBalance + statistics.totalVendorHolding
-            ).toString()
-          )}
-          pending={parseInt(
-            Number(
-              statistics.totalInterestBalance +
-                statistics.totalOffsetBalance +
+  if (!statistics) {
+    return (
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+          No statistics available
+        </div>
+      </div>
+    );
+  }
+
+  const club = clubAge();
+
+  const formatCurrency = (value: number) =>
+    (value || 0).toLocaleString("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    });
+
+  // Calculate derived values
+  const totalInvested =
+    statistics.totalLoanBalance + statistics.totalVendorHolding;
+  const pendingAmounts =
+    statistics.totalInterestBalance +
+    statistics.totalOffsetBalance +
+    statistics.totalMemberPeriodicDepositsBalance;
+  const currentPortfolioValue = statistics.currentClubNetValue;
+  const netValue = currentPortfolioValue + pendingAmounts;
+  const availableCash =
+    statistics.currentClubNetValue -
+    statistics.totalLoanBalance -
+    statistics.totalVendorHolding;
+
+  return (
+    <div className="w-full max-w-7xl mx-auto space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Overview of your financial club management
+        </p>
+      </div>
+
+      {/* KPI Row - 2 Cards with 1 placeholder */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <ModernStatCard
+          title="Active Members"
+          value={statistics.membersCount}
+          icon={<Users className="h-5 w-5" />}
+          iconBgColor="#E3F2FD"
+        />
+        <ModernStatCard
+          title="Club Age"
+          value={`${club.inMonth} months`}
+          icon={<CalendarDays className="h-5 w-5" />}
+          iconBgColor="#EDE7F6"
+        />
+        {/* Invisible placeholder for 3-column alignment */}
+        <div className="hidden xl:block" aria-hidden="true" />
+      </div>
+
+      {/* Financial Summary Sections */}
+      <div className="space-y-6">
+        {/* MEMBER FUNDS */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Member Funds
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ModernStatCard
+              title="Total Deposits"
+              value={formatCurrency(statistics.totalMemberPeriodicDeposits)}
+              icon={<CircleDollarSign className="h-5 w-5" />}
+              iconBgColor="#E8F5E9"
+            />
+            <ModernStatCard
+              title="Member Balance"
+              value={formatCurrency(
                 statistics.totalMemberPeriodicDepositsBalance
-            ).toString()
-          )}
-        />
-        <DoughnutChart
-          deposit={parseInt(
-            Number(statistics.totalMemberPeriodicDeposits).toString()
-          )}
-          offset={parseInt(Number(statistics.totalOffsetPaid).toString())}
-          returns={parseInt(Number(statistics.totalInterestPaid).toString())}
-        />
+              )}
+              icon={<Wallet className="h-5 w-5" />}
+              iconBgColor="#FFF3E0"
+            />
+            {/* Invisible placeholder for 3-column alignment */}
+            <div className="hidden xl:block" aria-hidden="true" />
+          </div>
+        </div>
+
+        {/* MEMBER OUTFLOW */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Member Outflow
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ModernStatCard
+              title="Withdrawals"
+              value={formatCurrency(statistics.totalMemberProfitWithdrawals)}
+              icon={<ArrowDownCircle className="h-5 w-5" />}
+              iconBgColor="#FBE9E7"
+            />
+            <ModernStatCard
+              title="Member Adjustments"
+              value={formatCurrency(statistics.totalOffsetAmount)}
+              icon={<SlidersHorizontal className="h-5 w-5" />}
+              iconBgColor="#F3E5F5"
+            />
+            {/* Invisible placeholder for 3-column alignment */}
+            <div className="hidden xl:block" aria-hidden="true" />
+          </div>
+        </div>
+
+        {/* LOAN SUMMARY */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Loan Summary
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ModernStatCard
+              title="Loan Taken"
+              value={formatCurrency(statistics.totalLoanTaken)}
+              icon={<Hand className="h-5 w-5" />}
+              iconBgColor="#E1F5FE"
+            />
+            <ModernStatCard
+              title="Interest Collected"
+              value={formatCurrency(statistics.totalInterestPaid)}
+              icon={<Coins className="h-5 w-5" />}
+              iconBgColor="#E8F5E9"
+            />
+            <ModernStatCard
+              title="Interest Balance"
+              value={formatCurrency(statistics.totalInterestBalance)}
+              icon={<Scale className="h-5 w-5" />}
+              iconBgColor="#FFF9C4"
+            />
+          </div>
+        </div>
+
+        {/* VENDOR TRANSACTIONS */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Vendor Transactions
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ModernStatCard
+              title="Vendor Investment"
+              value={formatCurrency(statistics.totalVendorHolding)}
+              icon={<Briefcase className="h-5 w-5" />}
+              iconBgColor="#E3F2FD"
+            />
+            <ModernStatCard
+              title="Vendor Profit"
+              value={formatCurrency(statistics.totalVendorProfit)}
+              icon={<TrendingUp className="h-5 w-5" />}
+              iconBgColor="#E8F5E9"
+            />
+            {/* Invisible placeholder for 3-column alignment */}
+            <div className="hidden xl:block" aria-hidden="true" />
+          </div>
+        </div>
+
+        {/* CASH FLOW POSITION */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Cash Flow Position
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ModernStatCard
+              title="Available Cash"
+              value={formatCurrency(availableCash)}
+              icon={<Wallet className="h-5 w-5" />}
+              iconBgColor="#FFF3E0"
+            />
+            <ModernStatCard
+              title="Total Invested"
+              value={formatCurrency(totalInvested)}
+              icon={<Layers className="h-5 w-5" />}
+              iconBgColor="#E1F5FE"
+            />
+            <ModernStatCard
+              title="Pending Amounts"
+              value={formatCurrency(pendingAmounts)}
+              icon={<Clock className="h-5 w-5" />}
+              iconBgColor="#F3E5F5"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* PORTFOLIO SUMMARY - 2 Large Cards with 1 placeholder */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Portfolio Summary
+        </h3>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <ModernStatCard
+            title="Current Value"
+            value={formatCurrency(currentPortfolioValue)}
+            icon={<Banknote className="h-5 w-5" />}
+            iconBgColor="#E8F5E9"
+          />
+          <ModernStatCard
+            title="Total Value"
+            value={formatCurrency(netValue)}
+            icon={<Crown className="h-5 w-5" />}
+            iconBgColor="#FFF3E0"
+            isHighlighted={true}
+          />
+          {/* Invisible placeholder for 3-column alignment */}
+          <div className="hidden xl:block" aria-hidden="true" />
+        </div>
+      </div>
+
+      {/* ANALYTICS SECTION - 2 Charts Side-by-Side */}
+      <EnhancedChartsSection statistics={statistics} />
+
+      {/* MEMBERS SNAPSHOT & RECENT ACTIVITY - Side by Side on Desktop */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Members Snapshot
+          </h3>
+          <MembersPreview initialMembers={members.slice(0, 16)} />
+        </div>
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Recent Activity
+          </h3>
+          <ActivityFeed limit={10} />
+        </div>
       </div>
     </div>
   );

@@ -12,17 +12,31 @@ import { VendorPassbookData } from "@/lib/type";
 type VendorToTransform = Account & { passbook: Passbook };
 
 export async function POST() {
-  const vendors = await prisma.account.findMany({
-    where: { isMember: false },
-    include: { passbook: true },
-  });
+  try {
+    const { requireAuth } = await import("@/lib/auth");
+    await requireAuth();
 
-  const transformedVendors = vendors
-    .map(transformVendorForTable)
-    .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.active > b.active ? -1 : 1));
+    const vendors = await prisma.account.findMany({
+      where: { isMember: false },
+      include: { passbook: true },
+    });
 
-  return NextResponse.json({ vendors: transformedVendors });
+    const transformedVendors = vendors
+      .map(transformVendorForTable)
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .sort((a, b) => (a.active > b.active ? -1 : 1));
+
+    return NextResponse.json({ vendors: transformedVendors });
+  } catch (error: any) {
+    console.error("Error fetching vendors:", error);
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.json(
+      { error: "Failed to fetch vendors" },
+      { status: 500 }
+    );
+  }
 }
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
