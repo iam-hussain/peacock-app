@@ -2,39 +2,88 @@
 
 export const dynamic = "force-dynamic";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowRight,
   BarChart3,
   Eye,
   HandCoins,
+  LayoutDashboard,
   LineChart,
+  LogOut,
   Moon,
+  Settings,
   Shield,
   Sun,
+  User,
   Users,
   Wallet,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import fetcher from "@/lib/fetcher";
 import { fetchAuthStatus } from "@/lib/query-options";
+import { cn } from "@/lib/utils";
+import { setIsLoggedIn } from "@/store/pageSlice";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
-  const { data: authData } = useQuery(fetchAuthStatus());
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const { data: authData, isLoading: isAuthLoading } =
+    useQuery(fetchAuthStatus());
 
   const isLoggedIn = authData?.isLoggedIn ?? false;
+  const isMember = authData?.user?.kind === "member";
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Fetch profile data for members
+  const { data: profileData } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () =>
+      fetcher.get("/api/profile") as Promise<{
+        account: {
+          firstName: string | null;
+          lastName: string | null;
+          username: string;
+        };
+      }>,
+    enabled: isMember && isLoggedIn,
+  });
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: () => fetcher.post("/api/auth/logout"),
+    onSuccess: async () => {
+      dispatch(setIsLoggedIn(false));
+      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      await queryClient.refetchQueries({ queryKey: ["authentication"] });
+      toast.success("Logged out successfully!");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   const features = [
     {
@@ -111,50 +160,39 @@ export default function Home() {
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
             {/* Theme Toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="h-9 w-9"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            )}
-
-            {/* Auth Buttons */}
-            {isLoggedIn ? (
-              <>
-                <Button size="sm" asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/dashboard/profile">Profile</Link>
-                </Button>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/dashboard/settings">Settings</Link>
-                </Button>
-              </>
-            ) : (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-9 w-9"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
           </div>
         </div>
       </nav>
 
       {/* Hero + Login Section */}
       <section className="container mx-auto px-4 py-12 md:py-20 lg:py-24">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 items-center max-w-6xl mx-auto">
-          {/* Left Column - Hero Content */}
-          <div className="flex flex-col space-y-6 text-center lg:text-left">
-            <div className="flex justify-center lg:justify-start">
+        <div
+          className={cn(
+            "grid grid-cols-1 gap-8 items-center max-w-6xl mx-auto",
+            "lg:grid-cols-2 lg:gap-12"
+          )}
+        >
+          {/* Left Column - Hero Content (Static - Always Visible) */}
+          <div
+            className={cn(
+              "flex flex-col space-y-6",
+              "text-center lg:text-left"
+            )}
+          >
+            <div className={cn("flex", "justify-center lg:justify-start")}>
               <Image
                 src="/peacock.svg"
                 alt="Peacock Club"
@@ -176,15 +214,9 @@ export default function Home() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <Button size="lg" asChild className="w-full sm:w-auto">
-                <Link href="/dashboard">
-                  View Members Dashboard
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-start">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="lg"
                 asChild
                 className="w-full sm:w-auto"
@@ -196,11 +228,106 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Column - Login Card */}
-          {!isLoggedIn && (
+          {/* Right Column - Login Card or User Card (Dynamic - Shows Skeleton When Loading) */}
+          {isAuthLoading ? (
+            <div className="flex justify-center lg:justify-end">
+              <div className="w-full max-w-[420px]">
+                <Card className="border-border/50">
+                  <CardContent className="p-6 space-y-4">
+                    <Skeleton className="h-7 w-32" />
+                    <Skeleton className="h-4 w-48" />
+                    <div className="space-y-3 pt-4">
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          ) : !isLoggedIn ? (
             <div className="flex justify-center lg:justify-end">
               <div className="w-full max-w-[420px]">
                 <LoginFormCard />
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <div className="w-full max-w-[420px]">
+                <Card className="w-full border-border/50 bg-card shadow-sm">
+                  <CardHeader className="space-y-1 pb-4">
+                    <CardTitle className="text-xl font-semibold">
+                      Welcome back!
+                    </CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
+                      {authData?.user?.kind === "admin"
+                        ? `Admin: ${authData.user.username}`
+                        : profileData?.account
+                          ? `${profileData.account.firstName || ""} ${profileData.account.lastName || ""}`.trim() ||
+                            profileData.account.username
+                          : "Access your club dashboard and manage your account."}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button
+                      size="lg"
+                      asChild
+                      className="w-full h-11 rounded-lg"
+                    >
+                      <Link href="/dashboard">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Go to Dashboard
+                      </Link>
+                    </Button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        asChild
+                        className="h-11 rounded-lg"
+                      >
+                        <Link href="/dashboard/profile">
+                          <User className="mr-2 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        asChild
+                        className="h-11 rounded-lg"
+                      >
+                        <Link href="/dashboard/settings">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Link>
+                      </Button>
+                    </div>
+                    <div className="pt-2 space-y-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="w-full text-muted-foreground hover:text-foreground"
+                      >
+                        <Link href="/dashboard/transaction">
+                          <Wallet className="mr-2 h-4 w-4" />
+                          View Transactions
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleLogout}
+                        disabled={logoutMutation.isPending}
+                        className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        {logoutMutation.isPending ? "Logging out..." : "Logout"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}

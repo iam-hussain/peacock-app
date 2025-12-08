@@ -26,10 +26,14 @@ interface MemberHeaderCardProps {
     active: boolean;
     status: string;
     clubHeldAmount?: number;
+    loanHistory?: Array<{ active?: boolean }>;
   };
 }
 
 export function MemberHeaderCard({ member }: MemberHeaderCardProps) {
+  const activeLoansCount =
+    member.loanHistory?.filter((loan) => loan.active).length || 0;
+
   return (
     <Card className="border-border/50 bg-card shadow-sm">
       <CardContent className="p-6 md:p-8">
@@ -60,13 +64,15 @@ export function MemberHeaderCard({ member }: MemberHeaderCardProps) {
                   }
                 >
                   {member.status}
+                  {member.active && activeLoansCount > 0 && (
+                    <span className="ml-1.5">({activeLoansCount})</span>
+                  )}
                 </Badge>
               </div>
-              {member.clubHeldAmount && member.clubHeldAmount > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Managing {moneyFormat(member.clubHeldAmount)} of club funds
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Managing {moneyFormat(member?.clubHeldAmount || 0)} of club
+                funds
+              </p>
             </div>
           </div>
 

@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,7 +24,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { CustomLink } from "../ui/link";
 
 import fetcher from "@/lib/fetcher";
 
@@ -37,7 +35,6 @@ const loginFormSchema = z.object({
 type LoginFormSchema = z.infer<typeof loginFormSchema>;
 
 export function LoginFormCard() {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
 
@@ -54,14 +51,17 @@ export function LoginFormCard() {
       fetcher.post("/api/auth/login", { body: data }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
+      await queryClient.refetchQueries({ queryKey: ["authentication"] });
       toast.success("Logged in successfully!");
-      router.push("/dashboard");
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.message || "Invalid username or password. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      const errorMessage = error.message || "Invalid username and password.";
+      const displayMessage =
+        errorMessage.includes("Invalid") || errorMessage.includes("invalid")
+          ? "Invalid username and password."
+          : errorMessage;
+      setError(displayMessage);
+      toast.error(displayMessage);
     },
   });
 
@@ -124,21 +124,17 @@ export function LoginFormCard() {
                       {...field}
                     />
                   </FormControl>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Default password: Your 10-digit mobile number
+                  </p>
                   <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
 
-            <div className="flex items-center justify-between">
-              <CustomLink
-                href="#forgot-password"
-                variant="link"
-                size="sm"
-                className="text-xs text-muted-foreground hover:text-primary"
-              >
-                Forgot password?
-              </CustomLink>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              Forgot password? Please contact the Admin to reset your password.
+            </p>
 
             <Button
               type="submit"
