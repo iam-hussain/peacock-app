@@ -1,8 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-
-import { useAuth } from "@/hooks/use-auth";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowDown,
@@ -30,6 +28,7 @@ import { TransactionFilterDrawer } from "@/components/molecules/transaction-filt
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
 import { useTableExport } from "@/hooks/use-table-export";
 import { transactionTypeMap } from "@/lib/config";
 import { dateFormat, newZoneDate } from "@/lib/date";
@@ -37,6 +36,7 @@ import { fetchAccountSelect, fetchTransactions } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 
 export default function TransactionsPage() {
+  const { canWrite } = useAuth();
   const { data: accounts = [] } = useQuery(fetchAccountSelect());
   const [searchQuery, setSearchQuery] = useState("");
   const [accountFilter, setAccountFilter] = useState("all");
@@ -75,7 +75,7 @@ export default function TransactionsPage() {
   const totalPages = data?.totalPages || 1;
 
   // Calculate inflow/outflow summary
-  const summary = useMemo(() => {
+  const _summary = useMemo(() => {
     let inflow = 0;
     let outflow = 0;
 
@@ -612,9 +612,7 @@ export default function TransactionsPage() {
       />
 
       {/* Mobile FAB */}
-      {canWrite && (
-        <FloatingActionButton onClick={handleAddTransaction} />
-      )}
+      {canWrite && <FloatingActionButton onClick={handleAddTransaction} />}
 
       {/* Transaction Form Dialog */}
       <TransactionFormDialog

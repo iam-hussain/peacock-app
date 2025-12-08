@@ -36,7 +36,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ joiningOffset, delayOffset });
   } catch (error: any) {
     console.error("Error updating offsets:", error);
-    if (error.message === "Unauthorized" || error.message.includes("Forbidden")) {
+    if (
+      error.message === "Unauthorized" ||
+      error.message.includes("Forbidden")
+    ) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
     return NextResponse.json(

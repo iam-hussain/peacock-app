@@ -23,7 +23,15 @@ export const fetchAuthStatus = () =>
     queryFn: () =>
       fetcher.post("/api/auth/status") as never as {
         isLoggedIn: boolean;
-        user: { kind: "admin" } | { kind: "member"; accountId: string; canRead: boolean; canWrite: boolean } | null;
+        user:
+          | { kind: "admin"; username: "admin" }
+          | {
+              kind: "member";
+              accountId: string;
+              canRead: boolean;
+              canWrite: boolean;
+            }
+          | null;
       },
     ...noRefetchConfigs,
   });

@@ -39,13 +39,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
 import { fileDateTime } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { fetchMembers, fetchVendors } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
-
-import { useAuth } from "@/hooks/use-auth";
 
 export default function SettingsPage() {
   const { isAdmin } = useAuth();

@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { createSessionCookie, hashPassword, verifyPassword } from "@/lib/auth";
+import { createSessionCookie, verifyPassword } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -61,11 +61,7 @@ export async function POST(request: Request) {
     if (!account) {
       account = await prisma.account.findFirst({
         where: {
-          OR: [
-            { slug: username },
-            { email: username },
-            { phone: username },
-          ],
+          OR: [{ slug: username }, { email: username }, { phone: username }],
           isMember: true,
           active: true,
         },

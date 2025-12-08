@@ -16,7 +16,7 @@ export async function DELETE(
   const { id } = params;
 
   try {
-    const user = await requireWriteAccess();
+    const _user = await requireWriteAccess();
 
     // Check if the transaction exists
     const transaction = await prisma.transaction.findUnique({ where: { id } });

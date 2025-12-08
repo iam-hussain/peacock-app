@@ -18,9 +18,9 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { clubAge } from "@/lib/date";
 import { fetchAuthStatus, fetchStatistics } from "@/lib/query-options";
 

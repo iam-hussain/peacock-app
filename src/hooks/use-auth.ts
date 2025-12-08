@@ -17,7 +17,7 @@ export type CurrentUser =
 export function useAuth() {
   const { data, isLoading } = useQuery(fetchAuthStatus());
 
-  const user: CurrentUser = data?.user || null;
+  const user: CurrentUser | null = data?.user || null;
   const isLoggedIn = data?.isLoggedIn ?? false;
   const isAdmin = user?.kind === "admin";
   const canWrite = isAdmin || (user?.kind === "member" && user.canWrite);
@@ -32,4 +32,3 @@ export function useAuth() {
     isLoading,
   };
 }
-

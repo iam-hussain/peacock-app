@@ -15,4 +15,3 @@ export async function GET() {
 
   return NextResponse.json({ user }, { status: 200 });
 }
-
