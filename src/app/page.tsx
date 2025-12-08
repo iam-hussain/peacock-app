@@ -143,7 +143,7 @@ export default function Home() {
               </>
             )}
           </div>
-      </div>
+        </div>
       </nav>
 
       {/* Hero + Login Section */}
@@ -152,7 +152,7 @@ export default function Home() {
           {/* Left Column - Hero Content */}
           <div className="flex flex-col space-y-6 text-center lg:text-left">
             <div className="flex justify-center lg:justify-start">
-        <Image
+              <Image
                 src="/peacock.svg"
                 alt="Peacock Club"
                 width={80}
@@ -180,7 +180,12 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button variant="ghost" size="lg" asChild className="w-full sm:w-auto">
+              <Button
+                variant="ghost"
+                size="lg"
+                asChild
+                className="w-full sm:w-auto"
+              >
                 <Link href="/dashboard/terms-and-conditions">
                   View Terms & Conditions
                 </Link>
@@ -218,10 +223,7 @@ export default function Home() {
       )}
 
       {/* Why Members Love Peacock Club Section */}
-      <section
-        id="overview"
-        className="container mx-auto px-4 py-16 md:py-24"
-      >
+      <section id="overview" className="container mx-auto px-4 py-16 md:py-24">
         <h2 className="mb-4 text-center text-3xl font-bold text-foreground md:text-4xl">
           Why Members Love Peacock Club
         </h2>
