@@ -142,7 +142,7 @@ export default function Home() {
               </>
             ) : (
               <Button variant="outline" size="sm" asChild>
-                <Link href="/">Dashboard</Link>
+                <Link href="/dashboard">Dashboard</Link>
               </Button>
             )}
           </div>
