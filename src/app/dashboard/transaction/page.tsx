@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -70,7 +72,10 @@ export default function TransactionsPage() {
   );
 
   // Use transactions directly from API (filtering is done server-side)
-  const transactions = data?.transactions || [];
+  const transactions = useMemo(
+    () => data?.transactions || [],
+    [data?.transactions]
+  );
   const totalTransactions = data?.total || 0;
   const totalPages = data?.totalPages || 1;
 
@@ -400,17 +405,23 @@ export default function TransactionsPage() {
           return (
             <RowActionsMenu
               onViewDetails={() => handleViewTransaction(transaction)}
-              onEdit={() => handleEditTransaction(transaction)}
+              onEdit={
+                canWrite ? () => handleEditTransaction(transaction) : undefined
+              }
             />
           );
         },
       },
     ],
-    []
+    [canWrite]
   );
 
   // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+  const {
+    handleExportCsv,
+    handleScreenshot,
+    tableRef: _tableRef,
+  } = useTableExport({
     tableName: "transactions",
     columns,
     data: transactions,
@@ -422,7 +433,11 @@ export default function TransactionsPage() {
       <div className="hidden lg:block">
         <PageHeader
           title="Transaction History"
-          subtitle="Review all deposits, withdrawals, transfers, loans, and vendor movements."
+          subtitle={
+            canWrite
+              ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
+              : "Read-only access. Contact admin to request write access."
+          }
           primaryAction={
             canWrite
               ? {
@@ -453,8 +468,9 @@ export default function TransactionsPage() {
           Transaction History
         </h1>
         <p className="text-sm text-muted-foreground">
-          Review all deposits, withdrawals, transfers, loans, and vendor
-          movements.
+          {canWrite
+            ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
+            : "Read-only access. Contact admin to request write access."}
         </p>
       </div>
 

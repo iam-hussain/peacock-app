@@ -20,7 +20,8 @@ export async function POST(request: Request) {
     }
 
     const adminUsername = process.env.ADMIN_USERNAME || "admin";
-    const adminPassword = process.env.ADMIN_PASSWORD || process.env.SUPER_ADMIN_PASSWORD;
+    const adminPassword =
+      process.env.ADMIN_PASSWORD || process.env.SUPER_ADMIN_PASSWORD;
 
     // Super admin login
     if (username === adminUsername) {
@@ -41,8 +42,8 @@ export async function POST(request: Request) {
       await createSessionCookie({
         sub: "admin",
         role: "SUPER_ADMIN",
-        canWrite: true,
-        canRead: true,
+        writeAccess: true,
+        readAccess: true,
       });
 
       return NextResponse.json(
@@ -80,7 +81,7 @@ export async function POST(request: Request) {
     }
 
     // Check read access
-    if (!account.canRead) {
+    if (!account.readAccess) {
       return NextResponse.json(
         { error: "Account does not have read access" },
         { status: 403 }
@@ -110,8 +111,8 @@ export async function POST(request: Request) {
     await createSessionCookie({
       sub: account.id,
       role: "MEMBER",
-      canWrite: account.canWrite,
-      canRead: account.canRead,
+      writeAccess: account.writeAccess,
+      readAccess: account.readAccess,
     });
 
     return NextResponse.json(
@@ -121,8 +122,8 @@ export async function POST(request: Request) {
           kind: "member",
           accountId: account.id,
           role: "MEMBER",
-          canRead: account.canRead,
-          canWrite: account.canWrite,
+          readAccess: account.readAccess,
+          writeAccess: account.writeAccess,
         },
       },
       { status: 200 }

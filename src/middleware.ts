@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
 
   // Route protection for /dashboard routes
   if (pathname.startsWith("/dashboard")) {
-    const sessionCookie = request.cookies.get("session")?.value;
+    const sessionCookie = request.cookies.get("pc_auth")?.value;
 
     if (!sessionCookie) {
       // Redirect to home page if no session
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/";
       // Clear invalid cookie
       const response = NextResponse.redirect(url);
-      response.cookies.set("session", "", {
+      response.cookies.set("pc_auth", "", {
         maxAge: 0,
         path: "/",
       });

@@ -35,7 +35,6 @@ export async function POST(request: Request) {
         note: note ?? undefined,
         transactionAt: newZoneDate(transactionAt || undefined),
         createdAt: createdAt || undefined,
-        createdByActor: user.kind === "admin" ? "ADMIN" : "MEMBER",
         createdById: user.kind === "member" ? user.accountId : null,
       },
     });
@@ -46,11 +45,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, transaction }, { status: 201 });
   } catch (error: any) {
     console.error("Failed to create transaction", error);
+    const { handleAuthError } = await import("@/lib/error-handler");
     if (
-      error.message === "Unauthorized" ||
-      error.message.includes("Forbidden")
+      error.message === "UNAUTHORIZED" ||
+      error.message === "FORBIDDEN_WRITE" ||
+      error.message === "FORBIDDEN_ADMIN"
     ) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
+      return handleAuthError(error);
     }
     return NextResponse.json(
       { error: "Failed to create transaction" },

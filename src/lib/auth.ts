@@ -3,27 +3,42 @@ import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "default-secret-change-in-production"
+  process.env.JWT_SECRET ||
+    process.env.AUTH_SECRET ||
+    "default-secret-change-in-production"
 );
 
-const COOKIE_NAME = "session";
+const COOKIE_NAME = "pc_auth";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+export type AuthUser = {
+  id: string;
+  role: "SUPER_ADMIN" | "MEMBER";
+  readAccess: boolean;
+  writeAccess: boolean;
+};
+
 export type CurrentUser =
-  | { kind: "admin"; username: "admin"; role: "SUPER_ADMIN" }
+  | {
+      kind: "admin";
+      username: "admin";
+      role: "SUPER_ADMIN";
+      id: "admin";
+    }
   | {
       kind: "member";
       accountId: string;
+      id: string;
       role: "MEMBER";
-      canRead: boolean;
-      canWrite: boolean;
+      readAccess: boolean;
+      writeAccess: boolean;
     };
 
 type JWTPayload = {
   sub: string; // "admin" or accountId
   role: "SUPER_ADMIN" | "MEMBER";
-  canWrite: boolean;
-  canRead: boolean;
+  readAccess: boolean;
+  writeAccess: boolean;
   exp?: number;
 };
 
@@ -37,8 +52,8 @@ export async function createSessionCookie(payload: Omit<JWTPayload, "exp">) {
   const token = await new SignJWT({
     sub: payload.sub,
     role: payload.role,
-    canWrite: payload.canWrite,
-    canRead: payload.canRead,
+    readAccess: payload.readAccess,
+    writeAccess: payload.writeAccess,
   } as JWTPayload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -84,24 +99,54 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     const { payload } = await jwtVerify<JWTPayload>(token, JWT_SECRET);
 
     if (payload.role === "SUPER_ADMIN") {
-      return { kind: "admin", username: "admin", role: "SUPER_ADMIN" };
+      return {
+        kind: "admin",
+        username: "admin",
+        role: "SUPER_ADMIN",
+        id: "admin",
+      };
     }
 
     if (payload.role === "MEMBER" && payload.sub) {
       return {
         kind: "member",
         accountId: payload.sub,
+        id: payload.sub,
         role: "MEMBER",
-        canRead: payload.canRead ?? true,
-        canWrite: payload.canWrite ?? false,
+        readAccess: payload.readAccess ?? true,
+        writeAccess: payload.writeAccess ?? false,
       };
     }
 
     return null;
-  } catch (error) {
+  } catch {
     // Invalid token, expired, or malformed
     return null;
   }
+}
+
+/**
+ * Gets the current user as AuthUser type (simplified)
+ */
+export async function getAuthUser(): Promise<AuthUser | null> {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  if (user.kind === "admin") {
+    return {
+      id: "admin",
+      role: "SUPER_ADMIN",
+      readAccess: true,
+      writeAccess: true,
+    };
+  }
+
+  return {
+    id: user.accountId,
+    role: "MEMBER",
+    readAccess: user.readAccess,
+    writeAccess: user.writeAccess,
+  };
 }
 
 /**
@@ -110,7 +155,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 export async function requireAuth(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error("Unauthorized");
+    throw new Error("UNAUTHORIZED");
   }
   return user;
 }
@@ -125,20 +170,21 @@ export async function requireWriteAccess(): Promise<CurrentUser> {
     return user;
   }
 
-  if (user.kind === "member" && user.canWrite) {
+  if (user.kind === "member" && user.writeAccess) {
     return user;
   }
 
-  throw new Error("Forbidden: Write access required");
+  throw new Error("FORBIDDEN_WRITE");
 }
 
 /**
  * Requires super admin access - throws if not super admin
  */
-export async function requireSuperAdmin(): Promise<{
+export async function requireAdmin(): Promise<{
   kind: "admin";
   username: "admin";
   role: "SUPER_ADMIN";
+  id: "admin";
 }> {
   const user = await requireAuth();
 
@@ -146,7 +192,19 @@ export async function requireSuperAdmin(): Promise<{
     return user;
   }
 
-  throw new Error("Forbidden: Super admin access required");
+  throw new Error("FORBIDDEN_ADMIN");
+}
+
+/**
+ * Alias for requireAdmin (backward compatibility)
+ */
+export async function requireSuperAdmin(): Promise<{
+  kind: "admin";
+  username: "admin";
+  role: "SUPER_ADMIN";
+  id: "admin";
+}> {
+  return requireAdmin();
 }
 
 // Password hashing utilities

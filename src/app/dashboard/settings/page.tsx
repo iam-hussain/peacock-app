@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -21,6 +23,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { MemberAdjustmentsDialog } from "@/components/molecules/member-adjustments-dialog";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
+import { MemberPermissionToggle } from "@/components/molecules/member-permission-toggle";
 import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -199,6 +202,66 @@ export default function SettingsPage() {
         ),
       },
       {
+        id: "readAccess",
+        accessorKey: "account.readAccess",
+        header: "Read",
+        enableSorting: true,
+        meta: {
+          tooltip: "Member can view dashboard and data.",
+        },
+        cell: ({ row }) => {
+          const member = row.original;
+          return (
+            <div className="flex items-center justify-center">
+              <span
+                className={`text-xs font-medium ${
+                  member.account.readAccess
+                    ? "text-green-600 dark:text-green-500"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {member.account.readAccess ? "Yes" : "No"}
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        id: "writeAccess",
+        accessorKey: "account.writeAccess",
+        header: "Write",
+        enableSorting: true,
+        meta: {
+          tooltip: "Member can create and edit transactions.",
+        },
+        cell: ({ row }) => {
+          const member = row.original;
+          if (!isAdmin) {
+            return (
+              <div className="flex items-center justify-center">
+                <span
+                  className={`text-xs font-medium ${
+                    member.account.writeAccess
+                      ? "text-green-600 dark:text-green-500"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {member.account.writeAccess ? "Yes" : "No"}
+                </span>
+              </div>
+            );
+          }
+
+          return (
+            <MemberPermissionToggle
+              memberId={member.account.id}
+              currentValue={member.account.writeAccess}
+              permissionType="writeAccess"
+            />
+          );
+        },
+      },
+      {
         id: "actions",
         header: "",
         enableSorting: false,
@@ -229,7 +292,7 @@ export default function SettingsPage() {
         },
       },
     ],
-    []
+    [isAdmin]
   );
 
   const members = membersData?.members || [];

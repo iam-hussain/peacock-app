@@ -32,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 
 declare module "@tanstack/react-table" {
+  // eslint-disable-next-line unused-imports/no-unused-vars
   interface ColumnMeta<TData, TValue> {
     align?: "left" | "right" | "center";
     tooltip?: string;

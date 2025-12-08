@@ -9,11 +9,6 @@ import prisma from "@/db";
 import { clubData } from "@/lib/config";
 import { newZoneDate } from "@/lib/date";
 
-type TransactionToTransform = Transaction & {
-  from: AccountDetails;
-  to: AccountDetails;
-};
-
 type AccountDetails = {
   id: string;
   slug: string;
@@ -22,6 +17,19 @@ type AccountDetails = {
   avatar: string | null;
   active: boolean;
   isMember: boolean;
+};
+
+type AuditAccountDetails = {
+  id: string;
+  firstName: string;
+  lastName: string | null;
+};
+
+type TransactionToTransform = Transaction & {
+  from: AccountDetails;
+  to: AccountDetails;
+  createdBy: AuditAccountDetails | null;
+  updatedBy: AuditAccountDetails | null;
 };
 
 export async function POST(request: Request) {
@@ -163,6 +171,20 @@ function fetchTransactions(
           isMember: true,
         },
       },
+      createdBy: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      updatedBy: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
     },
   });
 }
@@ -228,7 +250,23 @@ function transactionTableTransform(transaction: TransactionToTransform) {
     updated.to.avatar = clubData.avatar;
   }
 
-  return { ...transaction, ...updated };
+  const createdByName = transaction.createdBy
+    ? `${transaction.createdBy.firstName} ${transaction.createdBy.lastName || ""}`.trim()
+    : null;
+  const updatedByName = transaction.updatedBy
+    ? `${transaction.updatedBy.firstName} ${transaction.updatedBy.lastName || ""}`.trim()
+    : null;
+
+  return {
+    ...transaction,
+    ...updated,
+    createdByName,
+    updatedByName,
+    createdById: transaction.createdById,
+    updatedById: transaction.updatedById,
+    createdAt: transaction.createdAt,
+    updatedAt: transaction.updatedAt,
+  };
 }
 
 export type GetTransactionResponse = {

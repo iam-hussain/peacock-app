@@ -39,11 +39,13 @@ export async function DELETE(
     );
   } catch (error: any) {
     console.error("Error deleting transaction:", error);
+    const { handleAuthError } = await import("@/lib/error-handler");
     if (
-      error.message === "Unauthorized" ||
-      error.message.includes("Forbidden")
+      error.message === "UNAUTHORIZED" ||
+      error.message === "FORBIDDEN_WRITE" ||
+      error.message === "FORBIDDEN_ADMIN"
     ) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
+      return handleAuthError(error);
     }
     return NextResponse.json(
       { message: "Failed to delete transaction." },

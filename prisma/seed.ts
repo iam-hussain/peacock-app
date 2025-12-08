@@ -27,8 +27,9 @@ async function seed() {
     ...account,
     username: account.username || null,
     passwordHash: account.passwordHash || null,
-    canRead: account.canRead ?? true,
-    canWrite: account.canWrite ?? false,
+    role: account.role || "MEMBER",
+    readAccess: account.readAccess ?? account.canRead ?? true,
+    writeAccess: account.writeAccess ?? account.canWrite ?? false,
     lastLoginAt: account.lastLoginAt || null,
   }));
 
@@ -37,15 +38,10 @@ async function seed() {
   });
 
   // Map transactions to include new audit fields with defaults
-  // createdByActor is required, so we default to ADMIN for seed data
   const transactionsWithDefaults = backupData.transaction.map(
     (transaction: any) => ({
       ...transaction,
-      createdByActor: (transaction.createdByActor as "ADMIN" | "MEMBER") || "ADMIN",
       createdById: transaction.createdById || null,
-      updatedByActor: transaction.updatedByActor
-        ? (transaction.updatedByActor as "ADMIN" | "MEMBER")
-        : null,
       updatedById: transaction.updatedById || null,
     })
   );

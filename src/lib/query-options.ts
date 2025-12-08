@@ -24,12 +24,19 @@ export const fetchAuthStatus = () =>
       fetcher.post("/api/auth/status") as never as {
         isLoggedIn: boolean;
         user:
-          | { kind: "admin"; username: "admin" }
+          | {
+              kind: "admin";
+              username: "admin";
+              role: "SUPER_ADMIN";
+              id: "admin";
+            }
           | {
               kind: "member";
               accountId: string;
-              canRead: boolean;
-              canWrite: boolean;
+              id: string;
+              role: "MEMBER";
+              readAccess: boolean;
+              writeAccess: boolean;
             }
           | null;
       },

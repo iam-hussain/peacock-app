@@ -30,8 +30,8 @@ export async function POST(request: Request) {
       startAt,
       endAt,
       isMember,
-      canRead,
-      canWrite,
+      readAccess,
+      writeAccess,
     } = data;
 
     // Validate required fields
@@ -54,8 +54,8 @@ export async function POST(request: Request) {
       endAt: endAt ? newZoneDate(endAt) : undefined,
       active: active ?? true,
       isMember: isMember ?? true,
-      canRead: canRead ?? true,
-      canWrite: canWrite ?? false,
+      readAccess: readAccess ?? true,
+      writeAccess: writeAccess ?? false,
     };
 
     if (id) {

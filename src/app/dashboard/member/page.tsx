@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { Camera, Download, MoreHorizontal } from "lucide-react";

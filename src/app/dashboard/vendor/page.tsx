@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { Camera, Download, MoreHorizontal } from "lucide-react";
@@ -243,7 +245,11 @@ export default function VendorsPage() {
   );
 
   // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+  const {
+    handleExportCsv: _handleExportCsv,
+    handleScreenshot: _handleScreenshot,
+    tableRef,
+  } = useTableExport({
     tableName: "vendors",
     columns,
     data: filteredVendors,

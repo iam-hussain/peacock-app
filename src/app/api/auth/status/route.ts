@@ -24,6 +24,7 @@ export async function POST() {
             kind: "admin" as const,
             username: "admin" as const,
             role: "SUPER_ADMIN" as const,
+            id: "admin" as const,
           }
         : user;
 

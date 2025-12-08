@@ -104,7 +104,7 @@ export const displayDateTime = (input: Date = newZoneDate()) => {
   return format(newZoneDate(input), "dd MMM yyyy hh:mm a");
 };
 
-type DueDates = {
+type _DueDates = {
   nextDueDate: Date;
   recentDueDate: Date;
   monthsPassed: number;

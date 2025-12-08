@@ -119,7 +119,7 @@ export function PaginationControls({
     return pages;
   };
 
-  const pageNumbers = getPageNumbers();
+  const _pageNumbers = getPageNumbers();
   const canGoPrevious = currentPage > 1 && !isLoading;
   const canGoNext = currentPage < totalPages && !isLoading;
 

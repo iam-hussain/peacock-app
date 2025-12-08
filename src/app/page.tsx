@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
@@ -144,7 +146,7 @@ export default function Home() {
               </Button>
             )}
           </div>
-      </div>
+        </div>
       </nav>
 
       {/* Hero + Login Section */}
@@ -153,7 +155,7 @@ export default function Home() {
           {/* Left Column - Hero Content */}
           <div className="flex flex-col space-y-6 text-center lg:text-left">
             <div className="flex justify-center lg:justify-start">
-        <Image
+              <Image
                 src="/peacock.svg"
                 alt="Peacock Club"
                 width={80}

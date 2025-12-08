@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, Info, Landmark, Percent, Wallet } from "lucide-react";
 import { useMemo } from "react";
