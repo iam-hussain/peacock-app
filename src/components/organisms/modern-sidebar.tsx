@@ -69,7 +69,7 @@ export function ModernSidebar() {
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
       dispatch(setIsLoggedIn(false));
       toast.success("Logged out successfully!");
-      router.push("/login");
+      router.push("/");
     },
     onError: (error: any) => {
       toast.error(
@@ -221,41 +221,60 @@ export function ModernSidebar() {
 
       {/* Footer Actions */}
       <div className="p-4 border-t border-border/50 space-y-1">
-        <CustomLink
-          href="/dashboard/profile"
-          variant="ghost"
-          size="default"
-          className={cn(
-            "w-full justify-start gap-3 px-3 py-2.5 rounded-lg",
-            "hover:bg-accent hover:text-accent-foreground",
-            sideBarCollapsed && "justify-center px-2",
-            isActive("/dashboard/profile") &&
-              "bg-primary/10 text-primary border-l-2 border-primary font-medium"
-          )}
-          title={sideBarCollapsed ? "Profile" : undefined}
-        >
-          <User className="h-5 w-5 shrink-0" />
-          {!sideBarCollapsed && (
-            <span className="text-sm font-medium">Profile</span>
-          )}
-        </CustomLink>
-        {isLoggedIn && (
-          <Button
+        {isLoggedIn ? (
+          <>
+            <CustomLink
+              href="/dashboard/profile"
+              variant="ghost"
+              size="default"
+              className={cn(
+                "w-full justify-start gap-3 px-3 py-2.5 rounded-lg",
+                "hover:bg-accent hover:text-accent-foreground",
+                sideBarCollapsed && "justify-center px-2",
+                isActive("/dashboard/profile") &&
+                  "bg-primary/10 text-primary border-l-2 border-primary font-medium"
+              )}
+              title={sideBarCollapsed ? "Profile" : undefined}
+            >
+              <User className="h-5 w-5 shrink-0" />
+              {!sideBarCollapsed && (
+                <span className="text-sm font-medium">Profile</span>
+              )}
+            </CustomLink>
+            <Button
+              variant="ghost"
+              size="default"
+              className={cn(
+                "w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-destructive",
+                "hover:bg-destructive/10 hover:text-destructive",
+                sideBarCollapsed && "justify-center px-2"
+              )}
+              title={sideBarCollapsed ? "Logout" : undefined}
+              onClick={handleLogout}
+            >
+              <LogOut className="h-5 w-5 shrink-0" />
+              {!sideBarCollapsed && (
+                <span className="text-sm font-medium">Logout</span>
+              )}
+            </Button>
+          </>
+        ) : (
+          <CustomLink
+            href="/"
             variant="ghost"
             size="default"
             className={cn(
-              "w-full justify-start gap-3 px-3 py-2.5 rounded-lg text-destructive",
-              "hover:bg-destructive/10 hover:text-destructive",
+              "w-full justify-start gap-3 px-3 py-2.5 rounded-lg",
+              "hover:bg-accent hover:text-accent-foreground",
               sideBarCollapsed && "justify-center px-2"
             )}
-            title={sideBarCollapsed ? "Logout" : undefined}
-            onClick={handleLogout}
+            title={sideBarCollapsed ? "Dashboard" : undefined}
           >
-            <LogOut className="h-5 w-5 shrink-0" />
+            <LayoutDashboard className="h-5 w-5 shrink-0" />
             {!sideBarCollapsed && (
-              <span className="text-sm font-medium">Logout</span>
+              <span className="text-sm font-medium">Dashboard</span>
             )}
-          </Button>
+          </CustomLink>
         )}
       </div>
     </aside>

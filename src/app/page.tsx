@@ -140,11 +140,11 @@ export default function Home() {
               </>
             ) : (
               <Button variant="outline" size="sm" asChild>
-                <Link href="/login">Login</Link>
+                <Link href="/">Dashboard</Link>
               </Button>
             )}
           </div>
-        </div>
+      </div>
       </nav>
 
       {/* Hero + Login Section */}
@@ -153,7 +153,7 @@ export default function Home() {
           {/* Left Column - Hero Content */}
           <div className="flex flex-col space-y-6 text-center lg:text-left">
             <div className="flex justify-center lg:justify-start">
-              <Image
+        <Image
                 src="/peacock.svg"
                 alt="Peacock Club"
                 width={80}
@@ -210,14 +210,9 @@ export default function Home() {
         <section className="border-y border-border/50 bg-muted/30">
           <div className="container mx-auto px-4 py-6">
             <p className="text-center text-sm text-muted-foreground">
-              Already a member?{" "}
-              <Link
-                href="/login"
-                className="font-medium text-primary hover:underline"
-              >
-                Login
-              </Link>{" "}
-              to view your balances and loans in real time.
+              Already a member? Scroll up to{" "}
+              <span className="font-medium text-primary">login</span> and view
+              your balances and loans in real time.
             </p>
           </div>
         </section>

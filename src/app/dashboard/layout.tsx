@@ -21,9 +21,7 @@ export default function DashboardLayout({
 }>) {
   const router = useRouter();
   const dispatch = useDispatch();
-  const { data, isLoading, isError } = useQuery(
-    fetchAuthStatus()
-  );
+  const { data, isLoading, isError } = useQuery(fetchAuthStatus());
   const sideBarCollapsed = useSelector(
     (state: RootState) => state.page.sideBarCollapsed
   );

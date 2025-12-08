@@ -8,7 +8,6 @@ import { GoLaw } from "react-icons/go";
 import { HiBriefcase } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { IconType } from "react-icons/lib";
-import { PiSignInBold } from "react-icons/pi";
 import { PiSignOutBold } from "react-icons/pi";
 import { RiFolderTransferFill } from "react-icons/ri";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
@@ -70,7 +69,7 @@ function MenuItems({
 
       dispatch(setIsLoggedIn(false));
       toast.success("Logged out successfully!");
-      router.push("/login"); // Redirect to the dashboard or any protected route
+      router.push("/");
     },
     onError: (error) => {
       toast.error(
@@ -149,14 +148,12 @@ function MenuItems({
           {!isLoggedIn && (
             <CustomLink
               variant={"menu"}
-              href={"/login"}
-              onClick={() => {
-                handleLogout();
-                handleOnItemClick();
-              }}
-              title={collapsed ? "Login" : undefined}
+              href={"/"}
+              onClick={handleOnItemClick}
+              title={collapsed ? "Dashboard" : undefined}
             >
-              <PiSignInBold className="h-5 w-5" /> {!collapsed && "Login"}
+              <TbLayoutDashboardFilled className="h-5 w-5" />{" "}
+              {!collapsed && "Dashboard"}
             </CustomLink>
           )}
         </Box>

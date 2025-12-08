@@ -8,6 +8,7 @@ import {
   FolderSync,
   LayoutDashboard,
   LogOut,
+  Settings,
   User,
   Users,
   Wallet,
@@ -67,7 +68,7 @@ export function ModernSidebarMobile() {
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
       dispatch(setIsLoggedIn(false));
       toast.success("Logged out successfully!");
-      router.push("/login");
+      router.push("/");
     },
     onError: (error: any) => {
       toast.error(
@@ -216,33 +217,60 @@ export function ModernSidebarMobile() {
             </ScrollArea>
 
             {/* Footer Actions */}
-            {isLoggedIn && (
-              <div className="p-4 border-t border-border/50 space-y-1">
+            <div className="p-4 border-t border-border/50 space-y-1">
+              {isLoggedIn ? (
+                <>
+                  <CustomLink
+                    href="/dashboard/profile"
+                    variant="ghost"
+                    size="default"
+                    className={cn(
+                      "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
+                      isActive("/dashboard/profile") &&
+                        "bg-primary/10 text-primary font-medium"
+                    )}
+                    onClick={handleClose}
+                  >
+                    <User className="h-5 w-5 shrink-0" />
+                    <span className="text-sm font-medium">Profile</span>
+                  </CustomLink>
+                  <CustomLink
+                    href="/dashboard/settings"
+                    variant="ghost"
+                    size="default"
+                    className={cn(
+                      "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
+                      isActive("/dashboard/settings") &&
+                        "bg-primary/10 text-primary font-medium"
+                    )}
+                    onClick={handleClose}
+                  >
+                    <Settings className="h-5 w-5 shrink-0" />
+                    <span className="text-sm font-medium">Settings</span>
+                  </CustomLink>
+                  <Button
+                    variant="ghost"
+                    size="default"
+                    className="w-full justify-start gap-3 px-3 py-3 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-5 w-5 shrink-0" />
+                    <span className="text-sm font-medium">Logout</span>
+                  </Button>
+                </>
+              ) : (
                 <CustomLink
-                  href="/dashboard/profile"
+                  href="/"
                   variant="ghost"
                   size="default"
-                  className={cn(
-                    "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
-                    isActive("/dashboard/profile") &&
-                      "bg-primary/10 text-primary font-medium"
-                  )}
+                  className="w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground"
                   onClick={handleClose}
                 >
-                  <User className="h-5 w-5 shrink-0" />
-                  <span className="text-sm font-medium">Profile</span>
+                  <LayoutDashboard className="h-5 w-5 shrink-0" />
+                  <span className="text-sm font-medium">Dashboard</span>
                 </CustomLink>
-                <Button
-                  variant="ghost"
-                  size="default"
-                  className="w-full justify-start gap-3 px-3 py-3 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-5 w-5 shrink-0" />
-                  <span className="text-sm font-medium">Logout</span>
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </motion.aside>
         </>
       )}
