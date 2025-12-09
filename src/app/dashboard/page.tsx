@@ -147,7 +147,7 @@ export default function DashboardPage() {
           </h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
-              title="Withdrawals"
+              title="Profit Withdrawals"
               value={
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
