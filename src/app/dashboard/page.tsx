@@ -50,15 +50,15 @@ export default function DashboardPage() {
     : 0;
   const pendingAmounts = statistics
     ? statistics.totalInterestBalance +
-    statistics.totalOffsetBalance +
-    statistics.totalMemberPeriodicDepositsBalance
+      statistics.totalOffsetBalance +
+      statistics.totalMemberPeriodicDepositsBalance
     : 0;
   const currentPortfolioValue = statistics?.currentClubNetValue || 0;
   const netValue = currentPortfolioValue + pendingAmounts;
   const availableCash = statistics
     ? statistics.currentClubNetValue -
-    statistics.totalLoanBalance -
-    statistics.totalVendorHolding
+      statistics.totalLoanBalance -
+      statistics.totalVendorHolding
     : 0;
 
   return (
