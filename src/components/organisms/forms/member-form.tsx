@@ -40,7 +40,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       ? {
           firstName: selected.firstName,
           lastName: selected.lastName || "",
-          slug: selected.slug || "",
+          username: selected.username || "",
           phone: selected.phone || "",
           email: selected.email || "",
           avatar: selected.avatar || "",
@@ -51,7 +51,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
       : {
           firstName: "",
           lastName: "",
-          slug: "",
+          username: "",
           phone: "",
           email: "",
           avatar: "",
@@ -136,7 +136,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
           {/* Username - Full width */}
           <FormField
             control={form.control}
-            name="slug"
+            name="username"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username *</FormLabel>

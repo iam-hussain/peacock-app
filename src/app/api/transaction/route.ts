@@ -11,7 +11,7 @@ import { newZoneDate } from "@/lib/date";
 
 type AccountDetails = {
   id: string;
-  slug: string;
+  username: string;
   firstName: string;
   lastName: string | null;
   avatar: string | null;
@@ -152,7 +152,7 @@ function fetchTransactions(
       from: {
         select: {
           id: true,
-          slug: true,
+          username: true,
           firstName: true,
           lastName: true,
           avatar: true,
@@ -163,7 +163,7 @@ function fetchTransactions(
       to: {
         select: {
           id: true,
-          slug: true,
+          username: true,
           firstName: true,
           lastName: true,
           avatar: true,
@@ -202,7 +202,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
         ? `/image/${transaction.from.avatar}`
         : undefined,
       link: transaction.from.isMember
-        ? `/dashboard/member/${transaction.from.slug}`
+        ? `/dashboard/member/${transaction.from.username}`
         : undefined,
     },
     to: {
@@ -213,7 +213,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
         ? `/image/${transaction.to.avatar}`
         : undefined,
       link: transaction.to.isMember
-        ? `/dashboard/member/${transaction.to.slug}`
+        ? `/dashboard/member/${transaction.to.username}`
         : undefined,
     },
   };

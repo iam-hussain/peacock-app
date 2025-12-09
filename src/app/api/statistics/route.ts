@@ -198,8 +198,8 @@ export type TransformedMemberStat = ReturnType<typeof membersStatTransform>;
 function membersStatTransform(member: Account) {
   return {
     id: member.id,
-    slug: member.slug,
-    link: `/dashboard/member/${member.slug}`,
+    username: member.username,
+    link: `/dashboard/member/${member.username}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar ? `/image/${member.avatar}` : undefined,
     active: member.active,

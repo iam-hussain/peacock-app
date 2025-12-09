@@ -121,8 +121,8 @@ export function LoginFormCard() {
                         {/* Member Accounts */}
                         {loginableAccounts.length > 0 ? (
                           loginableAccounts.map((account) => {
-                            // Use slug (username) as value, fallback to id if slug is missing
-                            const username = account.slug || account.id;
+                            // Use username as value, fallback to id if username is missing
+                            const username = account.username || account.id;
                             return (
                               <SelectItem key={account.id} value={username}>
                                 {account.name}

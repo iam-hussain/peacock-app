@@ -26,7 +26,7 @@ interface SearchResult {
   members: Array<{
     id: string;
     name: string;
-    slug: string;
+    username: string;
     avatar?: string;
     link: string;
     active: boolean;

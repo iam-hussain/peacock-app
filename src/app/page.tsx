@@ -48,8 +48,10 @@ export default function Home() {
 
   const isLoggedIn = authData?.isLoggedIn ?? false;
   const isMember = authData?.user?.kind === "member";
+  const isAdminMember = authData?.user?.kind === "admin-member";
+  const isSuperAdmin = authData?.user?.kind === "admin";
 
-  // Fetch profile data for members
+  // Fetch profile data for members and admin-members (not for super admin)
   const { data: profileData } = useQuery({
     queryKey: ["profile"],
     queryFn: () =>
@@ -60,7 +62,7 @@ export default function Home() {
           username: string;
         };
       }>,
-    enabled: isMember && isLoggedIn,
+    enabled: (isMember || isAdminMember) && isLoggedIn,
   });
 
   // Logout mutation
@@ -258,11 +260,11 @@ export default function Home() {
                       Welcome back!
                     </CardTitle>
                     <CardDescription className="text-sm text-muted-foreground">
-                      {authData?.user?.kind === "admin"
-                        ? `Admin: ${authData.user.username}`
+                      {isSuperAdmin
+                        ? "Super Admin"
                         : profileData?.account
                           ? `${profileData.account.firstName || ""} ${profileData.account.lastName || ""}`.trim() ||
-                            profileData.account.username
+                          profileData.account.username
                           : "Access your club dashboard and manage your account."}
                     </CardDescription>
                   </CardHeader>

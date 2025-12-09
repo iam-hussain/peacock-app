@@ -2,7 +2,7 @@ import { AvatarGroup } from "../atoms/avatar-group";
 import Box from "../ui/box";
 import Typography from "../ui/typography";
 
-import { GetMemberBySlugResponse } from "@/app/api/account/member/[slug]/route";
+import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]/route";
 import { dateFormat, displayDateTime } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export function MemberDetails({
   member,
   captureMode,
-}: GetMemberBySlugResponse & { captureMode: boolean }) {
+}: GetMemberByUsernameResponse & { captureMode: boolean }) {
   return (
     <>
       <div

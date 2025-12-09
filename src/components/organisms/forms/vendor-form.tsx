@@ -40,7 +40,6 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
     defaultValues: selected
       ? {
           firstName: selected.firstName,
-          slug: selected.slug || "",
           lastName: selected.lastName || "",
           phone: selected.phone || "",
           email: selected.email || "",
@@ -51,7 +50,6 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
         }
       : {
           firstName: "",
-          slug: "",
           lastName: "",
           phone: "",
           email: "",

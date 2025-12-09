@@ -2,10 +2,10 @@ import clsx from "clsx";
 
 import { DashboardCard } from "../atoms/dashboard-card";
 
-import { GetMemberBySlugResponse } from "@/app/api/account/member/[slug]/route";
+import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]/route";
 import { moneyFormat } from "@/lib/utils";
 
-export function MemberDash({ member }: GetMemberBySlugResponse) {
+export function MemberDash({ member }: GetMemberByUsernameResponse) {
   return (
     <div
       className={clsx("grid grid-cols-1 gap-2 w-full", {

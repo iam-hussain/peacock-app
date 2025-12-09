@@ -191,9 +191,9 @@ export async function POST(request: Request) {
         return true;
       }
 
-      // Check slug and ID
+      // Check username and ID
       if (
-        member.slug.toLowerCase().includes(query) ||
+        member.username.toLowerCase().includes(query) ||
         member.id.toLowerCase().includes(query)
       ) {
         return true;
@@ -266,7 +266,7 @@ export async function POST(request: Request) {
       members: filteredMembers.slice(0, 5).map((m) => ({
         id: m.id,
         name: m.name,
-        slug: m.slug,
+        username: m.username,
         avatar: m.avatar,
         link: m.link,
         active: m.active,

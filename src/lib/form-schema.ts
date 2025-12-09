@@ -24,7 +24,7 @@ const transactionMethods = [
 
 export const accountFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
-  slug: z
+  username: z
     .string()
     .min(1, "Username is required")
     .regex(
@@ -32,7 +32,8 @@ export const accountFormSchema = z.object({
       "Username can only contain lowercase letters, numbers, hyphens, and underscores"
     )
     .min(3, "Username must be at least 3 characters")
-    .max(30, "Username must be at most 30 characters"),
+    .max(50, "Username must be at most 50 characters")
+    .optional(), // Optional for vendors (auto-generated)
   lastName: z.string().optional(),
   phone: z
     .string()

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Switch } from "../ui/switch";
 
 import fetcher from "@/lib/fetcher";
+import { cn } from "@/lib/utils";
 
 interface SmartAccessToggleProps {
   memberId: string;
@@ -44,12 +45,19 @@ export function SmartAccessToggle({
   } | null>(null);
 
   // Get current value based on access type
+  // When Admin is ON, Read and Write should appear ON (even if not explicitly set)
   const getCurrentValue = () => {
     if (optimisticState) {
       return optimisticState[accessType];
     }
-    if (accessType === "read") return currentRead;
-    if (accessType === "write") return currentWrite;
+    if (accessType === "read") {
+      // If Admin is ON, Read appears ON
+      return currentRead || currentAdmin;
+    }
+    if (accessType === "write") {
+      // If Admin is ON, Write appears ON
+      return currentWrite || currentAdmin;
+    }
     return currentAdmin;
   };
 
@@ -74,29 +82,28 @@ export function SmartAccessToggle({
       newAdmin = toggledValue;
     }
 
-    // Apply rules
+    // Apply permission rules
     if (accessType === "admin") {
-      // Admin ON → Read ON, Write ON
+      // Admin ON → Read ON, Write ON (Admin includes all permissions)
       if (toggledValue) {
         newRead = true;
         newWrite = true;
       }
-      // Admin OFF → keep Read/Write as is
+      // Admin OFF → keep Read/Write as is (don't auto-disable)
     } else if (accessType === "write") {
-      // Write ON → Read ON, Admin OFF
+      // Write ON → Read ON (Write requires Read), Admin OFF (mutually exclusive)
       if (toggledValue) {
         newRead = true;
         newAdmin = false;
       }
-      // Write OFF → keep Read as is
+      // Write OFF → keep Read as is (Read can stay ON independently)
     } else if (accessType === "read") {
-      // Read ON → Write OFF (unless explicitly set), Admin OFF
+      // Read ON → Write OFF, Admin OFF (Read-only mode)
       if (toggledValue) {
-        // If turning Read ON, turn Write and Admin OFF
         newWrite = false;
         newAdmin = false;
       } else {
-        // Read OFF → Write OFF, Admin OFF
+        // Read OFF → Write OFF, Admin OFF (no access without Read)
         newWrite = false;
         newAdmin = false;
       }
@@ -158,10 +165,12 @@ export function SmartAccessToggle({
   const isRuleDisabled = () => {
     if (accessType === "read") {
       // Read cannot be turned off if Admin or Write is ON (they require Read)
-      return (currentAdmin || currentWrite) && currentValue;
+      // Also disable if Admin is ON (Admin includes Read)
+      return currentAdmin || (currentWrite && currentValue);
     } else if (accessType === "write") {
       // Write cannot be turned off if Admin is ON (Admin includes Write)
-      return currentAdmin && currentValue;
+      // Also disable if Admin is ON
+      return currentAdmin;
     }
     // Admin can always be toggled
     return false;
@@ -170,11 +179,12 @@ export function SmartAccessToggle({
   const ruleDisabled = isRuleDisabled();
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center w-9">
       <Switch
         checked={currentValue}
         onCheckedChange={handleToggle}
         disabled={disabled || isUpdating || ruleDisabled}
+        className={cn(ruleDisabled && "opacity-60", isUpdating && "opacity-50")}
       />
     </div>
   );

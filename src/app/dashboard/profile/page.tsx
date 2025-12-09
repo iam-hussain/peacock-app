@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Info, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -50,7 +50,7 @@ const profileFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().optional(),
   email: z.string().email("Invalid email address").optional(),
-  slug: z
+  username: z
     .string()
     .min(1, "Username is required")
     .regex(
@@ -58,7 +58,7 @@ const profileFormSchema = z.object({
       "Username can only contain lowercase letters, numbers, hyphens, and underscores"
     )
     .min(3, "Username must be at least 3 characters")
-    .max(30, "Username must be at most 30 characters"),
+    .max(50, "Username must be at most 50 characters"),
 });
 
 const passwordFormSchema = z
@@ -78,12 +78,13 @@ type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 export default function ProfilePage() {
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // Detect if user is super-admin
   const isSuperAdmin = user?.kind === "admin";
 
   // Fetch profile data (will return virtual profile for super-admin)
-  const { data: profileData } = useQuery({
+  const { data: profileData, isLoading: isProfileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: () => fetcher.get("/api/profile"),
   });
@@ -95,21 +96,21 @@ export default function ProfilePage() {
       firstName: "",
       lastName: "",
       email: "",
-      slug: "",
+      username: "",
     },
   });
 
   // Update form when profile data loads
   useEffect(() => {
-    if (profileData?.account) {
+    if (profileData?.account && !isProfileLoading) {
       profileForm.reset({
         firstName: profileData.account.firstName || "",
         lastName: profileData.account.lastName || "",
         email: profileData.account.email || "",
-        slug: profileData.account.slug || profileData.account.username || "",
+        username: profileData.account.username || "",
       });
     }
-  }, [profileData, profileForm]);
+  }, [profileData, isProfileLoading, profileForm]);
 
   // Password form
   const passwordForm = useForm<PasswordFormValues>({
@@ -124,7 +125,9 @@ export default function ProfilePage() {
   const profileMutation = useMutation({
     mutationFn: (data: ProfileFormValues) =>
       fetcher.patch("/api/profile", { body: data }),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      await queryClient.refetchQueries({ queryKey: ["profile"] });
       toast.success("Profile updated successfully");
     },
     onError: (error: any) => {
@@ -210,7 +213,7 @@ export default function ProfilePage() {
               >
                 <FormField
                   control={profileForm.control}
-                  name="slug"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Username *</FormLabel>

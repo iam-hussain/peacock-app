@@ -21,7 +21,7 @@ import { MemberDash } from "./member-dash";
 import { MemberDetails } from "./member-details";
 
 import { TransformedMemberStat } from "@/app/api/statistics/route";
-import { fetchMemberBySlug, fetchMembers } from "@/lib/query-options";
+import { fetchMemberByUsername, fetchMembers } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
@@ -40,7 +40,7 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
   const members = data?.members || initialMembers;
 
   const { data: selectedMemberData } = useQuery({
-    ...fetchMemberBySlug(selectedMemberSlug || ""),
+    ...fetchMemberByUsername(selectedMemberSlug || ""),
     enabled: !!selectedMemberSlug,
   });
 
@@ -60,7 +60,7 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
       filtered = filtered.filter(
         (m) =>
           m.name.toLowerCase().includes(query) ||
-          m.slug.toLowerCase().includes(query)
+          m.username.toLowerCase().includes(query)
       );
     }
 
@@ -68,8 +68,8 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
     return filtered;
   }, [members, filterStatus, searchQuery]);
 
-  const handleMemberClick = (slug: string) => {
-    setSelectedMemberSlug(slug);
+  const handleMemberClick = (username: string) => {
+    setSelectedMemberSlug(username);
   };
 
   const handleCloseDrawer = () => {
@@ -119,8 +119,8 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {filteredMembers.map((member) => (
                 <button
-                  key={member.slug}
-                  onClick={() => handleMemberClick(member.slug)}
+                  key={member.username}
+                  onClick={() => handleMemberClick(member.username)}
                   className="group flex flex-col items-center gap-2 rounded-lg p-3 transition-colors hover:bg-muted/50"
                 >
                   <ClickableAvatar

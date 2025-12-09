@@ -87,10 +87,10 @@ export default function TransactionsPage() {
           params.delete("member");
           params.delete("account");
         } else {
-          // Find account and use member slug if available, otherwise use account ID
+          // Find account and use member username if available, otherwise use account ID
           const account = accounts.find((acc) => acc.id === updates.account);
-          if (account?.slug) {
-            params.set("member", account.slug);
+          if (account?.username) {
+            params.set("member", account.username);
           } else if (updates.account) {
             params.set("account", updates.account);
           }
@@ -190,7 +190,7 @@ export default function TransactionsPage() {
 
       if (memberSlug) {
         const memberAccount = accounts.find(
-          (acc) => acc.slug === memberSlug || acc.id === memberSlug
+          (acc) => acc.username === memberSlug || acc.id === memberSlug
         );
         if (memberAccount) {
           setAccountFilter(memberAccount.id);
@@ -470,7 +470,7 @@ export default function TransactionsPage() {
           const memberLink =
             account.link ||
             (account.isMember
-              ? `/dashboard/member/${account.slug}`
+              ? `/dashboard/member/${account.username}`
               : undefined);
           return (
             <div className="flex items-center gap-3">
@@ -529,7 +529,7 @@ export default function TransactionsPage() {
           const memberLink =
             account.link ||
             (account.isMember
-              ? `/dashboard/member/${account.slug}`
+              ? `/dashboard/member/${account.username}`
               : undefined);
           return (
             <div className="flex items-center gap-3">

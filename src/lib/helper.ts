@@ -1,5 +1,6 @@
 import { $Enums, PASSBOOK_TYPE } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
+import { nanoid } from "nanoid";
 
 import {
   calculateDateDiff,
@@ -14,6 +15,25 @@ import {
 } from "./type";
 
 import prisma from "@/db";
+
+/**
+ * Generate a username for vendors in the format: "name-uuid"
+ * For example: "john-doe-abc123"
+ */
+export function generateVendorUsername(
+  firstName: string,
+  lastName?: string | null
+): string {
+  const name = [firstName, lastName]
+    .filter(Boolean)
+    .join("-")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  const uuid = nanoid(8);
+  return `${name}-${uuid}`;
+}
 
 export const chitCalculator = (
   start: string | Date,
