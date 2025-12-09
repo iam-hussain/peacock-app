@@ -130,7 +130,7 @@ export function LoginFormCard() {
                             );
                           })
                         ) : (
-                          <SelectItem value="" disabled>
+                          <SelectItem value="no-accounts" disabled>
                             No accounts available
                           </SelectItem>
                         )}

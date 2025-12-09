@@ -56,10 +56,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Member/Admin login - try username first, then email
+    // Member/Admin login - try username, email, or slug
     let account = await prisma.account.findFirst({
       where: {
-        OR: [{ username: username }, { email: username }],
+        OR: [{ username: username }, { email: username }, { slug: username }],
         isMember: true,
         active: true,
       },
