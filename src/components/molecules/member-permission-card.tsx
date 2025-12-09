@@ -45,10 +45,10 @@ export function MemberPermissionCard({
   const canLogin = currentRead || currentWrite || currentAdmin;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-4 min-h-[200px]">
+    <div className="rounded-lg border border-border/50 bg-card p-3 shadow-sm transition-shadow hover:shadow-md">
       {/* Member Header */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
           <ClickableAvatar
             src={member.avatar}
             alt={member.name}
@@ -57,7 +57,8 @@ export function MemberPermissionCard({
             size="md"
           />
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+            {/* Name with Status Dot */}
+            <div className="flex items-center gap-1.5 mb-1">
               <span className="text-sm font-semibold text-foreground truncate">
                 {member.name}
               </span>
@@ -67,18 +68,19 @@ export function MemberPermissionCard({
                 }`}
               />
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
+            {/* Status and Login Access - Horizontally Aligned */}
+            <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">
                 {member.active ? "Active" : "Inactive"}
               </span>
               {canLogin ? (
-                <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-500">
-                  <CheckCircle2 className="h-3 w-3" />
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <CheckCircle2 className="h-2.5 w-2.5 text-green-600 dark:text-green-500" />
                   <span>Can Login</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <XCircle className="h-3 w-3" />
+                <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <XCircle className="h-2.5 w-2.5" />
                   <span>No Login Access</span>
                 </div>
               )}
@@ -94,31 +96,30 @@ export function MemberPermissionCard({
         )}
       </div>
 
-      {/* Managed Funds */}
-      <div>
-        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1 font-medium">
+      {/* Managed Funds - Tighter Block */}
+      <div className="mb-3">
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5 font-medium leading-tight">
           Managed Funds
         </div>
-        <div className="text-sm font-medium text-foreground">
+        <div className="text-sm font-medium text-foreground leading-tight">
           {moneyFormat(member.clubHeldAmount || 0)}
         </div>
       </div>
 
-      <Separator className="my-2" />
+      {/* Divider - Lighter with Adjusted Margins */}
+      <Separator className="my-2 opacity-25" />
 
-      {/* Permissions Section */}
-      <div className="space-y-4">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground font-medium">
+      {/* Permissions Section - Clean and Structured */}
+      <div>
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2 font-medium">
           Permissions
         </div>
 
-        {/* Top Row: READ on the right */}
-        <div className="flex items-center justify-end">
-          <div className="flex items-center gap-3 w-full max-w-[200px]">
-            <span className="text-sm font-medium text-foreground min-w-[56px] text-left">
-              READ
-            </span>
-            <div className="flex items-center justify-center flex-shrink-0">
+        <div className="space-y-2">
+          {/* First Row: READ */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-foreground">READ</span>
+            <div className="flex items-center">
               {isAdmin ? (
                 <SmartAccessToggle
                   memberId={member.account.id}
@@ -142,15 +143,10 @@ export function MemberPermissionCard({
               )}
             </div>
           </div>
-        </div>
 
-        {/* Second Row: WRITE and ADMIN */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 flex-1">
-            <span className="text-sm font-medium text-foreground min-w-[56px] text-left">
-              WRITE
-            </span>
-            <div className="flex items-center justify-center flex-shrink-0">
+          <div className="flex items-center justify-between flex-1">
+            <span className="text-xs font-medium text-foreground">WRITE</span>
+            <div className="flex items-center">
               {isAdmin ? (
                 <SmartAccessToggle
                   memberId={member.account.id}
@@ -174,11 +170,9 @@ export function MemberPermissionCard({
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3 flex-1">
-            <span className="text-sm font-medium text-foreground min-w-[56px] text-left">
-              ADMIN
-            </span>
-            <div className="flex items-center justify-center flex-shrink-0">
+          <div className="flex items-center justify-between flex-1">
+            <span className="text-xs font-medium text-foreground">ADMIN</span>
+            <div className="flex items-center">
               {isAdmin ? (
                 <SmartAccessToggle
                   memberId={member.account.id}

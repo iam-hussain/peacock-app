@@ -225,8 +225,9 @@ export default function SettingsPage() {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <div
-                    className={`h-1.5 w-1.5 rounded-full ${member.active ? "bg-green-500" : "bg-gray-400"
-                      }`}
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      member.active ? "bg-green-500" : "bg-gray-400"
+                    }`}
                   />
                   <span className="text-xs text-muted-foreground">
                     {member.active ? "Active" : "Inactive"}
@@ -273,10 +274,11 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${currentRead
+                  className={`text-xs font-medium ${
+                    currentRead
                       ? "text-green-600 dark:text-green-500"
                       : "text-muted-foreground"
-                    }`}
+                  }`}
                 >
                   {currentRead ? "Yes" : "No"}
                 </span>
@@ -324,10 +326,11 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${currentWrite
+                  className={`text-xs font-medium ${
+                    currentWrite
                       ? "text-green-600 dark:text-green-500"
                       : "text-muted-foreground"
-                    }`}
+                  }`}
                 >
                   {currentWrite ? "Yes" : "No"}
                 </span>
@@ -375,10 +378,11 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${currentAdmin
+                  className={`text-xs font-medium ${
+                    currentAdmin
                       ? "text-green-600 dark:text-green-500"
                       : "text-muted-foreground"
-                    }`}
+                  }`}
                 >
                   {currentAdmin ? "Yes" : "No"}
                 </span>
@@ -496,8 +500,9 @@ export default function SettingsPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <div
-              className={`h-1.5 w-1.5 rounded-full ${row.original.active ? "bg-green-500" : "bg-gray-400"
-                }`}
+              className={`h-1.5 w-1.5 rounded-full ${
+                row.original.active ? "bg-green-500" : "bg-gray-400"
+              }`}
             />
             <span className="text-sm text-muted-foreground">
               {row.original.active ? "Active" : "Inactive"}
