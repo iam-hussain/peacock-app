@@ -55,8 +55,14 @@ export default function TransactionsPage() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransformedTransaction | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const urlFilterApplied = useRef(false);
   const isInitialMount = useRef(true);
+
+  // Ensure we're on client before using searchParams
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Update URL with current filter values
   const updateURL = useCallback(
@@ -174,8 +180,9 @@ export default function TransactionsPage() {
     [pathname, router, searchParams, accounts]
   );
 
-  // Read initial values from URL on mount
+  // Read initial values from URL on mount (only on client)
   useEffect(() => {
+    if (!isMounted) return;
     if (isInitialMount.current && accounts.length > 0) {
       // Read account filter from URL (by member slug or account ID)
       const memberSlug = searchParams.get("member");
@@ -226,7 +233,7 @@ export default function TransactionsPage() {
 
       isInitialMount.current = false;
     }
-  }, [searchParams, accounts]);
+  }, [searchParams, accounts, isMounted]);
 
   // Track previous filter values to detect changes
   const prevFilters = useRef({ accountFilter, typeFilter, startDate, endDate });
@@ -235,48 +242,54 @@ export default function TransactionsPage() {
 
   // Update URL when filters change - reset page to 1
   useEffect(() => {
-    if (!isInitialMount.current) {
-      const filtersChanged =
-        prevFilters.current.accountFilter !== accountFilter ||
-        prevFilters.current.typeFilter !== typeFilter ||
-        prevFilters.current.startDate?.getTime() !== startDate?.getTime() ||
-        prevFilters.current.endDate?.getTime() !== endDate?.getTime();
+    if (!isMounted || !isInitialMount.current) return;
+    const filtersChanged =
+      prevFilters.current.accountFilter !== accountFilter ||
+      prevFilters.current.typeFilter !== typeFilter ||
+      prevFilters.current.startDate?.getTime() !== startDate?.getTime() ||
+      prevFilters.current.endDate?.getTime() !== endDate?.getTime();
 
-      if (filtersChanged) {
-        setCurrentPage(1);
-        prevFilters.current = { accountFilter, typeFilter, startDate, endDate };
-        updateURL({
-          account: accountFilter,
-          type: typeFilter,
-          startDate,
-          endDate,
-          pageSize,
-          page: 1, // Reset to page 1 when filters change
-          clearMember: accountFilter === "all",
-        });
-      }
+    if (filtersChanged) {
+      setCurrentPage(1);
+      prevFilters.current = { accountFilter, typeFilter, startDate, endDate };
+      updateURL({
+        account: accountFilter,
+        type: typeFilter,
+        startDate,
+        endDate,
+        pageSize,
+        page: 1, // Reset to page 1 when filters change
+        clearMember: accountFilter === "all",
+      });
     }
-  }, [accountFilter, typeFilter, startDate, endDate, pageSize, updateURL]);
+  }, [
+    accountFilter,
+    typeFilter,
+    startDate,
+    endDate,
+    pageSize,
+    updateURL,
+    isMounted,
+  ]);
 
   // Update URL when page or pageSize change (but not from filter changes)
   useEffect(() => {
-    if (!isInitialMount.current) {
-      const pageChanged = prevPage.current !== currentPage;
-      const pageSizeChanged = prevPageSize.current !== pageSize;
+    if (!isMounted || !isInitialMount.current) return;
+    const pageChanged = prevPage.current !== currentPage;
+    const pageSizeChanged = prevPageSize.current !== pageSize;
 
-      if (pageChanged || pageSizeChanged) {
-        prevPage.current = currentPage;
-        prevPageSize.current = pageSize;
-        updateURL({
-          account: accountFilter,
-          type: typeFilter,
-          startDate,
-          endDate,
-          pageSize,
-          page: currentPage,
-          clearMember: accountFilter === "all",
-        });
-      }
+    if (pageChanged || pageSizeChanged) {
+      prevPage.current = currentPage;
+      prevPageSize.current = pageSize;
+      updateURL({
+        account: accountFilter,
+        type: typeFilter,
+        startDate,
+        endDate,
+        pageSize,
+        page: currentPage,
+        clearMember: accountFilter === "all",
+      });
     }
   }, [
     currentPage,
@@ -286,6 +299,7 @@ export default function TransactionsPage() {
     startDate,
     endDate,
     updateURL,
+    isMounted,
   ]);
 
   // Build query options

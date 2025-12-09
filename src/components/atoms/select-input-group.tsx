@@ -42,7 +42,10 @@ export const SelectInputGroup = ({
         </SelectItem>
       )}
       {options.map(([value, label]) => (
-        <SelectItem key={value} value={(value || "").toString()}>
+        <SelectItem
+          key={value}
+          value={value ? value.toString() : `option-${label}`}
+        >
           {label}
         </SelectItem>
       ))}
