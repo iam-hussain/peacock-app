@@ -50,15 +50,15 @@ export default function DashboardPage() {
     : 0;
   const pendingAmounts = statistics
     ? statistics.totalInterestBalance +
-      statistics.totalOffsetBalance +
-      statistics.totalMemberPeriodicDepositsBalance
+    statistics.totalOffsetBalance +
+    statistics.totalMemberPeriodicDepositsBalance
     : 0;
   const currentPortfolioValue = statistics?.currentClubNetValue || 0;
   const netValue = currentPortfolioValue + pendingAmounts;
   const availableCash = statistics
     ? statistics.currentClubNetValue -
-      statistics.totalLoanBalance -
-      statistics.totalVendorHolding
+    statistics.totalLoanBalance -
+    statistics.totalVendorHolding
     : 0;
 
   return (
@@ -147,7 +147,7 @@ export default function DashboardPage() {
           </h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
-              title="Withdrawals"
+              title="Profit Withdrawals"
               value={
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
