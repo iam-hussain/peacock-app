@@ -24,6 +24,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { MemberAdjustmentsDialog } from "@/components/molecules/member-adjustments-dialog";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
+import { MemberPermissionCard } from "@/components/molecules/member-permission-card";
 import { SmartAccessToggle } from "@/components/molecules/smart-access-toggle";
 import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -224,9 +225,8 @@ export default function SettingsPage() {
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <div
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      member.active ? "bg-green-500" : "bg-gray-400"
-                    }`}
+                    className={`h-1.5 w-1.5 rounded-full ${member.active ? "bg-green-500" : "bg-gray-400"
+                      }`}
                   />
                   <span className="text-xs text-muted-foreground">
                     {member.active ? "Active" : "Inactive"}
@@ -273,11 +273,10 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${
-                    currentRead
+                  className={`text-xs font-medium ${currentRead
                       ? "text-green-600 dark:text-green-500"
                       : "text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   {currentRead ? "Yes" : "No"}
                 </span>
@@ -325,11 +324,10 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${
-                    currentWrite
+                  className={`text-xs font-medium ${currentWrite
                       ? "text-green-600 dark:text-green-500"
                       : "text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   {currentWrite ? "Yes" : "No"}
                 </span>
@@ -377,11 +375,10 @@ export default function SettingsPage() {
             return (
               <div className="flex items-center justify-center">
                 <span
-                  className={`text-xs font-medium ${
-                    currentAdmin
+                  className={`text-xs font-medium ${currentAdmin
                       ? "text-green-600 dark:text-green-500"
                       : "text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   {currentAdmin ? "Yes" : "No"}
                 </span>
@@ -499,9 +496,8 @@ export default function SettingsPage() {
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <div
-              className={`h-1.5 w-1.5 rounded-full ${
-                row.original.active ? "bg-green-500" : "bg-gray-400"
-              }`}
+              className={`h-1.5 w-1.5 rounded-full ${row.original.active ? "bg-green-500" : "bg-gray-400"
+                }`}
             />
             <span className="text-sm text-muted-foreground">
               {row.original.active ? "Active" : "Inactive"}
@@ -687,12 +683,81 @@ export default function SettingsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <DataTable
-            columns={memberColumns}
-            data={members}
-            frozenColumnKey="member"
-            isLoading={membersLoading}
-          />
+          {/* Desktop Table View */}
+          <div className="hidden lg:block">
+            <DataTable
+              columns={memberColumns}
+              data={members}
+              frozenColumnKey="member"
+              isLoading={membersLoading}
+            />
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="lg:hidden space-y-3">
+            {membersLoading ? (
+              <div className="space-y-3">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border border-border bg-card p-4 space-y-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-24 bg-muted animate-pulse rounded" />
+                      </div>
+                    </div>
+                    <div className="h-px bg-border" />
+                    <div className="space-y-3">
+                      <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                      <div className="space-y-2">
+                        <div className="h-8 w-full bg-muted animate-pulse rounded" />
+                        <div className="h-8 w-full bg-muted animate-pulse rounded" />
+                        <div className="h-8 w-full bg-muted animate-pulse rounded" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : members.length > 0 ? (
+              members.map((member) => {
+                const memberState = memberAccessState[member.account.id];
+                return (
+                  <MemberPermissionCard
+                    key={member.account.id}
+                    member={member}
+                    memberAccessState={memberState}
+                    isAdmin={isAdmin}
+                    onStateChange={(newState) => {
+                      setMemberAccessState((prev) => ({
+                        ...prev,
+                        [member.account.id]: newState,
+                      }));
+                    }}
+                    onEdit={
+                      canManageAccounts
+                        ? () => handleEditMember(member)
+                        : undefined
+                    }
+                    onAdjustOffset={
+                      canManageAccounts
+                        ? () => handleAdjustments(member)
+                        : undefined
+                    }
+                    onResetPassword={
+                      isAdmin ? () => handleResetPassword(member) : undefined
+                    }
+                  />
+                );
+              })
+            ) : (
+              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                No members found.
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 

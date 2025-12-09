@@ -23,7 +23,6 @@ export async function GET() {
             email: null,
             avatar: null,
             username: "admin",
-            slug: "admin",
             readAccess: true,
             writeAccess: true,
             active: true,
@@ -36,7 +35,8 @@ export async function GET() {
       );
     }
 
-    if (user.kind !== "member") {
+    // Allow both members and admin-members to access profile
+    if (user.kind !== "member" && user.kind !== "admin-member") {
       return NextResponse.json(
         { error: "Only members can access profile" },
         { status: 403 }
@@ -53,7 +53,6 @@ export async function GET() {
         email: true,
         avatar: true,
         username: true,
-        slug: true,
         readAccess: true,
         writeAccess: true,
         active: true,
@@ -99,13 +98,13 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const { firstName, lastName, phone, email, avatar, slug } =
+    const { firstName, lastName, phone, email, avatar, username } =
       await request.json();
 
-    // Validate slug if provided
-    if (slug) {
-      // Check slug format
-      if (!/^[a-z0-9_-]+$/.test(slug)) {
+    // Validate username if provided
+    if (username) {
+      // Check username format
+      if (!/^[a-z0-9_-]+$/.test(username)) {
         return NextResponse.json(
           {
             error:
@@ -114,16 +113,16 @@ export async function PATCH(request: Request) {
           { status: 400 }
         );
       }
-      if (slug.length < 3 || slug.length > 30) {
+      if (username.length < 3 || username.length > 50) {
         return NextResponse.json(
-          { error: "Username must be between 3 and 30 characters" },
+          { error: "Username must be between 3 and 50 characters" },
           { status: 400 }
         );
       }
 
-      // Check slug uniqueness (excluding current account)
+      // Check username uniqueness (excluding current account)
       const existingAccount = await prisma.account.findUnique({
-        where: { slug },
+        where: { username },
         select: { id: true },
       });
 
@@ -146,9 +145,7 @@ export async function PATCH(request: Request) {
         phone: phone ?? undefined,
         email: email ?? undefined,
         avatar: avatar ?? undefined,
-        slug: slug ?? undefined,
-        // Set username = slug for login
-        username: slug ? slug : undefined,
+        username: username ?? undefined,
       },
       select: {
         id: true,
@@ -158,7 +155,6 @@ export async function PATCH(request: Request) {
         email: true,
         avatar: true,
         username: true,
-        slug: true,
         readAccess: true,
         writeAccess: true,
         active: true,

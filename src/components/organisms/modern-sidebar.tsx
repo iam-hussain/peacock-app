@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Briefcase,
   ChevronLeft,
@@ -25,6 +25,7 @@ import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
 
+import { useAuth } from "@/hooks/use-auth";
 import { clubAge } from "@/lib/date";
 import fetcher from "@/lib/fetcher";
 import { cn } from "@/lib/utils";
@@ -63,6 +64,38 @@ export function ModernSidebar() {
   );
   const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
   const club = clubAge();
+  const { user } = useAuth();
+
+  // Fetch profile data for members and admin-members
+  const { data: profileData } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () =>
+      fetcher.get("/api/profile") as Promise<{
+        account: {
+          firstName: string | null;
+          lastName: string | null;
+          username: string;
+        };
+      }>,
+    enabled:
+      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member"),
+  });
+
+  // Get display name
+  const getDisplayName = () => {
+    if (user?.kind === "admin") {
+      return "Super Admin";
+    }
+    if (profileData?.account) {
+      const fullName = `${profileData.account.firstName || ""} ${
+        profileData.account.lastName || ""
+      }`.trim();
+      return fullName || profileData.account.username;
+    }
+    return null;
+  };
+
+  const displayName = getDisplayName();
 
   const logoutMutation = useMutation({
     mutationFn: () => fetcher.post("/api/auth/logout"),
@@ -224,6 +257,24 @@ export function ModernSidebar() {
       <div className="p-4 border-t border-border/50 space-y-1">
         {isLoggedIn ? (
           <>
+            {/* User Name Display */}
+            {displayName && !sideBarCollapsed && (
+              <div className="px-3 py-2 mb-2 rounded-lg bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-medium text-foreground truncate">
+                    {displayName}
+                  </span>
+                </div>
+              </div>
+            )}
+            {displayName && sideBarCollapsed && (
+              <div className="flex items-center justify-center mb-2">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+            )}
             <CustomLink
               href="/dashboard/profile"
               variant="ghost"

@@ -20,12 +20,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { fetchMemberBySlug } from "@/lib/query-options";
+import { fetchMemberByUsername } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/utils";
 
 export default function MemberPage({ params }: { params: { slug: string } }) {
-  const slug = params.slug;
-  const { data, isLoading, isError } = useQuery(fetchMemberBySlug(slug));
+  const username = params.slug; // URL param is still 'slug' for backward compatibility
+  const { data, isLoading, isError } = useQuery(
+    fetchMemberByUsername(username)
+  );
 
   const member = data?.member;
 

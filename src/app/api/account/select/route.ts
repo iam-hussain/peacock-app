@@ -8,7 +8,7 @@ import prisma from "@/db";
 
 type AccountToTransform = {
   id: string;
-  slug: string;
+  username: string;
   firstName: string;
   lastName: string | null;
   active: boolean;
@@ -18,7 +18,7 @@ type AccountToTransform = {
 function accountSelectTransform(account: AccountToTransform) {
   return {
     id: account.id,
-    slug: account.slug,
+    username: account.username,
     name: `${account.firstName}${account.lastName ? ` ${account.lastName}` : ""}`,
     active: account.active,
     isMember: account.isMember,
@@ -29,7 +29,7 @@ export async function POST() {
   const accounts = await prisma.account.findMany({
     select: {
       id: true,
-      slug: true,
+      username: true,
       firstName: true,
       lastName: true,
       active: true,

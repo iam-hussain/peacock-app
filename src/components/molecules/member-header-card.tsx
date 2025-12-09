@@ -19,7 +19,7 @@ import { moneyFormat } from "@/lib/utils";
 interface MemberHeaderCardProps {
   member: {
     id: string;
-    slug: string;
+    username: string;
     name: string;
     avatar?: string;
     startAt: number;
@@ -44,7 +44,7 @@ export function MemberHeaderCard({ member }: MemberHeaderCardProps) {
               src={member.avatar}
               alt={member.name}
               name={member.name}
-              href={`/dashboard/member/${member.slug}`}
+              href={`/dashboard/member/${member.username}`}
               size="xl"
             />
             <div className="flex flex-col items-center gap-2 md:items-start">
@@ -79,13 +79,13 @@ export function MemberHeaderCard({ member }: MemberHeaderCardProps) {
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/dashboard/transaction?member=${member.slug}`}>
+              <Link href={`/dashboard/transaction?member=${member.username}`}>
                 <Receipt className="mr-2 h-4 w-4" />
                 View Transactions
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/dashboard/member/${member.slug}?export=pdf`}>
+              <Link href={`/dashboard/member/${member.username}?export=pdf`}>
                 <Download className="mr-2 h-4 w-4" />
                 Export PDF
               </Link>
@@ -99,13 +99,15 @@ export function MemberHeaderCard({ member }: MemberHeaderCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/transaction?member=${member.slug}`}>
+                  <Link
+                    href={`/dashboard/transaction?member=${member.username}`}
+                  >
                     <Receipt className="mr-2 h-4 w-4" />
                     View All Transactions
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/loans?member=${member.slug}`}>
+                  <Link href={`/dashboard/loans?member=${member.username}`}>
                     <FileText className="mr-2 h-4 w-4" />
                     View All Loans
                   </Link>

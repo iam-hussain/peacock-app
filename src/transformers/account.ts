@@ -49,8 +49,8 @@ export function transformLoanForTable(vendorInput: ToTransform) {
 
   return {
     id: member.id,
-    slug: member.slug,
-    link: `/dashboard/member/${member.slug}`,
+    username: member.username,
+    link: `/dashboard/member/${member.username}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar
       ? member.avatar.startsWith("/image/")
@@ -138,8 +138,8 @@ export function membersTableTransform(
 
   return {
     id: member.id,
-    slug: member.slug,
-    link: `/dashboard/member/${member.slug}`,
+    username: member.username,
+    link: `/dashboard/member/${member.username}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
     avatar: member.avatar
       ? member.avatar.startsWith("/image/")

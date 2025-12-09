@@ -65,7 +65,6 @@ export async function setupSuperAdmin() {
       data: {
         firstName: "Super",
         lastName: "Admin",
-        slug: "super-admin",
         username: adminUsername,
         passwordHash,
         role: "SUPER_ADMIN",

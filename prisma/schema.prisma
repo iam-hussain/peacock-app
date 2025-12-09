@@ -19,10 +19,9 @@ model Account {
   id                  String        @id @default(auto()) @map("_id") @db.ObjectId
   firstName           String
   lastName            String?
-  slug                String        @unique
   // Auth
-  username            String?       // for login (enforce uniqueness in app logic for non-null values)
-  email               String?       // for login (enforce uniqueness in app logic for non-null values)
+  username            String        @unique // for login (required, unique)
+  email               String? // for login (enforce uniqueness in app logic for non-null values)
   passwordHash        String? // bcrypt hash; null for vendor-only accounts
   // Access control
   role                ROLE          @default(MEMBER)

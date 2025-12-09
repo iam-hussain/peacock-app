@@ -9,7 +9,7 @@ import path from "path";
 
 import prisma from "@/db";
 import { newZoneDate } from "@/lib/date";
-import { getDefaultPassbookData } from "@/lib/helper";
+import { generateVendorUsername, getDefaultPassbookData } from "@/lib/helper";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +20,6 @@ export async function POST(request: Request) {
       id,
       firstName,
       lastName,
-      slug,
       username,
       password,
       phone,
@@ -65,18 +64,46 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate slug (required for new members, optional for updates)
-    if (!id && !slug) {
-      return NextResponse.json(
-        { error: "Username is required" },
-        { status: 400 }
-      );
+    // Determine username: for vendors, auto-generate; for members, use provided username
+    let finalUsername: string;
+    if (!id) {
+      // Creating new account
+      if (isMember === false) {
+        // Vendor: auto-generate username
+        finalUsername = generateVendorUsername(firstName, lastName);
+      } else {
+        // Member: username is required
+        if (!username) {
+          return NextResponse.json(
+            { error: "Username is required for members" },
+            { status: 400 }
+          );
+        }
+        finalUsername = username;
+      }
+    } else {
+      // Updating existing account
+      if (username) {
+        finalUsername = username;
+      } else {
+        // If no username provided, keep existing username
+        const existingAccount = await prisma.account.findUnique({
+          where: { id },
+          select: { username: true },
+        });
+        if (!existingAccount?.username) {
+          return NextResponse.json(
+            { error: "Username is required" },
+            { status: 400 }
+          );
+        }
+        finalUsername = existingAccount.username;
+      }
     }
 
-    // Validate slug if provided
-    if (slug) {
-      // Check slug format
-      if (!/^[a-z0-9_-]+$/.test(slug)) {
+    // Validate username format
+    if (finalUsername) {
+      if (!/^[a-z0-9_-]+$/.test(finalUsername)) {
         return NextResponse.json(
           {
             error:
@@ -85,16 +112,16 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-      if (slug.length < 3 || slug.length > 30) {
+      if (finalUsername.length < 3 || finalUsername.length > 50) {
         return NextResponse.json(
-          { error: "Username must be between 3 and 30 characters" },
+          { error: "Username must be between 3 and 50 characters" },
           { status: 400 }
         );
       }
 
-      // Check slug uniqueness (excluding current account if updating)
+      // Check username uniqueness (excluding current account if updating)
       const existingAccount = await prisma.account.findUnique({
-        where: { slug },
+        where: { username: finalUsername },
         select: { id: true },
       });
 
@@ -112,9 +139,7 @@ export async function POST(request: Request) {
     const commonData: Parameters<typeof prisma.account.update>[0]["data"] = {
       firstName: firstName || undefined,
       lastName: lastName ?? undefined,
-      slug: slug ?? undefined,
-      // Set username = slug for login
-      username: slug ? slug : (username ?? undefined),
+      username: finalUsername,
       phone: phone ?? undefined,
       email: email ?? undefined,
       avatar: avatar ?? undefined,
@@ -210,7 +235,7 @@ export async function POST(request: Request) {
 
     const createData: any = {
       ...commonData,
-      slug: slug, // Required, validated above
+      username: finalUsername, // Required, validated above
       readAccess: defaultReadAccess,
       writeAccess: defaultWriteAccess,
       role: defaultRole,

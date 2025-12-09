@@ -16,13 +16,13 @@ export const fetchCache = "force-no-store";
 
 export async function POST(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: { username: string } }
 ) {
-  const { slug } = params;
+  const { username } = params;
 
   try {
     const account = await prisma.account.findUniqueOrThrow({
-      where: { slug, isMember: true },
+      where: { username, isMember: true },
       include: { passbook: true },
     });
 
@@ -49,7 +49,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error("Error fetching member by slug:", error);
+    console.error("Error fetching member by username:", error);
     return NextResponse.json(
       { message: "Failed to fetch member." },
       { status: 500 }
@@ -57,7 +57,7 @@ export async function POST(
   }
 }
 
-export type GetMemberBySlugResponse = {
+export type GetMemberByUsernameResponse = {
   member: TransformedMember &
     TransformedLoan &
     ReturnType<typeof memberMonthsPassedString>;

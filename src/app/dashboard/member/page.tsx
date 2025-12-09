@@ -40,7 +40,7 @@ export default function MembersPage() {
       filtered = filtered.filter(
         (m) =>
           m.name.toLowerCase().includes(query) ||
-          m.slug.toLowerCase().includes(query) ||
+          m.username.toLowerCase().includes(query) ||
           m.id.toLowerCase().includes(query)
       );
     }
@@ -71,7 +71,7 @@ export default function MembersPage() {
   };
 
   const handleViewTransactions = (member: TransformedMember) => {
-    window.location.href = `/dashboard/transaction?member=${member.slug}`;
+    window.location.href = `/dashboard/transaction?member=${member.username}`;
   };
 
   const handleResetFilters = () => {
