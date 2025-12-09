@@ -14,6 +14,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 import {
   Table,
   TableBody,
@@ -81,10 +82,63 @@ export function DataTable<TData, TValue>({
 
   if (isLoading) {
     return (
-      <div className="rounded-lg border border-border bg-card p-8">
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded bg-muted" />
+      <div className="space-y-4">
+        {/* Desktop Table Skeleton */}
+        <div className="hidden lg:block overflow-hidden rounded-lg border border-border bg-card">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-card">
+                <TableRow className="border-b">
+                  {columns.slice(0, Math.min(columns.length, 5)).map((_, i) => (
+                    <TableHead key={i} className="h-12 px-4">
+                      <Skeleton className="h-4 w-24" />
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[...Array(5)].map((_, i) => (
+                  <TableRow key={i} className="border-b">
+                    {columns
+                      .slice(0, Math.min(columns.length, 5))
+                      .map((_, j) => (
+                        <TableCell key={j} className="px-4 py-3">
+                          <Skeleton className="h-5 w-full" />
+                        </TableCell>
+                      ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Mobile Card Skeleton */}
+        <div className="lg:hidden space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="rounded-lg border border-border bg-card p-4 space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                {[...Array(4)].map((_, j) => (
+                  <div key={j} className="space-y-1">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

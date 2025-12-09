@@ -14,7 +14,8 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { TransformedTransaction } from "@/app/api/transaction/route";
 import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
@@ -39,6 +40,9 @@ import { moneyFormat } from "@/lib/utils";
 
 export default function TransactionsPage() {
   const { canWrite } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: accounts = [] } = useQuery(fetchAccountSelect());
   const [searchQuery, setSearchQuery] = useState("");
   const [accountFilter, setAccountFilter] = useState("all");
@@ -51,6 +55,238 @@ export default function TransactionsPage() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransformedTransaction | null>(null);
+  const urlFilterApplied = useRef(false);
+  const isInitialMount = useRef(true);
+
+  // Update URL with current filter values
+  const updateURL = useCallback(
+    (updates: {
+      account?: string | null;
+      type?: string | null;
+      startDate?: Date | null | undefined;
+      endDate?: Date | null | undefined;
+      pageSize?: number;
+      page?: number;
+      clearMember?: boolean;
+    }) => {
+      const params = new URLSearchParams();
+
+      // Handle account filter - if account is set, find member slug, otherwise keep member if exists
+      if (updates.account !== undefined) {
+        if (
+          updates.account === "all" ||
+          updates.clearMember ||
+          !updates.account
+        ) {
+          params.delete("member");
+          params.delete("account");
+        } else {
+          // Find account and use member slug if available, otherwise use account ID
+          const account = accounts.find((acc) => acc.id === updates.account);
+          if (account?.slug) {
+            params.set("member", account.slug);
+          } else if (updates.account) {
+            params.set("account", updates.account);
+          }
+        }
+      } else {
+        // Preserve existing member/account if not being updated
+        const existingMember = searchParams.get("member");
+        const existingAccount = searchParams.get("account");
+        if (existingMember) {
+          params.set("member", existingMember);
+        } else if (existingAccount) {
+          params.set("account", existingAccount);
+        }
+      }
+
+      // Handle type filter
+      if (updates.type !== undefined) {
+        if (updates.type && updates.type !== "all") {
+          params.set("type", updates.type);
+        }
+      } else {
+        const existingType = searchParams.get("type");
+        if (existingType) {
+          params.set("type", existingType);
+        }
+      }
+
+      // Handle date filters
+      // Check if the key exists in updates object (even if value is undefined)
+      if ("startDate" in updates) {
+        if (updates.startDate && updates.startDate !== null) {
+          params.set("startDate", updates.startDate.toISOString());
+        } else {
+          // Explicitly delete if null or undefined
+          params.delete("startDate");
+        }
+      } else {
+        const existingStartDate = searchParams.get("startDate");
+        if (existingStartDate) {
+          params.set("startDate", existingStartDate);
+        }
+      }
+
+      if ("endDate" in updates) {
+        if (updates.endDate && updates.endDate !== null) {
+          params.set("endDate", updates.endDate.toISOString());
+        } else {
+          // Explicitly delete if null or undefined
+          params.delete("endDate");
+        }
+      } else {
+        const existingEndDate = searchParams.get("endDate");
+        if (existingEndDate) {
+          params.set("endDate", existingEndDate);
+        }
+      }
+
+      // Handle page size - always include in URL
+      if (updates.pageSize !== undefined) {
+        params.set("pageSize", updates.pageSize.toString());
+      } else {
+        const existingPageSize = searchParams.get("pageSize");
+        if (existingPageSize) {
+          params.set("pageSize", existingPageSize);
+        } else {
+          // Default to 25 if not specified
+          params.set("pageSize", "25");
+        }
+      }
+
+      // Handle page - always include in URL
+      if (updates.page !== undefined) {
+        params.set("page", updates.page.toString());
+      } else {
+        const existingPage = searchParams.get("page");
+        if (existingPage) {
+          params.set("page", existingPage);
+        } else {
+          // Default to 1 if not specified
+          params.set("page", "1");
+        }
+      }
+
+      const newURL = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      router.push(newURL, { scroll: false });
+    },
+    [pathname, router, searchParams, accounts]
+  );
+
+  // Read initial values from URL on mount
+  useEffect(() => {
+    if (isInitialMount.current && accounts.length > 0) {
+      // Read account filter from URL (by member slug or account ID)
+      const memberSlug = searchParams.get("member");
+      const accountParam = searchParams.get("account");
+
+      if (memberSlug) {
+        const memberAccount = accounts.find(
+          (acc) => acc.slug === memberSlug || acc.id === memberSlug
+        );
+        if (memberAccount) {
+          setAccountFilter(memberAccount.id);
+          urlFilterApplied.current = true;
+        }
+      } else if (accountParam) {
+        const account = accounts.find((acc) => acc.id === accountParam);
+        if (account) {
+          setAccountFilter(accountParam);
+        }
+      }
+
+      // Read type filter
+      const typeParam = searchParams.get("type");
+      if (typeParam) {
+        setTypeFilter(typeParam);
+      }
+
+      // Read date filters
+      const startDateParam = searchParams.get("startDate");
+      if (startDateParam) {
+        setStartDate(new Date(startDateParam));
+      }
+      const endDateParam = searchParams.get("endDate");
+      if (endDateParam) {
+        setEndDate(new Date(endDateParam));
+      }
+
+      // Read page size
+      const pageSizeParam = searchParams.get("pageSize");
+      if (pageSizeParam) {
+        setPageSize(parseInt(pageSizeParam, 10));
+      }
+
+      // Read page
+      const pageParam = searchParams.get("page");
+      if (pageParam) {
+        setCurrentPage(parseInt(pageParam, 10));
+      }
+
+      isInitialMount.current = false;
+    }
+  }, [searchParams, accounts]);
+
+  // Track previous filter values to detect changes
+  const prevFilters = useRef({ accountFilter, typeFilter, startDate, endDate });
+  const prevPage = useRef(currentPage);
+  const prevPageSize = useRef(pageSize);
+
+  // Update URL when filters change - reset page to 1
+  useEffect(() => {
+    if (!isInitialMount.current) {
+      const filtersChanged =
+        prevFilters.current.accountFilter !== accountFilter ||
+        prevFilters.current.typeFilter !== typeFilter ||
+        prevFilters.current.startDate?.getTime() !== startDate?.getTime() ||
+        prevFilters.current.endDate?.getTime() !== endDate?.getTime();
+
+      if (filtersChanged) {
+        setCurrentPage(1);
+        prevFilters.current = { accountFilter, typeFilter, startDate, endDate };
+        updateURL({
+          account: accountFilter,
+          type: typeFilter,
+          startDate,
+          endDate,
+          pageSize,
+          page: 1, // Reset to page 1 when filters change
+          clearMember: accountFilter === "all",
+        });
+      }
+    }
+  }, [accountFilter, typeFilter, startDate, endDate, pageSize, updateURL]);
+
+  // Update URL when page or pageSize change (but not from filter changes)
+  useEffect(() => {
+    if (!isInitialMount.current) {
+      const pageChanged = prevPage.current !== currentPage;
+      const pageSizeChanged = prevPageSize.current !== pageSize;
+
+      if (pageChanged || pageSizeChanged) {
+        prevPage.current = currentPage;
+        prevPageSize.current = pageSize;
+        updateURL({
+          account: accountFilter,
+          type: typeFilter,
+          startDate,
+          endDate,
+          pageSize,
+          page: currentPage,
+          clearMember: accountFilter === "all",
+        });
+      }
+    }
+  }, [
+    currentPage,
+    pageSize,
+    accountFilter,
+    typeFilter,
+    startDate,
+    endDate,
+    updateURL,
+  ]);
 
   // Build query options
   const queryOptions = useMemo(
@@ -159,7 +395,10 @@ export default function TransactionsPage() {
     setTypeFilter("all");
     setStartDate(undefined);
     setEndDate(undefined);
+    setPageSize(25);
     setCurrentPage(1);
+    // Clear all URL parameters - navigate to clean URL
+    router.push(pathname, { scroll: false });
   };
 
   const handleApplyFilters = () => {
@@ -495,8 +734,20 @@ export default function TransactionsPage() {
           dateRange={{
             startDate,
             endDate,
-            onStartDateChange: setStartDate,
-            onEndDateChange: setEndDate,
+            onStartDateChange: (date) => {
+              setStartDate(date);
+              // If new start date is after end date, clear end date
+              if (date && endDate && date > endDate) {
+                setEndDate(undefined);
+              }
+            },
+            onEndDateChange: (date) => {
+              setEndDate(date);
+              // If new end date is before start date, clear start date
+              if (date && startDate && date < startDate) {
+                setStartDate(undefined);
+              }
+            },
           }}
           pageSize={{
             value: pageSize,
@@ -616,9 +867,21 @@ export default function TransactionsPage() {
         typeFilter={typeFilter}
         onTypeFilterChange={setTypeFilter}
         startDate={startDate}
-        onStartDateChange={setStartDate}
+        onStartDateChange={(date) => {
+          setStartDate(date);
+          // If new start date is after end date, clear end date
+          if (date && endDate && date > endDate) {
+            setEndDate(undefined);
+          }
+        }}
         endDate={endDate}
-        onEndDateChange={setEndDate}
+        onEndDateChange={(date) => {
+          setEndDate(date);
+          // If new end date is before start date, clear start date
+          if (date && startDate && date < startDate) {
+            setStartDate(undefined);
+          }
+        }}
         pageSize={pageSize}
         onPageSizeChange={setPageSize}
         accountOptions={accountOptions}

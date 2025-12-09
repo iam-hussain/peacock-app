@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 interface ModernStatCardProps {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   icon: ReactElement;
   iconBgColor?: string;
   trend?: {
@@ -54,14 +54,25 @@ export function ModernStatCard({
           </div>
           {/* Center: Value */}
           <div className="flex-1 text-center">
-            <p
-              className={cn(
-                "font-bold tracking-tight text-foreground",
-                isHighlighted ? "text-2xl" : "text-xl"
-              )}
-            >
-              {value}
-            </p>
+            {typeof value === "string" || typeof value === "number" ? (
+              <p
+                className={cn(
+                  "font-bold tracking-tight text-foreground",
+                  isHighlighted ? "text-2xl" : "text-xl"
+                )}
+              >
+                {value}
+              </p>
+            ) : (
+              <div
+                className={cn(
+                  "font-bold tracking-tight text-foreground",
+                  isHighlighted ? "text-2xl" : "text-xl"
+                )}
+              >
+                {value}
+              </div>
+            )}
             {trend && (
               <p
                 className={cn(

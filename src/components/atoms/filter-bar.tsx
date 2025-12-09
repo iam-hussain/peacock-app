@@ -173,7 +173,7 @@ export function FilterBar({
           </Select>
         )}
 
-        {/* Date From */}
+        {/* Date From (Start Date) */}
         {dateRange?.onStartDateChange && (
           <Popover>
             <PopoverTrigger asChild>
@@ -188,7 +188,7 @@ export function FilterBar({
                 {dateRange.startDate ? (
                   format(dateRange.startDate, "PPP")
                 ) : (
-                  <span>Date From</span>
+                  <span>Start Date</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -198,12 +198,17 @@ export function FilterBar({
                 selected={dateRange.startDate}
                 onSelect={dateRange.onStartDateChange}
                 initialFocus={false}
+                disabled={
+                  dateRange.endDate
+                    ? (date) => date > dateRange.endDate!
+                    : undefined
+                }
               />
             </PopoverContent>
           </Popover>
         )}
 
-        {/* Date To */}
+        {/* Date To (End Date) */}
         {dateRange?.onEndDateChange && (
           <Popover>
             <PopoverTrigger asChild>
@@ -218,7 +223,7 @@ export function FilterBar({
                 {dateRange.endDate ? (
                   format(dateRange.endDate, "PPP")
                 ) : (
-                  <span>Date To</span>
+                  <span>End Date</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -228,6 +233,11 @@ export function FilterBar({
                 selected={dateRange.endDate}
                 onSelect={dateRange.onEndDateChange}
                 initialFocus={false}
+                disabled={
+                  dateRange.startDate
+                    ? (date) => date < dateRange.startDate!
+                    : undefined
+                }
               />
             </PopoverContent>
           </Popover>

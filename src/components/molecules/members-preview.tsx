@@ -182,7 +182,9 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
                 <div className="flex justify-end pb-4">
                   <CustomLink
                     href={selectedMemberData.member.link}
-                    className="text-sm font-medium text-primary hover:underline"
+                    variant="link"
+                    size="none"
+                    className="text-sm font-medium"
                   >
                     View full profile →
                   </CustomLink>
