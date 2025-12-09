@@ -264,7 +264,7 @@ export default function Home() {
                         ? "Super Admin"
                         : profileData?.account
                           ? `${profileData.account.firstName || ""} ${profileData.account.lastName || ""}`.trim() ||
-                          profileData.account.username
+                            profileData.account.username
                           : "Access your club dashboard and manage your account."}
                     </CardDescription>
                   </CardHeader>
