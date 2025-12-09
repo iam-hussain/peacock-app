@@ -120,10 +120,10 @@ export function TransactionFilterDrawer({
 
             <Separator />
 
-            {/* Date From */}
+            {/* Start Date */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Date From
+                Start Date
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -144,15 +144,16 @@ export function TransactionFilterDrawer({
                     selected={startDate}
                     onSelect={onStartDateChange}
                     initialFocus
+                    disabled={endDate ? (date) => date > endDate : undefined}
                   />
                 </PopoverContent>
               </Popover>
             </div>
 
-            {/* Date To */}
+            {/* End Date */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Date To
+                End Date
               </label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -173,6 +174,9 @@ export function TransactionFilterDrawer({
                     selected={endDate}
                     onSelect={onEndDateChange}
                     initialFocus
+                    disabled={
+                      startDate ? (date) => date < startDate : undefined
+                    }
                   />
                 </PopoverContent>
               </Popover>
@@ -196,6 +200,7 @@ export function TransactionFilterDrawer({
                   <SelectItem value="10">10 per page</SelectItem>
                   <SelectItem value="25">25 per page</SelectItem>
                   <SelectItem value="50">50 per page</SelectItem>
+                  <SelectItem value="100">100 per page</SelectItem>
                 </SelectContent>
               </Select>
             </div>

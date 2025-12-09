@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -24,11 +24,20 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 import fetcher from "@/lib/fetcher";
+import { fetchAccountSelect } from "@/lib/query-options";
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, "Username or email is required."),
+  username: z.string().min(1, "Username is required."),
   password: z.string().min(1, "Password is required."),
 });
 
@@ -37,6 +46,14 @@ type LoginFormSchema = z.infer<typeof loginFormSchema>;
 export function LoginFormCard() {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
+  const { data: accounts = [] } = useQuery(fetchAccountSelect());
+
+  // Filter accounts to only show active members who can potentially login
+  const loginableAccounts = useMemo(() => {
+    return accounts
+      .filter((acc) => acc.isMember && acc.active)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [accounts]);
 
   const form = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
@@ -93,15 +110,36 @@ export function LoginFormCard() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    Username or email
+                    Username
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter username or email"
-                      className="h-11 rounded-lg"
-                      {...field}
-                    />
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="h-11 rounded-lg">
+                        <SelectValue placeholder="Select username" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {/* Member Accounts */}
+                        {loginableAccounts.length > 0 ? (
+                          loginableAccounts.map((account) => {
+                            // Use slug (username) as value, fallback to id if slug is missing
+                            const username = account.slug || account.id;
+                            return (
+                              <SelectItem key={account.id} value={username}>
+                                {account.name}
+                              </SelectItem>
+                            );
+                          })
+                        ) : (
+                          <SelectItem value="" disabled>
+                            No accounts available
+                          </SelectItem>
+                        )}
+                        {/* Separator */}
+                        {loginableAccounts.length > 0 && <SelectSeparator />}
+                        {/* Super Admin Option */}
+                        <SelectItem value="admin">Super Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>

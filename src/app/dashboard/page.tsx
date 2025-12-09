@@ -25,6 +25,8 @@ import { ActivityFeed } from "@/components/molecules/activity-feed";
 import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
 import { MembersPreview } from "@/components/molecules/members-preview";
 import { ModernStatCard } from "@/components/molecules/modern-stat-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { clubAge } from "@/lib/date";
 import { fetchStatistics } from "@/lib/query-options";
 
@@ -32,29 +34,6 @@ export default function DashboardPage() {
   const { data, isLoading } = useQuery(fetchStatistics());
   const statistics = data?.statistics;
   const members = data?.members || [];
-
-  if (isLoading) {
-    return (
-      <div className="w-full max-w-7xl mx-auto space-y-6">
-        <div className="h-8 w-64 animate-pulse rounded bg-muted" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded-lg bg-muted" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!statistics) {
-    return (
-      <div className="w-full max-w-7xl mx-auto space-y-6">
-        <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-          No statistics available
-        </div>
-      </div>
-    );
-  }
 
   const club = clubAge();
 
@@ -65,19 +44,22 @@ export default function DashboardPage() {
       maximumFractionDigits: 0,
     });
 
-  // Calculate derived values
-  const totalInvested =
-    statistics.totalLoanBalance + statistics.totalVendorHolding;
-  const pendingAmounts =
-    statistics.totalInterestBalance +
-    statistics.totalOffsetBalance +
-    statistics.totalMemberPeriodicDepositsBalance;
-  const currentPortfolioValue = statistics.currentClubNetValue;
+  // Calculate derived values (use 0 as fallback when loading)
+  const totalInvested = statistics
+    ? statistics.totalLoanBalance + statistics.totalVendorHolding
+    : 0;
+  const pendingAmounts = statistics
+    ? statistics.totalInterestBalance +
+      statistics.totalOffsetBalance +
+      statistics.totalMemberPeriodicDepositsBalance
+    : 0;
+  const currentPortfolioValue = statistics?.currentClubNetValue || 0;
   const netValue = currentPortfolioValue + pendingAmounts;
-  const availableCash =
-    statistics.currentClubNetValue -
-    statistics.totalLoanBalance -
-    statistics.totalVendorHolding;
+  const availableCash = statistics
+    ? statistics.currentClubNetValue -
+      statistics.totalLoanBalance -
+      statistics.totalVendorHolding
+    : 0;
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6">
@@ -93,13 +75,25 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         <ModernStatCard
           title="Active Members"
-          value={statistics.membersCount}
+          value={
+            isLoading ? (
+              <Skeleton className="h-6 w-12" />
+            ) : (
+              statistics?.membersCount || 0
+            )
+          }
           icon={<Users className="h-5 w-5" />}
           iconBgColor="#E3F2FD"
         />
         <ModernStatCard
           title="Club Age"
-          value={`${club.inMonth} months`}
+          value={
+            isLoading ? (
+              <Skeleton className="h-6 w-16" />
+            ) : (
+              `${club.inMonth} months`
+            )
+          }
           icon={<CalendarDays className="h-5 w-5" />}
           iconBgColor="#EDE7F6"
         />
@@ -117,15 +111,27 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Total Deposits"
-              value={formatCurrency(statistics.totalMemberPeriodicDeposits)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalMemberPeriodicDeposits || 0)
+                )
+              }
               icon={<CircleDollarSign className="h-5 w-5" />}
               iconBgColor="#E8F5E9"
             />
             <ModernStatCard
               title="Member Balance"
-              value={formatCurrency(
-                statistics.totalMemberPeriodicDepositsBalance
-              )}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(
+                    statistics?.totalMemberPeriodicDepositsBalance || 0
+                  )
+                )
+              }
               icon={<Wallet className="h-5 w-5" />}
               iconBgColor="#FFF3E0"
             />
@@ -142,13 +148,25 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Withdrawals"
-              value={formatCurrency(statistics.totalMemberProfitWithdrawals)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalMemberProfitWithdrawals || 0)
+                )
+              }
               icon={<ArrowDownCircle className="h-5 w-5" />}
               iconBgColor="#FBE9E7"
             />
             <ModernStatCard
               title="Member Adjustments"
-              value={formatCurrency(statistics.totalOffsetAmount)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalOffsetAmount || 0)
+                )
+              }
               icon={<SlidersHorizontal className="h-5 w-5" />}
               iconBgColor="#F3E5F5"
             />
@@ -165,19 +183,37 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Loan Taken"
-              value={formatCurrency(statistics.totalLoanTaken)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalLoanTaken || 0)
+                )
+              }
               icon={<Hand className="h-5 w-5" />}
               iconBgColor="#E1F5FE"
             />
             <ModernStatCard
               title="Interest Collected"
-              value={formatCurrency(statistics.totalInterestPaid)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalInterestPaid || 0)
+                )
+              }
               icon={<Coins className="h-5 w-5" />}
               iconBgColor="#E8F5E9"
             />
             <ModernStatCard
               title="Interest Balance"
-              value={formatCurrency(statistics.totalInterestBalance)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalInterestBalance || 0)
+                )
+              }
               icon={<Scale className="h-5 w-5" />}
               iconBgColor="#FFF9C4"
             />
@@ -192,13 +228,25 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Vendor Investment"
-              value={formatCurrency(statistics.totalVendorHolding)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalVendorHolding || 0)
+                )
+              }
               icon={<Briefcase className="h-5 w-5" />}
               iconBgColor="#E3F2FD"
             />
             <ModernStatCard
               title="Vendor Profit"
-              value={formatCurrency(statistics.totalVendorProfit)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalVendorProfit || 0)
+                )
+              }
               icon={<TrendingUp className="h-5 w-5" />}
               iconBgColor="#E8F5E9"
             />
@@ -215,19 +263,37 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             <ModernStatCard
               title="Available Cash"
-              value={formatCurrency(availableCash)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(availableCash)
+                )
+              }
               icon={<Wallet className="h-5 w-5" />}
               iconBgColor="#FFF3E0"
             />
             <ModernStatCard
               title="Total Invested"
-              value={formatCurrency(totalInvested)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(totalInvested)
+                )
+              }
               icon={<Layers className="h-5 w-5" />}
               iconBgColor="#E1F5FE"
             />
             <ModernStatCard
               title="Pending Amounts"
-              value={formatCurrency(pendingAmounts)}
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(pendingAmounts)
+                )
+              }
               icon={<Clock className="h-5 w-5" />}
               iconBgColor="#F3E5F5"
             />
@@ -243,13 +309,25 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <ModernStatCard
             title="Current Value"
-            value={formatCurrency(currentPortfolioValue)}
+            value={
+              isLoading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                formatCurrency(currentPortfolioValue)
+              )
+            }
             icon={<Banknote className="h-5 w-5" />}
             iconBgColor="#E8F5E9"
           />
           <ModernStatCard
             title="Total Value"
-            value={formatCurrency(netValue)}
+            value={
+              isLoading ? (
+                <Skeleton className="h-6 w-24" />
+              ) : (
+                formatCurrency(netValue)
+              )
+            }
             icon={<Crown className="h-5 w-5" />}
             iconBgColor="#FFF3E0"
             isHighlighted={true}
@@ -260,7 +338,22 @@ export default function DashboardPage() {
       </div>
 
       {/* ANALYTICS SECTION - 2 Charts Side-by-Side */}
-      <EnhancedChartsSection statistics={statistics} />
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border-border/50">
+            <CardContent className="p-6">
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+          <Card className="border-border/50">
+            <CardContent className="p-6">
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <EnhancedChartsSection statistics={statistics!} />
+      )}
 
       {/* MEMBERS SNAPSHOT & RECENT ACTIVITY - Side by Side on Desktop */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -268,15 +361,52 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Members Snapshot
           </h3>
-          <MembersPreview initialMembers={members.slice(0, 16)} />
+          {isLoading ? (
+            <Card className="border-border/50">
+              <CardContent className="p-6">
+                <Skeleton className="h-48 w-full" />
+              </CardContent>
+            </Card>
+          ) : (
+            <MembersPreview initialMembers={members.slice(0, 16)} />
+          )}
         </div>
         <div className="space-y-3">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Recent Activity
           </h3>
-          <ActivityFeed limit={10} />
+          {isLoading ? (
+            <Card className="border-border/50">
+              <CardContent className="p-6 space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : (
+            <ActivityFeed limit={10} />
+          )}
         </div>
       </div>
     </div>
   );
+
+  if (!statistics) {
+    return (
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Overview of your financial club management
+          </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+          No statistics available
+        </div>
+      </div>
+    );
+  }
 }
