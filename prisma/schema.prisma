@@ -73,7 +73,6 @@ model Passbook {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   type          PASSBOOK_TYPE @default(VENDOR)
   payload       Json          @default("{}")
-  loanHistory   Json          @default("[]")
   joiningOffset Float         @default(0)
   delayOffset   Float         @default(0)
   account       Account?

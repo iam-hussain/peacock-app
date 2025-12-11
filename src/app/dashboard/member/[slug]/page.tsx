@@ -210,11 +210,10 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
                     Member Status
                   </span>
                   <span
-                    className={`text-sm font-semibold ${
-                      member.active
+                    className={`text-sm font-semibold ${member.active
                         ? "text-green-600 dark:text-green-500"
                         : "text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {member.status}
                   </span>
@@ -366,8 +365,8 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
         {/* Loan Transactions Tab */}
         <TabsContent value="loan-transactions" className="space-y-4">
           {member.loanHistory &&
-          Array.isArray(member.loanHistory) &&
-          member.loanHistory.length > 0 ? (
+            Array.isArray(member.loanHistory) &&
+            member.loanHistory.length > 0 ? (
             <div className="space-y-4">
               {member.loanHistory
                 .sort((a, b) => {
@@ -387,6 +386,7 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
                     key={`${transaction.startDate}-${index}`}
                     transaction={transaction}
                     index={index + 1}
+                    totalCount={member.loanHistory.length}
                   />
                 ))}
             </div>

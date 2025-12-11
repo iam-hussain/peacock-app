@@ -21,6 +21,28 @@ export function fetchLoanTransaction(accountId?: string | null) {
   });
 }
 
+export async function getLoanHistoryForMember(
+  accountId: string
+): Promise<LoanHistoryEntry[]> {
+  const transactions = await fetchLoanTransaction(accountId);
+  const loanTransaction = transactions.filter((e) =>
+    ["LOAN_TAKEN", "LOAN_REPAY"].includes(e.transactionType)
+  );
+
+  // Group transactions by member (for LOAN_TAKEN, member is toId; for LOAN_REPAY, member is fromId)
+  const memberTransactions: Transaction[] = [];
+  loanTransaction.forEach((each) => {
+    if (each.transactionType === "LOAN_TAKEN" && each.toId === accountId) {
+      memberTransactions.push(each);
+    } else if (each.transactionType === "LOAN_REPAY" && each.fromId === accountId) {
+      memberTransactions.push(each);
+    }
+  });
+
+  const { loanHistory } = calculateLoanDetails(memberTransactions);
+  return loanHistory;
+}
+
 const getOneLoanDetails = (
   amount: number,
   start: Date | string,
@@ -114,20 +136,13 @@ export const calculateLoansHandler = (
   });
 
   Object.entries(memberGroup).forEach(([memberId, memTransactions]) => {
-    const { loanHistory, totalLoanBalance } =
-      calculateLoanDetails(memTransactions);
+    const { totalLoanBalance } = calculateLoanDetails(memTransactions);
 
     console.log(
-      `Member ID: ${memberId}, Total Loan Balance: ${totalLoanBalance}, Loan History: ${JSON.stringify(loanHistory)}`
+      `Member ID: ${memberId}, Total Loan Balance: ${totalLoanBalance}`
     );
 
-    const memberPassbook = passbookToUpdate.get(memberId);
-    if (memberPassbook) {
-      passbookToUpdate.set(
-        memberId,
-        setPassbookUpdateQuery(memberPassbook, {}, { loanHistory })
-      );
-    }
+    // Note: loanHistory is now calculated dynamically, no longer stored in DB
   });
 
   return passbookToUpdate;
@@ -154,11 +169,6 @@ export function resetMemberLoanPassbookData(
   //     })
   //   );
   // }
-  if (memberPassbook) {
-    passbookToUpdate.set(
-      memberId,
-      setPassbookUpdateQuery(memberPassbook, {}, { loanHistory: [] })
-    );
-  }
+  // Note: loanHistory is now calculated dynamically, no longer stored in DB
   return passbookToUpdate;
 }

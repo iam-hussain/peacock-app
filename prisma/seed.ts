@@ -21,8 +21,24 @@ async function seed() {
   await prisma.account.deleteMany();
   await prisma.passbook.deleteMany();
 
-  // Insert the data into Prisma models
-  await prisma.passbook.createMany({ data: backupData.passbook });
+  // Clean passbook data: remove loanHistory field (now calculated dynamically)
+  // and any accountId references (accounts will reference passbooks via passbookId)
+  const cleanedPassbooks = backupData.passbook.map((passbook: any) => {
+    // Explicitly include only fields that exist in the schema
+    return {
+      id: passbook.id || passbook._id,
+      type: passbook.type,
+      payload: passbook.payload || {},
+      joiningOffset: passbook.joiningOffset || 0,
+      delayOffset: passbook.delayOffset || 0,
+      isChit: passbook.isChit ?? true,
+      createdAt: passbook.createdAt ? new Date(passbook.createdAt) : new Date(),
+      updatedAt: passbook.updatedAt ? new Date(passbook.updatedAt) : new Date(),
+    };
+  });
+
+  // Insert passbooks first (without accountId references)
+  await prisma.passbook.createMany({ data: cleanedPassbooks });
 
   // Map accounts to include new auth fields with defaults
   // Track usernames to ensure uniqueness
