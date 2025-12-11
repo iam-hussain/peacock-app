@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
   ArcElement,
   CategoryScale,
@@ -26,7 +27,16 @@ import {
 
 import { TransformedStatistics } from "@/app/api/statistics/route";
 import { clubAge } from "@/lib/date";
+import fetcher from "@/lib/fetcher";
 import { formatIndianNumber } from "@/lib/utils";
+
+interface MonthlyData {
+  month: string;
+  monthYear: string;
+  available: number;
+  invested: number;
+  pending: number;
+}
 
 ChartJS.register(
   ArcElement,
@@ -43,32 +53,12 @@ interface EnhancedChartsSectionProps {
   statistics: TransformedStatistics;
 }
 
-// Helper to generate trend data (simulated historical data)
-function generateTrendData(
-  currentAvailable: number,
-  currentInvested: number,
-  currentPending: number,
-  months: number
-) {
-  const data = [];
-  const now = new Date();
-
-  for (let i = months - 1; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    // Simulate slight trend (this would be replaced with actual historical data)
-    const trendFactor = 1 + (months - i) * 0.02;
-    data.push({
-      month: format(date, "MMM"),
-      available: Math.max(
-        0,
-        currentAvailable * (0.7 + (trendFactor - 1) * 0.3)
-      ),
-      invested: Math.max(0, currentInvested * (0.8 + (trendFactor - 1) * 0.2)),
-      pending: Math.max(0, currentPending * (0.9 + (trendFactor - 1) * 0.1)),
-    });
-  }
-
-  return data;
+// Fetch monthly chart data from API
+async function fetchMonthlyChartData(range: string): Promise<MonthlyData[]> {
+  const response = (await fetcher.get(
+    `/api/charts/monthly-data?range=${range}`
+  )) as { data: MonthlyData[]; cached: boolean };
+  return response.data;
 }
 
 export function EnhancedChartsSection({
@@ -77,22 +67,13 @@ export function EnhancedChartsSection({
   const club = clubAge();
   const [selectedRange, setSelectedRange] = useState<string>("all-time");
 
-  // Calculate current values
-  const available = parseInt(
-    Number(statistics.currentClubBalance || 0).toString()
-  );
-  const invested = parseInt(
-    Number(
-      statistics.totalLoanBalance + statistics.totalVendorHolding
-    ).toString()
-  );
-  const pending = parseInt(
-    Number(
-      statistics.totalInterestBalance +
-        statistics.totalOffsetBalance +
-        statistics.totalMemberPeriodicDepositsBalance
-    ).toString()
-  );
+  // Fetch monthly chart data from API
+  const { data: monthlyData, isLoading: isLoadingChartData } = useQuery({
+    queryKey: ["chart-monthly-data", selectedRange],
+    queryFn: () => fetchMonthlyChartData(selectedRange),
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    gcTime: 1000 * 60 * 60 * 24, // 24 hours
+  });
 
   // Generate year options based on club age
   const yearOptions = useMemo(() => {
@@ -116,32 +97,17 @@ export function EnhancedChartsSection({
     return options;
   }, [club.inMonth]);
 
-  // Calculate months for selected range
-  const monthsForRange = useMemo(() => {
-    if (selectedRange === "all-time") {
-      return club.inMonth;
-    } else if (selectedRange.startsWith("year-")) {
-      const yearIndex = parseInt(selectedRange.split("-")[1]) - 1;
-      const yearOption = yearOptions[yearIndex];
-      if (yearOption) {
-        const months =
-          differenceInYears(yearOption.endDate, yearOption.startDate) * 12;
-        return Math.min(months, club.inMonth);
-      }
-      return 12;
-    } else {
-      return parseInt(selectedRange);
-    }
-  }, [selectedRange, yearOptions, club.inMonth]);
-
-  // Generate trend data based on selected range
+  // Use real monthly data from API or fallback to empty array
   const trendData = useMemo(() => {
-    return generateTrendData(available, invested, pending, monthsForRange);
-  }, [available, invested, pending, monthsForRange]);
+    if (!monthlyData || monthlyData.length === 0) {
+      return [];
+    }
+    return monthlyData;
+  }, [monthlyData]);
 
   // Cash Flow Trend - Multi-line Chart
   const cashFlowChartData = {
-    labels: trendData.map((d) => d.month),
+    labels: trendData.map((d) => d.monthYear),
     datasets: [
       {
         label: "Available Cash",
@@ -331,7 +297,15 @@ export function EnhancedChartsSection({
         </CardHeader>
         <CardContent>
           <div className="h-[350px]">
-            <Line data={cashFlowChartData} options={cashFlowChartOptions} />
+            {isLoadingChartData || !trendData || trendData.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-muted-foreground">
+                {isLoadingChartData
+                  ? "Loading chart data..."
+                  : "No data available"}
+              </div>
+            ) : (
+              <Line data={cashFlowChartData} options={cashFlowChartOptions} />
+            )}
           </div>
         </CardContent>
       </Card>
