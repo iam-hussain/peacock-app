@@ -387,7 +387,6 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
                     key={`${transaction.startDate}-${index}`}
                     transaction={transaction}
                     index={index + 1}
-                    totalCount={member.loanHistory.length}
                   />
                 ))}
             </div>

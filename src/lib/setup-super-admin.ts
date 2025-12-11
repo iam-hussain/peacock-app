@@ -52,6 +52,7 @@ export async function setupSuperAdmin() {
       data: {
         type: "MEMBER",
         payload: {},
+        loanHistory: [],
         joiningOffset: 0,
         delayOffset: 0,
         isChit: true,

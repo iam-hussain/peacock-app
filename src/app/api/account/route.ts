@@ -244,6 +244,7 @@ export async function POST(request: Request) {
         create: {
           type: isMember ? "MEMBER" : "VENDOR",
           payload: getDefaultPassbookData(isMember ? "MEMBER" : "VENDOR"),
+          loanHistory: [],
           joiningOffset: 0,
           delayOffset: 0,
         },

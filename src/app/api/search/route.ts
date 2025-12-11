@@ -121,21 +121,15 @@ export async function POST(request: Request) {
     // Transform vendors
     const transformedVendors = allVendors.map(transformVendorForTable);
 
-    // Transform loans - calculate dynamically to determine if member has loans
-    const loansToTransform = await Promise.all(
-      allMembers.map(async (member) => {
-        const transformed = await transformLoanForTable(member);
-        return { member, transformed };
-      })
-    );
-
-    // Filter to only include members with active loans or loan history
-    const transformedLoans = loansToTransform
+    // Transform loans
+    const transformedLoans = allMembers
       .filter(
-        ({ transformed }) =>
-          transformed.active || transformed.loanHistory.length > 0
+        (e) =>
+          e.active ||
+          (Array.isArray(e.passbook.loanHistory) &&
+            e.passbook.loanHistory.length > 0)
       )
-      .map(({ transformed }) => transformed);
+      .map(transformLoanForTable);
 
     // Filter members - improved search to handle partial matches and normalize spaces
     // Also search on original account data for firstName/lastName separately
@@ -248,9 +242,8 @@ export async function POST(request: Request) {
         const fromName = `${tx.from.firstName || ""} ${
           tx.from.lastName || ""
         }`.trim();
-        const toName = `${tx.to.firstName || ""} ${
-          tx.to.lastName || ""
-        }`.trim();
+        const toName =
+          `${tx.to.firstName || ""} ${tx.to.lastName || ""}`.trim();
         return {
           id: tx.id,
           fromName,
