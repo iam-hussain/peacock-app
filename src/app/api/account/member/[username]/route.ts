@@ -59,6 +59,6 @@ export async function POST(
 
 export type GetMemberByUsernameResponse = {
   member: TransformedMember &
-  TransformedLoan &
-  ReturnType<typeof memberMonthsPassedString>;
+    TransformedLoan &
+    ReturnType<typeof memberMonthsPassedString>;
 };

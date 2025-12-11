@@ -8,13 +8,12 @@ import { NextResponse } from "next/server";
 import prisma from "@/db";
 import { clubMonthsFromStart, getClubTotalDepositUpToday } from "@/lib/club";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { getLoanHistoryForMember } from "@/logic/loan-handler";
 import {
   ClubPassbookData,
-  LoanHistoryEntry,
   MemberPassbookData,
   VendorPassbookData,
 } from "@/lib/type";
+import { getLoanHistoryForMember } from "@/logic/loan-handler";
 
 type StatClubPassbook = {
   payload: MemberPassbookData | ClubPassbookData;
@@ -213,7 +212,9 @@ export type GetStatisticsResponse = {
   members: TransformedMemberStat[];
 };
 
-export type TransformedStatistics = ReturnType<typeof statisticsTransform>;
+export type TransformedStatistics = Awaited<
+  ReturnType<typeof statisticsTransform>
+>;
 export type TransformedMemberStat = ReturnType<typeof membersStatTransform>;
 
 function membersStatTransform(member: Account) {

@@ -4,11 +4,10 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface PhoneInputProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    "value" | "onChange"
-  > {
+export interface PhoneInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange"
+> {
   value?: string;
   onChange?: (value: string) => void;
 }

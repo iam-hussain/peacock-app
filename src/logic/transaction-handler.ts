@@ -1,6 +1,5 @@
 import { Transaction } from "@prisma/client";
 
-// Note: loanHistory is now calculated dynamically, no longer stored in DB
 import {
   PassbookConfigAction,
   PassbookConfigActionValue,
@@ -13,13 +12,22 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { MemberPassbookData } from "@/lib/type";
+import { MemberPassbookData, PassbookToUpdate } from "@/lib/type";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
 };
 
-function getPassbookUpdateQuery(
+type PassbookRole = "FROM" | "TO" | "CLUB";
+
+/**
+ * Builds a Prisma update query for a passbook based on transaction values and actions
+ * @param passbook - Prisma passbook update parameters
+ * @param values - Map of calculated values (AMOUNT, DEPOSIT_DIFF, TOTAL)
+ * @param action - Configuration action defining ADD/SUB operations
+ * @returns Updated Prisma passbook update parameters
+ */
+function buildPassbookUpdateQuery(
   passbook: Parameters<typeof prisma.passbook.update>[0],
   values: PassbookConfigActionValueMap,
   action:
@@ -27,28 +35,41 @@ function getPassbookUpdateQuery(
     | PassbookConfigAction["FROM"]
     | PassbookConfigAction["TO"]
 ): Parameters<typeof prisma.passbook.update>[0] {
-  const data: any = passbook.data.payload || {};
+  const payload = (passbook.data?.payload as Record<string, number>) || {};
 
-  return setPassbookUpdateQuery(passbook, {
-    ...Object.fromEntries(
-      Object.entries(action?.ADD || {}).map(([key, value]) => [
-        key,
-        Number(data[key as string] || 0) + values[value],
-      ])
-    ),
-    ...Object.fromEntries(
-      Object.entries(action?.SUB || {}).map(([key, value]) => [
-        key,
-        Number(data[key as string] || 0) - values[value],
-      ])
-    ),
-  });
+  const updates: Record<string, number> = {};
+
+  // Process ADD operations
+  if (action?.ADD) {
+    for (const [key, valueType] of Object.entries(action.ADD)) {
+      const currentValue = Number(payload[key] || 0);
+      updates[key] = currentValue + values[valueType];
+    }
+  }
+
+  // Process SUB operations
+  if (action?.SUB) {
+    for (const [key, valueType] of Object.entries(action.SUB)) {
+      const currentValue = Number(payload[key] || 0);
+      updates[key] = currentValue - values[valueType];
+    }
+  }
+
+  return setPassbookUpdateQuery(passbook, updates);
 }
 
-const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
+/**
+ * Fetches passbooks related to a transaction (from account, to account, and club)
+ * @param transaction - Transaction to get related passbooks for
+ * @returns Array of passbooks with their account relationships
+ */
+async function getTransactionPassbooks(transaction: Transaction) {
   return prisma.passbook.findMany({
     where: {
-      OR: [{ account: { id: { in: [fromId, toId] } } }, { type: "CLUB" }],
+      OR: [
+        { account: { id: { in: [transaction.fromId, transaction.toId] } } },
+        { type: "CLUB" },
+      ],
     },
     select: {
       id: true,
@@ -57,113 +78,166 @@ const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
       account: { select: { id: true } },
     },
   });
-};
+}
 
-type PassbookToUpdate = Map<
-  string,
-  Parameters<typeof prisma.passbook.update>[0]
->;
+/**
+ * Calculates withdrawal profit amount when a member withdraws more than their periodic deposits
+ * @param currentWithdrawalAmount - Current withdrawal amount in passbook
+ * @param transactionAmount - Amount being withdrawn in this transaction
+ * @param periodicDepositAmount - Total periodic deposits made by the member
+ * @returns Object with deposit difference (profit) and adjusted amount
+ */
+function calculateWithdrawalProfit(
+  currentWithdrawalAmount: number,
+  transactionAmount: number,
+  periodicDepositAmount: number
+) {
+  const totalWithdrawalAmount = currentWithdrawalAmount + transactionAmount;
+  const profitAmount =
+    totalWithdrawalAmount > periodicDepositAmount
+      ? totalWithdrawalAmount - periodicDepositAmount
+      : 0;
+  const adjustedAmount = transactionAmount - profitAmount;
 
-export const updatePassbookByTransaction = (
+  return {
+    depositDiff: profitAmount,
+    amount: adjustedAmount,
+  };
+}
+
+/**
+ * Calculates withdrawal values for a transaction, handling both normal and revert cases
+ * @param toPassbook - The passbook of the account receiving the withdrawal
+ * @param transactionAmount - Amount of the transaction
+ * @param isRevert - Whether this is a revert operation
+ * @returns Map of calculated values for the transaction
+ */
+function calculateWithdrawalValues(
+  toPassbook: Parameters<typeof prisma.passbook.update>[0] | undefined,
+  transactionAmount: number,
+  isRevert: boolean
+): PassbookConfigActionValueMap {
+  const values: PassbookConfigActionValueMap = {
+    AMOUNT: transactionAmount,
+    DEPOSIT_DIFF: 0,
+    TOTAL: transactionAmount,
+  };
+
+  if (!toPassbook) {
+    return values;
+  }
+
+  const payload = (toPassbook.data?.payload || {}) as MemberPassbookData;
+  const {
+    periodicDepositAmount = 0,
+    withdrawalAmount = 0,
+    profitWithdrawalAmount = 0,
+  } = payload;
+
+  if (!isRevert) {
+    // Normal withdrawal: calculate profit portion
+    const { depositDiff, amount } = calculateWithdrawalProfit(
+      withdrawalAmount,
+      transactionAmount,
+      periodicDepositAmount
+    );
+    values.DEPOSIT_DIFF = depositDiff;
+    values.AMOUNT = amount;
+  } else {
+    // Revert withdrawal: restore profit portion
+    values.DEPOSIT_DIFF =
+      transactionAmount > profitWithdrawalAmount
+        ? profitWithdrawalAmount
+        : transactionAmount;
+    values.AMOUNT = Math.max(transactionAmount - profitWithdrawalAmount, 0);
+  }
+
+  return values;
+}
+
+/**
+ * Updates passbooks based on a transaction according to configured rules
+ * @param passbookToUpdate - Map of passbooks being updated
+ * @param transaction - Transaction to process
+ * @param isRevert - Whether this is a revert operation (defaults to false)
+ * @returns Updated passbook map
+ */
+export function updatePassbookByTransaction(
   passbookToUpdate: PassbookToUpdate,
   transaction: Transaction,
-  isRevert: Boolean = false
-) => {
-  const transactionPassbooks: any = {
+  isRevert = false
+): PassbookToUpdate {
+  const passbookRoles: Record<PassbookRole, string> = {
     FROM: transaction.fromId,
     TO: transaction.toId,
     CLUB: "CLUB",
   };
 
+  // Initialize base values
   const values: PassbookConfigActionValueMap = {
     AMOUNT: transaction.amount,
     DEPOSIT_DIFF: 0,
     TOTAL: transaction.amount,
   };
 
-  if (transaction.transactionType === "WITHDRAW" && !isRevert) {
-    const toPassbook = passbookToUpdate.get(transaction.toId);
-    if (toPassbook) {
-      const { periodicDepositAmount = 0, withdrawalAmount = 0 } = (toPassbook
-        .data.payload || {}) as MemberPassbookData;
-      const totalWithdrawalAmount = withdrawalAmount + transaction.amount;
-      const totalWithdrawalProfit =
-        totalWithdrawalAmount > periodicDepositAmount
-          ? totalWithdrawalAmount - periodicDepositAmount
-          : 0;
-      values.DEPOSIT_DIFF = totalWithdrawalProfit;
-      values.AMOUNT = transaction.amount - totalWithdrawalProfit;
-    }
-  }
-
+  // Calculate withdrawal-specific values
   if (transaction.transactionType === "WITHDRAW") {
     const toPassbook = passbookToUpdate.get(transaction.toId);
-    if (toPassbook) {
-      const {
-        periodicDepositAmount = 0,
-        withdrawalAmount = 0,
-        profitWithdrawalAmount = 0,
-      } = (toPassbook.data.payload || {}) as MemberPassbookData;
-
-      if (!isRevert) {
-        const totalWithdrawalAmount = withdrawalAmount + transaction.amount;
-        const totalWithdrawalProfit =
-          totalWithdrawalAmount > periodicDepositAmount
-            ? totalWithdrawalAmount - periodicDepositAmount
-            : 0;
-        values.DEPOSIT_DIFF = totalWithdrawalProfit;
-        values.AMOUNT = transaction.amount - totalWithdrawalProfit;
-      } else {
-        // Revert case
-        values.DEPOSIT_DIFF =
-          transaction.amount > profitWithdrawalAmount
-            ? profitWithdrawalAmount
-            : transaction.amount;
-        values.AMOUNT =
-          transaction.amount > profitWithdrawalAmount
-            ? Math.max(transaction.amount - profitWithdrawalAmount, 0)
-            : 0;
-      }
-    }
+    const withdrawalValues = calculateWithdrawalValues(
+      toPassbook,
+      transaction.amount,
+      isRevert
+    );
+    Object.assign(values, withdrawalValues);
   }
 
-  Object.entries(transactionPassbookSettings).forEach(
-    ([transactionType, passbooksOf]) => {
-      if (transaction.transactionType === transactionType) {
-        Object.entries(passbooksOf).forEach(([passbookOf, action]: any[]) => {
-          const currentPassbook = passbookToUpdate.get(
-            transactionPassbooks[passbookOf]
-          );
-          if (currentPassbook) {
-            let currentAction = action;
-            if (isRevert) {
-              currentAction = { ADD: action.SUB, SUB: action.ADD };
-            }
-            passbookToUpdate.set(
-              transactionPassbooks[passbookOf],
-              getPassbookUpdateQuery(currentPassbook, values, currentAction)
-            );
-          }
-        });
-      }
-    }
-  );
+  // Apply transaction settings
+  const settings = transactionPassbookSettings[transaction.transactionType];
+  if (!settings) {
+    return passbookToUpdate;
+  }
+
+  for (const [role, action] of Object.entries(settings) as [
+    PassbookRole,
+    PassbookConfigAction[PassbookRole],
+  ][]) {
+    if (!action) continue;
+
+    const passbookId = passbookRoles[role];
+    const currentPassbook = passbookToUpdate.get(passbookId);
+    if (!currentPassbook) continue;
+
+    // Reverse ADD/SUB for revert operations
+    const effectiveAction = isRevert
+      ? { ADD: action.SUB, SUB: action.ADD }
+      : action;
+
+    const updatedPassbook = buildPassbookUpdateQuery(
+      currentPassbook,
+      values,
+      effectiveAction
+    );
+
+    passbookToUpdate.set(passbookId, updatedPassbook);
+  }
 
   return passbookToUpdate;
-};
+}
 
+/**
+ * Handles a transaction entry by updating related passbooks
+ * @param transaction - Transaction to process
+ * @param isDelete - Whether this is a delete/revert operation (defaults to false)
+ * @returns Promise resolving to bulk update result
+ */
 export async function transactionEntryHandler(
-  created: Transaction,
-  isDelete: boolean = false
+  transaction: Transaction,
+  isDelete = false
 ) {
-  const passbooks = await getTractionPassbook(created);
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
+  const passbooks = await getTransactionPassbooks(transaction);
+  const passbookToUpdate = initializePassbookToUpdate(passbooks, false);
 
-  passbookToUpdate = updatePassbookByTransaction(
-    passbookToUpdate,
-    created,
-    isDelete
-  );
+  updatePassbookByTransaction(passbookToUpdate, transaction, isDelete);
 
   // Note: loanHistory is now calculated dynamically from transactions,
   // so we don't need to update it here. The passbook payload (totalLoanTaken,

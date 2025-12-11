@@ -2,31 +2,29 @@ import { Account, Passbook } from "@prisma/client";
 
 import { calculateMonthsDifference, newZoneDate } from "@/lib/date";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { getLoanHistoryForMember } from "@/logic/loan-handler";
 import { LoanHistoryEntry, MemberPassbookData } from "@/lib/type";
+import { getLoanHistoryForMember } from "@/logic/loan-handler";
 
 type ToTransform = Account & { passbook: Passbook };
 
-export async function transformLoanForTable(
-  vendorInput: ToTransform
-): Promise<{
-  id: string
-  username: string
-  link: string
-  name: string
-  avatar: string | undefined
-  joined: number
-  startAt: number
-  status: string
-  active: boolean
-  totalLoanTaken: number
-  totalLoanRepay: number
-  totalLoanBalance: number
-  totalInterestPaid: number
-  totalInterestBalance: number
-  totalInterestAmount: number
-  loanHistory: LoanHistoryEntry[]
-  recentPassedString: string
+export async function transformLoanForTable(vendorInput: ToTransform): Promise<{
+  id: string;
+  username: string;
+  link: string;
+  name: string;
+  avatar: string | undefined;
+  joined: number;
+  startAt: number;
+  status: string;
+  active: boolean;
+  totalLoanTaken: number;
+  totalLoanRepay: number;
+  totalLoanBalance: number;
+  totalInterestPaid: number;
+  totalInterestBalance: number;
+  totalInterestAmount: number;
+  loanHistory: LoanHistoryEntry[];
+  recentPassedString: string;
 }> {
   const { passbook, ...member } = vendorInput;
   const {

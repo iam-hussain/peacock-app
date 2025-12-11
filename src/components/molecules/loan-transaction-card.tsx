@@ -40,7 +40,9 @@ export function LoanTransactionCard({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <span className="text-sm font-semibold">#{totalCount - index + 1}</span>
+              <span className="text-sm font-semibold">
+                #{totalCount - index + 1}
+              </span>
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">

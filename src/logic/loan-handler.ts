@@ -1,174 +1,186 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import { Transaction } from "@prisma/client";
 
 import prisma from "@/db";
 import { newZoneDate } from "@/lib/date";
-import {
-  calculateInterestByAmount,
-  setPassbookUpdateQuery,
-} from "@/lib/helper";
-import { LoanHistoryEntry, PassbookToUpdate } from "@/lib/type";
+import { calculateInterestByAmount } from "@/lib/helper";
+import { LoanHistoryEntry } from "@/lib/type";
 
-export function fetchLoanTransaction(accountId?: string | null) {
+const LOAN_TRANSACTION_TYPES = ["LOAN_TAKEN", "LOAN_REPAY"] as const;
+
+type LoanTransactionType = (typeof LOAN_TRANSACTION_TYPES)[number];
+
+interface CurrentLoan {
+  amount: number;
+  startDate: Date;
+  transactionType: LoanTransactionType;
+}
+
+/**
+ * Fetches all loan-related transactions for a specific account or all accounts
+ * @param accountId - Optional account ID to filter transactions
+ * @returns Array of loan transactions ordered by transaction date
+ */
+export function fetchLoanTransactions(accountId?: string | null) {
   return prisma.transaction.findMany({
     where: {
       ...(accountId
         ? { OR: [{ fromId: accountId }, { toId: accountId }] }
         : {}),
-      transactionType: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
+      transactionType: { in: [...LOAN_TRANSACTION_TYPES] },
     },
     orderBy: { transactionAt: "asc" },
   });
 }
 
+/**
+ * Calculates loan history for a specific member by fetching and processing their loan transactions
+ * @param accountId - The account ID of the member
+ * @returns Promise resolving to an array of loan history entries
+ */
 export async function getLoanHistoryForMember(
   accountId: string
 ): Promise<LoanHistoryEntry[]> {
-  const transactions = await fetchLoanTransaction(accountId);
-  const loanTransaction = transactions.filter((e) =>
-    ["LOAN_TAKEN", "LOAN_REPAY"].includes(e.transactionType)
-  );
+  const transactions = await fetchLoanTransactions(accountId);
 
-  // Group transactions by member (for LOAN_TAKEN, member is toId; for LOAN_REPAY, member is fromId)
-  const memberTransactions: Transaction[] = [];
-  loanTransaction.forEach((each) => {
-    if (each.transactionType === "LOAN_TAKEN" && each.toId === accountId) {
-      memberTransactions.push(each);
-    } else if (each.transactionType === "LOAN_REPAY" && each.fromId === accountId) {
-      memberTransactions.push(each);
+  // Filter and group transactions for this member
+  const memberTransactions = transactions.filter((tx) => {
+    if (tx.transactionType === "LOAN_TAKEN") {
+      return tx.toId === accountId;
     }
+    if (tx.transactionType === "LOAN_REPAY") {
+      return tx.fromId === accountId;
+    }
+    return false;
   });
 
   const { loanHistory } = calculateLoanDetails(memberTransactions);
   return loanHistory;
 }
 
-const getOneLoanDetails = (
+/**
+ * Calculates loan details for a completed loan period
+ * @param amount - Loan amount
+ * @param start - Start date of the loan
+ * @param end - End date of the loan (defaults to current date)
+ * @returns Loan history entry with calculated interest
+ */
+function calculateCompletedLoanDetails(
   amount: number,
-  start: Date | string,
-  end: Date | string = newZoneDate()
-): LoanHistoryEntry => {
-  const data = calculateInterestByAmount(amount, start, end);
+  start: Date | string | number,
+  end: Date | string | number = newZoneDate()
+): LoanHistoryEntry {
+  const interestData = calculateInterestByAmount(amount, start, end);
   return {
     active: false,
     amount,
-    ...data,
-    startDate: data.startDate.getTime(),
-    endDate: data.endDate.getTime(),
+    ...interestData,
+    startDate: interestData.startDate.getTime(),
+    endDate: interestData.endDate.getTime(),
   };
-};
+}
 
+/**
+ * Calculates loan history and total balance from a series of loan transactions
+ * @param transactions - Array of loan transactions ordered by date
+ * @returns Object containing loan history array and total loan balance
+ */
 export function calculateLoanDetails(transactions: Transaction[]) {
   const loanHistory: LoanHistoryEntry[] = [];
   let accountBalance = 0;
-  let prevLoan: any = null;
+  let currentLoan: CurrentLoan | null = null;
 
-  transactions.forEach((transaction) => {
+  for (const transaction of transactions) {
     const { transactionAt, transactionType, amount } = transaction;
 
     if (transactionType === "LOAN_TAKEN") {
-      if (prevLoan) {
+      // Close previous loan period if exists
+      if (currentLoan) {
         loanHistory.push(
-          getOneLoanDetails(prevLoan.amount, prevLoan.startDate, transactionAt)
+          calculateCompletedLoanDetails(
+            currentLoan.amount,
+            currentLoan.startDate,
+            transactionAt
+          )
         );
       }
-      accountBalance = accountBalance + amount;
-      prevLoan = {
-        active: true,
+
+      // Start new loan period
+      accountBalance += amount;
+      currentLoan = {
         amount: accountBalance,
         startDate: newZoneDate(transactionAt),
         transactionType,
       };
     } else if (transactionType === "LOAN_REPAY") {
-      if (prevLoan) {
+      // Close current loan period
+      if (currentLoan) {
         loanHistory.push(
-          getOneLoanDetails(accountBalance, prevLoan.startDate, transactionAt)
+          calculateCompletedLoanDetails(
+            accountBalance,
+            currentLoan.startDate,
+            transactionAt
+          )
         );
-        prevLoan = null;
+        currentLoan = null;
       }
-      accountBalance = accountBalance - amount;
 
+      // Update balance and start new period if balance remains
+      accountBalance -= amount;
       if (accountBalance > 0) {
-        prevLoan = {
-          active: true,
+        currentLoan = {
           amount: accountBalance,
           startDate: newZoneDate(transactionAt),
           transactionType,
         };
       }
     }
-  });
+  }
 
-  if (accountBalance > 0 && prevLoan) {
+  // Add active loan if balance remains
+  if (accountBalance > 0 && currentLoan) {
     loanHistory.push({
       active: true,
       amount: accountBalance,
-      startDate: prevLoan.startDate.getTime(),
+      startDate: currentLoan.startDate.getTime(),
       interestAmount: 0,
     });
   }
+
   return { loanHistory, totalLoanBalance: accountBalance };
 }
 
-export const calculateLoansHandler = (
-  passbookToUpdate: PassbookToUpdate,
-  transaction: Transaction[]
-) => {
-  const loanTransaction = transaction.filter((e) =>
-    ["LOAN_TAKEN", "LOAN_REPAY"].includes(e.transactionType)
+/**
+ * Groups loan transactions by member and calculates loan balances
+ * Note: This function is kept for backward compatibility but loanHistory
+ * is now calculated dynamically and not stored in the database
+ * @param passbookToUpdate - Map of passbooks to update
+ * @param transactions - Array of all transactions to process
+ * @returns Updated passbook map (no longer modifies loanHistory)
+ */
+export function calculateLoansHandler(
+  passbookToUpdate: Map<string, unknown>,
+  transactions: Transaction[]
+) {
+  const loanTransactions = transactions.filter((tx) =>
+    LOAN_TRANSACTION_TYPES.includes(tx.transactionType as LoanTransactionType)
   );
-  const memberGroup: { [key in string]: Transaction[] } = {};
 
-  loanTransaction.forEach((each) => {
-    if (each.transactionType === "LOAN_TAKEN") {
-      if (!memberGroup[each.toId]) {
-        memberGroup[each.toId] = [];
-      }
+  // Group transactions by member
+  const memberGroups = new Map<string, Transaction[]>();
+  for (const tx of loanTransactions) {
+    const memberId = tx.transactionType === "LOAN_TAKEN" ? tx.toId : tx.fromId;
+    const group = memberGroups.get(memberId) || [];
+    group.push(tx);
+    memberGroups.set(memberId, group);
+  }
 
-      memberGroup[each.toId].push(each);
-    } else {
-      if (!memberGroup[each.fromId]) {
-        memberGroup[each.fromId] = [];
-      }
-
-      memberGroup[each.fromId].push(each);
-    }
-  });
-
-  Object.entries(memberGroup).forEach(([memberId, memTransactions]) => {
-    const { totalLoanBalance } = calculateLoanDetails(memTransactions);
-
+  // Calculate balances for each member (for logging/debugging)
+  memberGroups.forEach((memberTransactions, memberId) => {
+    const { totalLoanBalance } = calculateLoanDetails(memberTransactions);
     console.log(
       `Member ID: ${memberId}, Total Loan Balance: ${totalLoanBalance}`
     );
-
-    // Note: loanHistory is now calculated dynamically, no longer stored in DB
   });
 
-  return passbookToUpdate;
-};
-
-export function resetMemberLoanPassbookData(
-  passbookToUpdate: PassbookToUpdate,
-  memberId: string
-): PassbookToUpdate {
-  // const clubPassbook = passbookToUpdate.get("CLUB");
-  const memberPassbook = passbookToUpdate.get(memberId);
-
-  // const { totalLoanBalance = 0 } = memberPassbook?.data
-  //   .payload as MemberPassbookData;
-
-  // if (clubPassbook) {
-  //   const { totalLoanBalance: clubTotalLoanBalance = 0 } = clubPassbook.data
-  //     .payload as ClubPassbookData;
-  //   // Update club passbook with the reverted loan data
-  //   passbookToUpdate.set(
-  //     "CLUB",
-  //     setPassbookUpdateQuery(clubPassbook, {
-  //       totalLoanBalance: clubTotalLoanBalance - totalLoanBalance,
-  //     })
-  //   );
-  // }
-  // Note: loanHistory is now calculated dynamically, no longer stored in DB
   return passbookToUpdate;
 }

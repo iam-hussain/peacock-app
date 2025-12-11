@@ -1,12 +1,8 @@
 import prisma from "@/db";
 import { getMemberTotalDepositUpToday } from "@/lib/club";
 import { calculateInterestByAmount } from "@/lib/helper";
+import { ClubPassbookData, VendorPassbookData } from "@/lib/type";
 import { getLoanHistoryForMember } from "@/logic/loan-handler";
-import {
-  ClubPassbookData,
-  LoanHistoryEntry,
-  VendorPassbookData,
-} from "@/lib/type";
 
 export async function getMemberClubStats() {
   const [members, clubPassbook, vendorPassbooks] = await Promise.all([

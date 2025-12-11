@@ -202,7 +202,7 @@ export async function POST(request: Request) {
             if (
               oldFilename &&
               oldFilename !==
-              newAvatar.replace("/image/", "").replace(/^\//, "")
+                newAvatar.replace("/image/", "").replace(/^\//, "")
             ) {
               const publicPath = path.join(process.cwd(), "public", "image");
               const oldFilePath = path.join(publicPath, oldFilename);

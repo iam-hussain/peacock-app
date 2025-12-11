@@ -131,7 +131,10 @@ export async function POST(request: Request) {
 
     // Filter to only include members with active loans or loan history
     const transformedLoans = loansToTransform
-      .filter(({ transformed }) => transformed.active || transformed.loanHistory.length > 0)
+      .filter(
+        ({ transformed }) =>
+          transformed.active || transformed.loanHistory.length > 0
+      )
       .map(({ transformed }) => transformed);
 
     // Filter members - improved search to handle partial matches and normalize spaces
@@ -242,10 +245,12 @@ export async function POST(request: Request) {
     // Filter transactions (by member/vendor names or amount)
     const filteredTransactions = allTransactions
       .map((tx) => {
-        const fromName = `${tx.from.firstName || ""} ${tx.from.lastName || ""
-          }`.trim();
-        const toName =
-          `${tx.to.firstName || ""} ${tx.to.lastName || ""}`.trim();
+        const fromName = `${tx.from.firstName || ""} ${
+          tx.from.lastName || ""
+        }`.trim();
+        const toName = `${tx.to.firstName || ""} ${
+          tx.to.lastName || ""
+        }`.trim();
         return {
           id: tx.id,
           fromName,

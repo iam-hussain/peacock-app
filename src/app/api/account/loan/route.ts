@@ -13,14 +13,10 @@ export async function POST() {
   });
 
   // Transform all loans and filter dynamically
-  const transformedLoans = await Promise.all(
-    loans.map(transformLoanForTable)
-  );
+  const transformedLoans = await Promise.all(loans.map(transformLoanForTable));
 
   const filteredAndSorted = transformedLoans
-    .filter(
-      (e) => e.active || e.loanHistory.length > 0
-    )
+    .filter((e) => e.active || e.loanHistory.length > 0)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
