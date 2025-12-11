@@ -10,7 +10,6 @@ import {
   Copy,
   Database,
   Download,
-  FileSpreadsheet,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
@@ -52,8 +51,9 @@ import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
-  const { isAdmin, canManageAccounts } = useAuth();
+  const { isAdmin, canManageAccounts, user } = useAuth();
   const queryClient = useQueryClient();
+  const isSuperAdmin = user?.kind === "admin";
 
   // Track access state for each member to handle optimistic updates
   const [memberAccessState, setMemberAccessState] = useState<
@@ -94,8 +94,7 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState<string | null>(null);
   const [recalculateReturnsDialogOpen, setRecalculateReturnsDialogOpen] =
     useState(false);
-  const [recalculateLoansDialogOpen, setRecalculateLoansDialogOpen] =
-    useState(false);
+
   const [backupDownloadLink, setBackupDownloadLink] = useState<string | null>(
     null
   );
@@ -107,20 +106,6 @@ export default function SettingsPage() {
       await queryClient.invalidateQueries({ queryKey: ["all"] });
       toast.success("Returns are recalculated successfully.");
       setRecalculateReturnsDialogOpen(false);
-    },
-    onError: (error: any) => {
-      toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
-    },
-  });
-
-  const loanMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate/loan"),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] });
-      toast.success("Loans are recalculated successfully.");
-      setRecalculateLoansDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(
@@ -563,63 +548,32 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Recalculate Returns */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <Calculator className="h-5 w-5" />
+          {/* Recalculate Returns - Super Admin Only */}
+          {isSuperAdmin && (
+            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Recalculate Returns
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Recompute all member returns based on the latest rules.
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Recalculate Returns
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Recompute all member returns based on the latest rules.
-                </p>
-              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setRecalculateReturnsDialogOpen(true)}
+                disabled={returnsMutation.isPending || backupMutation.isPending}
+              >
+                {returnsMutation.isPending ? "Running..." : "Run Recalculation"}
+              </Button>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setRecalculateReturnsDialogOpen(true)}
-              disabled={
-                returnsMutation.isPending ||
-                loanMutation.isPending ||
-                backupMutation.isPending
-              }
-            >
-              {returnsMutation.isPending ? "Running..." : "Run Recalculation"}
-            </Button>
-          </div>
-
-          {/* Recalculate Loans */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-green-500/10 text-green-600 dark:text-green-400">
-                <FileSpreadsheet className="h-5 w-5" />
-              </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Recalculate Loans
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Recompute all loan balances and interest.
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setRecalculateLoansDialogOpen(true)}
-              disabled={
-                returnsMutation.isPending ||
-                loanMutation.isPending ||
-                backupMutation.isPending
-              }
-            >
-              {loanMutation.isPending ? "Running..." : "Run Recalculation"}
-            </Button>
-          </div>
+          )}
 
           {/* Backup Data */}
           <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
@@ -651,11 +605,7 @@ export default function SettingsPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => backupMutation.mutate()}
-                disabled={
-                  returnsMutation.isPending ||
-                  loanMutation.isPending ||
-                  backupMutation.isPending
-                }
+                disabled={returnsMutation.isPending || backupMutation.isPending}
               >
                 {backupMutation.isPending ? "Backing up..." : "Create Backup"}
               </Button>
@@ -819,36 +769,6 @@ export default function SettingsPage() {
               disabled={returnsMutation.isPending}
             >
               {returnsMutation.isPending ? "Running..." : "Confirm"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Recalculate Loans Confirmation Dialog */}
-      <Dialog
-        open={recalculateLoansDialogOpen}
-        onOpenChange={setRecalculateLoansDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Recalculate Loans?</DialogTitle>
-            <DialogDescription>
-              This will recompute all loan balances and interest. It won&apos;t
-              delete data but may update balances.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setRecalculateLoansDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => loanMutation.mutate()}
-              disabled={loanMutation.isPending}
-            >
-              {loanMutation.isPending ? "Running..." : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>

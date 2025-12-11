@@ -62,7 +62,8 @@ interface IconRefProps {
 export { CustomLink, linkVariants };
 
 export interface CustomLinkProps
-  extends LinkProps,
+  extends
+    LinkProps,
     // React.AnchorHTMLAttributes<HTMLAnchorElement>,
     LinkVariantProps {
   asChild?: boolean;

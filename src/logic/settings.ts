@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import { TRANSACTION_TYPE } from "@prisma/client";
 
 import {
@@ -7,15 +6,26 @@ import {
   VendorPassbookData,
 } from "@/lib/type";
 
+/**
+ * Configuration type for transaction passbook updates
+ * Maps each transaction type to its passbook update rules
+ */
 export type TransactionPassbookConfig = {
   [key in TRANSACTION_TYPE]: PassbookConfigAction;
 };
 
+/**
+ * Union type of all possible passbook data record keys
+ */
 export type PassbookRecord =
   | keyof MemberPassbookData
   | keyof VendorPassbookData
   | keyof ClubPassbookData;
 
+/**
+ * Configuration action defining how to update passbooks for a transaction type
+ * Specifies which fields to ADD or SUBTRACT for FROM, TO, and CLUB passbooks
+ */
 export type PassbookConfigAction = {
   FROM?: {
     ADD?: Partial<
@@ -51,8 +61,18 @@ export type PassbookConfigAction = {
   };
 };
 
+/**
+ * Value types that can be used in passbook update calculations
+ * - AMOUNT: The transaction amount (may be adjusted for withdrawals)
+ * - DEPOSIT_DIFF: Difference for profit calculations (used in withdrawals)
+ * - TOTAL: The full transaction amount
+ */
 export type PassbookConfigActionValue = "AMOUNT" | "DEPOSIT_DIFF" | "TOTAL";
 
+/**
+ * Transaction passbook settings configuration
+ * Defines how each transaction type affects FROM, TO, and CLUB passbooks
+ */
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
     FROM: {

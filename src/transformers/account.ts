@@ -3,10 +3,29 @@ import { Account, Passbook } from "@prisma/client";
 import { calculateMonthsDifference, newZoneDate } from "@/lib/date";
 import { calculateInterestByAmount } from "@/lib/helper";
 import { LoanHistoryEntry, MemberPassbookData } from "@/lib/type";
+import { getLoanHistoryForMember } from "@/logic/loan-handler";
 
 type ToTransform = Account & { passbook: Passbook };
 
-export function transformLoanForTable(vendorInput: ToTransform) {
+export async function transformLoanForTable(vendorInput: ToTransform): Promise<{
+  id: string;
+  username: string;
+  link: string;
+  name: string;
+  avatar: string | undefined;
+  joined: number;
+  startAt: number;
+  status: string;
+  active: boolean;
+  totalLoanTaken: number;
+  totalLoanRepay: number;
+  totalLoanBalance: number;
+  totalInterestPaid: number;
+  totalInterestBalance: number;
+  totalInterestAmount: number;
+  loanHistory: LoanHistoryEntry[];
+  recentPassedString: string;
+}> {
   const { passbook, ...member } = vendorInput;
   const {
     totalLoanTaken = 0,
@@ -14,7 +33,9 @@ export function transformLoanForTable(vendorInput: ToTransform) {
     totalLoanBalance = 0,
     totalInterestPaid = 0,
   } = passbook.payload as unknown as MemberPassbookData;
-  const loans = (passbook.loanHistory || []) as unknown as LoanHistoryEntry[];
+
+  // Calculate loanHistory dynamically from transactions
+  const loans = await getLoanHistoryForMember(member.id);
 
   // Calculate interest and build loan history in a single pass
   const loanHistoryResult = loans.reduce(
@@ -77,7 +98,7 @@ export function transformLoanForTable(vendorInput: ToTransform) {
   };
 }
 
-export type TransformedLoan = ReturnType<typeof transformLoanForTable>;
+export type TransformedLoan = Awaited<ReturnType<typeof transformLoanForTable>>;
 
 export function membersTableTransform(
   member: ToTransform,

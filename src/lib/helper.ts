@@ -179,7 +179,6 @@ export function initializePassbookToUpdate(
           payload: isClean
             ? getDefaultPassbookData(passbook.type)
             : (passbook.payload as any),
-          loanHistory: [],
         },
       });
     }
@@ -190,7 +189,6 @@ export function initializePassbookToUpdate(
           payload: isClean
             ? getDefaultPassbookData(passbook.type)
             : (passbook.payload as any),
-          loanHistory: [],
         },
       });
     }

@@ -12,18 +12,15 @@ export async function POST() {
     include: { passbook: true },
   });
 
-  const transformedLoans = loans
-    .filter(
-      (e) =>
-        e.active ||
-        (Array.isArray(e.passbook.loanHistory) &&
-          e.passbook.loanHistory.length > 0)
-    )
-    .map(transformLoanForTable)
+  // Transform all loans and filter dynamically
+  const transformedLoans = await Promise.all(loans.map(transformLoanForTable));
+
+  const filteredAndSorted = transformedLoans
+    .filter((e) => e.active || e.loanHistory.length > 0)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));
 
-  return NextResponse.json({ accounts: transformedLoans });
+  return NextResponse.json({ accounts: filteredAndSorted });
 }
 
 export type GetLoanResponse = { accounts: TransformedLoan[] };

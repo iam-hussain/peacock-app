@@ -18583,7 +18583,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18606,66 +18605,6 @@
         "totalLoanBalance": 300000,
         "totalInterestPaid": 7000
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1712826696000,
-          "endDate": 1719859113000,
-          "monthsPassed": 2,
-          "daysPassed": 20,
-          "interestAmount": 2667,
-          "monthsPassedString": "2 mons 20 d",
-          "daysInMonth": 30,
-          "interestForDays": 666.6,
-          "interestPerDay": 33.33
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1730410200000,
-          "endDate": 1743536508797,
-          "monthsPassed": 5,
-          "daysPassed": 0,
-          "interestAmount": 5000,
-          "monthsPassedString": "5 mons",
-          "daysInMonth": 30,
-          "interestForDays": 0,
-          "interestPerDay": 33.33
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1743541908797,
-          "endDate": 1743557400000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 30,
-          "interestForDays": 0,
-          "interestPerDay": 16.67
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1758769200000,
-          "endDate": 1758850200000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 30,
-          "interestForDays": 0,
-          "interestPerDay": 50
-        },
-        {
-          "active": true,
-          "amount": 300000,
-          "startDate": 1758850200000,
-          "interestAmount": 0
-        }
-      ],
       "joiningOffset": 1629,
       "delayOffset": 0,
       "isChit": false,
@@ -18681,7 +18620,6 @@
         "accountBalance": -10200,
         "totalProfitAmount": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": true,
@@ -18697,7 +18635,6 @@
         "accountBalance": -1440,
         "totalProfitAmount": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18720,40 +18657,6 @@
         "totalLoanBalance": 150000,
         "totalInterestPaid": 7900
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1743994800000,
-          "endDate": 1744075800000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 30,
-          "interestForDays": 0,
-          "interestPerDay": 33.33
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1744081200000,
-          "endDate": 1758042798419,
-          "monthsPassed": 5,
-          "daysPassed": 8,
-          "interestAmount": 7900,
-          "monthsPassedString": "5 mons 8 d",
-          "daysInMonth": 30,
-          "interestForDays": 400,
-          "interestPerDay": 50
-        },
-        {
-          "active": true,
-          "amount": 150000,
-          "startDate": 1761355800000,
-          "interestAmount": 0
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18779,7 +18682,6 @@
         "totalInterestPaid": 115937,
         "totalVendorProfit": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18802,7 +18704,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18818,7 +18719,6 @@
         "accountBalance": -24625,
         "totalProfitAmount": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": true,
@@ -18841,7 +18741,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18864,7 +18763,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18887,34 +18785,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 17350
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 300000,
-          "startDate": 1743573600000,
-          "endDate": 1758850200000,
-          "monthsPassed": 5,
-          "daysPassed": 23,
-          "interestAmount": 17300,
-          "monthsPassedString": "5 mons 23 d",
-          "daysInMonth": 30,
-          "interestForDays": 2300,
-          "interestPerDay": 100
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1758855600000,
-          "endDate": 1758993378541,
-          "monthsPassed": 0,
-          "daysPassed": 1,
-          "interestAmount": 50,
-          "monthsPassedString": " 1 d",
-          "daysInMonth": 30,
-          "interestForDays": 50,
-          "interestPerDay": 50
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18937,7 +18807,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18960,7 +18829,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -18983,47 +18851,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 12284
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1723584600000,
-          "endDate": 1738440000000,
-          "monthsPassed": 5,
-          "daysPassed": 18,
-          "interestAmount": 5581,
-          "monthsPassedString": "5 mons 18 d",
-          "daysInMonth": 31,
-          "interestForDays": 580.68,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1745204400000,
-          "endDate": 1746745200000,
-          "monthsPassed": 0,
-          "daysPassed": 17,
-          "interestAmount": 567,
-          "monthsPassedString": " 17 d",
-          "daysInMonth": 30,
-          "interestForDays": 566.61,
-          "interestPerDay": 33.33
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1746750600000,
-          "endDate": 1758763800000,
-          "monthsPassed": 4,
-          "daysPassed": 16,
-          "interestAmount": 6800,
-          "monthsPassedString": "4 mons 16 d",
-          "daysInMonth": 30,
-          "interestForDays": 800,
-          "interestPerDay": 50
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19046,7 +18873,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19069,40 +18895,6 @@
         "totalLoanBalance": 100000,
         "totalInterestPaid": 10000
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 200000,
-          "startDate": 1693067174000,
-          "endDate": 1706164363000,
-          "monthsPassed": 4,
-          "daysPassed": 29,
-          "interestAmount": 9871,
-          "monthsPassedString": "4 mons 29 d",
-          "daysInMonth": 31,
-          "interestForDays": 1871.08,
-          "interestPerDay": 64.52
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1706169763000,
-          "endDate": 1707114972000,
-          "monthsPassed": 0,
-          "daysPassed": 10,
-          "interestAmount": 323,
-          "monthsPassedString": " 10 d",
-          "daysInMonth": 31,
-          "interestForDays": 322.6,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": true,
-          "amount": 100000,
-          "startDate": 1762911000000,
-          "interestAmount": 0
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19125,21 +18917,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 5000
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1717405521000,
-          "endDate": 1730404800000,
-          "monthsPassed": 4,
-          "daysPassed": 28,
-          "interestAmount": 4903,
-          "monthsPassedString": "4 mons 28 d",
-          "daysInMonth": 31,
-          "interestForDays": 903.28,
-          "interestPerDay": 32.26
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19162,47 +18939,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 6742
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1707120410000,
-          "endDate": 1717399993000,
-          "monthsPassed": 3,
-          "daysPassed": 28,
-          "interestAmount": 3903,
-          "monthsPassedString": "3 mons 28 d",
-          "daysInMonth": 31,
-          "interestForDays": 903.28,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1730583000000,
-          "endDate": 1738180800000,
-          "monthsPassed": 2,
-          "daysPassed": 26,
-          "interestAmount": 2839,
-          "monthsPassedString": "2 mons 26 d",
-          "daysInMonth": 31,
-          "interestForDays": 838.76,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1741748400000,
-          "endDate": 1752111000000,
-          "monthsPassed": 3,
-          "daysPassed": 27,
-          "interestAmount": 3900,
-          "monthsPassedString": "3 mons 27 d",
-          "daysInMonth": 30,
-          "interestForDays": 899.91,
-          "interestPerDay": 33.33
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19225,73 +18961,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 6500
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 200000,
-          "startDate": 1691490425000,
-          "endDate": 1696588463000,
-          "monthsPassed": 1,
-          "daysPassed": 28,
-          "interestAmount": 3867,
-          "monthsPassedString": "1 mons 28 d",
-          "daysInMonth": 30,
-          "interestForDays": 1866.76,
-          "interestPerDay": 66.67
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1719393753000,
-          "endDate": 1725307200000,
-          "monthsPassed": 2,
-          "daysPassed": 7,
-          "interestAmount": 1113,
-          "monthsPassedString": "2 mons 7 d",
-          "daysInMonth": 31,
-          "interestForDays": 112.91,
-          "interestPerDay": 16.13
-        },
-        {
-          "active": false,
-          "amount": 35000,
-          "startDate": 1725312600000,
-          "endDate": 1730059200000,
-          "monthsPassed": 1,
-          "daysPassed": 24,
-          "interestAmount": 621,
-          "monthsPassedString": "1 mons 24 d",
-          "daysInMonth": 31,
-          "interestForDays": 270.96,
-          "interestPerDay": 11.29
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1730064600000,
-          "endDate": 1745204400000,
-          "monthsPassed": 5,
-          "daysPassed": 24,
-          "interestAmount": 5774,
-          "monthsPassedString": "5 mons 24 d",
-          "daysInMonth": 31,
-          "interestForDays": 774.24,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 31790,
-          "startDate": 1745209800000,
-          "endDate": 1745204400000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 30,
-          "interestForDays": 0,
-          "interestPerDay": 10.6
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19314,7 +18983,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19337,66 +19005,6 @@
         "totalLoanBalance": 300000,
         "totalInterestPaid": 3500
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 200000,
-          "startDate": 1733871600000,
-          "endDate": 1736452800000,
-          "monthsPassed": 0,
-          "daysPassed": 29,
-          "interestAmount": 1871,
-          "monthsPassedString": " 29 d",
-          "daysInMonth": 31,
-          "interestForDays": 1871.08,
-          "interestPerDay": 64.52
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1736458200000,
-          "endDate": 1739450543011,
-          "monthsPassed": 1,
-          "daysPassed": 3,
-          "interestAmount": 1661,
-          "monthsPassedString": "1 mons 3 d",
-          "daysInMonth": 28,
-          "interestForDays": 160.71,
-          "interestPerDay": 53.57
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1739455943011,
-          "endDate": 1739496600000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 28,
-          "interestForDays": 0,
-          "interestPerDay": 35.71
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1739502000000,
-          "endDate": 1740879000000,
-          "monthsPassed": 0,
-          "daysPassed": 15,
-          "interestAmount": 268,
-          "monthsPassedString": " 15 d",
-          "daysInMonth": 28,
-          "interestForDays": 267.9,
-          "interestPerDay": 17.86
-        },
-        {
-          "active": true,
-          "amount": 300000,
-          "startDate": 1763861400000,
-          "interestAmount": 0
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19419,86 +19027,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 12806
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1696958908000,
-          "endDate": 1710138455000,
-          "monthsPassed": 5,
-          "daysPassed": 0,
-          "interestAmount": 7500,
-          "monthsPassedString": "5 mons",
-          "daysInMonth": 31,
-          "interestForDays": 0,
-          "interestPerDay": 48.39
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1719864859000,
-          "endDate": 1733860800000,
-          "monthsPassed": 5,
-          "daysPassed": 8,
-          "interestAmount": 5258,
-          "monthsPassedString": "5 mons 8 d",
-          "daysInMonth": 31,
-          "interestForDays": 258.08,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1733866200000,
-          "endDate": 1733947200000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 31,
-          "interestForDays": 0,
-          "interestPerDay": 16.13
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1746491400000,
-          "endDate": 1746756000000,
-          "monthsPassed": 0,
-          "daysPassed": 3,
-          "interestAmount": 97,
-          "monthsPassedString": " 3 d",
-          "daysInMonth": 31,
-          "interestForDays": 96.78,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1746761400000,
-          "endDate": 1747177200000,
-          "monthsPassed": 0,
-          "daysPassed": 4,
-          "interestAmount": 194,
-          "monthsPassedString": " 4 d",
-          "daysInMonth": 31,
-          "interestForDays": 193.56,
-          "interestPerDay": 48.39
-        },
-        {
-          "active": false,
-          "amount": 200000,
-          "startDate": 1747182600000,
-          "endDate": 1763775000000,
-          "monthsPassed": 6,
-          "daysPassed": 8,
-          "interestAmount": 12533,
-          "monthsPassedString": "6 mons 8 d",
-          "daysInMonth": 30,
-          "interestForDays": 533.36,
-          "interestPerDay": 66.67
-        }
-      ],
       "joiningOffset": 1629,
       "delayOffset": 0,
       "isChit": false,
@@ -19521,21 +19049,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 200000,
-          "startDate": 1740538800000,
-          "endDate": 1741051800000,
-          "monthsPassed": 0,
-          "daysPassed": 5,
-          "interestAmount": 357,
-          "monthsPassedString": " 5 d",
-          "daysInMonth": 28,
-          "interestForDays": 357.15,
-          "interestPerDay": 71.43
-        }
-      ],
       "joiningOffset": 1629,
       "delayOffset": 0,
       "isChit": false,
@@ -19546,7 +19059,6 @@
       "id": "66d95de89ff85b6e7c1106c3",
       "type": "VENDOR",
       "payload": {},
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19569,7 +19081,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19592,47 +19103,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 14000
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1706169928000,
-          "endDate": 1719388206000,
-          "monthsPassed": 5,
-          "daysPassed": 0,
-          "interestAmount": 5000,
-          "monthsPassedString": "5 mons",
-          "daysInMonth": 30,
-          "interestForDays": 0,
-          "interestPerDay": 33.33
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1738542600000,
-          "endDate": 1738623600000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 28,
-          "interestForDays": 0,
-          "interestPerDay": 35.71
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1738629000000,
-          "endDate": 1754443800000,
-          "monthsPassed": 6,
-          "daysPassed": 2,
-          "interestAmount": 9097,
-          "monthsPassedString": "6 mons 2 d",
-          "daysInMonth": 31,
-          "interestForDays": 96.78,
-          "interestPerDay": 48.39
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19648,7 +19118,6 @@
         "accountBalance": -31950,
         "totalProfitAmount": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": true,
@@ -19671,21 +19140,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 1500
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1733871600000,
-          "endDate": 1740792600000,
-          "monthsPassed": 2,
-          "daysPassed": 18,
-          "interestAmount": 1321,
-          "monthsPassedString": "2 mons 18 d",
-          "daysInMonth": 28,
-          "interestForDays": 321.48,
-          "interestPerDay": 17.86
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19708,7 +19162,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19731,99 +19184,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 7355
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1696699602000,
-          "endDate": 1709825743000,
-          "monthsPassed": 4,
-          "daysPassed": 28,
-          "interestAmount": 2483,
-          "monthsPassedString": "4 mons 28 d",
-          "daysInMonth": 29,
-          "interestForDays": 482.72,
-          "interestPerDay": 17.24
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1719393732000,
-          "endDate": 1730059200000,
-          "monthsPassed": 4,
-          "daysPassed": 1,
-          "interestAmount": 2016,
-          "monthsPassedString": "4 mons 1 d",
-          "daysInMonth": 31,
-          "interestForDays": 16.13,
-          "interestPerDay": 16.13
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1730064600000,
-          "endDate": 1734984000000,
-          "monthsPassed": 1,
-          "daysPassed": 25,
-          "interestAmount": 1833,
-          "monthsPassedString": "1 mons 25 d",
-          "daysInMonth": 30,
-          "interestForDays": 833.25,
-          "interestPerDay": 33.33
-        },
-        {
-          "active": false,
-          "amount": 90000,
-          "startDate": 1734989400000,
-          "endDate": 1734984000000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 31,
-          "interestForDays": 0,
-          "interestPerDay": 29.03
-        },
-        {
-          "active": false,
-          "amount": 40000,
-          "startDate": 1734989400000,
-          "endDate": 1734984000000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 31,
-          "interestForDays": 0,
-          "interestPerDay": 12.9
-        },
-        {
-          "active": false,
-          "amount": 10000,
-          "startDate": 1734989400000,
-          "endDate": 1735675200000,
-          "monthsPassed": 0,
-          "daysPassed": 7,
-          "interestAmount": 23,
-          "monthsPassedString": " 7 d",
-          "daysInMonth": 31,
-          "interestForDays": 22.61,
-          "interestPerDay": 3.23
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1743381000000,
-          "endDate": 1748646000000,
-          "monthsPassed": 1,
-          "daysPassed": 30,
-          "interestAmount": 1000,
-          "monthsPassedString": "1 mons 30 d",
-          "daysInMonth": 30,
-          "interestForDays": 500.1,
-          "interestPerDay": 16.67
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19846,73 +19206,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 4000
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1709917694000,
-          "endDate": 1723579200000,
-          "monthsPassed": 5,
-          "daysPassed": 5,
-          "interestAmount": 5161,
-          "monthsPassedString": "5 mons 5 d",
-          "daysInMonth": 31,
-          "interestForDays": 161.3,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1729719000000,
-          "endDate": 1731873600000,
-          "monthsPassed": 0,
-          "daysPassed": 24,
-          "interestAmount": 774,
-          "monthsPassedString": " 24 d",
-          "daysInMonth": 31,
-          "interestForDays": 774.24,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1731879000000,
-          "endDate": 1747177200000,
-          "monthsPassed": 5,
-          "daysPassed": 26,
-          "interestAmount": 8800,
-          "monthsPassedString": "5 mons 26 d",
-          "daysInMonth": 30,
-          "interestForDays": 1300,
-          "interestPerDay": 50
-        },
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1747182600000,
-          "endDate": 1747263600000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 31,
-          "interestForDays": 0,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 50000,
-          "startDate": 1747269000000,
-          "endDate": 1752197400000,
-          "monthsPassed": 1,
-          "daysPassed": 26,
-          "interestAmount": 933,
-          "monthsPassedString": "1 mons 26 d",
-          "daysInMonth": 30,
-          "interestForDays": 433.42,
-          "interestPerDay": 16.67
-        }
-      ],
       "joiningOffset": 0,
       "delayOffset": 441,
       "isChit": false,
@@ -19935,7 +19228,6 @@
         "totalLoanBalance": 0,
         "totalInterestPaid": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": false,
@@ -19958,40 +19250,6 @@
         "totalLoanBalance": 300000,
         "totalInterestPaid": 0
       },
-      "loanHistory": [
-        {
-          "active": false,
-          "amount": 100000,
-          "startDate": 1752116400000,
-          "endDate": 1752197400000,
-          "monthsPassed": 0,
-          "daysPassed": 0,
-          "interestAmount": 0,
-          "monthsPassedString": "",
-          "daysInMonth": 31,
-          "interestForDays": 0,
-          "interestPerDay": 32.26
-        },
-        {
-          "active": false,
-          "amount": 150000,
-          "startDate": 1752202800000,
-          "endDate": 1754443800000,
-          "monthsPassed": 0,
-          "daysPassed": 25,
-          "interestAmount": 1210,
-          "monthsPassedString": " 25 d",
-          "daysInMonth": 31,
-          "interestForDays": 1209.75,
-          "interestPerDay": 48.39
-        },
-        {
-          "active": true,
-          "amount": 300000,
-          "startDate": 1754443800000,
-          "interestAmount": 0
-        }
-      ],
       "joiningOffset": 1629,
       "delayOffset": 1734,
       "isChit": false,
@@ -20007,7 +19265,6 @@
         "accountBalance": 172600,
         "totalProfitAmount": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": true,
@@ -20023,7 +19280,6 @@
         "accountBalance": 73950,
         "totalProfitAmount": 0
       },
-      "loanHistory": [],
       "joiningOffset": 0,
       "delayOffset": 0,
       "isChit": true,
