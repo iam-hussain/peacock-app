@@ -52,15 +52,15 @@ export default function DashboardPage() {
     : 0;
   const pendingAmounts = statistics
     ? statistics.totalInterestBalance +
-      statistics.totalOffsetBalance +
-      statistics.totalMemberPeriodicDepositsBalance
+    statistics.totalOffsetBalance +
+    statistics.totalMemberPeriodicDepositsBalance
     : 0;
   const currentPortfolioValue = statistics?.currentClubNetValue || 0;
   const netValue = currentPortfolioValue + pendingAmounts;
   const availableCash = statistics
     ? statistics.currentClubNetValue -
-      statistics.totalLoanBalance -
-      statistics.totalVendorHolding
+    statistics.totalLoanBalance -
+    statistics.totalVendorHolding
     : 0;
 
   return (
@@ -74,7 +74,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Row - 2 Cards with 1 placeholder */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <ModernStatCard
           title="Active Members"
           value={
@@ -110,7 +110,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Member Funds
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ModernStatCard
               title="Total Deposits"
               value={
@@ -147,7 +147,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Member Outflow
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ModernStatCard
               title="Profit Withdrawals"
               value={
@@ -261,7 +261,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Vendor Transactions
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ModernStatCard
               title="Vendor Investment"
               value={
