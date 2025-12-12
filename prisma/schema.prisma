@@ -108,3 +108,44 @@ enum PASSBOOK_TYPE {
   VENDOR
   CLUB
 }
+
+model DashboardMonthlySummary {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  monthStartDate         DateTime
+  monthEndDate           DateTime
+  // Members
+  activeMembers          Int      @default(0)
+  clubAgeMonths          Int      @default(0)
+  // Member Funds
+  totalDeposits          Float    @default(0)
+  memberBalance          Float    @default(0)
+  // Member Outflow
+  profitWithdrawals      Float    @default(0)
+  memberAdjustments      Float    @default(0)
+  // Loans - Lifetime
+  totalLoanGiven         Float    @default(0)
+  totalInterestCollected Float    @default(0)
+  // Loans - Active / Outstanding
+  currentLoanTaken       Float    @default(0)
+  interestBalance        Float    @default(0)
+  // Vendor
+  vendorInvestment       Float    @default(0)
+  vendorProfit           Float    @default(0)
+  // Cash Flow
+  totalInvested          Float    @default(0)
+  pendingAmounts         Float    @default(0)
+  // Valuation
+  availableCash          Float    @default(0)
+  currentValue           Float    @default(0)
+  // Portfolio
+  totalPortfolioValue    Float    @default(0)
+  // System
+  recalculatedAt         DateTime @default(now())
+  recalculatedByAdminId  String?  @db.ObjectId
+  isLocked               Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([monthStartDate])
+  @@index([monthEndDate])
+}

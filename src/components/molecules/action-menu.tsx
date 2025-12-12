@@ -2,7 +2,6 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { BiSolidObjectsVerticalCenter } from "react-icons/bi";
 import { BsDatabaseFillCheck } from "react-icons/bs";
 import { FaDownload } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
@@ -50,20 +49,6 @@ const ActionMenu = () => {
     },
   });
 
-  const loanMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate/loan"),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] });
-
-      toast.success("Loans are recalculated successfully.");
-    },
-    onError: (error) => {
-      toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
-    },
-  });
-
   async function handleBackup(e: React.FormEvent) {
     e.preventDefault();
     return await backupMutation.mutateAsync();
@@ -74,45 +59,20 @@ const ActionMenu = () => {
     return await returnsMutation.mutateAsync();
   }
 
-  async function handleLoans(e: React.FormEvent) {
-    e.preventDefault();
-    return await loanMutation.mutateAsync();
-  }
-
   return (
     <>
       <Button
         variant={"menu"}
         onClick={handleReturns}
-        disabled={
-          backupMutation.isPending ||
-          returnsMutation.isPending ||
-          loanMutation.isPending
-        }
+        disabled={backupMutation.isPending || returnsMutation.isPending}
       >
         <FaCalculator className="h-5 w-5" />{" "}
         {returnsMutation.isPending ? "Returns ..." : "Recalculated Returns"}
       </Button>
       <Button
         variant={"menu"}
-        onClick={handleLoans}
-        disabled={
-          backupMutation.isPending ||
-          returnsMutation.isPending ||
-          loanMutation.isPending
-        }
-      >
-        <BiSolidObjectsVerticalCenter className="h-5 w-5" />{" "}
-        {returnsMutation.isPending ? "Loans ..." : "Recalculated Loans"}
-      </Button>
-      <Button
-        variant={"menu"}
         onClick={handleBackup}
-        disabled={
-          backupMutation.isPending ||
-          returnsMutation.isPending ||
-          loanMutation.isPending
-        }
+        disabled={backupMutation.isPending || returnsMutation.isPending}
       >
         <BsDatabaseFillCheck className="h-5 w-5" />{" "}
         {backupMutation.isPending ? "Backing up..." : "Backup Data"}

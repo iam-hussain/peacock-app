@@ -382,11 +382,11 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
                       : new Date(b.startDate).getTime();
                   return dateB - dateA;
                 })
-                .map((transaction, index) => (
+                .map((transaction: any, index: number) => (
                   <LoanTransactionCard
                     key={`${transaction.startDate}-${index}`}
                     transaction={transaction}
-                    index={index + 1}
+                    index={member.loanHistory.length - index}
                   />
                 ))}
             </div>

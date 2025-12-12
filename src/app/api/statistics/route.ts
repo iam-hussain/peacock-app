@@ -8,9 +8,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/db";
 import { clubMonthsFromStart, getClubTotalDepositUpToday } from "@/lib/club";
 import { calculateInterestByAmount } from "@/lib/helper";
+import { getMemberLoanHistory } from "@/lib/loan-calculator";
 import {
   ClubPassbookData,
-  LoanHistoryEntry,
   MemberPassbookData,
   VendorPassbookData,
 } from "@/lib/type";
@@ -18,12 +18,11 @@ import {
 type StatClubPassbook = {
   payload: MemberPassbookData | ClubPassbookData;
   type: $Enums.PASSBOOK_TYPE;
-  loanHistory: LoanHistoryEntry[];
 };
 type StatMemberPassbook = {
   payload: MemberPassbookData | ClubPassbookData;
   type: $Enums.PASSBOOK_TYPE;
-  loanHistory: LoanHistoryEntry[];
+  accountId?: string;
   joiningOffset: number;
   delayOffset: number;
 };
@@ -35,10 +34,10 @@ export async function POST() {
         where: { type: { in: ["CLUB", "MEMBER"] } },
         select: {
           type: true,
-          loanHistory: true,
           payload: true,
           joiningOffset: true,
           delayOffset: true,
+          account: { select: { id: true } },
         },
       }),
       prisma.account.findMany({ where: { isMember: true, active: true } }),
@@ -56,7 +55,12 @@ export async function POST() {
       })
       .reduce((a, b) => a + b, 0);
     const clubPassbook = passbooks.find((e) => e.type === "CLUB");
-    const membersPassbooks = passbooks.filter((e) => e.type === "MEMBER");
+    const membersPassbooks = passbooks
+      .filter((e) => e.type === "MEMBER")
+      .map((p) => ({
+        ...p,
+        accountId: p.account?.id,
+      })) as unknown as StatMemberPassbook[];
 
     if (!clubPassbook) {
       throw new Error("Invalid club statistics");
@@ -64,9 +68,9 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      statistics: statisticsTransform(
+      statistics: await statisticsTransform(
         clubPassbook as any,
-        membersPassbooks as any[],
+        membersPassbooks,
         members.length,
         totalVendorProfit
       ),
@@ -82,14 +86,23 @@ export async function POST() {
   }
 }
 
-function statisticsTransform(
+async function statisticsTransform(
   clubPassbook: StatClubPassbook,
   membersPassbooks: StatMemberPassbook[],
   membersCount: number,
   totalVendorProfit: number
 ) {
-  const expectedTotalLoanInterestAmount = membersPassbooks
-    .map(({ loanHistory }) => loanHistory)
+  // Calculate loan history on-the-fly for all members
+  const memberLoanHistories = await Promise.all(
+    membersPassbooks
+      .filter((p) => p.accountId)
+      .map(async (p) => {
+        const { loanHistory } = await getMemberLoanHistory(p.accountId!);
+        return loanHistory;
+      })
+  );
+
+  const expectedTotalLoanInterestAmount = memberLoanHistories
     .flat()
     .map((loan) => {
       const { interestAmount } = calculateInterestByAmount(
@@ -192,7 +205,9 @@ export type GetStatisticsResponse = {
   members: TransformedMemberStat[];
 };
 
-export type TransformedStatistics = ReturnType<typeof statisticsTransform>;
+export type TransformedStatistics = Awaited<
+  ReturnType<typeof statisticsTransform>
+>;
 export type TransformedMemberStat = ReturnType<typeof membersStatTransform>;
 
 function membersStatTransform(member: Account) {

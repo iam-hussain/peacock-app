@@ -8,6 +8,7 @@ import {
   FileText,
   FolderSync,
   LayoutDashboard,
+  LineChart,
   LogOut,
   Settings,
   User,
@@ -44,6 +45,7 @@ const mainNavItems: NavItem[] = [
   { icon: Briefcase, label: "Vendors", href: "/dashboard/vendor" },
   { icon: FolderSync, label: "Loans", href: "/dashboard/loan" },
   { icon: Wallet, label: "Transactions", href: "/dashboard/transaction" },
+  { icon: LineChart, label: "Analytics", href: "/dashboard/analytics" },
 ];
 
 const secondaryNavItems: NavItem[] = [

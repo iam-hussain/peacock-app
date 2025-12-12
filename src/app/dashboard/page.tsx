@@ -10,11 +10,11 @@ import {
   CalendarDays,
   CircleDollarSign,
   Clock,
-  Coins,
   Crown,
-  Hand,
+  FileText,
+  HandCoins,
+  Hourglass,
   Layers,
-  Scale,
   SlidersHorizontal,
   TrendingUp,
   Users,
@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 
 import { ActivityFeed } from "@/components/molecules/activity-feed";
-import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
 import { MembersPreview } from "@/components/molecules/members-preview";
 import { ModernStatCard } from "@/components/molecules/modern-stat-card";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,9 +30,10 @@ import { clubAge } from "@/lib/date";
 import { fetchStatistics } from "@/lib/query-options";
 
 export default function DashboardPage() {
-  const { data, isLoading } = useQuery(fetchStatistics());
-  const statistics = data?.statistics;
-  const members = data?.members || [];
+  // Fetch statistics data (includes club passbook data and members)
+  const { data: statsData, isLoading } = useQuery(fetchStatistics());
+  const statistics = (statsData as any)?.statistics;
+  const members = (statsData as any)?.members || [];
 
   const club = clubAge();
 
@@ -44,35 +44,24 @@ export default function DashboardPage() {
       maximumFractionDigits: 0,
     });
 
-  // Calculate derived values (use 0 as fallback when loading)
-  const totalInvested = statistics
-    ? statistics.totalLoanBalance + statistics.totalVendorHolding
-    : 0;
-  const pendingAmounts = statistics
-    ? statistics.totalInterestBalance +
-      statistics.totalOffsetBalance +
-      statistics.totalMemberPeriodicDepositsBalance
-    : 0;
-  const currentPortfolioValue = statistics?.currentClubNetValue || 0;
-  const netValue = currentPortfolioValue + pendingAmounts;
-  const availableCash = statistics
-    ? statistics.currentClubNetValue -
-      statistics.totalLoanBalance -
-      statistics.totalVendorHolding
-    : 0;
-
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-3">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Overview of your financial club management
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Dashboard
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Overview of your financial club management
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* KPI Row - 2 Cards with 1 placeholder */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <ModernStatCard
           title="Active Members"
           value={
@@ -91,7 +80,7 @@ export default function DashboardPage() {
             isLoading ? (
               <Skeleton className="h-6 w-16" />
             ) : (
-              `${club.inMonth} months`
+              `${statistics?.clubMonthsPassed || club.inMonth} months`
             )
           }
           icon={<CalendarDays className="h-5 w-5" />}
@@ -102,13 +91,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Financial Summary Sections */}
-      <div className="space-y-6">
+      <div className="space-y-3">
         {/* MEMBER FUNDS */}
-        <div className="space-y-3">
+        <div className="space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Member Funds
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <ModernStatCard
               title="Total Deposits"
               value={
@@ -128,7 +117,8 @@ export default function DashboardPage() {
                   <Skeleton className="h-6 w-24" />
                 ) : (
                   formatCurrency(
-                    statistics?.totalMemberPeriodicDepositsBalance || 0
+                    (statistics?.totalMemberPeriodicDeposits || 0) -
+                      (statistics?.totalMemberWithdrawals || 0)
                   )
                 )
               }
@@ -141,11 +131,11 @@ export default function DashboardPage() {
         </div>
 
         {/* MEMBER OUTFLOW */}
-        <div className="space-y-3">
+        <div className="space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Member Outflow
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <ModernStatCard
               title="Profit Withdrawals"
               value={
@@ -164,7 +154,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalOffsetAmount || 0)
+                  formatCurrency(statistics?.totalOffsetPaid || 0)
                 )
               }
               icon={<SlidersHorizontal className="h-5 w-5" />}
@@ -175,14 +165,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* LOAN SUMMARY */}
-        <div className="space-y-3">
+        {/* LOAN - LIFETIME */}
+        <div className="space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-            Loan Summary
+            Loan - Lifetime
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <ModernStatCard
-              title="Loan Taken"
+              title="Total Loan Given"
               value={
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
@@ -190,11 +180,11 @@ export default function DashboardPage() {
                   formatCurrency(statistics?.totalLoanTaken || 0)
                 )
               }
-              icon={<Hand className="h-5 w-5" />}
-              iconBgColor="#E1F5FE"
+              icon={<HandCoins className="h-5 w-5" />}
+              iconBgColor="#2563EB"
             />
             <ModernStatCard
-              title="Interest Collected"
+              title="Total Interest Collected"
               value={
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
@@ -202,8 +192,29 @@ export default function DashboardPage() {
                   formatCurrency(statistics?.totalInterestPaid || 0)
                 )
               }
-              icon={<Coins className="h-5 w-5" />}
-              iconBgColor="#E8F5E9"
+              icon={<TrendingUp className="h-5 w-5" />}
+              iconBgColor="#16A34A"
+            />
+          </div>
+        </div>
+
+        {/* LOAN - ACTIVE */}
+        <div className="space-y-1.5">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Loan - Active
+          </h3>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <ModernStatCard
+              title="Current Loan Taken"
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.totalLoanBalance || 0)
+                )
+              }
+              icon={<FileText className="h-5 w-5" />}
+              iconBgColor="#F59E0B"
             />
             <ModernStatCard
               title="Interest Balance"
@@ -214,25 +225,25 @@ export default function DashboardPage() {
                   formatCurrency(statistics?.totalInterestBalance || 0)
                 )
               }
-              icon={<Scale className="h-5 w-5" />}
-              iconBgColor="#FFF9C4"
+              icon={<Hourglass className="h-5 w-5" />}
+              iconBgColor="#EAB308"
             />
           </div>
         </div>
 
         {/* VENDOR TRANSACTIONS */}
-        <div className="space-y-3">
+        <div className="space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Vendor Transactions
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <ModernStatCard
               title="Vendor Investment"
               value={
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalVendorHolding || 0)
+                  formatCurrency(statistics?.totalInvestment || 0)
                 )
               }
               icon={<Briefcase className="h-5 w-5" />}
@@ -256,34 +267,25 @@ export default function DashboardPage() {
         </div>
 
         {/* CASH FLOW POSITION */}
-        <div className="space-y-3">
+        <div className="space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Cash Flow Position
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <ModernStatCard
-              title="Available Cash"
-              value={
-                isLoading ? (
-                  <Skeleton className="h-6 w-24" />
-                ) : (
-                  formatCurrency(availableCash)
-                )
-              }
-              icon={<Wallet className="h-5 w-5" />}
-              iconBgColor="#FFF3E0"
-            />
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             <ModernStatCard
               title="Total Invested"
               value={
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(totalInvested)
+                  formatCurrency(
+                    (statistics?.totalLoanBalance || 0) +
+                      (statistics?.totalVendorHolding || 0)
+                  )
                 )
               }
               icon={<Layers className="h-5 w-5" />}
-              iconBgColor="#E1F5FE"
+              iconBgColor="#2563EB"
             />
             <ModernStatCard
               title="Pending Amounts"
@@ -291,79 +293,107 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(pendingAmounts)
+                  formatCurrency(
+                    (statistics?.totalInterestBalance || 0) +
+                      (statistics?.totalOffsetBalance || 0)
+                  )
                 )
               }
               icon={<Clock className="h-5 w-5" />}
-              iconBgColor="#F3E5F5"
+              iconBgColor="#9333EA"
+            />
+          </div>
+        </div>
+
+        {/* VALUATION & CASH */}
+        <div className="space-y-1.5">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Valuation & Cash
+          </h3>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <ModernStatCard
+              title="Available Cash"
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.currentClubBalance || 0)
+                )
+              }
+              icon={<Wallet className="h-5 w-5" />}
+              iconBgColor="#F59E0B"
+            />
+            <ModernStatCard
+              title="Current Value"
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(statistics?.currentClubNetValue || 0)
+                )
+              }
+              icon={<Banknote className="h-5 w-5" />}
+              iconBgColor="#16A34A"
             />
           </div>
         </div>
       </div>
 
-      {/* PORTFOLIO SUMMARY - 2 Large Cards with 1 placeholder */}
-      <div className="space-y-3">
+      {/* PORTFOLIO SUMMARY - Full-width emphasized card */}
+      <div className="space-y-1.5">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Portfolio Summary
         </h3>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <ModernStatCard
-            title="Current Value"
-            value={
-              isLoading ? (
-                <Skeleton className="h-6 w-24" />
-              ) : (
-                formatCurrency(currentPortfolioValue)
-              )
-            }
-            icon={<Banknote className="h-5 w-5" />}
-            iconBgColor="#E8F5E9"
-          />
-          <ModernStatCard
-            title="Total Value"
-            value={
-              isLoading ? (
-                <Skeleton className="h-6 w-24" />
-              ) : (
-                formatCurrency(netValue)
-              )
-            }
-            icon={<Crown className="h-5 w-5" />}
-            iconBgColor="#FFF3E0"
-            isHighlighted={true}
-          />
-          {/* Invisible placeholder for 3-column alignment */}
-          <div className="hidden xl:block" aria-hidden="true" />
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <Card className="col-span-1 md:col-span-2 h-full flex flex-col rounded-lg border-2 border-primary/30 bg-card shadow-lg ring-2 ring-primary/10 transition-all hover:shadow-xl">
+            <CardContent className="flex flex-1 flex-col p-4 md:p-5">
+              <div className="flex flex-1 items-center justify-between gap-3">
+                {/* Left: Label */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Total Value
+                  </p>
+                </div>
+                {/* Center: Value */}
+                <div className="flex-1 text-center">
+                  {isLoading ? (
+                    <Skeleton className="h-10 w-48 mx-auto" />
+                  ) : (
+                    <p className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+                      {formatCurrency(
+                        (statistics?.currentClubBalance || 0) +
+                          (statistics?.totalLoanBalance || 0) +
+                          (statistics?.totalVendorHolding || 0) +
+                          (statistics?.totalInterestBalance || 0) +
+                          (statistics?.totalOffsetBalance || 0)
+                      )}
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Total portfolio value (cash + investments + receivables)
+                  </p>
+                </div>
+                {/* Right: Icon */}
+                <div className="flex shrink-0 items-center justify-center rounded-full h-16 w-16 bg-green-500/10 dark:bg-green-500/20">
+                  <div className="relative z-10 text-2xl text-green-600 dark:text-green-400">
+                    <Crown className="h-8 w-8" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* ANALYTICS SECTION - 2 Charts Side-by-Side */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-border/50">
-            <CardContent className="p-6">
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-          <Card className="border-border/50">
-            <CardContent className="p-6">
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-      ) : (
-        <EnhancedChartsSection statistics={statistics!} />
-      )}
-
       {/* MEMBERS SNAPSHOT & RECENT ACTIVITY - Side by Side on Desktop */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-3">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 pt-6">
+        <div className="lg:col-span-2 space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Members Snapshot
           </h3>
           {isLoading ? (
             <Card className="border-border/50">
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <Skeleton className="h-48 w-full" />
               </CardContent>
             </Card>
@@ -371,13 +401,13 @@ export default function DashboardPage() {
             <MembersPreview initialMembers={members.slice(0, 16)} />
           )}
         </div>
-        <div className="space-y-3">
+        <div className="space-y-1.5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Recent Activity
           </h3>
           {isLoading ? (
             <Card className="border-border/50">
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 space-y-3">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="space-y-2">
                     <Skeleton className="h-4 w-full" />
@@ -393,20 +423,4 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-
-  if (!statistics) {
-    return (
-      <div className="w-full max-w-7xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Overview of your financial club management
-          </p>
-        </div>
-        <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-          No statistics available
-        </div>
-      </div>
-    );
-  }
 }

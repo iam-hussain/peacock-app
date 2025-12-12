@@ -16,7 +16,8 @@
     "push": "prisma db push",
     "truncate": "node prisma/truncate.js",
     "seed": "prisma db seed",
-    "reset": "npm run truncate && npm run seed"
+    "reset": "npm run truncate && npm run seed",
+    "recalculate": "tsx prisma/recalculate.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

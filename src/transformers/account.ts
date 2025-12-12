@@ -1,51 +1,28 @@
 import { Account, Passbook } from "@prisma/client";
 
 import { calculateMonthsDifference, newZoneDate } from "@/lib/date";
-import { calculateInterestByAmount } from "@/lib/helper";
-import { LoanHistoryEntry, MemberPassbookData } from "@/lib/type";
+import { getMemberLoanHistory } from "@/lib/loan-calculator";
+import { MemberPassbookData } from "@/lib/type";
 
 type ToTransform = Account & { passbook: Passbook };
 
-export function transformLoanForTable(vendorInput: ToTransform) {
+export async function transformLoanForTable(vendorInput: ToTransform) {
   const { passbook, ...member } = vendorInput;
   const {
     totalLoanTaken = 0,
     totalLoanRepay = 0,
-    totalLoanBalance = 0,
     totalInterestPaid = 0,
   } = passbook.payload as unknown as MemberPassbookData;
-  const loans = (passbook.loanHistory || []) as unknown as LoanHistoryEntry[];
 
-  // Calculate interest and build loan history in a single pass
-  const loanHistoryResult = loans.reduce(
-    (acc, loan) => {
-      const interestCalc = calculateInterestByAmount(
-        loan.amount,
-        loan.startDate,
-        loan?.endDate
-      );
-      acc.totalInterestAmount += interestCalc.interestAmount;
-      // Remove startDate and endDate from loan before spreading
-      const { startDate: _startDate, endDate: _endDate } = loan;
-      acc.loanHistory.push({
-        ...interestCalc,
-        amount: loan.amount,
-        active: !loan.endDate, // Loan is active if there's no end date
-        startDate: newZoneDate(loan.startDate).getTime(),
-        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
-        totalInterestAmount: acc.totalInterestAmount,
-      });
-      // Store the most recent monthsPassedString
-      if (interestCalc.monthsPassedString) {
-        acc.recentPassedString = interestCalc.monthsPassedString;
-      }
-      return acc;
-    },
-    { totalInterestAmount: 0, loanHistory: [] as any[], recentPassedString: "" }
-  );
+  // Calculate loan history on-the-fly from transactions
+  const {
+    loanHistory: calculatedLoanHistory,
+    totalLoanBalance: calculatedTotalLoanBalance,
+    totalInterestAmount,
+    recentPassedString,
+  } = await getMemberLoanHistory(member.id);
 
-  const totalInterestBalance =
-    loanHistoryResult.totalInterestAmount - totalInterestPaid;
+  const totalInterestBalance = totalInterestAmount - totalInterestPaid;
 
   return {
     id: member.id,
@@ -61,23 +38,25 @@ export function transformLoanForTable(vendorInput: ToTransform) {
       newZoneDate(),
       newZoneDate(member.startAt)
     ),
-    startAt: loans.length
-      ? newZoneDate(loans[loans.length - 1].startDate).getTime()
+    startAt: calculatedLoanHistory.length
+      ? newZoneDate(
+          calculatedLoanHistory[calculatedLoanHistory.length - 1].startDate
+        ).getTime()
       : 0,
     status: member.active ? "Active" : "Disabled",
-    active: totalLoanBalance > 0,
+    active: calculatedTotalLoanBalance > 0,
     totalLoanTaken,
     totalLoanRepay,
-    totalLoanBalance,
+    totalLoanBalance: calculatedTotalLoanBalance,
     totalInterestPaid,
     totalInterestBalance,
-    totalInterestAmount: loanHistoryResult.totalInterestAmount,
-    loanHistory: loanHistoryResult.loanHistory,
-    recentPassedString: loanHistoryResult.recentPassedString,
+    totalInterestAmount,
+    loanHistory: calculatedLoanHistory,
+    recentPassedString,
   };
 }
 
-export type TransformedLoan = ReturnType<typeof transformLoanForTable>;
+export type TransformedLoan = Awaited<ReturnType<typeof transformLoanForTable>>;
 
 export function membersTableTransform(
   member: ToTransform,

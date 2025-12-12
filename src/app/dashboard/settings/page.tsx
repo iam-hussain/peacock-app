@@ -10,7 +10,6 @@ import {
   Copy,
   Database,
   Download,
-  FileSpreadsheet,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
@@ -52,7 +51,8 @@ import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
-  const { isAdmin, canManageAccounts } = useAuth();
+  const { isAdmin, canManageAccounts, user } = useAuth();
+  const isSuperAdmin = user?.kind === "admin" && user?.role === "SUPER_ADMIN";
   const queryClient = useQueryClient();
 
   // Track access state for each member to handle optimistic updates
@@ -94,7 +94,7 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState<string | null>(null);
   const [recalculateReturnsDialogOpen, setRecalculateReturnsDialogOpen] =
     useState(false);
-  const [recalculateLoansDialogOpen, setRecalculateLoansDialogOpen] =
+  const [recalculateDashboardDialogOpen, setRecalculateDashboardDialogOpen] =
     useState(false);
   const [backupDownloadLink, setBackupDownloadLink] = useState<string | null>(
     null
@@ -115,17 +115,26 @@ export default function SettingsPage() {
     },
   });
 
-  const loanMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate/loan"),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] });
-      toast.success("Loans are recalculated successfully.");
-      setRecalculateLoansDialogOpen(false);
+  const dashboardRecalcMutation = useMutation({
+    mutationFn: () => fetcher.post("/api/admin/dashboard/recalculate"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["all", "statistic"] });
+      toast.success("Dashboard data recalculated successfully.");
+      setRecalculateDashboardDialogOpen(false);
     },
     onError: (error: any) => {
-      toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
+      console.error("Dashboard recalculation error:", error);
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to recalculate dashboard data. Please try again.";
+      toast.error(errorMessage);
+      // Close dialog on error so user can see the error and try again if needed
+      setRecalculateDashboardDialogOpen(false);
+    },
+    onSettled: () => {
+      // This runs whether success or error - ensures state is reset
     },
   });
 
@@ -563,63 +572,67 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Recalculate Returns */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <Calculator className="h-5 w-5" />
+          {/* Recalculate Returns - Super Admin Only */}
+          {isSuperAdmin && (
+            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Recalculate Returns
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Recompute all member returns based on the latest rules.
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Recalculate Returns
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Recompute all member returns based on the latest rules.
-                </p>
-              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setRecalculateReturnsDialogOpen(true)}
+                disabled={returnsMutation.isPending || backupMutation.isPending}
+              >
+                {returnsMutation.isPending ? "Running..." : "Recalculate"}
+              </Button>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setRecalculateReturnsDialogOpen(true)}
-              disabled={
-                returnsMutation.isPending ||
-                loanMutation.isPending ||
-                backupMutation.isPending
-              }
-            >
-              {returnsMutation.isPending ? "Running..." : "Run Recalculation"}
-            </Button>
-          </div>
+          )}
 
-          {/* Recalculate Loans */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-green-500/10 text-green-600 dark:text-green-400">
-                <FileSpreadsheet className="h-5 w-5" />
+          {/* Recalculate Dashboard - Admin Only */}
+          {isAdmin && (
+            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="rounded-lg p-2.5 bg-green-500/10 text-green-600 dark:text-green-400">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Recalculate Dashboard Data
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Recompute all monthly dashboard snapshots from transaction
+                    history. This ensures all dashboard metrics are accurate and
+                    auditable.
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Recalculate Loans
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Recompute all loan balances and interest.
-                </p>
-              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setRecalculateDashboardDialogOpen(true)}
+                disabled={
+                  dashboardRecalcMutation.isPending ||
+                  returnsMutation.isPending ||
+                  backupMutation.isPending
+                }
+              >
+                {dashboardRecalcMutation.isPending
+                  ? "Running..."
+                  : "Recalculate"}
+              </Button>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setRecalculateLoansDialogOpen(true)}
-              disabled={
-                returnsMutation.isPending ||
-                loanMutation.isPending ||
-                backupMutation.isPending
-              }
-            >
-              {loanMutation.isPending ? "Running..." : "Run Recalculation"}
-            </Button>
-          </div>
+          )}
 
           {/* Backup Data */}
           <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
@@ -652,8 +665,8 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => backupMutation.mutate()}
                 disabled={
+                  dashboardRecalcMutation.isPending ||
                   returnsMutation.isPending ||
-                  loanMutation.isPending ||
                   backupMutation.isPending
                 }
               >
@@ -824,31 +837,48 @@ export default function SettingsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Recalculate Loans Confirmation Dialog */}
+      {/* Recalculate Dashboard Confirmation Dialog */}
       <Dialog
-        open={recalculateLoansDialogOpen}
-        onOpenChange={setRecalculateLoansDialogOpen}
+        open={recalculateDashboardDialogOpen}
+        onOpenChange={(open) => {
+          // Only allow closing if not currently running
+          if (!dashboardRecalcMutation.isPending) {
+            setRecalculateDashboardDialogOpen(open);
+          }
+        }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Recalculate Loans?</DialogTitle>
+            <DialogTitle>Recalculate Dashboard Data?</DialogTitle>
             <DialogDescription>
-              This will recompute all loan balances and interest. It won&apos;t
-              delete data but may update balances.
+              This will recalculate all monthly dashboard snapshots from the
+              first transaction to the current month. This process may take a
+              few minutes depending on the amount of historical data.
+              <br />
+              <br />
+              <strong>Warning:</strong> This will overwrite existing monthly
+              snapshots. Make sure you have a backup before proceeding.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button
               variant="outline"
-              onClick={() => setRecalculateLoansDialogOpen(false)}
+              onClick={() => {
+                if (!dashboardRecalcMutation.isPending) {
+                  setRecalculateDashboardDialogOpen(false);
+                }
+              }}
+              disabled={dashboardRecalcMutation.isPending}
             >
               Cancel
             </Button>
             <Button
-              onClick={() => loanMutation.mutate()}
-              disabled={loanMutation.isPending}
+              onClick={() => dashboardRecalcMutation.mutate()}
+              disabled={dashboardRecalcMutation.isPending}
             >
-              {loanMutation.isPending ? "Running..." : "Confirm"}
+              {dashboardRecalcMutation.isPending
+                ? "Recalculating..."
+                : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
