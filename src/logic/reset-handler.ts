@@ -1,16 +1,14 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
-import { calculateLoansHandler } from "./loan-handler";
-import { updatePassbookByTransaction } from "./transaction-handler";
+import { updatePassbookByTransaction } from './transaction-handler'
 
-import prisma from "@/db";
-import { clearCache } from "@/lib/cache";
+import prisma from '@/db'
+import { clearCache } from '@/lib/cache'
 import {
   bulkPassbookUpdate,
-  fetchAllLoanPassbook,
   fetchAllPassbook,
   initializePassbookToUpdate,
-} from "@/lib/helper";
+} from '@/lib/helper'
 
 export async function resetAllTransactionMiddlewareHandler() {
   clearCache();
@@ -29,22 +27,5 @@ export async function resetAllTransactionMiddlewareHandler() {
     );
   }
 
-  return bulkPassbookUpdate(passbookToUpdate);
-}
-
-export async function resetAllLoanHandler() {
-  clearCache();
-
-  const [transactions, passbooks] = await Promise.all([
-    prisma.transaction.findMany({
-      where: { transactionType: { in: ["LOAN_TAKEN", "LOAN_REPAY"] } },
-      orderBy: { transactionAt: "asc" },
-    }),
-    fetchAllLoanPassbook(),
-  ]);
-
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
-  passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
-
-  return bulkPassbookUpdate(passbookToUpdate);
+  return bulkPassbookUpdate(passbookToUpdate)
 }

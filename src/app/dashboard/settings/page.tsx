@@ -10,9 +10,8 @@ import {
   Copy,
   Database,
   Download,
-  FileSpreadsheet,
   UserPlus,
-} from "lucide-react";
+} from 'lucide-react'
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -93,12 +92,10 @@ export default function SettingsPage() {
     useState<TransformedMember | null>(null);
   const [newPassword, setNewPassword] = useState<string | null>(null);
   const [recalculateReturnsDialogOpen, setRecalculateReturnsDialogOpen] =
-    useState(false);
-  const [recalculateLoansDialogOpen, setRecalculateLoansDialogOpen] =
-    useState(false);
+    useState(false)
   const [backupDownloadLink, setBackupDownloadLink] = useState<string | null>(
     null
-  );
+  )
 
   // System Tools Mutations
   const returnsMutation = useMutation({
@@ -107,20 +104,6 @@ export default function SettingsPage() {
       await queryClient.invalidateQueries({ queryKey: ["all"] });
       toast.success("Returns are recalculated successfully.");
       setRecalculateReturnsDialogOpen(false);
-    },
-    onError: (error: any) => {
-      toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
-    },
-  });
-
-  const loanMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate/loan"),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] });
-      toast.success("Loans are recalculated successfully.");
-      setRecalculateLoansDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(
@@ -582,42 +565,9 @@ export default function SettingsPage() {
               variant="secondary"
               size="sm"
               onClick={() => setRecalculateReturnsDialogOpen(true)}
-              disabled={
-                returnsMutation.isPending ||
-                loanMutation.isPending ||
-                backupMutation.isPending
-              }
+              disabled={returnsMutation.isPending || backupMutation.isPending}
             >
               {returnsMutation.isPending ? "Running..." : "Run Recalculation"}
-            </Button>
-          </div>
-
-          {/* Recalculate Loans */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-green-500/10 text-green-600 dark:text-green-400">
-                <FileSpreadsheet className="h-5 w-5" />
-              </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Recalculate Loans
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Recompute all loan balances and interest.
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setRecalculateLoansDialogOpen(true)}
-              disabled={
-                returnsMutation.isPending ||
-                loanMutation.isPending ||
-                backupMutation.isPending
-              }
-            >
-              {loanMutation.isPending ? "Running..." : "Run Recalculation"}
             </Button>
           </div>
 
@@ -652,9 +602,7 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => backupMutation.mutate()}
                 disabled={
-                  returnsMutation.isPending ||
-                  loanMutation.isPending ||
-                  backupMutation.isPending
+                  returnsMutation.isPending || backupMutation.isPending
                 }
               >
                 {backupMutation.isPending ? "Backing up..." : "Create Backup"}
@@ -824,35 +772,6 @@ export default function SettingsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Recalculate Loans Confirmation Dialog */}
-      <Dialog
-        open={recalculateLoansDialogOpen}
-        onOpenChange={setRecalculateLoansDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Recalculate Loans?</DialogTitle>
-            <DialogDescription>
-              This will recompute all loan balances and interest. It won&apos;t
-              delete data but may update balances.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setRecalculateLoansDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => loanMutation.mutate()}
-              disabled={loanMutation.isPending}
-            >
-              {loanMutation.isPending ? "Running..." : "Confirm"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Member Form Dialog */}
       <MemberFormDialog

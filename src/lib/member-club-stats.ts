@@ -1,11 +1,7 @@
-import prisma from "@/db";
-import { getMemberTotalDepositUpToday } from "@/lib/club";
-import { calculateInterestByAmount } from "@/lib/helper";
-import {
-  ClubPassbookData,
-  LoanHistoryEntry,
-  VendorPassbookData,
-} from "@/lib/type";
+import prisma from '@/db'
+import { getMemberTotalDepositUpToday } from '@/lib/club'
+import { getMemberLoanHistory } from '@/lib/loan-calculator'
+import { ClubPassbookData, VendorPassbookData } from '@/lib/type'
 
 export async function getMemberClubStats() {
   const [members, clubPassbook, vendorPassbooks] = await Promise.all([
@@ -46,22 +42,15 @@ export async function getMemberClubStats() {
   const totalReturnPerMember =
     activeMemberCount > 0 ? availableProfit / activeMemberCount : 0;
 
-  // Calculate total interest amount from all members' loan histories
-  const totalInterestAmount = members.reduce((sum, member) => {
-    const loanHistory = (member.passbook.loanHistory ||
-      []) as LoanHistoryEntry[];
-    return (
-      sum +
-      loanHistory.reduce((acc, entry) => {
-        const { interestAmount } = calculateInterestByAmount(
-          entry.amount,
-          entry.startDate,
-          entry?.endDate
-        );
-        return acc + interestAmount;
-      }, 0)
-    );
-  }, 0);
+  // Calculate total interest amount from all members' loan histories (on-the-fly)
+  const memberLoanHistories = await Promise.all(
+    members.map((member) => getMemberLoanHistory(member.id))
+  )
+
+  const totalInterestAmount = memberLoanHistories.reduce(
+    (sum, { totalInterestAmount }) => sum + totalInterestAmount,
+    0
+  )
 
   const totalInterestBalance = totalInterestAmount - clubData.totalInterestPaid;
   const expectedLoanProfitPerMember =

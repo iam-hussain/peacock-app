@@ -121,15 +121,11 @@ export async function POST(request: Request) {
     // Transform vendors
     const transformedVendors = allVendors.map(transformVendorForTable);
 
-    // Transform loans
-    const transformedLoans = allMembers
-      .filter(
-        (e) =>
-          e.active ||
-          (Array.isArray(e.passbook.loanHistory) &&
-            e.passbook.loanHistory.length > 0)
-      )
-      .map(transformLoanForTable);
+    // Transform loans (on-the-fly calculation)
+    const transformedLoansPromises = allMembers.map(transformLoanForTable)
+    const transformedLoans = (await Promise.all(transformedLoansPromises)).filter(
+      (loan) => loan.active || loan.loanHistory.length > 0
+    )
 
     // Filter members - improved search to handle partial matches and normalize spaces
     // Also search on original account data for firstName/lastName separately
