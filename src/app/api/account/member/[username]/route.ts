@@ -33,13 +33,13 @@ export async function POST(
       expectedLoanProfitPerMember,
     } = stats;
 
-    const memberLoan = await transformLoanForTable(account)
+    const memberLoan = await transformLoanForTable(account);
     const memberData = membersTableTransform(
       account,
       memberTotalDeposit,
       totalReturnPerMember,
       expectedLoanProfitPerMember
-    )
+    );
 
     return NextResponse.json({
       member: {

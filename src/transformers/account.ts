@@ -55,7 +55,7 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
   }
 }
 
-export type TransformedLoan = ReturnType<typeof transformLoanForTable>;
+export type TransformedLoan = Awaited<ReturnType<typeof transformLoanForTable>>;
 
 export function membersTableTransform(
   member: ToTransform,

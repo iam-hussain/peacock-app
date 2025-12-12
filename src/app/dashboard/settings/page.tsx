@@ -51,7 +51,8 @@ import { moneyFormat } from "@/lib/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
-  const { isAdmin, canManageAccounts } = useAuth();
+  const { isAdmin, canManageAccounts, user } = useAuth();
+  const isSuperAdmin = user?.kind === 'admin' && user?.role === 'SUPER_ADMIN';
   const queryClient = useQueryClient();
 
   // Track access state for each member to handle optimistic updates
@@ -546,30 +547,32 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Recalculate Returns */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <Calculator className="h-5 w-5" />
+          {/* Recalculate Returns - Super Admin Only */}
+          {isSuperAdmin && (
+            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Calculator className="h-5 w-5" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Recalculate Returns
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Recompute all member returns based on the latest rules.
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Recalculate Returns
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Recompute all member returns based on the latest rules.
-                </p>
-              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setRecalculateReturnsDialogOpen(true)}
+                disabled={returnsMutation.isPending || backupMutation.isPending}
+              >
+                {returnsMutation.isPending ? 'Running...' : 'Run Recalculation'}
+              </Button>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setRecalculateReturnsDialogOpen(true)}
-              disabled={returnsMutation.isPending || backupMutation.isPending}
-            >
-              {returnsMutation.isPending ? "Running..." : "Run Recalculation"}
-            </Button>
-          </div>
+          )}
 
           {/* Backup Data */}
           <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">

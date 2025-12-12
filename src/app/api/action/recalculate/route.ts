@@ -2,21 +2,34 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { revalidatePath, revalidateTag } from "next/cache";
-import { NextResponse } from "next/server";
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { NextResponse } from 'next/server'
 
-import { resetAllTransactionMiddlewareHandler } from "@/logic/reset-handler";
+import { resetAllTransactionMiddlewareHandler } from '@/logic/reset-handler'
+import { requireSuperAdmin } from '@/lib/auth'
 
 export async function POST() {
   try {
-    await resetAllTransactionMiddlewareHandler();
+    // Only super admin can recalculate returns
+    await requireSuperAdmin()
 
-    revalidateTag("api");
-    revalidatePath("*");
-    // Return the file path
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ success: false, error: error }, { status: 500 });
+    await resetAllTransactionMiddlewareHandler()
+
+    revalidateTag('api')
+    revalidatePath('*')
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    console.error(error)
+    // Handle authorization errors
+    if (error?.message === 'FORBIDDEN_SUPER_ADMIN') {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Super admin access required' },
+        { status: 403 }
+      )
+    }
+    return NextResponse.json(
+      { success: false, error: error },
+      { status: 500 }
+    )
   }
 }

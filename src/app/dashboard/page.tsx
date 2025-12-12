@@ -12,14 +12,16 @@ import {
   Clock,
   Coins,
   Crown,
-  Hand,
+  FileText,
+  HandCoins,
+  Hourglass,
   Layers,
   Scale,
   SlidersHorizontal,
   TrendingUp,
   Users,
   Wallet,
-} from "lucide-react";
+} from 'lucide-react'
 
 import { ActivityFeed } from "@/components/molecules/activity-feed";
 import { EnhancedChartsSection } from "@/components/molecules/enhanced-charts-section";
@@ -176,47 +178,81 @@ export default function DashboardPage() {
         </div>
 
         {/* LOAN SUMMARY */}
-        <div className="space-y-3">
+        <div className="space-y-6">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Loan Summary
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <ModernStatCard
-              title="Loan Taken"
-              value={
-                isLoading ? (
-                  <Skeleton className="h-6 w-24" />
-                ) : (
-                  formatCurrency(statistics?.totalLoanTaken || 0)
-                )
-              }
-              icon={<Hand className="h-5 w-5" />}
-              iconBgColor="#E1F5FE"
-            />
-            <ModernStatCard
-              title="Interest Collected"
-              value={
-                isLoading ? (
-                  <Skeleton className="h-6 w-24" />
-                ) : (
-                  formatCurrency(statistics?.totalInterestPaid || 0)
-                )
-              }
-              icon={<Coins className="h-5 w-5" />}
-              iconBgColor="#E8F5E9"
-            />
-            <ModernStatCard
-              title="Interest Balance"
-              value={
-                isLoading ? (
-                  <Skeleton className="h-6 w-24" />
-                ) : (
-                  formatCurrency(statistics?.totalInterestBalance || 0)
-                )
-              }
-              icon={<Scale className="h-5 w-5" />}
-              iconBgColor="#FFF9C4"
-            />
+
+          {/* Section 1: Total Loan (Lifetime Summary) */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+              <h4 className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Lifetime
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <ModernStatCard
+                title="Total Loan Given"
+                value={
+                  isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    formatCurrency(statistics?.totalLoanTaken || 0)
+                  )
+                }
+                icon={<HandCoins className="h-5 w-5" />}
+                iconBgColor="#2563EB"
+              />
+              <ModernStatCard
+                title="Total Interest Collected"
+                value={
+                  isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    formatCurrency(statistics?.totalInterestPaid || 0)
+                  )
+                }
+                icon={<TrendingUp className="h-5 w-5" />}
+                iconBgColor="#16A34A"
+              />
+            </div>
+          </div>
+
+          {/* Section 2: Current Loan (Outstanding Summary) */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="h-1 w-1 rounded-full bg-amber-500" />
+              <h4 className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Active / Outstanding
+              </h4>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <ModernStatCard
+                title="Current Loan Taken"
+                value={
+                  isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    formatCurrency(statistics?.totalLoanBalance || 0)
+                  )
+                }
+                icon={<FileText className="h-5 w-5" />}
+                iconBgColor="#F59E0B"
+              />
+              <ModernStatCard
+                title="Interest Balance"
+                value={
+                  isLoading ? (
+                    <Skeleton className="h-6 w-24" />
+                  ) : (
+                    formatCurrency(statistics?.totalInterestBalance || 0)
+                  )
+                }
+                icon={<Hourglass className="h-5 w-5" />}
+                iconBgColor="#EAB308"
+              />
+            </div>
           </div>
         </div>
 
@@ -260,19 +296,7 @@ export default function DashboardPage() {
           <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Cash Flow Position
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <ModernStatCard
-              title="Available Cash"
-              value={
-                isLoading ? (
-                  <Skeleton className="h-6 w-24" />
-                ) : (
-                  formatCurrency(availableCash)
-                )
-              }
-              icon={<Wallet className="h-5 w-5" />}
-              iconBgColor="#FFF3E0"
-            />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ModernStatCard
               title="Total Invested"
               value={
@@ -283,7 +307,7 @@ export default function DashboardPage() {
                 )
               }
               icon={<Layers className="h-5 w-5" />}
-              iconBgColor="#E1F5FE"
+              iconBgColor="#2563EB"
             />
             <ModernStatCard
               title="Pending Amounts"
@@ -295,45 +319,82 @@ export default function DashboardPage() {
                 )
               }
               icon={<Clock className="h-5 w-5" />}
-              iconBgColor="#F3E5F5"
+              iconBgColor="#9333EA"
+            />
+          </div>
+        </div>
+
+        {/* VALUATION & CASH */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Valuation & Cash
+          </h3>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <ModernStatCard
+              title="Available Cash"
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(availableCash)
+                )
+              }
+              icon={<Wallet className="h-5 w-5" />}
+              iconBgColor="#F59E0B"
+            />
+            <ModernStatCard
+              title="Current Value"
+              value={
+                isLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  formatCurrency(currentPortfolioValue)
+                )
+              }
+              icon={<Banknote className="h-5 w-5" />}
+              iconBgColor="#16A34A"
             />
           </div>
         </div>
       </div>
 
-      {/* PORTFOLIO SUMMARY - 2 Large Cards with 1 placeholder */}
+      {/* PORTFOLIO SUMMARY - Full-width emphasized card */}
       <div className="space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Portfolio Summary
         </h3>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <ModernStatCard
-            title="Current Value"
-            value={
-              isLoading ? (
-                <Skeleton className="h-6 w-24" />
-              ) : (
-                formatCurrency(currentPortfolioValue)
-              )
-            }
-            icon={<Banknote className="h-5 w-5" />}
-            iconBgColor="#E8F5E9"
-          />
-          <ModernStatCard
-            title="Total Value"
-            value={
-              isLoading ? (
-                <Skeleton className="h-6 w-24" />
-              ) : (
-                formatCurrency(netValue)
-              )
-            }
-            icon={<Crown className="h-5 w-5" />}
-            iconBgColor="#FFF3E0"
-            isHighlighted={true}
-          />
-          {/* Invisible placeholder for 3-column alignment */}
-          <div className="hidden xl:block" aria-hidden="true" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Card className="col-span-1 md:col-span-2 h-full flex flex-col rounded-lg border-2 border-primary/30 bg-card shadow-lg ring-2 ring-primary/10 transition-all hover:shadow-xl">
+            <CardContent className="flex flex-1 flex-col p-6 md:p-8">
+              <div className="flex flex-1 items-center justify-between gap-6">
+                {/* Left: Label */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Total Value
+                  </p>
+                </div>
+                {/* Center: Value */}
+                <div className="flex-1 text-center">
+                  {isLoading ? (
+                    <Skeleton className="h-10 w-48 mx-auto" />
+                  ) : (
+                    <p className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+                      {formatCurrency(netValue)}
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Total portfolio value (cash + investments + receivables)
+                  </p>
+                </div>
+                {/* Right: Icon */}
+                <div className="flex shrink-0 items-center justify-center rounded-full h-16 w-16 bg-green-500/10 dark:bg-green-500/20">
+                  <div className="relative z-10 text-2xl text-green-600 dark:text-green-400">
+                    <Crown className="h-8 w-8" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
