@@ -118,7 +118,7 @@ export default function DashboardPage() {
                 ) : (
                   formatCurrency(
                     (statistics?.totalMemberPeriodicDeposits || 0) -
-                      (statistics?.totalMemberWithdrawals || 0)
+                    (statistics?.totalMemberWithdrawals || 0)
                   )
                 )
               }
@@ -280,7 +280,7 @@ export default function DashboardPage() {
                 ) : (
                   formatCurrency(
                     (statistics?.totalLoanBalance || 0) +
-                      (statistics?.totalVendorHolding || 0)
+                    (statistics?.totalVendorHolding || 0)
                   )
                 )
               }
@@ -295,7 +295,7 @@ export default function DashboardPage() {
                 ) : (
                   formatCurrency(
                     (statistics?.totalInterestBalance || 0) +
-                      (statistics?.totalOffsetBalance || 0)
+                    (statistics?.totalOffsetBalance || 0)
                   )
                 )
               }
@@ -362,10 +362,10 @@ export default function DashboardPage() {
                     <p className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
                       {formatCurrency(
                         (statistics?.currentClubBalance || 0) +
-                          (statistics?.totalLoanBalance || 0) +
-                          (statistics?.totalVendorHolding || 0) +
-                          (statistics?.totalInterestBalance || 0) +
-                          (statistics?.totalOffsetBalance || 0)
+                        (statistics?.totalLoanBalance || 0) +
+                        (statistics?.totalVendorHolding || 0) +
+                        (statistics?.totalInterestBalance || 0) +
+                        (statistics?.totalOffsetBalance || 0)
                       )}
                     </p>
                   )}
