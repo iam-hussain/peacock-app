@@ -12,9 +12,7 @@ export async function POST() {
     include: { passbook: true },
   });
 
-  const transformedLoans = await Promise.all(
-    loans.map(transformLoanForTable)
-  );
+  const transformedLoans = await Promise.all(loans.map(transformLoanForTable));
 
   const filteredLoans = transformedLoans
     .filter((e) => e.active || e.loanHistory.length > 0)

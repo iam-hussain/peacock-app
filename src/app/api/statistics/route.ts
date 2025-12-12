@@ -5,34 +5,33 @@ export const fetchCache = "force-no-store";
 import { $Enums, Account } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-import prisma from '@/db'
-import { clubMonthsFromStart, getClubTotalDepositUpToday } from '@/lib/club'
-import { calculateInterestByAmount } from '@/lib/helper'
-import { getMemberLoanHistory } from '@/lib/loan-calculator'
+import prisma from "@/db";
+import { clubMonthsFromStart, getClubTotalDepositUpToday } from "@/lib/club";
+import { calculateInterestByAmount } from "@/lib/helper";
+import { getMemberLoanHistory } from "@/lib/loan-calculator";
 import {
   ClubPassbookData,
-  LoanHistoryEntry,
   MemberPassbookData,
   VendorPassbookData,
-} from '@/lib/type'
+} from "@/lib/type";
 
 type StatClubPassbook = {
-  payload: MemberPassbookData | ClubPassbookData
-  type: $Enums.PASSBOOK_TYPE
-}
+  payload: MemberPassbookData | ClubPassbookData;
+  type: $Enums.PASSBOOK_TYPE;
+};
 type StatMemberPassbook = {
-  payload: MemberPassbookData | ClubPassbookData
-  type: $Enums.PASSBOOK_TYPE
-  accountId?: string
-  joiningOffset: number
-  delayOffset: number
-}
+  payload: MemberPassbookData | ClubPassbookData;
+  type: $Enums.PASSBOOK_TYPE;
+  accountId?: string;
+  joiningOffset: number;
+  delayOffset: number;
+};
 
 export async function POST() {
   try {
     const [passbooks, members, vendorsPass] = await Promise.all([
       prisma.passbook.findMany({
-        where: { type: { in: ['CLUB', 'MEMBER'] } },
+        where: { type: { in: ["CLUB", "MEMBER"] } },
         select: {
           type: true,
           payload: true,
@@ -43,10 +42,10 @@ export async function POST() {
       }),
       prisma.account.findMany({ where: { isMember: true, active: true } }),
       prisma.passbook.findMany({
-        where: { type: 'VENDOR' },
+        where: { type: "VENDOR" },
         select: { payload: true },
       }),
-    ])
+    ]);
 
     const totalVendorProfit = vendorsPass
       .map((e) => {
@@ -55,16 +54,16 @@ export async function POST() {
         return Math.max(totalReturns - totalInvestment, 0);
       })
       .reduce((a, b) => a + b, 0);
-    const clubPassbook = passbooks.find((e) => e.type === 'CLUB')
+    const clubPassbook = passbooks.find((e) => e.type === "CLUB");
     const membersPassbooks = passbooks
-      .filter((e) => e.type === 'MEMBER')
+      .filter((e) => e.type === "MEMBER")
       .map((p) => ({
         ...p,
         accountId: p.account?.id,
-      })) as StatMemberPassbook[]
+      })) as unknown as StatMemberPassbook[];
 
     if (!clubPassbook) {
-      throw new Error('Invalid club statistics')
+      throw new Error("Invalid club statistics");
     }
 
     return NextResponse.json({
@@ -78,7 +77,7 @@ export async function POST() {
       members: members
         .map(membersStatTransform)
         .sort((a, b) => (a.name > b.name ? 1 : -1)),
-    })
+    });
   } catch (error) {
     return NextResponse.json({
       success: false,
@@ -98,10 +97,10 @@ async function statisticsTransform(
     membersPassbooks
       .filter((p) => p.accountId)
       .map(async (p) => {
-        const { loanHistory } = await getMemberLoanHistory(p.accountId!)
-        return loanHistory
+        const { loanHistory } = await getMemberLoanHistory(p.accountId!);
+        return loanHistory;
       })
-  )
+  );
 
   const expectedTotalLoanInterestAmount = memberLoanHistories
     .flat()
@@ -110,10 +109,10 @@ async function statisticsTransform(
         loan.amount,
         loan.startDate,
         loan?.endDate
-      )
-      return interestAmount
+      );
+      return interestAmount;
     })
-    .reduce((a, b) => a + b, 0)
+    .reduce((a, b) => a + b, 0);
   const expectedTotalMemberPeriodicDeposits =
     getClubTotalDepositUpToday(membersCount);
 
@@ -206,7 +205,9 @@ export type GetStatisticsResponse = {
   members: TransformedMemberStat[];
 };
 
-export type TransformedStatistics = ReturnType<typeof statisticsTransform>;
+export type TransformedStatistics = Awaited<
+  ReturnType<typeof statisticsTransform>
+>;
 export type TransformedMemberStat = ReturnType<typeof membersStatTransform>;
 
 function membersStatTransform(member: Account) {

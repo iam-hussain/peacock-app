@@ -43,7 +43,7 @@ export function ModernStatCard({
       )}
     >
       <CardContent
-        className={cn("flex flex-1 flex-col p-4", isHighlighted && "p-5")}
+        className={cn("flex flex-1 flex-col p-3", isHighlighted && "p-4")}
       >
         <div className="flex flex-1 items-center justify-between gap-4">
           {/* Left: Label */}

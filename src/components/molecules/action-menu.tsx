@@ -50,27 +50,27 @@ const ActionMenu = () => {
   });
 
   async function handleBackup(e: React.FormEvent) {
-    e.preventDefault()
-    return await backupMutation.mutateAsync()
+    e.preventDefault();
+    return await backupMutation.mutateAsync();
   }
 
   async function handleReturns(e: React.FormEvent) {
-    e.preventDefault()
-    return await returnsMutation.mutateAsync()
+    e.preventDefault();
+    return await returnsMutation.mutateAsync();
   }
 
   return (
     <>
       <Button
-        variant={'menu'}
+        variant={"menu"}
         onClick={handleReturns}
         disabled={backupMutation.isPending || returnsMutation.isPending}
       >
-        <FaCalculator className="h-5 w-5" />{' '}
-        {returnsMutation.isPending ? 'Returns ...' : 'Recalculated Returns'}
+        <FaCalculator className="h-5 w-5" />{" "}
+        {returnsMutation.isPending ? "Returns ..." : "Recalculated Returns"}
       </Button>
       <Button
-        variant={'menu'}
+        variant={"menu"}
         onClick={handleBackup}
         disabled={backupMutation.isPending || returnsMutation.isPending}
       >

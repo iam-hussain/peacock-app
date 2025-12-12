@@ -1,10 +1,10 @@
-import { Transaction } from '@prisma/client'
+import { Transaction } from "@prisma/client";
 
 import {
   PassbookConfigAction,
   PassbookConfigActionValue,
   transactionPassbookSettings,
-} from './settings'
+} from "./settings";
 
 import prisma from "@/db";
 import {
@@ -162,9 +162,9 @@ export async function transactionEntryHandler(
     passbookToUpdate,
     created,
     isDelete
-  )
+  );
 
   // Loan history is now calculated on-the-fly from transactions
   // No need to store or recalculate loanHistory in passbook
-  return bulkPassbookUpdate(passbookToUpdate)
+  return bulkPassbookUpdate(passbookToUpdate);
 }

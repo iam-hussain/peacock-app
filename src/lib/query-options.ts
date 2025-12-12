@@ -124,3 +124,31 @@ export const fetchTransactions = (options: any) => {
     ...noRefetchConfigs,
   });
 };
+
+export const fetchDashboardSummary = (month?: string) =>
+  queryOptions({
+    queryKey: ["dashboard", "summary", month || "latest"],
+    queryFn: () =>
+      fetcher.get(
+        month
+          ? `/api/dashboard/summary?month=${month}`
+          : "/api/dashboard/summary/latest"
+      ) as Promise<{
+        success: boolean;
+        summary: any;
+        error?: string;
+      }>,
+    retry: false, // Don't retry on 503/404 errors
+    ...noRefetchConfigs,
+  });
+
+export const fetchDashboardGraphs = (from: string, to: string) =>
+  queryOptions({
+    queryKey: ["dashboard", "graphs", from, to],
+    queryFn: () =>
+      fetcher.get(`/api/dashboard/graphs?from=${from}&to=${to}`) as Promise<{
+        success: boolean;
+        summaries: any[];
+      }>,
+    ...noRefetchConfigs,
+  });

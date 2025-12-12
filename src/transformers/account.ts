@@ -1,19 +1,18 @@
-import { Account, Passbook } from '@prisma/client'
+import { Account, Passbook } from "@prisma/client";
 
-import { calculateMonthsDifference, newZoneDate } from '@/lib/date'
-import { MemberPassbookData } from '@/lib/type'
-import { getMemberLoanHistory } from '@/lib/loan-calculator'
+import { calculateMonthsDifference, newZoneDate } from "@/lib/date";
+import { getMemberLoanHistory } from "@/lib/loan-calculator";
+import { MemberPassbookData } from "@/lib/type";
 
-type ToTransform = Account & { passbook: Passbook }
+type ToTransform = Account & { passbook: Passbook };
 
 export async function transformLoanForTable(vendorInput: ToTransform) {
-  const { passbook, ...member } = vendorInput
+  const { passbook, ...member } = vendorInput;
   const {
     totalLoanTaken = 0,
     totalLoanRepay = 0,
-    totalLoanBalance = 0,
     totalInterestPaid = 0,
-  } = passbook.payload as unknown as MemberPassbookData
+  } = passbook.payload as unknown as MemberPassbookData;
 
   // Calculate loan history on-the-fly from transactions
   const {
@@ -21,9 +20,9 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
     totalLoanBalance: calculatedTotalLoanBalance,
     totalInterestAmount,
     recentPassedString,
-  } = await getMemberLoanHistory(member.id)
+  } = await getMemberLoanHistory(member.id);
 
-  const totalInterestBalance = totalInterestAmount - totalInterestPaid
+  const totalInterestBalance = totalInterestAmount - totalInterestPaid;
 
   return {
     id: member.id,
@@ -40,9 +39,11 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
       newZoneDate(member.startAt)
     ),
     startAt: calculatedLoanHistory.length
-      ? newZoneDate(calculatedLoanHistory[calculatedLoanHistory.length - 1].startDate).getTime()
+      ? newZoneDate(
+          calculatedLoanHistory[calculatedLoanHistory.length - 1].startDate
+        ).getTime()
       : 0,
-    status: member.active ? 'Active' : 'Disabled',
+    status: member.active ? "Active" : "Disabled",
     active: calculatedTotalLoanBalance > 0,
     totalLoanTaken,
     totalLoanRepay,
@@ -52,7 +53,7 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
     totalInterestAmount,
     loanHistory: calculatedLoanHistory,
     recentPassedString,
-  }
+  };
 }
 
 export type TransformedLoan = Awaited<ReturnType<typeof transformLoanForTable>>;

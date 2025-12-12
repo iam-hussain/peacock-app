@@ -1,9 +1,9 @@
-import { Transaction } from '@prisma/client'
+import { Transaction } from "@prisma/client";
 
-import prisma from '@/db'
-import { newZoneDate } from '@/lib/date'
-import { calculateInterestByAmount } from '@/lib/helper'
-import { LoanHistoryEntry } from '@/lib/type'
+import prisma from "@/db";
+import { newZoneDate } from "@/lib/date";
+import { calculateInterestByAmount } from "@/lib/helper";
+import { LoanHistoryEntry } from "@/lib/type";
 
 /**
  * Fetches all loan transactions for a specific member
@@ -12,10 +12,10 @@ export function fetchLoanTransactionsForMember(memberId: string) {
   return prisma.transaction.findMany({
     where: {
       OR: [{ fromId: memberId }, { toId: memberId }],
-      transactionType: { in: ['LOAN_TAKEN', 'LOAN_REPAY'] },
+      transactionType: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
     },
-    orderBy: { transactionAt: 'asc' },
-  })
+    orderBy: { transactionAt: "asc" },
+  });
 }
 
 /**
@@ -26,49 +26,49 @@ const getOneLoanDetails = (
   start: Date | string,
   end: Date | string = newZoneDate()
 ): LoanHistoryEntry => {
-  const data = calculateInterestByAmount(amount, start, end)
+  const data = calculateInterestByAmount(amount, start, end);
   return {
     active: false,
     amount,
     ...data,
     startDate: data.startDate.getTime(),
     endDate: data.endDate.getTime(),
-  }
-}
+  };
+};
 
 /**
  * Calculates loan history from an array of loan transactions
  * This is the core calculation logic that processes transactions chronologically
  */
 export function calculateLoanDetails(transactions: Transaction[]) {
-  const loanHistory: LoanHistoryEntry[] = []
-  let accountBalance = 0
-  let prevLoan: any = null
+  const loanHistory: LoanHistoryEntry[] = [];
+  let accountBalance = 0;
+  let prevLoan: any = null;
 
   transactions.forEach((transaction) => {
-    const { transactionAt, transactionType, amount } = transaction
+    const { transactionAt, transactionType, amount } = transaction;
 
-    if (transactionType === 'LOAN_TAKEN') {
+    if (transactionType === "LOAN_TAKEN") {
       if (prevLoan) {
         loanHistory.push(
           getOneLoanDetails(prevLoan.amount, prevLoan.startDate, transactionAt)
-        )
+        );
       }
-      accountBalance = accountBalance + amount
+      accountBalance = accountBalance + amount;
       prevLoan = {
         active: true,
         amount: accountBalance,
         startDate: newZoneDate(transactionAt),
         transactionType,
-      }
-    } else if (transactionType === 'LOAN_REPAY') {
+      };
+    } else if (transactionType === "LOAN_REPAY") {
       if (prevLoan) {
         loanHistory.push(
           getOneLoanDetails(accountBalance, prevLoan.startDate, transactionAt)
-        )
-        prevLoan = null
+        );
+        prevLoan = null;
       }
-      accountBalance = accountBalance - amount
+      accountBalance = accountBalance - amount;
 
       if (accountBalance > 0) {
         prevLoan = {
@@ -76,10 +76,10 @@ export function calculateLoanDetails(transactions: Transaction[]) {
           amount: accountBalance,
           startDate: newZoneDate(transactionAt),
           transactionType,
-        }
+        };
       }
     }
-  })
+  });
 
   if (accountBalance > 0 && prevLoan) {
     loanHistory.push({
@@ -87,9 +87,9 @@ export function calculateLoanDetails(transactions: Transaction[]) {
       amount: accountBalance,
       startDate: prevLoan.startDate.getTime(),
       interestAmount: 0,
-    })
+    });
   }
-  return { loanHistory, totalLoanBalance: accountBalance }
+  return { loanHistory, totalLoanBalance: accountBalance };
 }
 
 /**
@@ -97,8 +97,8 @@ export function calculateLoanDetails(transactions: Transaction[]) {
  * This replaces reading from passbook.loanHistory
  */
 export async function getMemberLoanHistory(memberId: string) {
-  const transactions = await fetchLoanTransactionsForMember(memberId)
-  const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions)
+  const transactions = await fetchLoanTransactionsForMember(memberId);
+  const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
 
   // Recalculate interest for each entry (same as transformLoanForTable does)
   const loanHistoryResult = loanHistory.reduce(
@@ -107,10 +107,10 @@ export async function getMemberLoanHistory(memberId: string) {
         loan.amount,
         loan.startDate,
         loan?.endDate
-      )
-      acc.totalInterestAmount += interestCalc.interestAmount
+      );
+      acc.totalInterestAmount += interestCalc.interestAmount;
       // Remove startDate and endDate from loan before spreading
-      const { startDate: _startDate, endDate: _endDate } = loan
+      const { startDate: _startDate, endDate: _endDate } = loan;
       acc.loanHistory.push({
         ...interestCalc,
         amount: loan.amount,
@@ -118,21 +118,20 @@ export async function getMemberLoanHistory(memberId: string) {
         startDate: newZoneDate(loan.startDate).getTime(),
         endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
         totalInterestAmount: acc.totalInterestAmount,
-      })
+      });
       // Store the most recent monthsPassedString
       if (interestCalc.monthsPassedString) {
-        acc.recentPassedString = interestCalc.monthsPassedString
+        acc.recentPassedString = interestCalc.monthsPassedString;
       }
-      return acc
+      return acc;
     },
-    { totalInterestAmount: 0, loanHistory: [] as any[], recentPassedString: '' }
-  )
+    { totalInterestAmount: 0, loanHistory: [] as any[], recentPassedString: "" }
+  );
 
   return {
     loanHistory: loanHistoryResult.loanHistory,
     totalLoanBalance,
     totalInterestAmount: loanHistoryResult.totalInterestAmount,
     recentPassedString: loanHistoryResult.recentPassedString,
-  }
+  };
 }
-
