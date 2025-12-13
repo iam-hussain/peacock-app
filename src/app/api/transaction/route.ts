@@ -78,7 +78,7 @@ function getQueryParams(url: string) {
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),
     endDate: searchParams.get("endDate"),
-    sortField: searchParams.get("sortField") || "transactionAt",
+    sortField: searchParams.get('sortField') || 'occurredAt',
     sortOrder: searchParams.get("sortOrder") || "desc",
   };
 }
@@ -121,7 +121,7 @@ function createFilters({
   if (startDate && endDate)
     if (
       sortField &&
-      (sortField === "transactionAt" || sortField === "createdAt")
+      (sortField === 'occurredAt' || sortField === 'createdAt')
     ) {
       filters[sortField] = {
         gte: newZoneDate(startDate),
@@ -201,7 +201,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       avatar: transaction.from.avatar
         ? `/image/${transaction.from.avatar}`
         : undefined,
-      link: transaction.from.isMember
+      link: transaction.from.type === 'MEMBER'
         ? `/dashboard/member/${transaction.from.username}`
         : undefined,
     },
@@ -212,7 +212,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       avatar: transaction.to.avatar
         ? `/image/${transaction.to.avatar}`
         : undefined,
-      link: transaction.to.isMember
+      link: transaction.to.type === 'MEMBER'
         ? `/dashboard/member/${transaction.to.username}`
         : undefined,
     },
