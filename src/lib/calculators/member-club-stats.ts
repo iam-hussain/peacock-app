@@ -25,11 +25,12 @@ export async function getMemberClubStats() {
   ]);
 
   const totalOffset = members
-    .map((m) => m.passbook.joiningOffset + m.passbook.delayOffset)
+    .filter((m) => m.passbook !== null)
+    .map((m) => (m.passbook?.joiningOffset || 0) + (m.passbook?.delayOffset || 0))
     .reduce((a, b) => a + b, 0);
 
   const memberTotalDeposit = getMemberTotalDepositUpToday();
-  const activeMemberCount = members.filter((m) => m.active).length;
+  const activeMemberCount = members.filter((m) => m.status === 'ACTIVE').length;
   const clubData = clubPassbook.payload as ClubPassbookData;
 
   const totalVendorProfit = vendorPassbooks
