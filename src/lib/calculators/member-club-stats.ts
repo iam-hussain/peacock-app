@@ -9,9 +9,14 @@ export async function getMemberClubStats() {
       where: { type: 'MEMBER' },
       include: { passbook: true },
     }),
-    prisma.passbook.findFirstOrThrow({
-      where: { kind: "CLUB" },
+    prisma.passbook.findFirst({
+      where: { kind: 'CLUB' },
       select: { payload: true },
+    }).then(club => {
+      if (!club) {
+        throw new Error('CLUB passbook not found. Please run seed to initialize database.')
+      }
+      return club
     }),
     prisma.passbook.findMany({
       where: { kind: "VENDOR" },
