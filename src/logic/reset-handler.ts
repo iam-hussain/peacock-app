@@ -88,7 +88,7 @@ export async function resetAllTransactionMiddlewareHandler(
       // loanHistory is stored as JSON, need to parse it
       const loanHistoryData = passbook.data.loanHistory as any
       const loanTransactions = Array.isArray(loanHistoryData) ? loanHistoryData : []
-      
+
       const loanDetails = calculateLoanDetails(loanTransactions)
       if (loanDetails && typeof loanDetails.totalLoanBalance === 'number' && loanDetails.totalLoanBalance > 0) {
         const interestResult = calculateInterestByAmount(
