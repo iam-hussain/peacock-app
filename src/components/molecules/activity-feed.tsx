@@ -147,10 +147,10 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
     fetchTransactions({
       page: 1,
       limit,
-      accountId: "",
-      transactionType: "",
-      sortField: "transactionAt",
-      sortOrder: "desc",
+      accountId: '',
+      transactionType: '',
+      sortField: 'occurredAt',
+      sortOrder: 'desc',
     })
   );
 
