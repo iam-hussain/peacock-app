@@ -42,7 +42,7 @@ function mapAccountToNewSchema(account: any) {
 
   // Determine canLogin
   const canLogin = Boolean(
-    account.canLogin ?? 
+    account.canLogin ??
     (account.passwordHash && (account.readAccess || account.writeAccess || account.role === 'ADMIN' || account.role === 'SUPER_ADMIN'))
   )
 
@@ -105,7 +105,7 @@ async function seed() {
     'public',
     'peacock_backup.json'
   )
-  
+
   console.log(`📂 Reading backup from: ${backupFilePath}`)
   const backupData = JSON.parse(readFileSync(backupFilePath, 'utf8'))
 
@@ -161,6 +161,7 @@ async function seed() {
       avatar,
       startAt,
       endAt,
+      accessUpdatedBy, // Old field name
       ...accountBase
     } = account
 
@@ -169,14 +170,15 @@ async function seed() {
       username,
       passwordHash: account.passwordHash || null,
       lastLoginAt: account.lastLoginAt || null,
-      
+
       // New schema fields
       ...newSchemaFields,
-      
+
       // Renamed fields
       avatarUrl: avatar || null,
       startedAt: startAt || new Date(),
       endedAt: endAt || null,
+      accessUpdatedById: accessUpdatedBy || null, // Rename field
     }
   })
 
@@ -217,7 +219,7 @@ async function seed() {
         ...transactionBase,
         createdById: transaction.createdById || null,
         updatedById: transaction.updatedById || null,
-        
+
         // New/renamed fields
         occurredAt: transactionAt || new Date(),
         description: note || null,
@@ -244,12 +246,12 @@ async function seed() {
   console.log(`   - Accounts: ${finalCounts[0]}`)
   console.log(`   - Transactions: ${finalCounts[1]}`)
   console.log(`   - Passbooks: ${finalCounts[2]}`)
-  
+
   const superAdmins = await prisma.account.count({
     where: { role: 'SUPER_ADMIN' }
   })
   console.log(`   - Super Admins: ${superAdmins}`)
-  
+
   console.log('\n✨ Database seeded successfully!')
 }
 
