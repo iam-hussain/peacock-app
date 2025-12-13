@@ -31,12 +31,12 @@ type TransactionType =
   | "REJOIN";
 
 interface ActivityItem {
-  id: string;
-  type: TransactionType;
-  amount: number;
-  fromName?: string;
-  toName?: string;
-  fromSub?: string;
+  id: string
+  type: TransactionType
+  amount: number
+  fromName?: string
+  toName?: string
+  fromSub?: string
   toSub?: string
   occurredAt: number
   description?: string
@@ -149,7 +149,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
       limit,
       accountId: "",
       transactionType: "",
-      sortField: 'occurredAt',
+      sortField: "transactionAt",
       sortOrder: "desc",
     })
   );
