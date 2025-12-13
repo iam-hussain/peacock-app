@@ -15,7 +15,7 @@ type AccountDetails = {
   firstName: string
   lastName: string | null
   avatarUrl: string | null
-  active: boolean
+  status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED' | 'CLOSED'
   type: 'MEMBER' | 'VENDOR' | 'CLUB' | 'SYSTEM'
 };
 
@@ -95,7 +95,7 @@ function createFilters({
     filters.OR = [{ fromId: accountId }, { toId: accountId }];
   }
   if (transactionType) {
-    filters.transactionType = transactionType;
+    filters.type = transactionType;
     if (accountId && transactionType !== "FUNDS_TRANSFER") {
       if (
         [
@@ -155,9 +155,9 @@ function fetchTransactions(
           username: true,
           firstName: true,
           lastName: true,
-          avatar: true,
-          active: true,
-          isMember: true,
+          avatarUrl: true,
+          status: true,
+          type: true,
         },
       },
       to: {
@@ -166,9 +166,9 @@ function fetchTransactions(
           username: true,
           firstName: true,
           lastName: true,
-          avatar: true,
-          active: true,
-          isMember: true,
+          avatarUrl: true,
+          status: true,
+          type: true,
         },
       },
       createdBy: {
@@ -198,8 +198,8 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       ...transaction.from,
       name: fromName,
       sub: "",
-      avatar: transaction.from.avatar
-        ? `/image/${transaction.from.avatar}`
+      avatar: transaction.from.avatarUrl
+        ? `/image/${transaction.from.avatarUrl}`
         : undefined,
       link: transaction.from.type === 'MEMBER'
         ? `/dashboard/member/${transaction.from.username}`
@@ -209,8 +209,8 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       ...transaction.to,
       name: toName,
       sub: "",
-      avatar: transaction.to.avatar
-        ? `/image/${transaction.to.avatar}`
+      avatar: transaction.to.avatarUrl
+        ? `/image/${transaction.to.avatarUrl}`
         : undefined,
       link: transaction.to.type === 'MEMBER'
         ? `/dashboard/member/${transaction.to.username}`
@@ -218,18 +218,18 @@ function transactionTableTransform(transaction: TransactionToTransform) {
     },
   };
 
-  if (["LOAN_TAKEN"].includes(transaction.transactionType)) {
+  if (["LOAN_TAKEN"].includes(transaction.type)) {
     updated.to.sub = "Loan Account";
   }
 
-  if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.transactionType)) {
+  if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.type)) {
     updated.from.sub = "Loan Account";
     updated.to.sub = "Club Account";
   }
 
   if (
     ["WITHDRAW", "LOAN_TAKEN", "VENDOR_INVEST", "FUNDS_TRANSFER"].includes(
-      transaction.transactionType
+      transaction.type
     )
   ) {
     updated.from.sub = "Club Account";
@@ -244,7 +244,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       "LOAN_REPAY",
       "LOAN_INTEREST",
       "FUNDS_TRANSFER",
-    ].includes(transaction.transactionType)
+    ].includes(transaction.type)
   ) {
     updated.to.sub = clubData.sub;
     updated.to.avatar = clubData.avatar;
