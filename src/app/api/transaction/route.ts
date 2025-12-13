@@ -12,11 +12,11 @@ import { newZoneDate } from "@/lib/core/date";
 type AccountDetails = {
   id: string;
   username: string;
-  firstName: string;
-  lastName: string | null;
-  avatar: string | null;
-  active: boolean;
-  isMember: boolean;
+  firstName: string
+  lastName: string | null
+  avatarUrl: string | null
+  active: boolean
+  type: 'MEMBER' | 'VENDOR' | 'CLUB' | 'SYSTEM'
 };
 
 type AuditAccountDetails = {
