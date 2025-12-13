@@ -6,15 +6,15 @@ import { ClubPassbookData, VendorPassbookData } from "@/lib/validators/type";
 export async function getMemberClubStats() {
   const [members, clubPassbook, vendorPassbooks] = await Promise.all([
     prisma.account.findMany({
-      where: { isMember: true },
+      where: { type: 'MEMBER' },
       include: { passbook: true },
     }),
     prisma.passbook.findFirstOrThrow({
-      where: { type: "CLUB" },
+      where: { kind: "CLUB" },
       select: { payload: true },
     }),
     prisma.passbook.findMany({
-      where: { type: "VENDOR" },
+      where: { kind: "VENDOR" },
       select: { payload: true },
     }),
   ]);

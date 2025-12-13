@@ -22,7 +22,7 @@ export async function PATCH(
       where: { id },
       select: {
         id: true,
-        isMember: true,
+        type: 'MEMBER',
         readAccess: true,
         writeAccess: true,
         role: true,
@@ -33,7 +33,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
-    if (!account.isMember) {
+    if (!(account.type === 'MEMBER')) {
       return NextResponse.json(
         { error: "Only member accounts can have access updated" },
         { status: 400 }
@@ -47,10 +47,10 @@ export async function PATCH(
     const roleProvided = role !== undefined && role !== null;
 
     // Start with provided values or current values
-    let finalReadAccess = readAccessProvided ? readAccess : account.readAccess;
+    let finalReadAccess = readAccessProvided ? readAccess : (account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
     let finalWriteAccess = writeAccessProvided
       ? writeAccess
-      : account.writeAccess;
+      : (account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
     let finalRole = roleProvided ? role : account.role;
 
     // Ensure role is valid enum value

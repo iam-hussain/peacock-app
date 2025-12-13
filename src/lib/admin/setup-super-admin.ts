@@ -49,7 +49,7 @@ export async function setupSuperAdmin() {
     // First, we need to create a passbook for the admin
     const passbook = await prisma.passbook.create({
       data: {
-        type: "MEMBER",
+        kind: "MEMBER",
         payload: {},
         loanHistory: [],
         joiningOffset: 0,
@@ -70,7 +70,7 @@ export async function setupSuperAdmin() {
         readAccess: true,
         writeAccess: true,
         active: true,
-        isMember: true,
+        type: 'MEMBER',
         passbookId: passbook.id,
       },
     })

@@ -115,7 +115,25 @@ export default function AnalyticsPage() {
     )
   );
 
-  const summaries = data?.summaries || [];
+  const summaries = data?.summaries || []
+
+  // Extract nested data for chart
+  const flatSummaries = summaries.map((s: any) => ({
+    monthStartDate: s.monthStartDate,
+    totalDeposits: s.memberFunds?.totalDeposits || 0,
+    memberBalance: s.memberFunds?.memberBalance || 0,
+    profitWithdrawals: s.memberOutflow?.profitWithdrawals || 0,
+    memberAdjustments: s.memberOutflow?.memberAdjustments || 0,
+    currentLoanTaken: s.loans?.outstanding?.currentLoanTaken || 0,
+    totalInterestCollected: s.loans?.lifetime?.totalInterestCollected || 0,
+    interestBalance: s.loans?.outstanding?.interestBalance || 0,
+    vendorInvestment: s.vendor?.vendorInvestment || 0,
+    vendorProfit: s.vendor?.vendorProfit || 0,
+    pendingAmounts: s.cashFlow?.pendingAmounts || 0,
+    availableCash: s.valuation?.availableCash || 0,
+    currentValue: s.valuation?.currentValue || 0,
+    totalPortfolioValue: s.portfolio?.totalPortfolioValue || 0,
+  }))
 
   // Toggle metric visibility
   const toggleMetric = (key: string) => {
@@ -130,16 +148,16 @@ export default function AnalyticsPage() {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-    if (!summaries.length) return null;
+    if (!flatSummaries.length) return null
 
-    const labels = summaries.map((s: any) =>
-      format(new Date(s.monthStartDate), "MMM yyyy")
-    );
+    const labels = flatSummaries.map((s: any) =>
+      format(new Date(s.monthStartDate), 'MMM yyyy')
+    )
 
     const datasets = METRICS.filter((m) => visibleMetrics.has(m.key)).map(
       (metric) => ({
         label: metric.label,
-        data: summaries.map((s: any) => s[metric.key] || 0),
+        data: flatSummaries.map((s: any) => s[metric.key] || 0),
         borderColor: metric.color,
         backgroundColor: `${metric.color}20`,
         fill: false,
@@ -148,10 +166,10 @@ export default function AnalyticsPage() {
         pointRadius: 3,
         pointHoverRadius: 5,
       })
-    );
+    )
 
-    return { labels, datasets };
-  }, [summaries, visibleMetrics]);
+    return { labels, datasets }
+  }, [flatSummaries, visibleMetrics])
 
   const chartOptions = {
     responsive: true,
@@ -325,16 +343,16 @@ export default function AnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {summaries
+                  {flatSummaries
                     .slice(-12)
                     .reverse()
-                    .map((summary: any) => (
+                    .map((summary: any, idx: number) => (
                       <tr
-                        key={summary.id}
+                        key={idx}
                         className="border-b hover:bg-muted/50"
                       >
                         <td className="p-2 sticky left-0 bg-card">
-                          {format(new Date(summary.monthStartDate), "MMM yyyy")}
+                          {format(new Date(summary.monthStartDate), 'MMM yyyy')}
                         </td>
                         <td className="text-right p-2">
                           {formatIndianNumber(summary.totalDeposits || 0)}

@@ -151,7 +151,7 @@ export function TransactionCardMobile({
             {transactionTypeMap[transaction.transactionType]}
           </p>
           <p className="text-xs text-muted-foreground">
-            {dateFormat(newZoneDate(transaction.transactionAt))}
+            {dateFormat(newZoneDate(transaction.occurredAt))}
           </p>
         </div>
       </CardContent>

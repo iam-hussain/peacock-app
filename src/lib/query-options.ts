@@ -19,37 +19,36 @@ const noRefetchConfigs = {
 
 export const fetchAuthStatus = () =>
   queryOptions({
-    queryKey: ["authentication"],
+    queryKey: ['authentication'],
     queryFn: () =>
-      fetcher.post("/api/auth/status") as never as {
-        isLoggedIn: boolean;
+      fetcher.post('/api/auth/status') as never as {
+        isLoggedIn: boolean
         user:
-        | {
-          kind: "admin";
-          username: "admin";
-          role: "SUPER_ADMIN";
-          id: "admin";
-        }
-        | {
-          kind: "admin-member";
-          accountId: string;
-          id: string;
-          role: "ADMIN";
-          readAccess: boolean;
-          writeAccess: boolean;
-        }
-        | {
-          kind: "member";
-          accountId: string;
-          id: string;
-          role: "MEMBER";
-          readAccess: boolean;
-          writeAccess: boolean;
-        }
-        | null;
+          | {
+              kind: 'admin'
+              username: 'admin'
+              role: 'SUPER_ADMIN'
+              id: 'admin'
+              accessLevel: 'ADMIN'
+            }
+          | {
+              kind: 'admin-member'
+              accountId: string
+              id: string
+              role: 'ADMIN'
+              accessLevel: 'ADMIN'
+            }
+          | {
+              kind: 'member'
+              accountId: string
+              id: string
+              role: 'MEMBER'
+              accessLevel: 'READ' | 'WRITE' | 'ADMIN'
+            }
+          | null
       },
     ...noRefetchConfigs,
-  });
+  })
 
 export const fetchMemberByUsername = (username: string) =>
   queryOptions({
@@ -207,11 +206,14 @@ export const fetchDashboardSummary = (month?: string) =>
 
 export const fetchDashboardGraphs = (from: string, to: string) =>
   queryOptions({
-    queryKey: ["dashboard", "graphs", from, to],
+    queryKey: ['dashboard', 'graphs', from, to],
     queryFn: () =>
-      fetcher.get(`/api/dashboard/graphs?from=${from}&to=${to}`) as Promise<{
-        success: boolean;
-        summaries: any[];
+      fetcher.get(`/api/dashboard/summary/range?from=${from}&to=${to}`) as Promise<{
+        success: boolean
+        from: string
+        to: string
+        count: number
+        summaries: any[]
       }>,
     ...noRefetchConfigs,
-  });
+  })

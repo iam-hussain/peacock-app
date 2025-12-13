@@ -19,14 +19,14 @@ export async function PATCH(
 
     const account = await prisma.account.findUnique({
       where: { id },
-      select: { id: true, isMember: true },
+      select: { id: true, type: 'MEMBER' },
     });
 
     if (!account) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
-    if (!account.isMember) {
+    if (!(account.type === 'MEMBER')) {
       return NextResponse.json(
         { error: "Only member accounts can have permissions updated" },
         { status: 400 }

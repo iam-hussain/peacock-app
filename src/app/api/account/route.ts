@@ -39,21 +39,14 @@ export async function POST(request: Request) {
 
     // Creating new account requires admin
     if (!id) {
-      currentUser = await requireAdmin();
-      isAdminUser = true;
+      currentUser = await requireAdmin()
+      isAdminUser = true
     } else {
       // Updating existing account - only admins can edit members/vendors
       // Write users can only edit transactions, not accounts
-      if (isMember === false) {
-        // Vendor updates require admin
-        currentUser = await requireAdmin();
-        isAdminUser = true;
-      } else {
-        // Member updates require admin (Write users cannot edit members)
-        currentUser = await requireAdmin();
-        isAdminUser =
-          currentUser.kind === "admin" || currentUser.kind === "admin-member";
-      }
+      // All account updates require admin
+      currentUser = await requireAdmin()
+      isAdminUser = currentUser.accessLevel === 'ADMIN'
     }
 
     // Validate required fields
@@ -64,22 +57,26 @@ export async function POST(request: Request) {
       );
     }
 
+    // Determine account type from isMember parameter (for backward compatibility)
+    // In the new schema, we'll set type: MEMBER or VENDOR
+    const accountType = isMember === false ? 'VENDOR' : 'MEMBER'
+
     // Determine username: for vendors, auto-generate; for members, use provided username
-    let finalUsername: string;
+    let finalUsername: string
     if (!id) {
       // Creating new account
-      if (isMember === false) {
+      if (accountType === 'VENDOR') {
         // Vendor: auto-generate username
-        finalUsername = generateVendorUsername(firstName, lastName);
+        finalUsername = generateVendorUsername(firstName, lastName)
       } else {
         // Member: username is required
         if (!username) {
           return NextResponse.json(
-            { error: "Username is required for members" },
+            { error: 'Username is required for members' },
             { status: 400 }
-          );
+          )
         }
-        finalUsername = username;
+        finalUsername = username
       }
     } else {
       // Updating existing account
@@ -136,28 +133,31 @@ export async function POST(request: Request) {
       }
     }
 
-    const commonData: Parameters<typeof prisma.account.update>[0]["data"] = {
+    const commonData: Parameters<typeof prisma.account.update>[0]['data'] = {
       firstName: firstName || undefined,
       lastName: lastName ?? undefined,
       username: finalUsername,
       phone: phone ?? undefined,
       email: email ?? undefined,
-      avatar: avatar ?? undefined,
-      startAt: newZoneDate(startAt || undefined),
-      endAt: endAt ? newZoneDate(endAt) : undefined,
+      avatarUrl: avatar ?? undefined,
+      startedAt: newZoneDate(startAt || undefined),
+      endedAt: endAt ? newZoneDate(endAt) : undefined,
       active: active ?? true,
-      isMember: isMember ?? true,
+      type: accountType,
+      status: active === false ? 'INACTIVE' : 'ACTIVE',
       // Only admins can change access control fields
-      readAccess: isAdminUser ? (readAccess ?? true) : undefined,
-      writeAccess: isAdminUser ? (writeAccess ?? false) : undefined,
-    };
+      // Map readAccess/writeAccess to accessLevel for backward compatibility
+      accessLevel: isAdminUser 
+        ? (writeAccess || readAccess === false ? 'WRITE' : readAccess ? 'READ' : 'READ')
+        : undefined,
+    }
 
     if (id) {
       // Get existing account to check for old avatar and verify it's a member
       const existingAccount = await prisma.account.findUnique({
         where: { id },
-        select: { avatar: true, isMember: true },
-      });
+        select: { avatarUrl: true, type: true },
+      })
 
       if (!existingAccount) {
         return NextResponse.json(
@@ -167,11 +167,11 @@ export async function POST(request: Request) {
       }
 
       // Ensure writeAccess users can only update members, not vendors
-      if (!isAdminUser && existingAccount.isMember === false) {
+      if (!isAdminUser && existingAccount.type === 'VENDOR') {
         return NextResponse.json(
-          { error: "Only admins can update vendors" },
+          { error: 'Only admins can update vendors' },
           { status: 403 }
-        );
+        )
       }
 
       // Update existing member
@@ -188,8 +188,8 @@ export async function POST(request: Request) {
       });
 
       // Delete old avatar if it was removed or replaced
-      if (existingAccount?.avatar) {
-        const oldAvatar = existingAccount.avatar;
+      if (existingAccount?.avatarUrl) {
+        const oldAvatar = existingAccount.avatarUrl
         const newAvatar = avatar || "";
 
         // If avatar was removed or changed, delete the old file
@@ -226,30 +226,29 @@ export async function POST(request: Request) {
     }
 
     // Create a new member
-    // Default access: Read ON, Write OFF, Admin OFF
-    const defaultReadAccess = isAdminUser ? (readAccess ?? true) : true;
-    const defaultWriteAccess = isAdminUser ? (writeAccess ?? false) : false;
-    const defaultRole = isAdminUser && writeAccess ? "ADMIN" : "MEMBER";
-    const defaultCanLogin =
-      defaultReadAccess || defaultWriteAccess || defaultRole === "ADMIN";
+    // Default access: Read access by default
+    const defaultAccessLevel: 'READ' | 'WRITE' | 'ADMIN' = isAdminUser 
+      ? (writeAccess ? 'WRITE' : readAccess === false ? 'READ' : 'READ')
+      : 'READ'
+    const defaultRole: 'SUPER_ADMIN' | 'ADMIN' | 'MEMBER' = isAdminUser && writeAccess ? 'ADMIN' : 'MEMBER'
+    const defaultCanLogin = defaultAccessLevel !== 'READ' || defaultRole === 'ADMIN'
 
     const createData: any = {
       ...commonData,
       username: finalUsername, // Required, validated above
-      readAccess: defaultReadAccess,
-      writeAccess: defaultWriteAccess,
+      accessLevel: defaultAccessLevel,
       role: defaultRole,
       canLogin: defaultCanLogin,
       passbook: {
         create: {
-          type: isMember ? "MEMBER" : "VENDOR",
-          payload: getDefaultPassbookData(isMember ? "MEMBER" : "VENDOR"),
+          kind: accountType, // Use new kind field
+          payload: getDefaultPassbookData(accountType),
           loanHistory: [],
           joiningOffset: 0,
           delayOffset: 0,
         },
       },
-    };
+    }
 
     // Hash password if provided
     if (password) {

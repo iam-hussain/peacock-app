@@ -17,7 +17,7 @@ export async function POST() {
     await requireAuth();
 
     const vendors = await prisma.account.findMany({
-      where: { isMember: false },
+      where: { type: 'VENDOR' },
       include: { passbook: true },
     });
 

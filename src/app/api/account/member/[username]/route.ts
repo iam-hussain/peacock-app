@@ -22,7 +22,7 @@ export async function POST(
 
   try {
     const account = await prisma.account.findUniqueOrThrow({
-      where: { username, isMember: true },
+      where: { username, type: 'MEMBER' },
       include: { passbook: true },
     });
 
@@ -45,7 +45,7 @@ export async function POST(
       member: {
         ...memberLoan,
         ...memberData,
-        ...memberMonthsPassedString(account.startAt),
+        ...memberMonthsPassedString(account.startedAt),
       },
     });
   } catch (error) {

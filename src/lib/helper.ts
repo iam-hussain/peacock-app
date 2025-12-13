@@ -161,10 +161,10 @@ export function setPassbookUpdateQuery(
 
 export function initializePassbookToUpdate(
   passbooks: {
-    account: { id: string } | null;
-    id: string;
-    type: $Enums.PASSBOOK_TYPE;
-    payload: JsonValue;
+    account: { id: string } | null
+    id: string
+    kind: $Enums.PassbookKind
+    payload: JsonValue
   }[],
   isClean: boolean = true
 ): PassbookToUpdate {
@@ -201,11 +201,11 @@ export function fetchAllPassbook() {
   return prisma.passbook.findMany({
     select: {
       id: true,
-      type: true,
+      kind: true,
       payload: true,
       account: { select: { id: true } },
     },
-  });
+  })
 }
 
 export function fetchAllLoanPassbook() {

@@ -63,7 +63,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
   const mutation = useMutation({
     mutationFn: (body: any) =>
       fetcher.post("/api/account", {
-        body: { id: selected?.id, ...body, isMember: false },
+        body: { id: selected?.id, ...body, type: 'VENDOR' },
       }),
     onSuccess: async (data: any) => {
       await queryClient.invalidateQueries({ queryKey: ["vendor"] });

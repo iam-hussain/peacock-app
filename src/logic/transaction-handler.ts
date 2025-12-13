@@ -47,7 +47,7 @@ function getPassbookUpdateQuery(
 const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
   return prisma.passbook.findMany({
     where: {
-      OR: [{ account: { id: { in: [fromId, toId] } } }, { type: "CLUB" }],
+      OR: [{ account: { id: { in: [fromId, toId] } } }, { kind: "CLUB" }],
     },
     select: {
       id: true,

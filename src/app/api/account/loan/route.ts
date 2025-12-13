@@ -8,7 +8,7 @@ import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
 
 export async function POST() {
   const loans = await prisma.account.findMany({
-    where: { isMember: true },
+    where: { type: 'MEMBER' },
     include: { passbook: true },
   });
 

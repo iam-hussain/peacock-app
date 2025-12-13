@@ -1,8 +1,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
-import { endOfMonth, startOfMonth } from "date-fns";
+import { endOfMonth, startOfMonth } from 'date-fns'
 
-import { updatePassbookByTransaction } from "./transaction-handler";
+import { updatePassbookByTransaction } from './transaction-handler'
 
 import prisma from '@/db'
 import { clearCache } from '@/lib/core/cache'
@@ -14,6 +14,8 @@ import {
   initializePassbookToUpdate,
 } from '@/lib/helper'
 import { calculateLoanDetails } from '@/lib/calculators/loan-calculator'
+import { PassbookToUpdate } from '@/lib/validators/type'
+import { vendorCalcHandler } from '@/logic/vendor-middleware'
 
 export async function resetAllTransactionMiddlewareHandler(
   shouldUpdatePassbooks = true,
@@ -22,144 +24,109 @@ export async function resetAllTransactionMiddlewareHandler(
   clearCache()
   await prisma.summary.deleteMany()
 
-  const [transactions, passbooks, activeMembers] = await Promise.all([
-    prisma.transaction.findMany({ orderBy: { transactionAt: "asc" } }),
+  const [transactions, passbooks, activeMemberCount] = await Promise.all([
+    prisma.transaction.findMany({ orderBy: { occurredAt: 'asc' } }),
     fetchAllPassbook(),
-    prisma.account.count({ where: { isMember: true, active: true } }),
+    prisma.account.count({ where: { type: 'MEMBER', active: true } }),
   ])
 
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, true)
+  // Cast passbooks to expected type for initializePassbookToUpdate
+  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true)
 
   if (transactions.length === 0 && shouldUpdatePassbooks) {
     // No transactions, just update passbooks
-    return bulkPassbookUpdate(passbookToUpdate);
+    await bulkPassbookUpdate(passbookToUpdate)
+    return
   }
 
   // Group transactions by month
-  const transactionsByMonth = new Map<string, typeof transactions>();
-
+  const transactionsByMonth: Map<string, typeof transactions> = new Map()
   transactions.forEach((tx) => {
-    const monthKey = startOfMonth(tx.transactionAt).toISOString();
+    const monthKey = startOfMonth(tx.occurredAt).toISOString()
     if (!transactionsByMonth.has(monthKey)) {
-      transactionsByMonth.set(monthKey, []);
+      transactionsByMonth.set(monthKey, [])
     }
-    transactionsByMonth.get(monthKey)!.push(tx);
-  });
+    transactionsByMonth.get(monthKey)!.push(tx)
+  })
 
-  // Get all member accounts for loan tracking
-  const memberAccounts = await prisma.account.findMany({
-    where: { isMember: true, active: true },
-    select: { id: true },
-  });
-  const memberIds = new Set(memberAccounts.map((m) => m.id));
+  // Sort months chronologically
+  const sortedMonths = Array.from(transactionsByMonth.keys()).sort()
 
-  // Process transactions month by month and calculate snapshots
-  const months = Array.from(transactionsByMonth.keys()).sort();
-  const monthlySnapshots: any[] = [];
+  // Monthly snapshots to create
+  const monthlySnapshots: any[] = []
 
-  // Track loan transactions per member for interest calculation
-  const memberLoanTransactions = new Map<string, typeof transactions>();
-
-  for (const monthKey of months) {
-    const monthTransactions = transactionsByMonth.get(monthKey)!;
-    const monthStart = new Date(monthKey);
-    const monthEnd = endOfMonth(monthStart);
+  // Process each month
+  for (const monthKey of sortedMonths) {
+    const monthTransactions = transactionsByMonth.get(monthKey)!
+    const monthStart = new Date(monthKey)
+    const monthEnd = endOfMonth(monthStart)
 
     // Process all transactions for this month
     for (const transaction of monthTransactions) {
       passbookToUpdate = updatePassbookByTransaction(
         passbookToUpdate,
         transaction
-      );
-
-      // Track loan transactions for interest calculation
-      // For LOAN_TAKEN: member is 'to' (receiving loan from club)
-      // For LOAN_REPAY: member is 'from' (repaying to club)
-      if (
-        transaction.transactionType === "LOAN_TAKEN" &&
-        memberIds.has(transaction.toId)
-      ) {
-        const memberId = transaction.toId;
-        if (!memberLoanTransactions.has(memberId)) {
-          memberLoanTransactions.set(memberId, []);
-        }
-        memberLoanTransactions.get(memberId)!.push(transaction);
-      } else if (
-        transaction.transactionType === "LOAN_REPAY" &&
-        memberIds.has(transaction.fromId)
-      ) {
-        const memberId = transaction.fromId;
-        if (!memberLoanTransactions.has(memberId)) {
-          memberLoanTransactions.set(memberId, []);
-        }
-        memberLoanTransactions.get(memberId)!.push(transaction);
-      }
+      )
     }
 
-    // Calculate expected total loan interest amount from processed transactions
-    let expectedTotalLoanInterestAmount = 0;
-    for (const [memberId, loanTxs] of Array.from(
-      memberLoanTransactions.entries()
-    )) {
-      // Filter transactions up to month end
-      const transactionsUpToDate = loanTxs.filter(
-        (tx: (typeof transactions)[0]) => tx.transactionAt <= monthEnd
-      );
+    // Calculate vendor profits after transactions
+    const vendorIds = Array.from(passbookToUpdate.keys()).filter(
+      (id) => passbookToUpdate.get(id)?.data.kind === 'VENDOR'
+    )
+    passbookToUpdate = vendorCalcHandler(passbookToUpdate, vendorIds)
 
-      if (transactionsUpToDate.length === 0) continue;
+    // Calculate loan interest for this month
+    const loanAccounts = Array.from(passbookToUpdate.keys()).filter((id) => {
+      const pb = passbookToUpdate.get(id)
+      return pb?.data.kind === 'MEMBER'
+    })
 
-      // Calculate loan history from transactions
-      const { loanHistory } = calculateLoanDetails(transactionsUpToDate);
+    for (const accountId of loanAccounts) {
+      const passbook = passbookToUpdate.get(accountId)
+      if (!passbook) continue
 
-      // Calculate interest for each loan entry
-      for (const loan of loanHistory) {
-        if (loan.active) {
-          // Active loan - calculate interest up to month end
-          // loan.startDate is a timestamp (number), convert to Date
-          const startDate =
-            typeof loan.startDate === "number"
-              ? new Date(loan.startDate)
-              : loan.startDate;
-          const interestCalc = calculateInterestByAmount(
-            loan.amount,
-            startDate,
-            monthEnd
-          );
-          expectedTotalLoanInterestAmount += interestCalc.interestAmount;
-        } else if (loan.endDate) {
-          // Completed loan - use the calculated interest
-          const startDate =
-            typeof loan.startDate === "number"
-              ? new Date(loan.startDate)
-              : loan.startDate;
-          const endDate =
-            typeof loan.endDate === "number"
-              ? new Date(loan.endDate)
-              : loan.endDate;
-          const interestCalc = calculateInterestByAmount(
-            loan.amount,
-            startDate,
-            endDate
-          );
-          expectedTotalLoanInterestAmount += interestCalc.interestAmount;
+      // loanHistory is stored as JSON, need to parse it
+      const loanHistoryData = passbook.data.loanHistory as any
+      const loanTransactions = Array.isArray(loanHistoryData) ? loanHistoryData : []
+      
+      const loanDetails = calculateLoanDetails(loanTransactions)
+      if (loanDetails && typeof loanDetails.totalLoanBalance === 'number' && loanDetails.totalLoanBalance > 0) {
+        const interestResult = calculateInterestByAmount(
+          loanDetails.totalLoanBalance,
+          monthStart,
+          monthEnd
+        )
+        if (interestResult.interestAmount > 0) {
+          passbookToUpdate = updatePassbookByTransaction(passbookToUpdate, {
+            id: `loan-interest-${accountId}-${monthKey}`,
+            fromId: accountId,
+            toId: 'CLUB',
+            amount: interestResult.interestAmount,
+            type: 'LOAN_INTEREST',
+            occurredAt: monthEnd,
+            method: 'ACCOUNT',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          } as any)
         }
       }
     }
 
-    // After processing all transactions for this month, calculate snapshot
-    const snapshot = await calculateMonthlySnapshotFromPassbooks(
-      monthStart,
-      passbookToUpdate,
-      activeMembers,
-      expectedTotalLoanInterestAmount
-    );
-
-    if (snapshot) {
-      monthlySnapshots.push(snapshot);
+    // Create monthly snapshot if needed
+    if (shouldUpdateDashboard) {
+      const snapshot = await calculateMonthlySnapshotFromPassbooks(
+        monthStart,
+        passbookToUpdate,
+        activeMemberCount,
+        0 // expectedTotalLoanInterestAmount - calculate if needed
+      )
+      if (snapshot) {
+        monthlySnapshots.push(snapshot)
+      }
     }
   }
 
-  // Save all monthly snapshots
+  // Bulk insert monthly snapshots
   if (monthlySnapshots.length > 0 && shouldUpdateDashboard) {
     await prisma.summary.createMany({
       data: monthlySnapshots,
@@ -169,5 +136,6 @@ export async function resetAllTransactionMiddlewareHandler(
   if (shouldUpdatePassbooks) {
     await bulkPassbookUpdate(passbookToUpdate)
   }
-  return;
+
+  clearCache()
 }

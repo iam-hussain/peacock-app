@@ -263,7 +263,7 @@ export default function SettingsPage() {
       },
       {
         id: "readAccess",
-        accessorKey: "account.readAccess",
+        accessorKey: "(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN')",
         header: "Read",
         enableSorting: true,
         meta: {
@@ -274,8 +274,8 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.account.readAccess;
-          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentRead = memberState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+          const currentWrite = memberState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 
@@ -315,7 +315,7 @@ export default function SettingsPage() {
       },
       {
         id: "writeAccess",
-        accessorKey: "account.writeAccess",
+        accessorKey: "(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN')",
         header: "Write",
         enableSorting: true,
         meta: {
@@ -326,8 +326,8 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.account.readAccess;
-          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentRead = memberState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+          const currentWrite = memberState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 
@@ -378,8 +378,8 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.account.readAccess;
-          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentRead = memberState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+          const currentWrite = memberState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 

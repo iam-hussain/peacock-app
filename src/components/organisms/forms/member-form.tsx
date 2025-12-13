@@ -64,7 +64,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
   const mutation = useMutation({
     mutationFn: (body: any) =>
       fetcher.post("/api/account", {
-        body: { id: selected?.id, ...body, isMember: true },
+        body: { id: selected?.id, ...body, type: 'MEMBER' },
       }),
     onSuccess: async (data: any) => {
       toast.success(

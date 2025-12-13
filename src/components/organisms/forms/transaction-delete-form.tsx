@@ -80,7 +80,7 @@ export function TransactionDeleteForm({
             <strong className="text-sm text-foreground/70 font-medium">
               Transaction Date:
             </strong>{" "}
-            {dateFormat(newZoneDate(transaction.transactionAt))}
+            {dateFormat(newZoneDate(transaction.occurredAt))}
           </div>
           <div className="flex justify-between text-sm border-b">
             <strong className="text-sm text-foreground/70 font-medium">

@@ -21,7 +21,7 @@ function accountSelectTransform(account: AccountToTransform) {
     username: account.username,
     name: `${account.firstName}${account.lastName ? ` ${account.lastName}` : ""}`,
     active: account.active,
-    isMember: account.isMember,
+    isMember: (account.type === 'MEMBER'),
   };
 }
 
@@ -33,7 +33,7 @@ export async function POST() {
       firstName: true,
       lastName: true,
       active: true,
-      isMember: true,
+      type: 'MEMBER',
     },
   });
 
