@@ -122,10 +122,24 @@ async function seed() {
   await prisma.summary.deleteMany()
   console.log('✅ Cleared all existing data\n')
 
-  // Insert passbooks first
-  console.log('📚 Seeding passbooks...')
-  await prisma.passbook.createMany({ data: backupData.passbook })
-  console.log(`✅ Created ${backupData.passbook.length} passbooks\n`)
+  // Transform and insert passbooks first
+  console.log('📚 Transforming and seeding passbooks...')
+  const passbooksWithNewSchema = backupData.passbook.map((passbook: any) => {
+    const { type, ...passbookBase } = passbook
+    return {
+      ...passbookBase,
+      kind: type, // Rename type → kind
+      // Add new fields with defaults
+      currentBalance: 0,
+      totalDeposits: 0,
+      totalWithdrawals: 0,
+      meta: null,
+      version: 0,
+      lastCalculatedAt: null,
+    }
+  })
+  await prisma.passbook.createMany({ data: passbooksWithNewSchema })
+  console.log(`✅ Created ${passbooksWithNewSchema.length} passbooks\n`)
 
   // Track usernames to ensure uniqueness
   const usedUsernames = new Set<string>()
