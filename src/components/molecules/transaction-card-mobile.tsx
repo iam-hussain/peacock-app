@@ -8,9 +8,9 @@ import { Card, CardContent } from "../ui/card";
 import { Separator } from "../ui/separator";
 
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { transactionTypeMap } from "@/lib/config";
-import { dateFormat, newZoneDate } from "@/lib/date";
-import { moneyFormat } from "@/lib/utils";
+import { transactionTypeMap } from "@/lib/config/config";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import { moneyFormat } from "@/lib/ui/utils";
 
 interface TransactionCardMobileProps {
   transaction: TransformedTransaction;

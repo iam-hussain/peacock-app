@@ -1,18 +1,18 @@
 import { $Enums, PASSBOOK_TYPE } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid'
 
 import {
   calculateDateDiff,
   calculateTimePassed,
   getMonthsPassedString,
   newZoneDate,
-} from "./date";
+} from '@/lib/core/date'
 import {
   ClubPassbookData,
   MemberPassbookData,
   VendorPassbookData,
-} from "./type";
+} from '@/lib/validators/type'
 
 import prisma from "@/db";
 
@@ -81,9 +81,8 @@ export const bulkPassbookUpdate = async (
       try {
         const operations = batch.map((value) => prisma.passbook.update(value));
 
-        await prisma.$transaction(operations); // Execute all updates in the batch
-        console.log(`Batch ${i / batchSize + 1} updated successfully`);
-        break; // Exit retry loop if successful
+        await prisma.$transaction(operations) // Execute all updates in the batch
+        break // Exit retry loop if successful
       } catch (e: any) {
         if (e?.code === "P2034" && attempt < maxRetries - 1) {
           console.warn(

@@ -12,7 +12,7 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { MemberPassbookData } from "@/lib/type";
+import { MemberPassbookData } from '@/lib/validators/type';
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;

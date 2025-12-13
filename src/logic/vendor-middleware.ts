@@ -5,7 +5,7 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { PassbookToUpdate, VendorPassbookData } from "@/lib/type";
+import { PassbookToUpdate, VendorPassbookData } from '@/lib/validators/type';
 
 const getVendorsPassbook = () => {
   return prisma.passbook.findMany({

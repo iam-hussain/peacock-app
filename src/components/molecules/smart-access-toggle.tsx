@@ -6,8 +6,8 @@ import { toast } from "sonner";
 
 import { Switch } from "../ui/switch";
 
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
 
 interface SmartAccessToggleProps {
   memberId: string;

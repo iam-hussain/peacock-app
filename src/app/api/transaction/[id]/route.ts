@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireWriteAccess } from "@/lib/auth";
+import { requireWriteAccess } from "@/lib/core/auth";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function DELETE(
@@ -39,7 +39,7 @@ export async function DELETE(
     );
   } catch (error: any) {
     console.error("Error deleting transaction:", error);
-    const { handleAuthError } = await import("@/lib/error-handler");
+    const { handleAuthError } = await import("@/lib/core/error-handler");
     if (
       error.message === "UNAUTHORIZED" ||
       error.message === "FORBIDDEN_WRITE" ||

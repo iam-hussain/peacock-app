@@ -25,8 +25,8 @@ import {
 } from "../ui/select";
 
 import { TransformedStatistics } from "@/app/api/statistics/route";
-import { clubAge } from "@/lib/date";
-import { formatIndianNumber } from "@/lib/utils";
+import { clubAge } from "@/lib/core/date";
+import { formatIndianNumber } from "@/lib/ui/utils";
 
 ChartJS.register(
   ArcElement,

@@ -18,9 +18,9 @@ import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
 import { useTableExport } from "@/hooks/use-table-export";
-import { dateFormat, newZoneDate } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchMembers } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function MembersPage() {

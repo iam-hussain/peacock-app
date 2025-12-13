@@ -22,7 +22,7 @@ import { MemberDetails } from "./member-details";
 
 import { TransformedMemberStat } from "@/app/api/statistics/route";
 import { fetchMemberByUsername, fetchMembers } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 interface MembersPreviewProps {

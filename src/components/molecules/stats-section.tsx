@@ -22,7 +22,7 @@ import {
 import { ModernStatCard } from "./modern-stat-card";
 
 import { TransformedStatistics } from "@/app/api/statistics/route";
-import { clubAge } from "@/lib/date";
+import { clubAge } from "@/lib/core/date";
 
 interface StatsSectionProps {
   statistics: TransformedStatistics;

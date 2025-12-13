@@ -9,60 +9,114 @@ import prisma from "@/db";
 
 /**
  * GET /api/dashboard/summary?month=YYYY-MM
- * Get dashboard summary for a specific month
+ * Get dashboard summary for a specific month (or latest if no month provided)
+ * Returns structured financial data from Summary table - NO CALCULATIONS
  */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const monthParam = searchParams.get("month");
 
-    if (!monthParam) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Month parameter is required (format: YYYY-MM)",
-        },
-        { status: 400 }
-      );
-    }
+    let summary;
 
-    // Parse month string (YYYY-MM) to Date
-    const monthDate = parse(monthParam, "yyyy-MM", new Date());
-    if (isNaN(monthDate.getTime())) {
-      return NextResponse.json(
-        { success: false, error: "Invalid month format. Use YYYY-MM" },
-        { status: 400 }
-      );
-    }
+    if (monthParam) {
+      // Parse month string (YYYY-MM) to Date
+      const monthDate = parse(monthParam, "yyyy-MM", new Date());
+      if (isNaN(monthDate.getTime())) {
+        return NextResponse.json(
+          { success: false, error: "Invalid month format. Use YYYY-MM" },
+          { status: 400 }
+        );
+      }
 
-    const monthStart = startOfMonth(monthDate);
+      const monthStart = startOfMonth(monthDate);
+      summary = await prisma.summary.findFirst();
 
-    const summary = await (prisma as any).dashboardMonthlySummary?.findUnique({
-      where: { monthStartDate: monthStart },
-    });
+      if (!summary) {
+        return NextResponse.json(
+          { success: false, error: "Summary not found for this month" },
+          { status: 404 }
+        );
+      }
+    } else {
+      // Return latest summary if no month provided
+      summary = await prisma.summary.findFirst({
+        orderBy: { monthStartDate: 'desc' },
+      })
 
-    if (!summary) {
-      // Check if model exists
-      if (!(prisma as any).dashboardMonthlySummary) {
+      if (!summary) {
         return NextResponse.json(
           {
             success: false,
-            error:
-              "Dashboard model not available. Please run: npx prisma generate && npx prisma migrate dev",
+            error: "No dashboard summary found. Please run recalculation first.",
           },
-          { status: 503 }
+          { status: 404 }
         );
       }
-      return NextResponse.json(
-        { success: false, error: "Summary not found for this month" },
-        { status: 404 }
-      );
     }
 
-    return NextResponse.json({
+    // Structure response according to financial domain semantics
+    const response = {
       success: true,
-      summary,
-    });
+      data: {
+        // Members
+        members: {
+          activeMembers: summary.activeMembers,
+          clubAgeMonths: summary.clubAgeMonths,
+        },
+        // Member Funds
+        memberFunds: {
+          totalDeposits: summary.totalDeposits,
+          memberBalance: summary.memberBalance,
+        },
+        // Member Outflow
+        memberOutflow: {
+          profitWithdrawals: summary.profitWithdrawals,
+          memberAdjustments: summary.memberAdjustments,
+        },
+        // Loans - Lifetime
+        loans: {
+          lifetime: {
+            totalLoanGiven: summary.totalLoanGiven,
+            totalInterestCollected: summary.totalInterestCollected,
+          },
+          // Loans - Outstanding
+          outstanding: {
+            currentLoanTaken: summary.currentLoanTaken,
+            interestBalance: summary.interestBalance,
+          },
+        },
+        // Vendor
+        vendor: {
+          vendorInvestment: summary.vendorInvestment,
+          vendorProfit: summary.vendorProfit,
+        },
+        // Cash Flow
+        cashFlow: {
+          totalInvested: summary.totalInvested,
+          pendingAmounts: summary.pendingAmounts,
+        },
+        // Valuation
+        valuation: {
+          availableCash: summary.availableCash,
+          currentValue: summary.currentValue,
+        },
+        // Portfolio
+        portfolio: {
+          totalPortfolioValue: summary.totalPortfolioValue,
+        },
+        // System Metadata
+        systemMeta: {
+          monthStartDate: summary.monthStartDate,
+          monthEndDate: summary.monthEndDate,
+          recalculatedAt: summary.recalculatedAt,
+          recalculatedByAdminId: summary.recalculatedByAdminId,
+          isLocked: summary.isLocked,
+        },
+      },
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Error fetching dashboard summary:", error);
     return NextResponse.json(

@@ -1,8 +1,8 @@
 import { Account, Passbook } from "@prisma/client";
 
-import { calculateMonthsDifference, newZoneDate } from "@/lib/date";
-import { getMemberLoanHistory } from "@/lib/loan-calculator";
-import { MemberPassbookData } from "@/lib/type";
+import { calculateMonthsDifference, newZoneDate } from "@/lib/core/date";
+import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
+import { MemberPassbookData } from '@/lib/validators/type';
 
 type ToTransform = Account & { passbook: Passbook };
 

@@ -7,13 +7,13 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { chitCalculator } from "@/lib/helper";
-import { VendorPassbookData } from "@/lib/type";
+import { VendorPassbookData } from '@/lib/validators/type';
 
 type VendorToTransform = Account & { passbook: Passbook };
 
 export async function POST() {
   try {
-    const { requireAuth } = await import("@/lib/auth");
+    const { requireAuth } = await import("@/lib/core/auth");
     await requireAuth();
 
     const vendors = await prisma.account.findMany({

@@ -4,36 +4,31 @@ import { endOfMonth, startOfMonth } from "date-fns";
 
 import { updatePassbookByTransaction } from "./transaction-handler";
 
-import prisma from "@/db";
-import { clearCache } from "@/lib/cache";
-import { calculateMonthlySnapshotFromPassbooks } from "@/lib/dashboard-calculator";
-import { calculateInterestByAmount } from "@/lib/helper";
+import prisma from '@/db'
+import { clearCache } from '@/lib/core/cache'
+import { calculateMonthlySnapshotFromPassbooks } from '@/lib/calculators/dashboard-calculator'
+import { calculateInterestByAmount } from '@/lib/helper'
 import {
   bulkPassbookUpdate,
   fetchAllPassbook,
   initializePassbookToUpdate,
-} from "@/lib/helper";
-import { calculateLoanDetails } from "@/lib/loan-calculator";
+} from '@/lib/helper'
+import { calculateLoanDetails } from '@/lib/calculators/loan-calculator'
 
 export async function resetAllTransactionMiddlewareHandler(
   shouldUpdatePassbooks = true,
   shouldUpdateDashboard = true
 ) {
-  clearCache();
-  console.log("Deleting all dashboard monthly summaries");
-  await prisma.dashboardMonthlySummary.deleteMany();
-  console.log("Deleted all dashboard monthly summaries");
+  clearCache()
+  await prisma.summary.deleteMany()
 
   const [transactions, passbooks, activeMembers] = await Promise.all([
     prisma.transaction.findMany({ orderBy: { transactionAt: "asc" } }),
     fetchAllPassbook(),
     prisma.account.count({ where: { isMember: true, active: true } }),
-  ]);
+  ])
 
-  console.log("Fetched all transactions", transactions.length);
-  console.log("Fetched all passbooks", passbooks.length);
-
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, true)
 
   if (transactions.length === 0 && shouldUpdatePassbooks) {
     // No transactions, just update passbooks
@@ -166,17 +161,13 @@ export async function resetAllTransactionMiddlewareHandler(
 
   // Save all monthly snapshots
   if (monthlySnapshots.length > 0 && shouldUpdateDashboard) {
-    console.log(`Creating ${monthlySnapshots.length} monthly snapshots`);
-    await (prisma as any).dashboardMonthlySummary.createMany({
+    await prisma.summary.createMany({
       data: monthlySnapshots,
-    });
-    console.log("Created all monthly snapshots");
+    })
   }
 
   if (shouldUpdatePassbooks) {
-    console.log("Updating all passbooks");
-    await bulkPassbookUpdate(passbookToUpdate);
-    console.log("Updated all passbooks");
+    await bulkPassbookUpdate(passbookToUpdate)
   }
   return;
 }

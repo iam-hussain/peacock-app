@@ -13,8 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { dateFormat, newZoneDate } from "@/lib/date";
-import { moneyFormat } from "@/lib/utils";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import { moneyFormat } from "@/lib/ui/utils";
 
 interface MemberHeaderCardProps {
   member: {

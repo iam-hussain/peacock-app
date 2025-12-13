@@ -72,14 +72,25 @@ model Transaction {
 model Passbook {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   type          PASSBOOK_TYPE @default(VENDOR)
+  // Financial Data (stored as JSON for flexibility)
+  // For MEMBER: periodicDepositAmount, offsetDepositAmount, accountBalance, etc.
+  // For VENDOR: totalInvestment, totalReturns, totalProfitAmount
+  // For CLUB: clubHeldAmount, currentClubBalance, netClubBalance, etc.
   payload       Json          @default("{}")
+  // Loan History (array of loan records with dates and amounts)
   loanHistory   Json          @default("[]")
-  joiningOffset Float         @default(0)
-  delayOffset   Float         @default(0)
+  // Adjustments
+  joiningOffset Float         @default(0) // Late join adjustment amount
+  delayOffset   Float         @default(0) // Delayed payment adjustment amount
+  // Configuration
+  isChit        Boolean       @default(true) // Whether this passbook is for chit/club operations
+  // Relations
   account       Account?
-  isChit        Boolean       @default(true)
+  // Timestamps
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  @@index([type])
 }
 
 enum TRANSACTION_METHOD {
@@ -109,7 +120,7 @@ enum PASSBOOK_TYPE {
   CLUB
 }
 
-model DashboardMonthlySummary {
+model Summary {
   id                     String   @id @default(auto()) @map("_id") @db.ObjectId
   monthStartDate         DateTime
   monthEndDate           DateTime

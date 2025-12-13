@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 
 import MenuItems from "./menu-items";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 import { RootState } from "@/store";
 import { toggleSideBarCollapse } from "@/store/pageSlice";
 

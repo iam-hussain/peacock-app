@@ -1,7 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import { TRANSACTION_TYPE } from "@prisma/client";
 
-import { newZoneDate } from "./date";
+import { newZoneDate } from '@/lib/core/date'
 
 type Stage = { name: string; amount: number; startDate: Date; endDate?: Date };
 

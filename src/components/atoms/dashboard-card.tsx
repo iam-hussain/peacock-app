@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 
 import { Card, CardContent } from "../ui/card";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 // DashboardCard Component with Icon
 export function DashboardCard({

@@ -30,7 +30,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line unused-imports/no-unused-vars

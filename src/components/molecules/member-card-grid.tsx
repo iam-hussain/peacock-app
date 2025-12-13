@@ -4,8 +4,8 @@ import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-import { cn } from "@/lib/utils";
-import { moneyFormat } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 interface MemberCardGridProps {

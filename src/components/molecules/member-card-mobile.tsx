@@ -11,8 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-import { dateFormat, newZoneDate } from "@/lib/date";
-import { moneyFormat } from "@/lib/utils";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 interface MemberCardMobileProps {

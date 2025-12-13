@@ -9,7 +9,7 @@ import { LuClipboardPenLine } from "react-icons/lu";
 import { AvatarGroup } from "./avatar-group";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 type AvatarCellProps = {
   id: string;

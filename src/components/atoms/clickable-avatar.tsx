@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 interface ClickableAvatarProps {
   src?: string;

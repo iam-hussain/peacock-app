@@ -12,7 +12,7 @@ import {
 import { Card, CardContent } from "../ui/card";
 
 import { fetchTransactions } from "@/lib/query-options";
-import { cn, moneyFormat } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/ui/utils";
 
 interface ActivityFeedProps {
   limit?: number;

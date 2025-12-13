@@ -7,8 +7,8 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { chitCalculator } from "@/lib/helper";
-import { getMemberClubStats } from "@/lib/member-club-stats";
-import { VendorPassbookData } from "@/lib/type";
+import { getMemberClubStats } from "@/lib/calculators/member-club-stats";
+import { VendorPassbookData } from '@/lib/validators/type';
 import {
   membersTableTransform,
   transformLoanForTable,

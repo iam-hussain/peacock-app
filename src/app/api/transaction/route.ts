@@ -6,8 +6,8 @@ import { Transaction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { clubData } from "@/lib/config";
-import { newZoneDate } from "@/lib/date";
+import { clubData } from "@/lib/config/config";
+import { newZoneDate } from "@/lib/core/date";
 
 type AccountDetails = {
   id: string;
@@ -34,7 +34,7 @@ type TransactionToTransform = Transaction & {
 
 export async function POST(request: Request) {
   try {
-    const { requireAuth } = await import("@/lib/auth");
+    const { requireAuth } = await import("@/lib/core/auth");
     await requireAuth();
 
     const queryParams = getQueryParams(request.url);

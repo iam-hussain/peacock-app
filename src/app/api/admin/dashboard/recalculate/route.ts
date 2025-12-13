@@ -4,8 +4,8 @@ export const fetchCache = "force-no-store";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { requireAdmin } from "@/lib/auth";
-import { handleAuthError } from "@/lib/error-handler";
+import { requireAdmin } from "@/lib/core/auth";
+import { handleAuthError } from "@/lib/core/error-handler";
 import { resetAllTransactionMiddlewareHandler } from "@/logic/reset-handler";
 
 /**

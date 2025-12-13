@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Separator } from "../ui/separator";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 interface KeyValueRow {
   label: string;

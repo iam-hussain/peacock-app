@@ -6,8 +6,8 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireWriteAccess } from "@/lib/auth";
-import { newZoneDate } from "@/lib/date";
+import { requireWriteAccess } from "@/lib/core/auth";
+import { newZoneDate } from "@/lib/core/date";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function POST(request: Request) {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, transaction }, { status: 201 });
   } catch (error: any) {
     console.error("Failed to create transaction", error);
-    const { handleAuthError } = await import("@/lib/error-handler");
+    const { handleAuthError } = await import("@/lib/core/error-handler");
     if (
       error.message === "UNAUTHORIZED" ||
       error.message === "FORBIDDEN_WRITE" ||

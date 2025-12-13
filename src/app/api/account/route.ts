@@ -8,12 +8,12 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
-import { newZoneDate } from "@/lib/date";
+import { newZoneDate } from "@/lib/core/date";
 import { generateVendorUsername, getDefaultPassbookData } from "@/lib/helper";
 
 export async function POST(request: Request) {
   try {
-    const { requireAdmin, hashPassword } = await import("@/lib/auth");
+    const { requireAdmin, hashPassword } = await import("@/lib/core/auth");
 
     const data = await request.json();
     const {

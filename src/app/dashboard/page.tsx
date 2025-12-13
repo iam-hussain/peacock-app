@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import {
   ArrowDownCircle,
   Banknote,
@@ -26,16 +27,41 @@ import { MembersPreview } from "@/components/molecules/members-preview";
 import { ModernStatCard } from "@/components/molecules/modern-stat-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { clubAge } from "@/lib/date";
-import { fetchStatistics } from "@/lib/query-options";
+import { fetchDashboardSummary, fetchMembers } from "@/lib/query-options";
 
 export default function DashboardPage() {
-  // Fetch statistics data (includes club passbook data and members)
-  const { data: statsData, isLoading } = useQuery(fetchStatistics());
-  const statistics = (statsData as any)?.statistics;
-  const members = (statsData as any)?.members || [];
+  // Month filter can be added later - for now use latest
+  const selectedMonth: string | undefined = undefined;
 
-  const club = clubAge();
+  // Fetch dashboard summary from Summary table - NO CALCULATIONS
+  const {
+    data: summaryData,
+    isLoading: isSummaryLoading,
+    error: summaryError,
+  } = useQuery(fetchDashboardSummary(selectedMonth));
+
+  // Fetch members separately (not part of Summary)
+  const { data: membersData, isLoading: isMembersLoading } =
+    useQuery(fetchMembers());
+
+  const summary = summaryData?.success ? summaryData?.data : undefined;
+  const members = membersData?.members || [];
+
+  const isLoading = isSummaryLoading || isMembersLoading;
+
+  // Check if API returned an error (success: false)
+  const hasError =
+    summaryError ||
+    (summaryData && !summaryData.success) ||
+    (!isSummaryLoading && !summaryData);
+
+  // Log errors for debugging
+  if (summaryError || (summaryData && !summaryData.success)) {
+    console.error(
+      'Dashboard summary error:',
+      summaryError || summaryData?.error
+    )
+  }
 
   const formatCurrency = (value: number) =>
     (value || 0).toLocaleString("en-IN", {
@@ -43,6 +69,14 @@ export default function DashboardPage() {
       currency: "INR",
       maximumFractionDigits: 0,
     });
+
+  const formatDate = (date: Date | string) => {
+    try {
+      return format(new Date(date), "MMMM yyyy");
+    } catch {
+      return "N/A";
+    }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-3">
@@ -56,11 +90,39 @@ export default function DashboardPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               Overview of your financial club management
             </p>
+            {hasError && !isLoading && (
+              <div className="mt-2 rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3 text-xs text-yellow-800 dark:text-yellow-200">
+                <p className="font-medium">No dashboard data available</p>
+                <p className="mt-1">
+                  {summaryData?.error ||
+                    "Please run recalculation from Settings to populate dashboard data."}
+                </p>
+                <p className="mt-2 text-xs">
+                  Go to Settings → Recalculate Dashboard Data
+                </p>
+              </div>
+            )}
+            {summary?.systemMeta && !hasError && (
+              <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                <p>
+                  Dashboard as of:{" "}
+                  <span className="font-medium">
+                    {formatDate(summary.systemMeta.monthStartDate)}
+                  </span>
+                </p>
+                <p>
+                  Last recalculated:{" "}
+                  <span className="font-medium">
+                    {format(new Date(summary.systemMeta.recalculatedAt), "PPp")}
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* KPI Row - 2 Cards with 1 placeholder */}
+      {/* KPI Row - 2 Cards */}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <ModernStatCard
           title="Active Members"
@@ -68,7 +130,7 @@ export default function DashboardPage() {
             isLoading ? (
               <Skeleton className="h-6 w-12" />
             ) : (
-              statistics?.membersCount || 0
+              summary?.members?.activeMembers || 0
             )
           }
           icon={<Users className="h-5 w-5" />}
@@ -80,7 +142,7 @@ export default function DashboardPage() {
             isLoading ? (
               <Skeleton className="h-6 w-16" />
             ) : (
-              `${statistics?.clubMonthsPassed || club.inMonth} months`
+              `${summary?.members?.clubAgeMonths || 0} months`
             )
           }
           icon={<CalendarDays className="h-5 w-5" />}
@@ -104,7 +166,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalMemberPeriodicDeposits || 0)
+                  formatCurrency(summary?.memberFunds?.totalDeposits || 0)
                 )
               }
               icon={<CircleDollarSign className="h-5 w-5" />}
@@ -116,10 +178,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(
-                    (statistics?.totalMemberPeriodicDeposits || 0) -
-                      (statistics?.totalMemberWithdrawals || 0)
-                  )
+                  formatCurrency(summary?.memberFunds?.memberBalance || 0)
                 )
               }
               icon={<Wallet className="h-5 w-5" />}
@@ -142,7 +201,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalMemberProfitWithdrawals || 0)
+                  formatCurrency(summary?.memberOutflow?.profitWithdrawals || 0)
                 )
               }
               icon={<ArrowDownCircle className="h-5 w-5" />}
@@ -154,7 +213,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalOffsetPaid || 0)
+                  formatCurrency(summary?.memberOutflow?.memberAdjustments || 0)
                 )
               }
               icon={<SlidersHorizontal className="h-5 w-5" />}
@@ -177,7 +236,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalLoanTaken || 0)
+                  formatCurrency(summary?.loans?.lifetime?.totalLoanGiven || 0)
                 )
               }
               icon={<HandCoins className="h-5 w-5" />}
@@ -189,7 +248,9 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalInterestPaid || 0)
+                  formatCurrency(
+                    summary?.loans?.lifetime?.totalInterestCollected || 0
+                  )
                 )
               }
               icon={<TrendingUp className="h-5 w-5" />}
@@ -210,7 +271,9 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalLoanBalance || 0)
+                  formatCurrency(
+                    summary?.loans?.outstanding?.currentLoanTaken || 0
+                  )
                 )
               }
               icon={<FileText className="h-5 w-5" />}
@@ -222,7 +285,9 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalInterestBalance || 0)
+                  formatCurrency(
+                    summary?.loans?.outstanding?.interestBalance || 0
+                  )
                 )
               }
               icon={<Hourglass className="h-5 w-5" />}
@@ -243,7 +308,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalInvestment || 0)
+                  formatCurrency(summary?.vendor?.vendorInvestment || 0)
                 )
               }
               icon={<Briefcase className="h-5 w-5" />}
@@ -255,7 +320,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.totalVendorProfit || 0)
+                  formatCurrency(summary?.vendor?.vendorProfit || 0)
                 )
               }
               icon={<TrendingUp className="h-5 w-5" />}
@@ -278,10 +343,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(
-                    (statistics?.totalLoanBalance || 0) +
-                      (statistics?.totalVendorHolding || 0)
-                  )
+                  formatCurrency(summary?.cashFlow?.totalInvested || 0)
                 )
               }
               icon={<Layers className="h-5 w-5" />}
@@ -293,10 +355,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(
-                    (statistics?.totalInterestBalance || 0) +
-                      (statistics?.totalOffsetBalance || 0)
-                  )
+                  formatCurrency(summary?.cashFlow?.pendingAmounts || 0)
                 )
               }
               icon={<Clock className="h-5 w-5" />}
@@ -317,7 +376,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.currentClubBalance || 0)
+                  formatCurrency(summary?.valuation?.availableCash || 0)
                 )
               }
               icon={<Wallet className="h-5 w-5" />}
@@ -329,7 +388,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(statistics?.currentClubNetValue || 0)
+                  formatCurrency(summary?.valuation?.currentValue || 0)
                 )
               }
               icon={<Banknote className="h-5 w-5" />}
@@ -361,11 +420,7 @@ export default function DashboardPage() {
                   ) : (
                     <p className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
                       {formatCurrency(
-                        (statistics?.currentClubBalance || 0) +
-                          (statistics?.totalLoanBalance || 0) +
-                          (statistics?.totalVendorHolding || 0) +
-                          (statistics?.totalInterestBalance || 0) +
-                          (statistics?.totalOffsetBalance || 0)
+                        summary?.portfolio?.totalPortfolioValue || 0
                       )}
                     </p>
                   )}

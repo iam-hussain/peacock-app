@@ -6,8 +6,8 @@ import {
   isBefore,
 } from "date-fns";
 
-import { clubConfig } from "./config";
-import { calculateTimePassed, newZoneDate } from "./date";
+import { clubConfig } from '@/lib/config/config'
+import { calculateTimePassed, newZoneDate } from '@/lib/core/date'
 
 const getPeriodString = (months: number, days: number) => {
   return months ? `${months} mons${days ? ` ${days} d` : ""}` : null;

@@ -27,8 +27,8 @@ import { PaginationFilters } from "../../molecules/pagination-filters";
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
 import { Dialog } from "@/components/ui/dialog";
-import { transactionTypeMap } from "@/lib/config";
-import { newZoneDate } from "@/lib/date";
+import { transactionTypeMap } from "@/lib/config/config";
+import { newZoneDate } from "@/lib/core/date";
 import { fetchTransactions } from "@/lib/query-options";
 
 const baseColumns = (

@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDashboardGraphs } from "@/lib/query-options";
-import { formatIndianNumber } from "@/lib/utils";
+import { formatIndianNumber } from "@/lib/ui/utils";
 
 ChartJS.register(
   CategoryScale,

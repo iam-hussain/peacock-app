@@ -30,13 +30,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { transactionTypeHumanMap } from "@/lib/config";
-import { newZoneDate } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
+import { transactionTypeHumanMap } from "@/lib/config/config";
+import { newZoneDate } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
 import {
   TransactionFormSchema,
   transactionFormSchema,
-} from "@/lib/form-schema";
+} from "@/lib/validators/form-schema";
 
 type TransactionFormProps = {
   accounts: TransformedAccountSelect[];

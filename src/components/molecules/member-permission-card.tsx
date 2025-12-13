@@ -6,7 +6,7 @@ import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SmartAccessToggle } from "@/components/molecules/smart-access-toggle";
 import { Separator } from "@/components/ui/separator";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 interface MemberPermissionCardProps {

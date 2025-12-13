@@ -6,14 +6,14 @@ import { $Enums, Account } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { clubMonthsFromStart, getClubTotalDepositUpToday } from "@/lib/club";
+import { clubMonthsFromStart, getClubTotalDepositUpToday } from "@/lib/config/club";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { getMemberLoanHistory } from "@/lib/loan-calculator";
+import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
 import {
   ClubPassbookData,
   MemberPassbookData,
   VendorPassbookData,
-} from "@/lib/type";
+} from '@/lib/validators/type';
 
 type StatClubPassbook = {
   payload: MemberPassbookData | ClubPassbookData;
@@ -185,18 +185,6 @@ async function statisticsTransform(
     expectedClubNetValue,
     totalMemberProfitWithdrawals,
     totalOffsetAmount,
-    // deposit: currentIn - statistics.offsetIn,
-    // balance: totalDeposit - currentIn + offsetBalance,
-    // offset: statistics.offset,
-    // offsetIn: statistics.offsetIn,
-    // offsetBalance,
-    // loadBalance,
-    // returns: statistics.returns,
-    // memberValue: Math.round(netValue / membersCount),
-    // invested: statistics.fund - statistics.balance,
-    // liquidity: statistics.balance,
-    // netAmount,
-    // netValue,
   };
 }
 

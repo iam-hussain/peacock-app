@@ -5,8 +5,8 @@ import { ArrowRight, Minus, Plus } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 
 import { TransformedStatistics } from "@/app/api/statistics/route";
-import { moneyFormat } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
+import { cn } from "@/lib/ui/utils";
 
 interface NetValueBreakdownProps {
   statistics: TransformedStatistics;

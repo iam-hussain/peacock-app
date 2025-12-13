@@ -20,8 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
 import { RootState } from "@/store";
 import { openSideBar, setIsLoggedIn } from "@/store/pageSlice";
 

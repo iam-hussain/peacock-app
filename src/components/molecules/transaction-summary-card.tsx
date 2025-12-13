@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "../ui/card";
 
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 interface TransactionSummaryCardProps {
   inflow: number;

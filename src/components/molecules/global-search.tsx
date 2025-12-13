@@ -18,9 +18,9 @@ import { Input } from "../ui/input";
 import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
 
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
-import { moneyFormat } from "@/lib/utils";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 interface SearchResult {
   members: Array<{

@@ -10,7 +10,7 @@ import { ModernSidebar } from "@/components/organisms/modern-sidebar";
 import { ModernSidebarMobile } from "@/components/organisms/modern-sidebar-mobile";
 import { ModernTopBar } from "@/components/organisms/modern-top-bar";
 import { fetchAuthStatus } from "@/lib/query-options";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 import { RootState } from "@/store";
 import { setIsLoggedIn } from "@/store/pageSlice";
 

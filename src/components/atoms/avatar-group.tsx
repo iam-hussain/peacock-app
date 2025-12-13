@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { FaCircle } from "react-icons/fa";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 export function AvatarGroup({
   className,

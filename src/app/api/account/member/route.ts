@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { getMemberClubStats } from "@/lib/member-club-stats";
+import { getMemberClubStats } from "@/lib/calculators/member-club-stats";
 import {
   membersTableTransform,
   TransformedMember,
@@ -13,7 +13,7 @@ import {
 
 export async function POST() {
   try {
-    const { requireAuth } = await import("@/lib/auth");
+    const { requireAuth } = await import("@/lib/core/auth");
     await requireAuth();
 
     revalidateTag("api");

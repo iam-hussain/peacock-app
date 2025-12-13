@@ -43,8 +43,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
 
 const profileFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),

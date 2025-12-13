@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import MenuItems from "./menu-items";
 
-import { animateDecorator } from "@/lib/animate";
-import { cn } from "@/lib/utils";
+import { animateDecorator } from "@/lib/ui/animate";
+import { cn } from "@/lib/ui/utils";
 import { RootState } from "@/store";
 import { openSideBar } from "@/store/pageSlice";
 

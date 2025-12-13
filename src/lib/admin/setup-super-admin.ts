@@ -1,6 +1,6 @@
-import { hashPassword } from "./auth";
+import { hashPassword } from '@/lib/core/auth'
 
-import prisma from "@/db";
+import prisma from '@/db'
 
 /**
  * Ensures super admin account exists in the database
@@ -40,8 +40,7 @@ export async function setupSuperAdmin() {
             active: true,
             role: "SUPER_ADMIN",
           },
-        });
-        console.log("✅ Super admin password updated");
+        })
       }
       return;
     }
@@ -74,9 +73,7 @@ export async function setupSuperAdmin() {
         isMember: true,
         passbookId: passbook.id,
       },
-    });
-
-    console.log("✅ Super admin account created successfully");
+    })
   } catch (error: any) {
     console.error("❌ Error setting up super admin:", error);
     throw error;

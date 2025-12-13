@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/core/auth";
 
 export async function GET() {
   try {

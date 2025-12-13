@@ -1,5 +1,5 @@
-import { clubConfig } from "./config";
-import { calculateMonthsDifference, newZoneDate } from "./date";
+import { clubConfig } from './config'
+import { calculateMonthsDifference, newZoneDate } from '@/lib/core/date'
 
 export function calculateMonthlyInterest(
   principal: number,

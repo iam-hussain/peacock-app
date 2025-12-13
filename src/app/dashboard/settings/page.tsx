@@ -44,10 +44,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { fileDateTime } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
+import { fileDateTime } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
 import { fetchMembers, fetchVendors } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
@@ -102,58 +102,58 @@ export default function SettingsPage() {
 
   // System Tools Mutations
   const returnsMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate"),
+    mutationFn: () => fetcher.post('/api/admin/recalculate'),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] });
-      toast.success("Returns are recalculated successfully.");
-      setRecalculateReturnsDialogOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ['all'] })
+      toast.success('Returns are recalculated successfully.')
+      setRecalculateReturnsDialogOpen(false)
     },
     onError: (error: any) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
+        error.message || 'An unexpected error occurred. Please try again.'
+      )
     },
-  });
+  })
 
   const dashboardRecalcMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/admin/dashboard/recalculate"),
+    mutationFn: () => fetcher.post('/api/admin/dashboard/recalculate'),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      queryClient.invalidateQueries({ queryKey: ["all", "statistic"] });
-      toast.success("Dashboard data recalculated successfully.");
-      setRecalculateDashboardDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['all', 'statistic'] })
+      toast.success('Dashboard data recalculated successfully.')
+      setRecalculateDashboardDialogOpen(false)
     },
     onError: (error: any) => {
-      console.error("Dashboard recalculation error:", error);
+      console.error('Dashboard recalculation error:', error)
       const errorMessage =
         error?.response?.data?.error ||
         error?.message ||
-        "Failed to recalculate dashboard data. Please try again.";
-      toast.error(errorMessage);
+        'Failed to recalculate dashboard data. Please try again.'
+      toast.error(errorMessage)
       // Close dialog on error so user can see the error and try again if needed
-      setRecalculateDashboardDialogOpen(false);
+      setRecalculateDashboardDialogOpen(false)
     },
     onSettled: () => {
       // This runs whether success or error - ensures state is reset
     },
-  });
+  })
 
   const backupMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/backup"),
+    mutationFn: () => fetcher.post('/api/admin/backup'),
     onSuccess: async (data: any) => {
       const blob = new Blob([JSON.stringify(data)], {
-        type: "application/json",
-      });
-      const downloadUrl = URL.createObjectURL(blob);
-      setBackupDownloadLink(downloadUrl);
-      toast.success("Data backup done successfully, download now.");
+        type: 'application/json',
+      })
+      const downloadUrl = URL.createObjectURL(blob)
+      setBackupDownloadLink(downloadUrl)
+      toast.success('Data backup done successfully, download now.')
     },
     onError: (error: any) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
+        error.message || 'An unexpected error occurred. Please try again.'
+      )
     },
-  });
+  })
 
   const handleAddMember = () => {
     setSelectedMember(null);

@@ -27,9 +27,9 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
 
 import { useAuth } from "@/hooks/use-auth";
-import { clubAge } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
+import { clubAge } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
 import { RootState } from "@/store";
 import { setIsLoggedIn, toggleSideBarCollapse } from "@/store/pageSlice";
 

@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 interface TransactionFormDialogProps {
   open: boolean;

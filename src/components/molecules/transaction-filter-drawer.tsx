@@ -24,7 +24,7 @@ import {
 } from "../ui/select";
 import { Separator } from "../ui/separator";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 interface TransactionFilterDrawerProps {
   open: boolean;

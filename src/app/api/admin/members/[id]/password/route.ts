@@ -6,7 +6,7 @@ import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { hashPassword, requireSuperAdmin } from "@/lib/auth";
+import { hashPassword, requireSuperAdmin } from "@/lib/core/auth";
 
 export async function POST(
   request: Request,

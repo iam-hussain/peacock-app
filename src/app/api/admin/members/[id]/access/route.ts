@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/core/auth";
 
 export async function PATCH(
   request: Request,
@@ -14,16 +14,9 @@ export async function PATCH(
   try {
     const currentUser = await requireAdmin();
 
-    const { id } = params;
-    const body = await request.json();
-    const { readAccess, writeAccess, role } = body;
-
-    console.log("Access update request:", {
-      id,
-      readAccess,
-      writeAccess,
-      role,
-    });
+    const { id } = params
+    const body = await request.json()
+    const { readAccess, writeAccess, role } = body
 
     const account = await prisma.account.findUnique({
       where: { id },
@@ -77,8 +70,7 @@ export async function PATCH(
     ) {
       finalRole = "ADMIN";
       finalReadAccess = true;
-      finalWriteAccess = true;
-      console.log("Admin role detected, setting Read and Write to true");
+      finalWriteAccess = true
     }
     // 2. If Admin role is explicitly removed → keep Read/Write as is
     else if (roleProvided && role === "MEMBER") {

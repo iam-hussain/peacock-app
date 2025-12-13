@@ -1,6 +1,6 @@
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions } from '@tanstack/react-query'
 
-import fetcher from "./fetcher";
+import fetcher from '@/lib/core/fetcher'
 
 import { GetLoanResponse } from "@/app/api/account/loan/route";
 import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]/route";
@@ -24,29 +24,29 @@ export const fetchAuthStatus = () =>
       fetcher.post("/api/auth/status") as never as {
         isLoggedIn: boolean;
         user:
-          | {
-              kind: "admin";
-              username: "admin";
-              role: "SUPER_ADMIN";
-              id: "admin";
-            }
-          | {
-              kind: "admin-member";
-              accountId: string;
-              id: string;
-              role: "ADMIN";
-              readAccess: boolean;
-              writeAccess: boolean;
-            }
-          | {
-              kind: "member";
-              accountId: string;
-              id: string;
-              role: "MEMBER";
-              readAccess: boolean;
-              writeAccess: boolean;
-            }
-          | null;
+        | {
+          kind: "admin";
+          username: "admin";
+          role: "SUPER_ADMIN";
+          id: "admin";
+        }
+        | {
+          kind: "admin-member";
+          accountId: string;
+          id: string;
+          role: "ADMIN";
+          readAccess: boolean;
+          writeAccess: boolean;
+        }
+        | {
+          kind: "member";
+          accountId: string;
+          id: string;
+          role: "MEMBER";
+          readAccess: boolean;
+          writeAccess: boolean;
+        }
+        | null;
       },
     ...noRefetchConfigs,
   });
@@ -128,16 +128,79 @@ export const fetchTransactions = (options: any) => {
 export const fetchDashboardSummary = (month?: string) =>
   queryOptions({
     queryKey: ["dashboard", "summary", month || "latest"],
-    queryFn: () =>
-      fetcher.get(
-        month
-          ? `/api/dashboard/summary?month=${month}`
-          : "/api/dashboard/summary/latest"
-      ) as Promise<{
-        success: boolean;
-        summary: any;
-        error?: string;
-      }>,
+    queryFn: async () => {
+      try {
+        const response = await fetcher.get(
+          month
+            ? `/api/dashboard/summary?month=${month}`
+            : "/api/dashboard/summary"
+        );
+        return response as {
+          success: boolean;
+          data?: {
+            members: {
+              activeMembers: number;
+              clubAgeMonths: number;
+            };
+            memberFunds: {
+              totalDeposits: number;
+              memberBalance: number;
+            };
+            memberOutflow: {
+              profitWithdrawals: number;
+              memberAdjustments: number;
+            };
+            loans: {
+              lifetime: {
+                totalLoanGiven: number;
+                totalInterestCollected: number;
+              };
+              outstanding: {
+                currentLoanTaken: number;
+                interestBalance: number;
+              };
+            };
+            vendor: {
+              vendorInvestment: number;
+              vendorProfit: number;
+            };
+            cashFlow: {
+              totalInvested: number;
+              pendingAmounts: number;
+            };
+            valuation: {
+              availableCash: number;
+              currentValue: number;
+            };
+            portfolio: {
+              totalPortfolioValue: number;
+            };
+            systemMeta: {
+              monthStartDate: Date;
+              monthEndDate: Date;
+              recalculatedAt: Date;
+              recalculatedByAdminId: string | null;
+              isLocked: boolean;
+            };
+          };
+          error?: string;
+        };
+      } catch (error: any) {
+        // Log the error for debugging
+        console.error("Error fetching dashboard summary:", error);
+        // Return error response structure for proper error handling
+        const errorMessage =
+          error?.message ||
+            error?.response?.data?.error ||
+            error?.response?.status === 404
+            ? "No dashboard data found. Please run recalculation first."
+            : "Failed to fetch dashboard summary";
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      }
+    },
     retry: false, // Don't retry on 503/404 errors
     ...noRefetchConfigs,
   });

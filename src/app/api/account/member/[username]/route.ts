@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { memberMonthsPassedString } from "@/lib/date";
-import { getMemberClubStats } from "@/lib/member-club-stats";
+import { memberMonthsPassedString } from "@/lib/core/date";
+import { getMemberClubStats } from "@/lib/calculators/member-club-stats";
 import {
   membersTableTransform,
   TransformedLoan,

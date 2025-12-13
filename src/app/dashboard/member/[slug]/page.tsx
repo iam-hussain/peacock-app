@@ -21,7 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { fetchMemberByUsername } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 export default function MemberPage({ params }: { params: { slug: string } }) {
   const username = params.slug; // URL param is still 'slug' for backward compatibility

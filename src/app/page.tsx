@@ -34,9 +34,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/core/fetcher";
 import { fetchAuthStatus } from "@/lib/query-options";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 import { setIsLoggedIn } from "@/store/pageSlice";
 
 export default function Home() {

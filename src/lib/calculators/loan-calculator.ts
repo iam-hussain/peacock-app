@@ -1,9 +1,9 @@
 import { Transaction } from "@prisma/client";
 
 import prisma from "@/db";
-import { newZoneDate } from "@/lib/date";
+import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { LoanHistoryEntry } from "@/lib/type";
+import { LoanHistoryEntry } from "@/lib/validators/type";
 
 /**
  * Fetches all loan transactions for a specific member

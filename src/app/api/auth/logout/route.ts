@@ -4,7 +4,7 @@ export const fetchCache = "force-no-store";
 
 import { NextResponse } from "next/server";
 
-import { clearSessionCookie } from "@/lib/auth";
+import { clearSessionCookie } from "@/lib/core/auth";
 
 export async function POST() {
   try {

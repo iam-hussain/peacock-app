@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/core/auth";
 
 export async function PATCH(
   request: Request,

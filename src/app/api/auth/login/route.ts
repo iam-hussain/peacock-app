@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { createSessionCookie, verifyPassword } from "@/lib/auth";
+import { createSessionCookie, verifyPassword } from "@/lib/core/auth";
 
 export async function POST(request: Request) {
   try {

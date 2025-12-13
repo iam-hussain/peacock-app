@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader } from "../ui/card";
 
-import { dateFormat, newZoneDate } from "@/lib/date";
-import { LoanHistoryEntry } from "@/lib/type";
-import { cn, moneyFormat } from "@/lib/utils";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import { LoanHistoryEntry } from '@/lib/validators/type';
+import { cn, moneyFormat } from "@/lib/ui/utils";
 
 export function LoanHistory({
   loanHistory,

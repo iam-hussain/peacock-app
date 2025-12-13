@@ -9,45 +9,45 @@ import { toast } from "sonner";
 
 import { Button } from "../ui/button";
 
-import { fileDateTime } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
+import { fileDateTime } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
 
 const ActionMenu = () => {
   const queryClient = useQueryClient();
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
 
   const backupMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/backup"),
+    mutationFn: () => fetcher.post('/api/admin/backup'),
     onSuccess: async (data: any) => {
       // Assuming the response contains the JSON file as a buffer
       const blob = new Blob([JSON.stringify(data)], {
-        type: "application/json",
-      });
-      const downloadUrl = URL.createObjectURL(blob); // Create a downloadable link
-      setDownloadLink(downloadUrl); // Set download link
-      toast.success("Data backup done successfully, download now.");
+        type: 'application/json',
+      })
+      const downloadUrl = URL.createObjectURL(blob) // Create a downloadable link
+      setDownloadLink(downloadUrl) // Set download link
+      toast.success('Data backup done successfully, download now.')
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
+        error.message || 'An unexpected error occurred. Please try again.'
+      )
     },
-  });
+  })
 
   const returnsMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate"),
+    mutationFn: () => fetcher.post('/api/admin/recalculate'),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] });
+      await queryClient.invalidateQueries({ queryKey: ['all'] })
 
-      toast.success("Returns are recalculated successfully.");
+      toast.success('Returns are recalculated successfully.')
     },
     onError: (error) => {
       toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
+        error.message || 'An unexpected error occurred. Please try again.'
+      )
     },
-  });
+  })
 
   async function handleBackup(e: React.FormEvent) {
     e.preventDefault();

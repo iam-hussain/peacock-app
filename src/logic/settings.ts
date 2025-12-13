@@ -5,7 +5,7 @@ import {
   ClubPassbookData,
   MemberPassbookData,
   VendorPassbookData,
-} from "@/lib/type";
+} from '@/lib/validators/type';
 
 export type TransactionPassbookConfig = {
   [key in TRANSACTION_TYPE]: PassbookConfigAction;

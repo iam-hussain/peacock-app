@@ -18,9 +18,9 @@ import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useTableExport } from "@/hooks/use-table-export";
-import { dateFormat, newZoneDate } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchVendors } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 export default function VendorsPage() {
   const { data, isLoading } = useQuery(fetchVendors());
@@ -54,8 +54,8 @@ export default function VendorsPage() {
 
   const handleViewDetails = (vendor: TransformedVendor) => {
     // Navigate to vendor details if needed
-    console.log("View vendor details", vendor);
-  };
+    // TODO: Implement vendor details view
+  }
 
   const handleResetFilters = () => {
     setSearchQuery("");
@@ -267,14 +267,14 @@ export default function VendorsPage() {
               label: "Export CSV",
               icon: <Download className="h-4 w-4" />,
               onClick: () => {
-                console.log("Export CSV");
+                // TODO: Implement CSV export
               },
             },
             {
-              label: "Screenshot",
+              label: 'Screenshot',
               icon: <Camera className="h-4 w-4" />,
               onClick: () => {
-                console.log("Screenshot");
+                // TODO: Implement screenshot
               },
             },
           ]}

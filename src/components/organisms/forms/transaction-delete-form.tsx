@@ -5,10 +5,10 @@ import { toast } from "sonner";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { transactionTypeMap } from "@/lib/config";
-import { dateFormat, newZoneDate } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
-import { moneyFormat } from "@/lib/utils";
+import { transactionTypeMap } from "@/lib/config/config";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
+import { moneyFormat } from "@/lib/ui/utils";
 
 type TransactionDeleteFormProps = {
   transaction: TransformedTransaction;
