@@ -212,6 +212,7 @@ async function seed() {
       const {
         transactionAt,
         note,
+        transactionType, // Old field name
         ...transactionBase
       } = transaction
 
@@ -221,6 +222,7 @@ async function seed() {
         updatedById: transaction.updatedById || null,
 
         // New/renamed fields
+        type: transactionType || 'PERIODIC_DEPOSIT', // Rename transactionType → type
         occurredAt: transactionAt || new Date(),
         description: note || null,
         currency: 'INR',
