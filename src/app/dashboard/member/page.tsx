@@ -71,7 +71,7 @@ export default function MembersPage() {
   };
 
   const handleViewTransactions = (member: TransformedMember) => {
-    window.location.href = `/dashboard/transaction?member=${member.username}`;
+    window.location.href = `/dashboard/transaction?member=${member.username}&type=LOAN_ALL`;
   };
 
   const handleResetFilters = () => {

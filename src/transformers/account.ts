@@ -1,10 +1,10 @@
 import { Account, Passbook } from "@prisma/client";
 
-import { calculateMonthsDifference, newZoneDate } from "@/lib/core/date";
 import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
-import { MemberPassbookData } from '@/lib/validators/type';
+import { calculateMonthsDifference, newZoneDate } from "@/lib/core/date";
+import { MemberPassbookData } from "@/lib/validators/type";
 
-type ToTransform = Account & { passbook: Passbook };
+type ToTransform = Account & { passbook: Passbook | null };
 
 export async function transformLoanForTable(vendorInput: ToTransform) {
   const { passbook, ...member } = vendorInput;
@@ -29,14 +29,14 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
     username: member.username,
     link: `/dashboard/member/${member.username}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar
-      ? member.avatar.startsWith("/image/")
-        ? member.avatar
-        : `/image/${member.avatar}`
+    avatar: member.avatarUrl
+      ? member.avatarUrl.startsWith("/image/")
+        ? member.avatarUrl
+        : `/image/${member.avatarUrl}`
       : undefined,
     joined: calculateMonthsDifference(
       newZoneDate(),
-      newZoneDate(member.startAt)
+      newZoneDate(member.startedAt)
     ),
     startAt: calculatedLoanHistory.length
       ? newZoneDate(
@@ -120,16 +120,16 @@ export function membersTableTransform(
     username: member.username,
     link: `/dashboard/member/${member.username}`,
     name: `${member.firstName}${member.lastName ? ` ${member.lastName}` : ""}`,
-    avatar: member.avatar
-      ? member.avatar.startsWith("/image/")
-        ? member.avatar
-        : `/image/${member.avatar}`
+    avatar: member.avatarUrl
+      ? member.avatarUrl.startsWith("/image/")
+        ? member.avatarUrl
+        : `/image/${member.avatarUrl}`
       : undefined,
     joined: calculateMonthsDifference(
       newZoneDate(),
-      newZoneDate(member.startAt)
+      newZoneDate(member.startedAt)
     ),
-    startAt: member.startAt.getTime(),
+    startAt: member.startedAt ? member.startedAt.getTime() : 0,
     status: member.active ? "Active" : "Disabled",
     active: member.active,
     totalDepositAmount: totalDepositMinusWithdrawals,

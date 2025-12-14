@@ -180,7 +180,7 @@ export function FilterBar({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full sm:w-[140px] justify-start text-left font-normal",
+                  "w-full sm:w-[200px] justify-start text-left font-normal",
                   !dateRange.startDate && "text-muted-foreground"
                 )}
               >
@@ -215,7 +215,7 @@ export function FilterBar({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full sm:w-[140px] justify-start text-left font-normal",
+                  "w-full sm:w-[200px] justify-start text-left font-normal",
                   !dateRange.endDate && "text-muted-foreground"
                 )}
               >

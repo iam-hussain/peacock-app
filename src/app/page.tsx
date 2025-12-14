@@ -70,6 +70,11 @@ export default function Home() {
     mutationFn: () => fetcher.post("/api/auth/logout"),
     onSuccess: async () => {
       dispatch(setIsLoggedIn(false));
+      queryClient.setQueryData(["authentication"], {
+        isLoggedIn: false,
+        user: null,
+      });
+      queryClient.removeQueries({ queryKey: ["profile"] });
       await queryClient.invalidateQueries({ queryKey: ["authentication"] });
       await queryClient.refetchQueries({ queryKey: ["authentication"] });
       toast.success("Logged out successfully!");

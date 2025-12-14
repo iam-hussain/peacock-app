@@ -53,9 +53,12 @@ export default function VendorsPage() {
   }, [data?.vendors, searchQuery, statusFilter]);
 
   const handleViewDetails = (vendor: TransformedVendor) => {
-    // Navigate to vendor details if needed
-    // TODO: Implement vendor details view
-  }
+    window.location.href = `/dashboard/vendor/${vendor.id}`;
+  };
+
+  const handleViewTransactions = (vendor: TransformedVendor) => {
+    window.location.href = `/dashboard/transaction?account=${vendor.id}`;
+  };
 
   const handleResetFilters = () => {
     setSearchQuery("");
@@ -235,7 +238,7 @@ export default function VendorsPage() {
           return (
             <RowActionsMenu
               onViewDetails={() => handleViewDetails(vendor)}
-              onViewTransactions={() => handleViewDetails(vendor)}
+              onViewTransactions={() => handleViewTransactions(vendor)}
             />
           );
         },
@@ -271,7 +274,7 @@ export default function VendorsPage() {
               },
             },
             {
-              label: 'Screenshot',
+              label: "Screenshot",
               icon: <Camera className="h-4 w-4" />,
               onClick: () => {
                 // TODO: Implement screenshot

@@ -36,8 +36,12 @@ export function MemberPermissionCard({
   onAdjustOffset,
   onResetPassword,
 }: MemberPermissionCardProps) {
-  const currentRead = memberAccessState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
-  const currentWrite = memberAccessState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+  const currentRead =
+    memberAccessState?.read ??
+    ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+  const currentWrite =
+    memberAccessState?.write ??
+    ["WRITE", "ADMIN"].includes(member.account.accessLevel);
   const currentAdmin =
     memberAccessState?.admin ?? member.account.role === "ADMIN";
 

@@ -27,11 +27,13 @@ export default function RootLayout({
         <Analytics />
         <QueryProvider>
           <StoreProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider>
+              {children}
+              <Toaster position="bottom-right" />
+            </ThemeProvider>
           </StoreProvider>
         </QueryProvider>
       </body>
-      <Toaster position="bottom-right" />
     </html>
   );
 }

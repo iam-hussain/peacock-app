@@ -18,7 +18,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import fetcher from "@/lib/core/fetcher";
-import { offsetFormSchema, OffsetFromSchema } from "@/lib/validators/form-schema";
+import {
+  offsetFormSchema,
+  OffsetFromSchema,
+} from "../../../lib/validators/form-schema";
 
 type OffsetFormProps = {
   passbookId: string;

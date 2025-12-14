@@ -15,8 +15,8 @@ import { Card, CardContent, CardHeader } from "../ui/card";
 import { Separator } from "../ui/separator";
 
 import { dateFormat, newZoneDate } from "@/lib/core/date";
-import { LoanHistoryEntry } from '@/lib/validators/type';
 import { moneyFormat } from "@/lib/ui/utils";
+import { LoanHistoryEntry } from "@/lib/validators/type";
 
 interface LoanTransactionCardProps {
   transaction: LoanHistoryEntry;

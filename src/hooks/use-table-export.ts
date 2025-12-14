@@ -206,7 +206,8 @@ export function useTableExport<TData>({
    * Capture and export table as screenshot
    */
   const handleScreenshot = useCallback(async () => {
-    if (!tableRef.current) {
+    const element = tableRef.current;
+    if (!element) {
       toast.error("Table element not found");
       return;
     }
@@ -214,14 +215,21 @@ export function useTableExport<TData>({
     try {
       toast.loading("Capturing screenshot...", { id: "screenshot" });
 
-      // Capture with html2canvas
-      const canvas = await html2canvas(tableRef.current, {
-        scale: 2, // Higher resolution
+      const width = element.scrollWidth;
+      const height = element.scrollHeight;
+
+      // Capture with html2canvas using full content size (no crop)
+      const canvas = await html2canvas(element, {
+        scale: 2, // Higher resolution for crisp export
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: tableRef.current.scrollWidth,
-        windowHeight: tableRef.current.scrollHeight,
+        width,
+        height,
+        windowWidth: width,
+        windowHeight: height,
+        scrollX: 0,
+        scrollY: 0,
       });
 
       // Convert canvas to blob

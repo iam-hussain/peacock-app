@@ -6,10 +6,11 @@ import { Account, Passbook } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { newZoneDate } from "@/lib/core/date";
 import { chitCalculator } from "@/lib/helper";
-import { VendorPassbookData } from '@/lib/validators/type';
+import { VendorPassbookData } from "@/lib/validators/type";
 
-type VendorToTransform = Account & { passbook: Passbook };
+type VendorToTransform = Account & { passbook: Passbook | null };
 
 export async function POST() {
   try {
@@ -17,7 +18,7 @@ export async function POST() {
     await requireAuth();
 
     const vendors = await prisma.account.findMany({
-      where: { type: 'VENDOR' },
+      where: { type: "VENDOR" },
       include: { passbook: true },
     });
 
@@ -41,8 +42,9 @@ export async function POST() {
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, ...vendor } = vendorInput;
-  const { totalInvestment, totalReturns } =
-    passbook.payload as VendorPassbookData;
+  const { totalInvestment, totalReturns } = passbook
+    ? (passbook.payload as VendorPassbookData)
+    : { totalInvestment: 0, totalReturns: 0 };
 
   const statusData: {
     nextDueDate: number | null;
@@ -50,17 +52,22 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
   } = { nextDueDate: null, monthsPassedString: null };
 
   if (vendor.active) {
-    const chitData = chitCalculator(vendor.startAt, vendor?.endAt);
+    const chitData = chitCalculator(vendor.startedAt, vendor?.endedAt);
     statusData.nextDueDate = vendor.active ? chitData.nextDueDate : null;
     statusData.monthsPassedString = chitData.monthsPassedString;
   }
 
+  const startAtMs = vendor.startedAt
+    ? newZoneDate(vendor.startedAt).getTime()
+    : null;
+  const endAtMs = vendor.endedAt ? newZoneDate(vendor.endedAt).getTime() : null;
+
   return {
     id: vendor.id,
     name: `${vendor.firstName}${vendor.lastName ? ` ${vendor.lastName}` : ""}`,
-    avatar: vendor.avatar ? `/image/${vendor.avatar}` : undefined,
-    startAt: vendor.startAt.getTime(),
-    endAt: vendor.endAt ? vendor.endAt.getTime() : null,
+    avatar: vendor.avatarUrl ? `/image/${vendor.avatarUrl}` : undefined,
+    startAt: startAtMs,
+    endAt: endAtMs,
     status: vendor.active ? "Active" : "Disabled",
     active: vendor.active,
     totalInvestment,

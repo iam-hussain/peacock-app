@@ -1,14 +1,18 @@
-import { queryOptions } from '@tanstack/react-query'
-
-import fetcher from '@/lib/core/fetcher'
+import { queryOptions } from "@tanstack/react-query";
 
 import { GetLoanResponse } from "@/app/api/account/loan/route";
 import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]/route";
 import { GetMemberResponse } from "@/app/api/account/member/route";
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { GetVendorResponse } from "@/app/api/account/vendor/route";
-import { GetStatisticsResponse } from "@/app/api/statistics/route";
 import { GetTransactionResponse } from "@/app/api/transaction/route";
+import fetcher from "@/lib/core/fetcher";
+
+type GetStatisticsResponse = {
+  success: boolean;
+  data?: unknown;
+  error?: string;
+};
 
 const noRefetchConfigs = {
   refetchOnMount: false,
@@ -19,36 +23,36 @@ const noRefetchConfigs = {
 
 export const fetchAuthStatus = () =>
   queryOptions({
-    queryKey: ['authentication'],
+    queryKey: ["authentication"],
     queryFn: () =>
-      fetcher.post('/api/auth/status') as never as {
-        isLoggedIn: boolean
+      fetcher.post("/api/auth/status") as never as {
+        isLoggedIn: boolean;
         user:
-          | {
-              kind: 'admin'
-              username: 'admin'
-              role: 'SUPER_ADMIN'
-              id: 'admin'
-              accessLevel: 'ADMIN'
-            }
-          | {
-              kind: 'admin-member'
-              accountId: string
-              id: string
-              role: 'ADMIN'
-              accessLevel: 'ADMIN'
-            }
-          | {
-              kind: 'member'
-              accountId: string
-              id: string
-              role: 'MEMBER'
-              accessLevel: 'READ' | 'WRITE' | 'ADMIN'
-            }
-          | null
+        | {
+          kind: "admin";
+          username: "admin";
+          role: "SUPER_ADMIN";
+          id: "admin";
+          accessLevel: "ADMIN";
+        }
+        | {
+          kind: "admin-member";
+          accountId: string;
+          id: string;
+          role: "ADMIN";
+          accessLevel: "ADMIN";
+        }
+        | {
+          kind: "member";
+          accountId: string;
+          id: string;
+          role: "MEMBER";
+          accessLevel: "READ" | "WRITE" | "ADMIN";
+        }
+        | null;
       },
     ...noRefetchConfigs,
-  })
+  });
 
 export const fetchMemberByUsername = (username: string) =>
   queryOptions({
@@ -206,14 +210,16 @@ export const fetchDashboardSummary = (month?: string) =>
 
 export const fetchDashboardGraphs = (from: string, to: string) =>
   queryOptions({
-    queryKey: ['dashboard', 'graphs', from, to],
+    queryKey: ["dashboard", "graphs", from, to],
     queryFn: () =>
-      fetcher.get(`/api/dashboard/summary/range?from=${from}&to=${to}`) as Promise<{
-        success: boolean
-        from: string
-        to: string
-        count: number
-        summaries: any[]
+      fetcher.get(
+        `/api/dashboard/summary/range?from=${from}&to=${to}`
+      ) as Promise<{
+        success: boolean;
+        from: string;
+        to: string;
+        count: number;
+        summaries: any[];
       }>,
     ...noRefetchConfigs,
-  })
+  });

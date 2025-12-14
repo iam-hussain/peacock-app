@@ -12,7 +12,7 @@ type AccountToTransform = {
   firstName: string;
   lastName: string | null;
   active: boolean;
-  isMember: boolean;
+  type: "MEMBER" | "VENDOR" | "CLUB" | "SYSTEM";
 };
 
 function accountSelectTransform(account: AccountToTransform) {
@@ -21,19 +21,20 @@ function accountSelectTransform(account: AccountToTransform) {
     username: account.username,
     name: `${account.firstName}${account.lastName ? ` ${account.lastName}` : ""}`,
     active: account.active,
-    isMember: (account.type === 'MEMBER'),
+    isMember: account.type === "MEMBER",
   };
 }
 
 export async function POST() {
   const accounts = await prisma.account.findMany({
+    where: { type: { in: ["MEMBER", "VENDOR"] } },
     select: {
       id: true,
       username: true,
       firstName: true,
       lastName: true,
       active: true,
-      type: 'MEMBER',
+      type: true,
     },
   });
 

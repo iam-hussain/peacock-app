@@ -102,58 +102,58 @@ export default function SettingsPage() {
 
   // System Tools Mutations
   const returnsMutation = useMutation({
-    mutationFn: () => fetcher.post('/api/admin/recalculate'),
+    mutationFn: () => fetcher.post("/api/admin/recalculate"),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['all'] })
-      toast.success('Returns are recalculated successfully.')
-      setRecalculateReturnsDialogOpen(false)
+      await queryClient.invalidateQueries({ queryKey: ["all"] });
+      toast.success("Returns are recalculated successfully.");
+      setRecalculateReturnsDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(
-        error.message || 'An unexpected error occurred. Please try again.'
-      )
+        error.message || "An unexpected error occurred. Please try again."
+      );
     },
-  })
+  });
 
   const dashboardRecalcMutation = useMutation({
-    mutationFn: () => fetcher.post('/api/admin/dashboard/recalculate'),
+    mutationFn: () => fetcher.post("/api/admin/dashboard/recalculate"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      queryClient.invalidateQueries({ queryKey: ['all', 'statistic'] })
-      toast.success('Dashboard data recalculated successfully.')
-      setRecalculateDashboardDialogOpen(false)
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["all", "statistic"] });
+      toast.success("Dashboard data recalculated successfully.");
+      setRecalculateDashboardDialogOpen(false);
     },
     onError: (error: any) => {
-      console.error('Dashboard recalculation error:', error)
+      console.error("Dashboard recalculation error:", error);
       const errorMessage =
         error?.response?.data?.error ||
         error?.message ||
-        'Failed to recalculate dashboard data. Please try again.'
-      toast.error(errorMessage)
+        "Failed to recalculate dashboard data. Please try again.";
+      toast.error(errorMessage);
       // Close dialog on error so user can see the error and try again if needed
-      setRecalculateDashboardDialogOpen(false)
+      setRecalculateDashboardDialogOpen(false);
     },
     onSettled: () => {
       // This runs whether success or error - ensures state is reset
     },
-  })
+  });
 
   const backupMutation = useMutation({
-    mutationFn: () => fetcher.post('/api/admin/backup'),
+    mutationFn: () => fetcher.post("/api/admin/backup"),
     onSuccess: async (data: any) => {
       const blob = new Blob([JSON.stringify(data)], {
-        type: 'application/json',
-      })
-      const downloadUrl = URL.createObjectURL(blob)
-      setBackupDownloadLink(downloadUrl)
-      toast.success('Data backup done successfully, download now.')
+        type: "application/json",
+      });
+      const downloadUrl = URL.createObjectURL(blob);
+      setBackupDownloadLink(downloadUrl);
+      toast.success("Data backup done successfully, download now.");
     },
     onError: (error: any) => {
       toast.error(
-        error.message || 'An unexpected error occurred. Please try again.'
-      )
+        error.message || "An unexpected error occurred. Please try again."
+      );
     },
-  })
+  });
 
   const handleAddMember = () => {
     setSelectedMember(null);
@@ -263,7 +263,13 @@ export default function SettingsPage() {
       },
       {
         id: "readAccess",
-        accessorKey: "(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN')",
+        accessorFn: (row) => {
+          const state = memberAccessState[row.account.id];
+          return (
+            state?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(row.account.accessLevel)
+          );
+        },
         header: "Read",
         enableSorting: true,
         meta: {
@@ -274,8 +280,12 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
-          const currentWrite = memberState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+          const currentRead =
+            memberState?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+          const currentWrite =
+            memberState?.write ??
+            ["WRITE", "ADMIN"].includes(member.account.accessLevel);
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 
@@ -315,7 +325,12 @@ export default function SettingsPage() {
       },
       {
         id: "writeAccess",
-        accessorKey: "(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN')",
+        accessorFn: (row) => {
+          const state = memberAccessState[row.account.id];
+          return (
+            state?.write ?? ["WRITE", "ADMIN"].includes(row.account.accessLevel)
+          );
+        },
         header: "Write",
         enableSorting: true,
         meta: {
@@ -326,8 +341,12 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
-          const currentWrite = memberState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+          const currentRead =
+            memberState?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+          const currentWrite =
+            memberState?.write ??
+            ["WRITE", "ADMIN"].includes(member.account.accessLevel);
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 
@@ -367,7 +386,10 @@ export default function SettingsPage() {
       },
       {
         id: "adminAccess",
-        accessorKey: "account.role",
+        accessorFn: (row) => {
+          const state = memberAccessState[row.account.id];
+          return state?.admin ?? row.account.role === "ADMIN";
+        },
         header: "Admin",
         enableSorting: true,
         meta: {
@@ -378,8 +400,12 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.(account.accessLevel === 'READ' || account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
-          const currentWrite = memberState?.write ?? member.(account.accessLevel === 'WRITE' || account.accessLevel === 'ADMIN');
+          const currentRead =
+            memberState?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+          const currentWrite =
+            memberState?.write ??
+            ["WRITE", "ADMIN"].includes(member.account.accessLevel);
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 

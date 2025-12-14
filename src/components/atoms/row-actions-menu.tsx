@@ -2,7 +2,6 @@
 
 import {
   Edit,
-  Eye,
   Key,
   MoreHorizontal,
   Receipt,
@@ -25,6 +24,7 @@ interface RowActionsMenuProps {
   onViewTransactions?: () => void;
   onDeactivate?: () => void;
   onRemove?: () => void;
+  onDelete?: () => void;
   onAddRepayment?: () => void;
   onAdjustOffset?: () => void;
   onChangePassword?: () => void;
@@ -32,7 +32,6 @@ interface RowActionsMenuProps {
 }
 
 export function RowActionsMenu({
-  onViewDetails,
   onEdit,
   onViewTransactions,
   onDeactivate,
@@ -41,10 +40,10 @@ export function RowActionsMenu({
   onAdjustOffset,
   onChangePassword,
   onResetPassword,
+  onDelete,
 }: RowActionsMenuProps) {
   // Check if there are any actions available
   const hasActions = !!(
-    onViewDetails ||
     onEdit ||
     onViewTransactions ||
     onDeactivate ||
@@ -52,7 +51,8 @@ export function RowActionsMenu({
     onAddRepayment ||
     onAdjustOffset ||
     onChangePassword ||
-    onResetPassword
+    onResetPassword ||
+    onDelete
   );
 
   // Don't render if no actions are available
@@ -69,12 +69,6 @@ export function RowActionsMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[180px]">
-        {onViewDetails && (
-          <DropdownMenuItem onClick={onViewDetails}>
-            <Eye className="mr-2 h-4 w-4" />
-            View Loan
-          </DropdownMenuItem>
-        )}
         {onAddRepayment && (
           <DropdownMenuItem onClick={onAddRepayment}>
             <Receipt className="mr-2 h-4 w-4" />
@@ -93,12 +87,6 @@ export function RowActionsMenu({
             Adjustments
           </DropdownMenuItem>
         )}
-        {onChangePassword && (
-          <DropdownMenuItem onClick={onChangePassword}>
-            <Key className="mr-2 h-4 w-4" />
-            Change Password
-          </DropdownMenuItem>
-        )}
         {onResetPassword && (
           <DropdownMenuItem onClick={onResetPassword}>
             <Key className="mr-2 h-4 w-4" />
@@ -111,7 +99,7 @@ export function RowActionsMenu({
             Edit
           </DropdownMenuItem>
         )}
-        {(onDeactivate || onRemove) && <DropdownMenuSeparator />}
+        {(onDeactivate || onRemove || onDelete) && <DropdownMenuSeparator />}
         {onDeactivate && (
           <DropdownMenuItem onClick={onDeactivate} className="text-destructive">
             <Trash2 className="mr-2 h-4 w-4" />
@@ -122,6 +110,12 @@ export function RowActionsMenu({
           <DropdownMenuItem onClick={onRemove} className="text-destructive">
             <Trash2 className="mr-2 h-4 w-4" />
             Remove Member
+          </DropdownMenuItem>
+        )}
+        {onDelete && (
+          <DropdownMenuItem onClick={onDelete} className="text-destructive">
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

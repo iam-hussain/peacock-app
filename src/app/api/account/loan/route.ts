@@ -8,13 +8,18 @@ import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
 
 export async function POST() {
   const loans = await prisma.account.findMany({
-    where: { type: 'MEMBER' },
+    where: { type: "MEMBER" },
     include: { passbook: true },
   });
 
-  const transformedLoans = await Promise.all(loans.map(transformLoanForTable));
+  const transformedLoans = await Promise.all(
+    loans.map((loan) =>
+      loan.passbook ? transformLoanForTable(loan as any) : null
+    )
+  );
 
   const filteredLoans = transformedLoans
+    .filter((e): e is NonNullable<typeof e> => Boolean(e))
     .filter((e) => e.active || e.loanHistory.length > 0)
     .sort((a, b) => (a.name > b.name ? 1 : -1))
     .sort((a, b) => (a.active > b.active ? -1 : 1));

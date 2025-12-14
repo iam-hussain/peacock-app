@@ -12,7 +12,7 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { MemberPassbookData } from '@/lib/validators/type';
+import { MemberPassbookData } from "@/lib/validators/type";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
@@ -51,7 +51,7 @@ const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
     },
     select: {
       id: true,
-      type: true,
+      kind: true,
       payload: true,
       account: { select: { id: true } },
     },
@@ -80,7 +80,7 @@ export const updatePassbookByTransaction = (
     TOTAL: transaction.amount,
   };
 
-  if (transaction.transactionType === "WITHDRAW" && !isRevert) {
+  if (transaction.type === "WITHDRAW" && !isRevert) {
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
       const { periodicDepositAmount = 0, withdrawalAmount = 0 } = (toPassbook
@@ -95,7 +95,7 @@ export const updatePassbookByTransaction = (
     }
   }
 
-  if (transaction.transactionType === "WITHDRAW") {
+  if (transaction.type === "WITHDRAW") {
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
       const {
@@ -128,7 +128,7 @@ export const updatePassbookByTransaction = (
 
   Object.entries(transactionPassbookSettings).forEach(
     ([transactionType, passbooksOf]) => {
-      if (transaction.transactionType === transactionType) {
+      if (transaction.type === transactionType) {
         Object.entries(passbooksOf).forEach(([passbookOf, action]: any[]) => {
           const currentPassbook = passbookToUpdate.get(
             transactionPassbooks[passbookOf]

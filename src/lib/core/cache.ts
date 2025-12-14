@@ -13,13 +13,13 @@ class Cache {
 
   public static getInstance(): NodeCache {
     if (!Cache.instance) {
-      if (typeof global.nodeCache === 'undefined') {
+      if (typeof global.nodeCache === "undefined") {
         global.nodeCache = new NodeCache({
           stdTTL: 300, // Cache time-to-live in seconds (5 minutes)
           checkperiod: 60, // Check for expired keys every minute
-        })
+        });
       }
-      Cache.instance = global.nodeCache
+      Cache.instance = global.nodeCache;
     }
     return Cache.instance;
   }
@@ -27,10 +27,10 @@ class Cache {
 
 export function clearCache() {
   if (global.nodeCache) {
-    const catchState = global.nodeCache.getStats()
+    const catchState = global.nodeCache.getStats();
     if (catchState.keys > 0) {
-      global.nodeCache.flushAll()
-      global.nodeCache.flushStats()
+      global.nodeCache.flushAll();
+      global.nodeCache.flushStats();
     }
   }
 }

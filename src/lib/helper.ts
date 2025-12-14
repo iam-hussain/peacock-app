@@ -1,20 +1,19 @@
-import { $Enums, PASSBOOK_TYPE } from "@prisma/client";
+import { $Enums, PassbookKind } from "@prisma/client";
 import { JsonValue } from "@prisma/client/runtime/library";
-import { nanoid } from 'nanoid'
+import { nanoid } from "nanoid";
 
+import prisma from "@/db";
 import {
   calculateDateDiff,
   calculateTimePassed,
   getMonthsPassedString,
   newZoneDate,
-} from '@/lib/core/date'
+} from "@/lib/core/date";
 import {
   ClubPassbookData,
   MemberPassbookData,
   VendorPassbookData,
-} from '@/lib/validators/type'
-
-import prisma from "@/db";
+} from "@/lib/validators/type";
 
 /**
  * Generate a username for vendors in the format: "name-uuid"
@@ -24,15 +23,17 @@ export function generateVendorUsername(
   firstName: string,
   lastName?: string | null
 ): string {
-  const name = [firstName, lastName]
+  const uuid = nanoid(8);
+  const name = [firstName, lastName, uuid]
     .filter(Boolean)
     .join("-")
+    .trim()
+    .replace(/ /g, "")
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
-  const uuid = nanoid(8);
-  return `${name}-${uuid}`;
+  return name
 }
 
 export const chitCalculator = (
@@ -81,8 +82,8 @@ export const bulkPassbookUpdate = async (
       try {
         const operations = batch.map((value) => prisma.passbook.update(value));
 
-        await prisma.$transaction(operations) // Execute all updates in the batch
-        break // Exit retry loop if successful
+        await prisma.$transaction(operations); // Execute all updates in the batch
+        break; // Exit retry loop if successful
       } catch (e: any) {
         if (e?.code === "P2034" && attempt < maxRetries - 1) {
           console.warn(
@@ -100,7 +101,7 @@ export const bulkPassbookUpdate = async (
 };
 
 export const getDefaultPassbookData = (
-  type: PASSBOOK_TYPE = "MEMBER"
+  type: PassbookKind = "MEMBER"
 ): ClubPassbookData | MemberPassbookData | VendorPassbookData => {
   if (type === "MEMBER") {
     return {
@@ -161,33 +162,35 @@ export function setPassbookUpdateQuery(
 
 export function initializePassbookToUpdate(
   passbooks: {
-    account: { id: string } | null
-    id: string
-    kind: $Enums.PassbookKind
-    payload: JsonValue
+    account: { id: string } | null;
+    id: string;
+    kind: $Enums.PassbookKind;
+    payload: JsonValue;
   }[],
   isClean: boolean = true
 ): PassbookToUpdate {
   let passbookToUpdate: PassbookToUpdate = new Map();
 
   for (let passbook of passbooks) {
-    if (passbook.account?.id && passbook.type !== "CLUB") {
+    if (passbook.account?.id && passbook.kind !== "CLUB") {
       passbookToUpdate.set(passbook.account?.id, {
         where: { id: passbook.id },
         data: {
+          kind: passbook.kind,
           payload: isClean
-            ? getDefaultPassbookData(passbook.type)
+            ? getDefaultPassbookData(passbook.kind)
             : (passbook.payload as any),
           loanHistory: [],
         },
       });
     }
-    if (passbook.type === "CLUB") {
+    if (passbook.kind === "CLUB") {
       passbookToUpdate.set("CLUB", {
         where: { id: passbook.id },
         data: {
+          kind: passbook.kind,
           payload: isClean
-            ? getDefaultPassbookData(passbook.type)
+            ? getDefaultPassbookData(passbook.kind)
             : (passbook.payload as any),
           loanHistory: [],
         },
@@ -205,15 +208,15 @@ export function fetchAllPassbook() {
       payload: true,
       account: { select: { id: true } },
     },
-  })
+  });
 }
 
 export function fetchAllLoanPassbook() {
   return prisma.passbook.findMany({
-    where: { type: { in: ["CLUB", "MEMBER"] } },
+    where: { kind: { in: ["CLUB", "MEMBER"] } },
     select: {
       id: true,
-      type: true,
+      kind: true,
       payload: true,
       account: { select: { id: true } },
     },

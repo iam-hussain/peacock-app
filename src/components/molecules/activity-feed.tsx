@@ -31,15 +31,15 @@ type TransactionType =
   | "REJOIN";
 
 interface ActivityItem {
-  id: string
-  type: TransactionType
-  amount: number
-  fromName?: string
-  toName?: string
-  fromSub?: string
-  toSub?: string
-  occurredAt: number
-  description?: string
+  id: string;
+  type: TransactionType;
+  amount: number;
+  fromName?: string;
+  toName?: string;
+  fromSub?: string;
+  toSub?: string;
+  occurredAt: number;
+  description?: string;
 }
 
 function getActivityIcon(type: TransactionType) {
@@ -147,17 +147,17 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
     fetchTransactions({
       page: 1,
       limit,
-      accountId: '',
-      transactionType: '',
-      sortField: 'occurredAt',
-      sortOrder: 'desc',
+      accountId: "",
+      transactionType: "",
+      sortField: "occurredAt",
+      sortOrder: "desc",
     })
   );
 
   const activities: ActivityItem[] =
     data?.transactions?.map((tx: any) => ({
       id: tx.id,
-      type: tx.transactionType,
+      type: tx.type || tx.transactionType,
       amount: tx.amount,
       fromName: tx.from?.name || tx.fromName,
       toName: tx.to?.name || tx.toName,

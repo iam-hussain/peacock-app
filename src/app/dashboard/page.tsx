@@ -58,9 +58,9 @@ export default function DashboardPage() {
   // Log errors for debugging
   if (summaryError || (summaryData && !summaryData.success)) {
     console.error(
-      'Dashboard summary error:',
+      "Dashboard summary error:",
       summaryError || summaryData?.error
-    )
+    );
   }
 
   const formatCurrency = (value: number) =>
@@ -90,34 +90,6 @@ export default function DashboardPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               Overview of your financial club management
             </p>
-            {hasError && !isLoading && (
-              <div className="mt-2 rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-3 text-xs text-yellow-800 dark:text-yellow-200">
-                <p className="font-medium">No dashboard data available</p>
-                <p className="mt-1">
-                  {summaryData?.error ||
-                    "Please run recalculation from Settings to populate dashboard data."}
-                </p>
-                <p className="mt-2 text-xs">
-                  Go to Settings → Recalculate Dashboard Data
-                </p>
-              </div>
-            )}
-            {summary?.systemMeta && !hasError && (
-              <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                <p>
-                  Dashboard as of:{" "}
-                  <span className="font-medium">
-                    {formatDate(summary.systemMeta.monthStartDate)}
-                  </span>
-                </p>
-                <p>
-                  Last recalculated:{" "}
-                  <span className="font-medium">
-                    {format(new Date(summary.systemMeta.recalculatedAt), "PPp")}
-                  </span>
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>

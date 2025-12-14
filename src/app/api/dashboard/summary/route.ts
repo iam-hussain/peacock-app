@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { parse, startOfMonth } from "date-fns";
+import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
@@ -29,7 +29,6 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const monthStart = startOfMonth(monthDate);
       summary = await prisma.summary.findFirst();
 
       if (!summary) {
@@ -41,14 +40,15 @@ export async function GET(request: NextRequest) {
     } else {
       // Return latest summary if no month provided
       summary = await prisma.summary.findFirst({
-        orderBy: { monthStartDate: 'desc' },
-      })
+        orderBy: { monthStartDate: "desc" },
+      });
 
       if (!summary) {
         return NextResponse.json(
           {
             success: false,
-            error: "No dashboard summary found. Please run recalculation first.",
+            error:
+              "No dashboard summary found. Please run recalculation first.",
           },
           { status: 404 }
         );

@@ -19,14 +19,14 @@ export async function POST(
 
     const account = await prisma.account.findUnique({
       where: { id },
-      select: { id: true, type: 'MEMBER' },
+      select: { id: true, type: true },
     });
 
     if (!account) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
-    if (!(account.type === 'MEMBER')) {
+    if (!(account.type === "MEMBER")) {
       return NextResponse.json(
         { error: "Only member accounts can have passwords reset" },
         { status: 400 }

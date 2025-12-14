@@ -12,11 +12,11 @@ import { newZoneDate } from "@/lib/core/date";
 type AccountDetails = {
   id: string;
   username: string;
-  firstName: string
-  lastName: string | null
-  avatarUrl: string | null
-  status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED' | 'CLOSED'
-  type: 'MEMBER' | 'VENDOR' | 'CLUB' | 'SYSTEM'
+  firstName: string;
+  lastName: string | null;
+  avatarUrl: string | null;
+  status: "ACTIVE" | "INACTIVE" | "BLOCKED" | "CLOSED";
+  type: "MEMBER" | "VENDOR" | "CLUB" | "SYSTEM";
 };
 
 type AuditAccountDetails = {
@@ -78,7 +78,7 @@ function getQueryParams(url: string) {
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),
     endDate: searchParams.get("endDate"),
-    sortField: searchParams.get('sortField') || 'occurredAt',
+    sortField: searchParams.get("sortField") || "occurredAt",
     sortOrder: searchParams.get("sortOrder") || "desc",
   };
 }
@@ -95,7 +95,23 @@ function createFilters({
     filters.OR = [{ fromId: accountId }, { toId: accountId }];
   }
   if (transactionType) {
-    filters.type = transactionType;
+    const mapMultiType = (value: string) => {
+      if (value === "LOAN_ALL") {
+        return ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"];
+      }
+      if (value.includes(",")) {
+        return value
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+      }
+      return value;
+    };
+    const mappedType = mapMultiType(transactionType);
+    filters.type =
+      Array.isArray(mappedType) && mappedType.length > 0
+        ? { in: mappedType }
+        : mappedType;
     if (accountId && transactionType !== "FUNDS_TRANSFER") {
       if (
         [
@@ -121,7 +137,7 @@ function createFilters({
   if (startDate && endDate)
     if (
       sortField &&
-      (sortField === 'occurredAt' || sortField === 'createdAt')
+      (sortField === "occurredAt" || sortField === "createdAt")
     ) {
       filters[sortField] = {
         gte: newZoneDate(startDate),
@@ -201,9 +217,10 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       avatar: transaction.from.avatarUrl
         ? `/image/${transaction.from.avatarUrl}`
         : undefined,
-      link: transaction.from.type === 'MEMBER'
-        ? `/dashboard/member/${transaction.from.username}`
-        : undefined,
+      link:
+        transaction.from.type === "MEMBER"
+          ? `/dashboard/member/${transaction.from.username}`
+          : undefined,
     },
     to: {
       ...transaction.to,
@@ -212,9 +229,10 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       avatar: transaction.to.avatarUrl
         ? `/image/${transaction.to.avatarUrl}`
         : undefined,
-      link: transaction.to.type === 'MEMBER'
-        ? `/dashboard/member/${transaction.to.username}`
-        : undefined,
+      link:
+        transaction.to.type === "MEMBER"
+          ? `/dashboard/member/${transaction.to.username}`
+          : undefined,
     },
   };
 
@@ -260,6 +278,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
   return {
     ...transaction,
     ...updated,
+    transactionType: transaction.type,
     createdByName,
     updatedByName,
     createdById: transaction.createdById,

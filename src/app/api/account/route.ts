@@ -39,14 +39,14 @@ export async function POST(request: Request) {
 
     // Creating new account requires admin
     if (!id) {
-      currentUser = await requireAdmin()
-      isAdminUser = true
+      currentUser = await requireAdmin();
+      isAdminUser = true;
     } else {
       // Updating existing account - only admins can edit members/vendors
       // Write users can only edit transactions, not accounts
       // All account updates require admin
-      currentUser = await requireAdmin()
-      isAdminUser = currentUser.accessLevel === 'ADMIN'
+      currentUser = await requireAdmin();
+      isAdminUser = currentUser.accessLevel === "ADMIN";
     }
 
     // Validate required fields
@@ -59,24 +59,24 @@ export async function POST(request: Request) {
 
     // Determine account type from isMember parameter (for backward compatibility)
     // In the new schema, we'll set type: MEMBER or VENDOR
-    const accountType = isMember === false ? 'VENDOR' : 'MEMBER'
+    const accountType = isMember === false ? "VENDOR" : "MEMBER";
 
     // Determine username: for vendors, auto-generate; for members, use provided username
-    let finalUsername: string
+    let finalUsername: string;
     if (!id) {
       // Creating new account
-      if (accountType === 'VENDOR') {
+      if (accountType === "VENDOR") {
         // Vendor: auto-generate username
-        finalUsername = generateVendorUsername(firstName, lastName)
+        finalUsername = generateVendorUsername(firstName, lastName);
       } else {
         // Member: username is required
         if (!username) {
           return NextResponse.json(
-            { error: 'Username is required for members' },
+            { error: "Username is required for members" },
             { status: 400 }
-          )
+          );
         }
-        finalUsername = username
+        finalUsername = username;
       }
     } else {
       // Updating existing account
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const commonData: Parameters<typeof prisma.account.update>[0]['data'] = {
+    const commonData: Parameters<typeof prisma.account.update>[0]["data"] = {
       firstName: firstName || undefined,
       lastName: lastName ?? undefined,
       username: finalUsername,
@@ -144,20 +144,24 @@ export async function POST(request: Request) {
       endedAt: endAt ? newZoneDate(endAt) : undefined,
       active: active ?? true,
       type: accountType,
-      status: active === false ? 'INACTIVE' : 'ACTIVE',
+      status: active === false ? "INACTIVE" : "ACTIVE",
       // Only admins can change access control fields
       // Map readAccess/writeAccess to accessLevel for backward compatibility
-      accessLevel: isAdminUser 
-        ? (writeAccess || readAccess === false ? 'WRITE' : readAccess ? 'READ' : 'READ')
+      accessLevel: isAdminUser
+        ? writeAccess || readAccess === false
+          ? "WRITE"
+          : readAccess
+            ? "READ"
+            : "READ"
         : undefined,
-    }
+    };
 
     if (id) {
       // Get existing account to check for old avatar and verify it's a member
       const existingAccount = await prisma.account.findUnique({
         where: { id },
         select: { avatarUrl: true, type: true },
-      })
+      });
 
       if (!existingAccount) {
         return NextResponse.json(
@@ -167,11 +171,11 @@ export async function POST(request: Request) {
       }
 
       // Ensure writeAccess users can only update members, not vendors
-      if (!isAdminUser && existingAccount.type === 'VENDOR') {
+      if (!isAdminUser && existingAccount.type === "VENDOR") {
         return NextResponse.json(
-          { error: 'Only admins can update vendors' },
+          { error: "Only admins can update vendors" },
           { status: 403 }
-        )
+        );
       }
 
       // Update existing member
@@ -189,7 +193,7 @@ export async function POST(request: Request) {
 
       // Delete old avatar if it was removed or replaced
       if (existingAccount?.avatarUrl) {
-        const oldAvatar = existingAccount.avatarUrl
+        const oldAvatar = existingAccount.avatarUrl;
         const newAvatar = avatar || "";
 
         // If avatar was removed or changed, delete the old file
@@ -227,11 +231,17 @@ export async function POST(request: Request) {
 
     // Create a new member
     // Default access: Read access by default
-    const defaultAccessLevel: 'READ' | 'WRITE' | 'ADMIN' = isAdminUser 
-      ? (writeAccess ? 'WRITE' : readAccess === false ? 'READ' : 'READ')
-      : 'READ'
-    const defaultRole: 'SUPER_ADMIN' | 'ADMIN' | 'MEMBER' = isAdminUser && writeAccess ? 'ADMIN' : 'MEMBER'
-    const defaultCanLogin = defaultAccessLevel !== 'READ' || defaultRole === 'ADMIN'
+    const defaultAccessLevel: "READ" | "WRITE" | "ADMIN" = isAdminUser
+      ? writeAccess
+        ? "WRITE"
+        : readAccess === false
+          ? "READ"
+          : "READ"
+      : "READ";
+    const defaultRole: "SUPER_ADMIN" | "ADMIN" | "MEMBER" =
+      isAdminUser && writeAccess ? "ADMIN" : "MEMBER";
+    const defaultCanLogin =
+      defaultAccessLevel !== "READ" || defaultRole === "ADMIN";
 
     const createData: any = {
       ...commonData,
@@ -248,7 +258,7 @@ export async function POST(request: Request) {
           delayOffset: 0,
         },
       },
-    }
+    };
 
     // Hash password if provided
     if (password) {

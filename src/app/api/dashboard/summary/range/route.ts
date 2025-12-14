@@ -1,11 +1,11 @@
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-export const fetchCache = 'force-no-store'
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
-import { parse, startOfMonth, endOfMonth } from 'date-fns'
-import { NextRequest, NextResponse } from 'next/server'
+import { endOfMonth, parse, startOfMonth } from "date-fns";
+import { NextRequest, NextResponse } from "next/server";
 
-import prisma from '@/db'
+import prisma from "@/db";
 
 /**
  * GET /api/dashboard/summary/range?from=YYYY-MM&to=YYYY-MM
@@ -14,30 +14,33 @@ import prisma from '@/db'
  */
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const fromParam = searchParams.get('from')
-    const toParam = searchParams.get('to')
+    const searchParams = request.nextUrl.searchParams;
+    const fromParam = searchParams.get("from");
+    const toParam = searchParams.get("to");
 
     if (!fromParam || !toParam) {
       return NextResponse.json(
-        { success: false, error: 'Missing from or to parameters. Use YYYY-MM format' },
+        {
+          success: false,
+          error: "Missing from or to parameters. Use YYYY-MM format",
+        },
         { status: 400 }
-      )
+      );
     }
 
     // Parse date strings (YYYY-MM)
-    const fromDate = parse(fromParam, 'yyyy-MM', new Date())
-    const toDate = parse(toParam, 'yyyy-MM', new Date())
+    const fromDate = parse(fromParam, "yyyy-MM", new Date());
+    const toDate = parse(toParam, "yyyy-MM", new Date());
 
     if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
       return NextResponse.json(
-        { success: false, error: 'Invalid date format. Use YYYY-MM' },
+        { success: false, error: "Invalid date format. Use YYYY-MM" },
         { status: 400 }
-      )
+      );
     }
 
-    const fromMonthStart = startOfMonth(fromDate)
-    const toMonthEnd = endOfMonth(toDate)
+    const fromMonthStart = startOfMonth(fromDate);
+    const toMonthEnd = endOfMonth(toDate);
 
     // Fetch all summaries in range
     const summaries = await prisma.summary.findMany({
@@ -47,17 +50,18 @@ export async function GET(request: NextRequest) {
           lte: toMonthEnd,
         },
       },
-      orderBy: { monthStartDate: 'asc' },
-    })
+      orderBy: { monthStartDate: "asc" },
+    });
 
     if (summaries.length === 0) {
       return NextResponse.json(
         {
           success: false,
-          error: 'No dashboard summaries found for this range. Please run recalculation first.',
+          error:
+            "No dashboard summaries found for this range. Please run recalculation first.",
         },
         { status: 404 }
-      )
+      );
     }
 
     // Structure response - return array of monthly snapshots
@@ -70,25 +74,25 @@ export async function GET(request: NextRequest) {
         // Period
         monthStartDate: summary.monthStartDate,
         monthEndDate: summary.monthEndDate,
-        
+
         // Members
         members: {
           activeMembers: summary.activeMembers,
           clubAgeMonths: summary.clubAgeMonths,
         },
-        
+
         // Member Funds
         memberFunds: {
           totalDeposits: summary.totalDeposits,
           memberBalance: summary.memberBalance,
         },
-        
+
         // Member Outflow
         memberOutflow: {
           profitWithdrawals: summary.profitWithdrawals,
           memberAdjustments: summary.memberAdjustments,
         },
-        
+
         // Loans - Lifetime
         loans: {
           lifetime: {
@@ -101,30 +105,30 @@ export async function GET(request: NextRequest) {
             interestBalance: summary.interestBalance,
           },
         },
-        
+
         // Vendor
         vendor: {
           vendorInvestment: summary.vendorInvestment,
           vendorProfit: summary.vendorProfit,
         },
-        
+
         // Cash Flow
         cashFlow: {
           totalInvested: summary.totalInvested,
           pendingAmounts: summary.pendingAmounts,
         },
-        
+
         // Valuation
         valuation: {
           availableCash: summary.availableCash,
           currentValue: summary.currentValue,
         },
-        
+
         // Portfolio
         portfolio: {
           totalPortfolioValue: summary.totalPortfolioValue,
         },
-        
+
         // System Metadata
         systemMeta: {
           recalculatedAt: summary.recalculatedAt,
@@ -132,15 +136,14 @@ export async function GET(request: NextRequest) {
           isLocked: summary.isLocked,
         },
       })),
-    }
+    };
 
-    return NextResponse.json(response)
+    return NextResponse.json(response);
   } catch (error) {
-    console.error('Error fetching dashboard summary range:', error)
+    console.error("Error fetching dashboard summary range:", error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch dashboard summary range' },
+      { success: false, error: "Failed to fetch dashboard summary range" },
       { status: 500 }
-    )
+    );
   }
 }
-

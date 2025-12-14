@@ -1,16 +1,17 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import * as React from "react"
+import { nanoid } from "nanoid"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
 
-import { AvatarUpload } from "../../atoms/avatar-upload";
-import { DatePickerForm } from "../../atoms/date-picker-form";
-import { PhoneInput } from "../../atoms/phone-input";
-import { Button } from "../../ui/button";
-import { Switch } from "../../ui/switch";
+import { AvatarUpload } from "../../atoms/avatar-upload"
+import { DatePickerForm } from "../../atoms/date-picker-form"
+import { PhoneInput } from "../../atoms/phone-input"
+import { Button } from "../../ui/button"
+import { Switch } from "../../ui/switch"
 
 import {
   Form,
@@ -19,11 +20,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { newZoneDate } from "@/lib/core/date";
-import fetcher from "@/lib/core/fetcher";
-import { accountFormSchema, AccountFromSchema } from "@/lib/validators/form-schema";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { newZoneDate } from "@/lib/core/date"
+import fetcher from "@/lib/core/fetcher"
+import { VendorFormSchema, vendorFormSchema } from "@/lib/validators/form-schema"
 
 type VendorFormProps = {
   selected?: any; // existing vendor object, if updating
@@ -32,15 +33,16 @@ type VendorFormProps = {
 };
 
 export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
-  const queryClient = useQueryClient();
-  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false);
+  const queryClient = useQueryClient()
+  const [isUploadingAvatar, setIsUploadingAvatar] = React.useState(false)
 
-  const form = useForm({
-    resolver: zodResolver(accountFormSchema),
+  const form = useForm<VendorFormSchema>({
+    resolver: zodResolver(vendorFormSchema),
     defaultValues: selected
       ? {
           firstName: selected.firstName,
           lastName: selected.lastName || "",
+          username: selected.username || "",
           phone: selected.phone || "",
           email: selected.email || "",
           avatar: selected.avatar || "",
@@ -51,6 +53,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
       : {
           firstName: "",
           lastName: "",
+          username: "",
           phone: "",
           email: "",
           avatar: "",
@@ -63,10 +66,13 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
   const mutation = useMutation({
     mutationFn: (body: any) =>
       fetcher.post("/api/account", {
-        body: { id: selected?.id, ...body, type: 'VENDOR' },
+        body: { id: selected?.id, isMember: false, type: "VENDOR", ...body },
       }),
     onSuccess: async (data: any) => {
-      await queryClient.invalidateQueries({ queryKey: ["vendor"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["all", "vendor", "account"] }),
+        queryClient.invalidateQueries({ queryKey: ["select", "account", "member", "vendor"] }),
+      ]);
 
       toast.success(
         selected
@@ -74,9 +80,7 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
           : "Vendor created successfully 🚀"
       );
       form.reset(data?.account || {}); // Reset form after submission
-      if (onSuccess) {
-        onSuccess();
-      }
+      onSuccess?.()
     },
     onError: (error) => {
       toast.error(
@@ -126,8 +130,29 @@ export function VendorForm({ selected, onSuccess, onCancel }: VendorFormProps) {
     }
   };
 
-  async function onSubmit(variables: AccountFromSchema) {
-    return await mutation.mutateAsync(variables as any);
+  async function onSubmit(variables: VendorFormSchema) {
+    const rawUsername = (variables.username || "").trim()
+    const sanitized =
+      rawUsername.length === 0
+        ? ""
+        : rawUsername
+            .toLowerCase()
+            .replace(/[^a-z0-9_-]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "")
+    const fallbackBase = [variables.firstName, variables.lastName]
+      .filter(Boolean)
+      .join("-")
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "vendor"
+    const username = sanitized || `${fallbackBase}-${nanoid(6)}`
+
+    return await mutation.mutateAsync({
+      ...variables,
+      username,
+    } as any)
   }
 
   return (

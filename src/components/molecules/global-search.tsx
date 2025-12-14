@@ -49,8 +49,8 @@ interface SearchResult {
     fromName: string;
     toName: string;
     amount: number;
-    transactionType: string;
-    occurredAt: number
+    type: string;
+    occurredAt: number;
   }>;
 }
 
@@ -292,7 +292,7 @@ export function GlobalSearch({
                             {tx.fromName} → {tx.toName}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {moneyFormat(tx.amount)} • {tx.transactionType}
+                            {moneyFormat(tx.amount)} • {tx.type}
                           </p>
                         </div>
                       </CustomLink>

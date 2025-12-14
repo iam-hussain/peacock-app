@@ -1,67 +1,91 @@
-"use client";
+"use client"
 
-import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
-import Link from "next/link";
+import { ArrowDown, ArrowRight, ArrowUp, MoreHorizontal } from "lucide-react"
+import Link from "next/link"
+import { useMemo } from "react"
 
-import { ClickableAvatar } from "../atoms/clickable-avatar";
-import { Card, CardContent } from "../ui/card";
-import { Separator } from "../ui/separator";
+import { ClickableAvatar } from "../atoms/clickable-avatar"
+import { Card, CardContent } from "../ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu"
+import { Badge } from "../ui/badge"
 
-import { TransformedTransaction } from "@/app/api/transaction/route";
-import { transactionTypeMap } from "@/lib/config/config";
-import { dateFormat, newZoneDate } from "@/lib/core/date";
-import { moneyFormat } from "@/lib/ui/utils";
+import { TransformedTransaction } from "@/app/api/transaction/route"
+import { transactionTypeHumanMap } from "@/lib/config/config"
+import { dateFormat, newZoneDate } from "@/lib/core/date"
+import { moneyFormat } from "@/lib/ui/utils"
 
 interface TransactionCardMobileProps {
-  transaction: TransformedTransaction;
-  onClick?: () => void;
+  transaction: TransformedTransaction
+  onEdit?: (transaction: TransformedTransaction) => void
+  onDelete?: (transaction: TransformedTransaction) => void
 }
+
+const INFLOW_TYPES = [
+  "PERIODIC_DEPOSIT",
+  "OFFSET_DEPOSIT",
+  "REJOIN",
+  "VENDOR_RETURNS",
+  "LOAN_REPAY",
+  "LOAN_INTEREST",
+]
+
+const OUTFLOW_TYPES = ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"]
 
 export function TransactionCardMobile({
   transaction,
-  onClick,
+  onEdit,
+  onDelete,
 }: TransactionCardMobileProps) {
-  const isInflow = [
-    "PERIODIC_DEPOSIT",
-    "OFFSET_DEPOSIT",
-    "REJOIN",
-    "VENDOR_RETURNS",
-    "LOAN_REPAY",
-    "LOAN_INTEREST",
-  ].includes(transaction.transactionType);
+  const transactionType =
+    transaction.transactionType || (transaction as any).type
+  const primaryParty =
+    transactionType === "LOAN_TAKEN" ? transaction.to : transaction.from
 
-  const isOutflow = ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"].includes(
-    transaction.transactionType
-  );
+  const { isInflow, isOutflow, amountColor, amountPrefix, amountIcon } =
+    useMemo(() => {
+      const inflow = INFLOW_TYPES.includes(transactionType)
+      const outflow = OUTFLOW_TYPES.includes(transactionType)
+      return {
+        isInflow: inflow,
+        isOutflow: outflow,
+        amountColor: inflow
+          ? "text-success-foreground"
+          : outflow
+            ? "text-destructive"
+            : "text-muted-foreground",
+        amountPrefix: inflow ? "+" : outflow ? "−" : "",
+        amountIcon: inflow ? ArrowDown : outflow ? ArrowUp : ArrowRight,
+      }
+    }, [transactionType])
 
-  const amountColor = isInflow
-    ? "text-green-600 dark:text-green-500"
-    : isOutflow
-      ? "text-destructive"
-      : "text-muted-foreground";
+  const handleEdit = () => {
+    onEdit?.(transaction)
+  }
 
-  const Icon = isInflow ? ArrowDown : isOutflow ? ArrowUp : ArrowRight;
+  const AmountIcon = amountIcon
 
   return (
-    <Card
-      className="border-border/50 bg-card shadow-sm transition-all hover:shadow-md cursor-pointer"
-      onClick={onClick}
-    >
-      <CardContent className="p-4">
-        {/* Top Row: From + Amount */}
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            {transaction.from.link ? (
+    <Card className="rounded-2xl border border-border/50 bg-card shadow-sm transition-all hover:shadow-md">
+      <CardContent className="p-4 sm:p-5 space-y-3">
+        {/* Row 1: Avatar/name/club on left, direction+amount+menu on right */}
+        <div className="flex items-start gap-4">
+          <div className="flex flex-1 items-start gap-3 min-w-0">
+            {primaryParty.link ? (
               <ClickableAvatar
-                src={transaction.from.avatar}
-                alt={transaction.from.name}
-                name={transaction.from.name}
-                href={transaction.from.link}
+                src={primaryParty.avatar}
+                alt={primaryParty.name}
+                name={primaryParty.name}
+                href={primaryParty.link}
                 size="md"
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground shrink-0">
-                {transaction.from.name
+              <div className="h-12 w-12 shrink-0 rounded-full bg-muted flex items-center justify-center text-sm font-semibold text-muted-foreground">
+                {primaryParty.name
                   .split(" ")
                   .map((n) => n[0])
                   .join("")
@@ -69,92 +93,77 @@ export function TransactionCardMobile({
                   .slice(0, 2)}
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              {transaction.from.link ? (
+            <div className="min-w-0 space-y-1">
+              {primaryParty.link ? (
                 <Link
-                  href={transaction.from.link}
-                  className="text-sm font-semibold text-foreground hover:underline block truncate"
-                  onClick={(e) => e.stopPropagation()}
+                  href={primaryParty.link}
+                  className="block text-sm font-semibold text-foreground truncate"
+                  onClick={(event) => event.stopPropagation()}
                 >
-                  {transaction.from.name}
+                  {primaryParty.name}
                 </Link>
               ) : (
                 <p className="text-sm font-semibold text-foreground truncate">
-                  {transaction.from.name}
+                  {primaryParty.name}
                 </p>
               )}
-              {transaction.from.sub && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {transaction.from.sub}
-                </p>
-              )}
+              <p className="text-xs text-muted-foreground truncate">
+                {primaryParty.sub || "Peacock Club"}
+              </p>
             </div>
           </div>
-          <div className={`flex items-center gap-1.5 ${amountColor} shrink-0`}>
-            <Icon className="h-4 w-4" />
-            <span className="text-base font-bold">
-              {moneyFormat(transaction.amount)}
+
+          <div className="flex items-start gap-3 shrink-0">
+            <div className={`flex items-center gap-1 ${amountColor}`}>
+              {AmountIcon && <AmountIcon className="h-4 w-4" />}
+              <span className="text-lg font-semibold tabular-nums">
+                {amountPrefix}
+                {moneyFormat(transaction.amount)}
+              </span>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="h-9 w-9 inline-flex items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground hover:bg-muted/60"
+                  aria-label="Transaction actions"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => onDelete?.(transaction)}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Row 2: Badge + note (left), Date (right) */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
+            <Badge
+              variant="secondary"
+              className="text-[11px] font-medium rounded-full px-3 py-1 leading-tight"
+            >
+              {transactionTypeHumanMap[transactionType] ||
+                transactionTypeHumanMap.PERIODIC_DEPOSIT}
+            </Badge>
+            <span className="text-xs text-muted-foreground truncate">
+              {(transaction as any).note ||
+                (transaction as any).description}
             </span>
           </div>
-        </div>
-
-        {/* Middle Row: Arrow + To */}
-        <div className="flex items-center gap-2 mb-3 pl-[52px]">
-          <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            {transaction.to.link ? (
-              <ClickableAvatar
-                src={transaction.to.avatar}
-                alt={transaction.to.name}
-                name={transaction.to.name}
-                href={transaction.to.link}
-                size="sm"
-              />
-            ) : (
-              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground shrink-0">
-                {transaction.to.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2)}
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              {transaction.to.link ? (
-                <Link
-                  href={transaction.to.link}
-                  className="text-sm font-medium text-foreground hover:underline block truncate"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {transaction.to.name}
-                </Link>
-              ) : (
-                <p className="text-sm font-medium text-foreground truncate">
-                  {transaction.to.name}
-                </p>
-              )}
-              {transaction.to.sub && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {transaction.to.sub}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <Separator className="mb-3" />
-
-        {/* Bottom Row: Type + Date */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-medium text-muted-foreground">
-            {transactionTypeMap[transaction.transactionType]}
-          </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground shrink-0">
             {dateFormat(newZoneDate(transaction.occurredAt))}
           </p>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

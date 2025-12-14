@@ -65,7 +65,7 @@ export default function LoansPage() {
   };
 
   const handleAddRepayment = (loan: TransformedLoan) => {
-    window.location.href = `/dashboard/transaction?member=${loan.username}&type=LOAN_REPAY`;
+    window.location.href = `/dashboard/transaction?member=${loan.username}&type=LOAN_ALL`;
   };
 
   const handleChangePassword = () => {

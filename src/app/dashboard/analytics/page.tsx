@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
     )
   );
 
-  const summaries = data?.summaries || []
+  const summaries = data?.summaries || [];
 
   // Extract nested data for chart
   const flatSummaries = summaries.map((s: any) => ({
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
     availableCash: s.valuation?.availableCash || 0,
     currentValue: s.valuation?.currentValue || 0,
     totalPortfolioValue: s.portfolio?.totalPortfolioValue || 0,
-  }))
+  }));
 
   // Toggle metric visibility
   const toggleMetric = (key: string) => {
@@ -148,11 +148,11 @@ export default function AnalyticsPage() {
 
   // Prepare chart data
   const chartData = useMemo(() => {
-    if (!flatSummaries.length) return null
+    if (!flatSummaries.length) return null;
 
     const labels = flatSummaries.map((s: any) =>
-      format(new Date(s.monthStartDate), 'MMM yyyy')
-    )
+      format(new Date(s.monthStartDate), "MMM yyyy")
+    );
 
     const datasets = METRICS.filter((m) => visibleMetrics.has(m.key)).map(
       (metric) => ({
@@ -166,10 +166,10 @@ export default function AnalyticsPage() {
         pointRadius: 3,
         pointHoverRadius: 5,
       })
-    )
+    );
 
-    return { labels, datasets }
-  }, [flatSummaries, visibleMetrics])
+    return { labels, datasets };
+  }, [flatSummaries, visibleMetrics]);
 
   const chartOptions = {
     responsive: true,
@@ -347,12 +347,9 @@ export default function AnalyticsPage() {
                     .slice(-12)
                     .reverse()
                     .map((summary: any, idx: number) => (
-                      <tr
-                        key={idx}
-                        className="border-b hover:bg-muted/50"
-                      >
+                      <tr key={idx} className="border-b hover:bg-muted/50">
                         <td className="p-2 sticky left-0 bg-card">
-                          {format(new Date(summary.monthStartDate), 'MMM yyyy')}
+                          {format(new Date(summary.monthStartDate), "MMM yyyy")}
                         </td>
                         <td className="text-right p-2">
                           {formatIndianNumber(summary.totalDeposits || 0)}

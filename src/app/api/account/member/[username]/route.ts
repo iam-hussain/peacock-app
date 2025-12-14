@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { memberMonthsPassedString } from "@/lib/core/date";
 import { getMemberClubStats } from "@/lib/calculators/member-club-stats";
+import { memberMonthsPassedString } from "@/lib/core/date";
 import {
   membersTableTransform,
   TransformedLoan,
@@ -22,7 +22,7 @@ export async function POST(
 
   try {
     const account = await prisma.account.findUniqueOrThrow({
-      where: { username, type: 'MEMBER' },
+      where: { username, type: "MEMBER" },
       include: { passbook: true },
     });
 

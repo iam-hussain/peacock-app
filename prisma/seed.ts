@@ -1,12 +1,12 @@
-import { PrismaClient } from '@prisma/client'
-import { readFileSync } from 'fs'
-import path from 'path'
+import { PrismaClient } from "@prisma/client";
+import { readFileSync } from "fs";
+import path from "path";
 
-import { generateVendorUsername } from '../src/lib/helper'
+import { generateVendorUsername } from "../src/lib/helper";
 
 const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
-})
+  log: ["query", "info", "warn", "error"],
+});
 
 /**
  * Maps legacy account data to new schema
@@ -15,36 +15,40 @@ const prisma = new PrismaClient({
  */
 function mapAccountToNewSchema(account: any) {
   // Determine AccountType based on isMember
-  const type = account.isMember === false ? 'VENDOR' : 'MEMBER'
+  const type = account.isMember === false ? "VENDOR" : "MEMBER";
 
   // Determine AccessLevel based on role and access flags
-  let accessLevel: 'READ' | 'WRITE' | 'ADMIN'
-  if (account.role === 'SUPER_ADMIN' || account.role === 'ADMIN') {
-    accessLevel = 'ADMIN'
+  let accessLevel: "READ" | "WRITE" | "ADMIN";
+  if (account.role === "SUPER_ADMIN" || account.role === "ADMIN") {
+    accessLevel = "ADMIN";
   } else if (account.writeAccess || account.canWrite) {
-    accessLevel = 'WRITE'
+    accessLevel = "WRITE";
   } else {
-    accessLevel = 'READ'
+    accessLevel = "READ";
   }
 
   // Determine AccountRole
-  let role: 'SUPER_ADMIN' | 'ADMIN' | 'MEMBER'
-  if (account.role === 'SUPER_ADMIN') {
-    role = 'SUPER_ADMIN'
-  } else if (account.role === 'ADMIN') {
-    role = 'ADMIN'
+  let role: "SUPER_ADMIN" | "ADMIN" | "MEMBER";
+  if (account.role === "SUPER_ADMIN") {
+    role = "SUPER_ADMIN";
+  } else if (account.role === "ADMIN") {
+    role = "ADMIN";
   } else {
-    role = 'MEMBER'
+    role = "MEMBER";
   }
 
   // Determine AccountStatus
-  const status = account.active === false ? 'INACTIVE' : 'ACTIVE'
+  const status = account.active === false ? "INACTIVE" : "ACTIVE";
 
   // Determine canLogin
   const canLogin = Boolean(
     account.canLogin ??
-    (account.passwordHash && (account.readAccess || account.writeAccess || account.role === 'ADMIN' || account.role === 'SUPER_ADMIN'))
-  )
+      (account.passwordHash &&
+        (account.readAccess ||
+          account.writeAccess ||
+          account.role === "ADMIN" ||
+          account.role === "SUPER_ADMIN"))
+  );
 
   return {
     type,
@@ -52,7 +56,7 @@ function mapAccountToNewSchema(account: any) {
     role,
     status,
     canLogin,
-  }
+  };
 }
 
 /**
@@ -63,166 +67,213 @@ function generateUniqueUsername(
   usedUsernames: Set<string>
 ): string {
   // Determine username: use existing username, or slug (for backward compatibility), or generate for vendors
-  let username: string
+  let username: string;
 
   if (account.username) {
-    username = account.username
+    username = account.username;
   } else if (account.slug) {
     // For backward compatibility, use slug as username
-    username = account.slug
+    username = account.slug;
   } else if (account.isMember === false) {
     // Vendor: generate username
-    username = generateVendorUsername(account.firstName, account.lastName)
+    username = generateVendorUsername(account.firstName, account.lastName);
   } else {
     // Member without username or slug: use a generated one based on name
     const name = [account.firstName, account.lastName]
       .filter(Boolean)
-      .join('-')
+      .join("-")
       .toLowerCase()
-      .replace(/[^a-z0-9-]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-    username = name || `member-${account.id}`
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+    username = name || `member-${account.id}`;
   }
 
   // Ensure username is unique
-  let finalUsername = username
-  let counter = 1
+  let finalUsername = username;
+  let counter = 1;
   while (usedUsernames.has(finalUsername)) {
-    finalUsername = `${username}_${counter}`
-    counter++
+    finalUsername = `${username}_${counter}`;
+    counter++;
   }
-  usedUsernames.add(finalUsername)
+  usedUsernames.add(finalUsername);
 
-  return finalUsername
+  return finalUsername;
 }
 
+const toDate = (value: any) => (value ? new Date(value) : null);
+
+const buildDefaultClubPassbook = () => ({
+  kind: "CLUB",
+  payload: {
+    totalMemberPeriodicDeposits: 0,
+    totalMemberOffsetDeposits: 0,
+    totalMemberWithdrawals: 0,
+    totalMemberProfitWithdrawals: 0,
+    currentClubBalance: 0,
+    netClubBalance: 0,
+    totalInvestment: 0,
+    totalReturns: 0,
+    totalProfit: 0,
+    totalLoanTaken: 0,
+    totalLoanRepay: 0,
+    totalLoanBalance: 0,
+    totalInterestPaid: 0,
+    totalVendorProfit: 0,
+  },
+  loanHistory: [],
+  currentBalance: 0,
+  totalDeposits: 0,
+  totalWithdrawals: 0,
+  joiningOffset: 0,
+  delayOffset: 0,
+  meta: null,
+  version: 0,
+  lastCalculatedAt: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+});
+
 async function seed() {
-  console.log('🌱 Starting database seed...\n')
+  console.log("🌱 Starting database seed...\n");
 
   const backupFilePath = path.join(
     process.cwd(),
-    'public',
-    'peacock_backup.json'
-  )
+    "public",
+    "peacock_backup.json"
+  );
 
-  console.log(`📂 Reading backup from: ${backupFilePath}`)
-  const backupData = JSON.parse(readFileSync(backupFilePath, 'utf8'))
+  console.log(`📂 Reading backup from: ${backupFilePath}`);
+  const backupData = JSON.parse(readFileSync(backupFilePath, "utf8"));
 
-  console.log(`📊 Backup contains:`)
-  console.log(`   - ${backupData.account?.length || 0} accounts`)
-  console.log(`   - ${backupData.transaction?.length || 0} transactions`)
-  console.log(`   - ${backupData.passbook?.length || 0} passbooks\n`)
+  console.log(`📊 Backup contains:`);
+  console.log(`   - ${backupData.account?.length || 0} accounts`);
+  console.log(`   - ${backupData.transaction?.length || 0} transactions`);
+  console.log(`   - ${backupData.passbook?.length || 0} passbooks\n`);
 
   // Clear existing data (order matters due to foreign key constraints)
-  console.log('🗑️  Clearing existing data...')
-  // 1. Clear passbook references from accounts first
-  await prisma.account.updateMany({
-    data: { passbookId: null },
-  })
-  // 2. Delete transactions (no dependencies)
-  await prisma.transaction.deleteMany()
-  // 3. Delete accounts (after clearing passbook references)
-  await prisma.account.deleteMany()
-  // 4. Delete passbooks (after accounts are deleted)
-  await prisma.passbook.deleteMany()
-  // 5. Delete summaries
-  await prisma.summary.deleteMany()
-  console.log('✅ Cleared all existing data\n')
+  console.log("🗑️  Clearing existing data...");
+  // 1. Delete transactions first (no dependencies)
+  await prisma.transaction.deleteMany();
+  // 2. Delete accounts (this will automatically clear passbookId references)
+  await prisma.account.deleteMany();
+  // 3. Delete passbooks (after accounts are deleted)
+  await prisma.passbook.deleteMany();
+  // 4. Delete summaries
+  await prisma.summary.deleteMany();
+  console.log("✅ Cleared all existing data\n");
 
   // Transform and insert passbooks first
-  console.log('📚 Transforming and seeding passbooks...')
+  console.log("📚 Transforming and seeding passbooks...");
   const passbooksWithNewSchema = backupData.passbook.map((passbook: any) => {
-    const { type, ...passbookBase } = passbook
+    const { type, createdAt, updatedAt, lastCalculatedAt, ...passbookBase } =
+      passbook;
     return {
       ...passbookBase,
       kind: type, // Rename type → kind
+      createdAt: toDate(createdAt) ?? new Date(),
+      updatedAt: toDate(updatedAt) ?? new Date(),
+      lastCalculatedAt: toDate(lastCalculatedAt),
       // Add new fields with defaults
       currentBalance: 0,
       totalDeposits: 0,
       totalWithdrawals: 0,
       meta: null,
       version: 0,
-      lastCalculatedAt: null,
-    }
-  })
-  await prisma.passbook.createMany({ data: passbooksWithNewSchema })
-  console.log(`✅ Created ${passbooksWithNewSchema.length} passbooks\n`)
+    };
+  });
+  const hasClubPassbook = passbooksWithNewSchema.some(
+    (p: any) => p.kind === "CLUB"
+  );
+  if (!hasClubPassbook) {
+    passbooksWithNewSchema.push(buildDefaultClubPassbook());
+  }
+  await prisma.passbook.createMany({ data: passbooksWithNewSchema });
+  console.log(`✅ Created ${passbooksWithNewSchema.length} passbooks\n`);
 
   // Track usernames to ensure uniqueness
-  const usedUsernames = new Set<string>()
+  const usedUsernames = new Set<string>();
 
   // Map accounts to new schema
-  console.log('👥 Transforming accounts to new schema...')
+  console.log("👥 Transforming accounts to new schema...");
   const accountsWithNewSchema = backupData.account.map((account: any) => {
-    const username = generateUniqueUsername(account, usedUsernames)
-    const newSchemaFields = mapAccountToNewSchema(account)
+    const username = generateUniqueUsername(account, usedUsernames);
+    const newSchemaFields = mapAccountToNewSchema(account);
 
     // Destructure to exclude legacy/unwanted fields
     const {
-      slug,
-      isMember,
-      readAccess,
-      writeAccess,
-      canRead,
-      canWrite,
+      slug: _slug,
+      isMember: _isMember,
+      readAccess: _readAccess,
+      writeAccess: _writeAccess,
+      canRead: _canRead,
+      canWrite: _canWrite,
       avatar,
       startAt,
       endAt,
       accessUpdatedBy, // Old field name
+      createdAt,
+      updatedAt,
+      lastLoginAt,
       ...accountBase
-    } = account
+    } = account;
 
     return {
       ...accountBase,
       username,
       passwordHash: account.passwordHash || null,
-      lastLoginAt: account.lastLoginAt || null,
+      lastLoginAt: toDate(lastLoginAt),
 
       // New schema fields
       ...newSchemaFields,
 
       // Renamed fields
       avatarUrl: avatar || null,
-      startedAt: startAt || new Date(),
-      endedAt: endAt || null,
+      startedAt: toDate(startAt) ?? new Date(),
+      endedAt: toDate(endAt),
       accessUpdatedById: accessUpdatedBy || null, // Rename field
-    }
-  })
+      createdAt: toDate(createdAt) ?? new Date(),
+      updatedAt: toDate(updatedAt) ?? new Date(),
+    };
+  });
 
-  console.log(`📝 Account type distribution:`)
+  console.log(`📝 Account type distribution:`);
   const typeCount = accountsWithNewSchema.reduce((acc: any, a: any) => {
-    acc[a.type] = (acc[a.type] || 0) + 1
-    return acc
-  }, {})
+    acc[a.type] = (acc[a.type] || 0) + 1;
+    return acc;
+  }, {});
   Object.entries(typeCount).forEach(([type, count]) => {
-    console.log(`   - ${type}: ${count}`)
-  })
+    console.log(`   - ${type}: ${count}`);
+  });
 
-  console.log(`🔐 Access level distribution:`)
+  console.log(`🔐 Access level distribution:`);
   const accessCount = accountsWithNewSchema.reduce((acc: any, a: any) => {
-    acc[a.accessLevel] = (acc[a.accessLevel] || 0) + 1
-    return acc
-  }, {})
+    acc[a.accessLevel] = (acc[a.accessLevel] || 0) + 1;
+    return acc;
+  }, {});
   Object.entries(accessCount).forEach(([level, count]) => {
-    console.log(`   - ${level}: ${count}`)
-  })
+    console.log(`   - ${level}: ${count}`);
+  });
 
   await prisma.account.createMany({
     data: accountsWithNewSchema,
-  })
-  console.log(`✅ Created ${accountsWithNewSchema.length} accounts\n`)
+  });
+  console.log(`✅ Created ${accountsWithNewSchema.length} accounts\n`);
 
   // Map transactions to include new fields with defaults
-  console.log('💸 Seeding transactions...')
+  console.log("💸 Seeding transactions...");
   const transactionsWithDefaults = backupData.transaction.map(
     (transaction: any) => {
       const {
         transactionAt,
         note,
         transactionType, // Old field name
+        createdAt,
+        updatedAt,
+        occurredAt,
+        method,
         ...transactionBase
-      } = transaction
+      } = transaction;
 
       return {
         ...transactionBase,
@@ -230,50 +281,53 @@ async function seed() {
         updatedById: transaction.updatedById || null,
 
         // New/renamed fields
-        type: transactionType || 'PERIODIC_DEPOSIT', // Rename transactionType → type
-        occurredAt: transactionAt || new Date(),
+        type: transactionType || "PERIODIC_DEPOSIT", // Rename transactionType → type
+        occurredAt: toDate(transactionAt || occurredAt) ?? new Date(),
         description: note || null,
-        currency: 'INR',
+        currency: "INR",
         tags: [],
         referenceId: null,
         postedAt: null,
-      }
+        method: method || "ACCOUNT",
+        createdAt: toDate(createdAt) ?? new Date(),
+        updatedAt: toDate(updatedAt) ?? new Date(),
+      };
     }
-  )
+  );
 
   await prisma.transaction.createMany({
     data: transactionsWithDefaults,
-  })
-  console.log(`✅ Created ${transactionsWithDefaults.length} transactions\n`)
+  });
+  console.log(`✅ Created ${transactionsWithDefaults.length} transactions\n`);
 
   // Summary statistics
-  console.log('📊 Seed Summary:')
+  console.log("📊 Seed Summary:");
   const finalCounts = await Promise.all([
     prisma.account.count(),
     prisma.transaction.count(),
     prisma.passbook.count(),
-  ])
-  console.log(`   - Accounts: ${finalCounts[0]}`)
-  console.log(`   - Transactions: ${finalCounts[1]}`)
-  console.log(`   - Passbooks: ${finalCounts[2]}`)
+  ]);
+  console.log(`   - Accounts: ${finalCounts[0]}`);
+  console.log(`   - Transactions: ${finalCounts[1]}`);
+  console.log(`   - Passbooks: ${finalCounts[2]}`);
 
   const superAdmins = await prisma.account.count({
-    where: { role: 'SUPER_ADMIN' }
-  })
-  console.log(`   - Super Admins: ${superAdmins}`)
+    where: { role: "SUPER_ADMIN" },
+  });
+  console.log(`   - Super Admins: ${superAdmins}`);
 
-  console.log('\n✨ Database seeded successfully!')
+  console.log("\n✨ Database seeded successfully!");
 }
 
 seed()
   .then(() => {
-    console.log('\n🎉 Seed completed!')
-    process.exit(0)
+    console.log("\n🎉 Seed completed!");
+    process.exit(0);
   })
   .catch((error) => {
-    console.error('\n❌ Seed failed:', error)
-    process.exit(1)
+    console.error("\n❌ Seed failed:", error);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });

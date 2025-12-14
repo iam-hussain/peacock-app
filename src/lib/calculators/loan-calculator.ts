@@ -12,7 +12,7 @@ export function fetchLoanTransactionsForMember(memberId: string) {
   return prisma.transaction.findMany({
     where: {
       OR: [{ fromId: memberId }, { toId: memberId }],
-      type: { in: ['LOAN_TAKEN', 'LOAN_REPAY'] },
+      type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
     },
     orderBy: { occurredAt: "asc" },
   });
@@ -46,25 +46,25 @@ export function calculateLoanDetails(transactions: Transaction[]) {
   let prevLoan: any = null;
 
   transactions.forEach((transaction) => {
-    const { occurredAt, type: transactionType, amount } = transaction
+    const { occurredAt, type: transactionType, amount } = transaction;
 
-    if (transactionType === 'LOAN_TAKEN') {
+    if (transactionType === "LOAN_TAKEN") {
       if (prevLoan) {
         loanHistory.push(
           getOneLoanDetails(prevLoan.amount, prevLoan.startDate, occurredAt)
-        )
+        );
       }
-      accountBalance = accountBalance + amount
+      accountBalance = accountBalance + amount;
       prevLoan = {
         active: true,
         amount: accountBalance,
-        startDate: newZoneDate(transactionAt),
+        startDate: newZoneDate(occurredAt),
         transactionType,
       };
     } else if (transactionType === "LOAN_REPAY") {
       if (prevLoan) {
         loanHistory.push(
-          getOneLoanDetails(accountBalance, prevLoan.startDate, transactionAt)
+          getOneLoanDetails(accountBalance, prevLoan.startDate, occurredAt)
         );
         prevLoan = null;
       }
@@ -74,7 +74,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
         prevLoan = {
           active: true,
           amount: accountBalance,
-          startDate: newZoneDate(transactionAt),
+          startDate: newZoneDate(occurredAt),
           transactionType,
         };
       }
