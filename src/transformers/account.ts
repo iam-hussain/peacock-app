@@ -2,17 +2,30 @@ import { Account, Passbook } from "@prisma/client";
 
 import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
 import { calculateMonthsDifference, newZoneDate } from "@/lib/core/date";
-import { MemberPassbookData } from "@/lib/validators/type";
+import { MemberFinancialSnapshot } from "@/lib/validators/type";
 
 type ToTransform = Account & { passbook: Passbook | null };
 
 export async function transformLoanForTable(vendorInput: ToTransform) {
   const { passbook, ...member } = vendorInput;
+  // Support both old and new field names for backward compatibility
+  const payload =
+    (passbook?.payload as unknown as MemberFinancialSnapshot & {
+      totalInterestPaid?: number;
+      totalLoanTaken?: number;
+      totalLoanRepaid?: number;
+    }) || {};
   const {
-    totalLoanTaken = 0,
-    totalLoanRepay = 0,
-    totalInterestPaid = 0,
-  } = (passbook?.payload as unknown as MemberPassbookData) || {};
+    loansPrincipalTaken = payload.totalLoanTaken ??
+      payload.loansPrincipalTaken ??
+      0,
+    loansPrincipalRepaid = payload.totalLoanRepaid ??
+      payload.loansPrincipalRepaid ??
+      0,
+    interestPaidTotal = payload.totalInterestPaid ??
+      payload.interestPaidTotal ??
+      0,
+  } = payload;
 
   // Calculate loan history on-the-fly from transactions
   const {
@@ -22,7 +35,7 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
     recentPassedString,
   } = await getMemberLoanHistory(member.id);
 
-  const totalInterestBalance = totalInterestAmount - totalInterestPaid;
+  const totalInterestBalance = totalInterestAmount - interestPaidTotal;
 
   return {
     id: member.id,
@@ -45,10 +58,10 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
       : 0,
     status: member.active ? "Active" : "Disabled",
     active: calculatedTotalLoanBalance > 0,
-    totalLoanTaken,
-    totalLoanRepay,
+    totalLoanTaken: loansPrincipalTaken,
+    totalLoanRepay: loansPrincipalRepaid,
     totalLoanBalance: calculatedTotalLoanBalance,
-    totalInterestPaid,
+    totalInterestPaid: interestPaidTotal,
     totalInterestBalance,
     totalInterestAmount,
     loanHistory: calculatedLoanHistory,
@@ -66,37 +79,56 @@ export function membersTableTransform(
 ) {
   const { passbook, ...account } = member;
   const { delayOffset = 0, joiningOffset = 0 } = passbook || {};
+  // Support both old and new field names for backward compatibility
+  const payload =
+    (passbook?.payload as unknown as MemberFinancialSnapshot & {
+      periodicDepositAmount?: number;
+      offsetDepositAmount?: number;
+      totalDepositAmount?: number;
+      withdrawalAmount?: number;
+      accountBalance?: number;
+      clubHeldAmount?: number;
+      profitWithdrawalAmount?: number;
+    }) || {};
   const {
-    periodicDepositAmount = 0,
-    offsetDepositAmount = 0,
-    totalDepositAmount = 0,
-    withdrawalAmount = 0,
-    accountBalance = 0,
-    clubHeldAmount = 0,
-    profitWithdrawalAmount = 0,
-  } = (passbook?.payload as unknown as MemberPassbookData) || {};
+    periodicDepositsTotal = payload.periodicDepositAmount ??
+      payload.periodicDepositsTotal ??
+      0,
+    offsetDepositsTotal = payload.offsetDepositAmount ??
+      payload.offsetDepositsTotal ??
+      0,
+    totalDeposits = payload.totalDepositAmount ?? payload.totalDeposits ?? 0,
+    withdrawalsTotal = payload.withdrawalAmount ??
+      payload.withdrawalsTotal ??
+      0,
+    memberBalance = payload.accountBalance ?? payload.memberBalance ?? 0,
+    clubHeldBalance = payload.clubHeldAmount ?? payload.clubHeldBalance ?? 0,
+    profitWithdrawalsTotal = payload.profitWithdrawalAmount ??
+      payload.profitWithdrawalsTotal ??
+      0,
+  } = payload;
 
   // Calculate total offset and balances
   const totalOffsetAmount = delayOffset + joiningOffset;
-  const totalDepositMinusWithdrawals = totalDepositAmount - withdrawalAmount;
+  const totalDepositMinusWithdrawals = totalDeposits - withdrawalsTotal;
   const periodicDepositMinusWithdrawals =
-    periodicDepositAmount - withdrawalAmount;
-  const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositAmount;
+    periodicDepositsTotal - withdrawalsTotal;
+  const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositsTotal;
 
   // Total balance is what the member should have minus what is in their account
   let totalBalanceAmount =
-    memberTotalDeposit + totalOffsetAmount - accountBalance;
+    memberTotalDeposit + totalOffsetAmount - memberBalance;
   // If total balance is more than memberTotalDeposit, use only the period balance
   let totalPeriodBalanceAmount =
     totalBalanceAmount > memberTotalDeposit
-      ? memberTotalDeposit - accountBalance
+      ? memberTotalDeposit - memberBalance
       : 0;
 
   // Calculate member's share of returns
   let memberTotalReturnAmount = totalReturnAmount - totalOffsetAmount;
   // Calculate periodic deposit balance
   let periodicDepositBalance =
-    memberTotalDeposit - (periodicDepositAmount - withdrawalAmount);
+    memberTotalDeposit - (periodicDepositsTotal - withdrawalsTotal);
 
   // Expected offset amount for inactive members
   let expectedOffsetAmount = 0;
@@ -109,9 +141,9 @@ export function membersTableTransform(
   }
 
   // Net value is what is in the account plus any returns
-  const netValue = accountBalance + memberTotalReturnAmount;
+  const netValue = memberBalance + memberTotalReturnAmount;
   // Total withdrawals
-  const totalWithdrawalAmount = profitWithdrawalAmount + withdrawalAmount;
+  const totalWithdrawalAmount = profitWithdrawalsTotal + withdrawalsTotal;
 
   return {
     id: member.id,
@@ -133,21 +165,21 @@ export function membersTableTransform(
     totalDepositAmount: totalDepositMinusWithdrawals,
     totalOffsetAmount,
     periodicDepositAmount: periodicDepositMinusWithdrawals,
-    offsetDepositAmount,
+    offsetDepositAmount: offsetDepositsTotal,
     totalOffsetBalanceAmount,
     totalPeriodBalanceAmount,
     totalBalanceAmount,
     totalReturnAmount: memberTotalReturnAmount,
     expectedReturnAmount: expectedLoanProfit,
-    clubHeldAmount,
+    clubHeldAmount: clubHeldBalance,
     delayOffset,
     joiningOffset,
     netValue,
     account: { ...account, delayOffset, joiningOffset },
     periodicDepositBalance,
-    withdrawalAmount,
-    profitWithdrawalAmount,
-    accountBalance,
+    withdrawalAmount: withdrawalsTotal,
+    profitWithdrawalAmount: profitWithdrawalsTotal,
+    accountBalance: memberBalance,
     memberTotalDeposit,
     totalWithdrawalAmount,
     expectedOffsetAmount,

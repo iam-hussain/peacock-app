@@ -9,13 +9,23 @@ import { LoanHistoryEntry } from "@/lib/validators/type";
  * Fetches all loan transactions for a specific member
  */
 export function fetchLoanTransactionsForMember(memberId: string) {
-  return prisma.transaction.findMany({
-    where: {
-      OR: [{ fromId: memberId }, { toId: memberId }],
-      type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
-    },
-    orderBy: { occurredAt: "asc" },
-  });
+  return prisma.transaction
+    .findMany({
+      where: {
+        OR: [{ fromId: memberId }, { toId: memberId }],
+        type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
+      },
+      orderBy: { occurredAt: "asc" },
+    })
+    .then((transactions) => {
+      return transactions.filter((transaction) => {
+        return (
+          (transaction.type === "LOAN_TAKEN" &&
+            transaction.toId === memberId) ||
+          (transaction.type === "LOAN_REPAY" && transaction.fromId === memberId)
+        );
+      });
+    });
 }
 
 /**
@@ -104,26 +114,19 @@ export async function getMemberLoanHistory(memberId: string) {
   const loanHistoryResult = loanHistory.reduce(
     (acc, loan) => {
       const interestCalc = calculateInterestByAmount(
-        loan.amount ?? loan.principalAmount ?? 0,
-        loan.startDate ?? loan.startedAt ?? newZoneDate(),
-        loan?.endDate ?? loan?.closedAt
+        loan.amount ?? 0,
+        loan.startDate ?? newZoneDate(),
+        loan?.endDate
       );
       acc.totalInterestAmount += interestCalc.interestAmount;
       // Remove startDate and endDate from loan before spreading
       const { startDate: _startDate, endDate: _endDate } = loan;
       acc.loanHistory.push({
         ...interestCalc,
-        amount: loan.amount ?? loan.principalAmount ?? 0,
-        active: !(loan.endDate ?? loan.closedAt), // Loan is active if there's no end date
-        startDate: newZoneDate(
-          loan.startDate ?? loan.startedAt ?? newZoneDate()
-        ).getTime(),
-        endDate:
-          (loan.endDate ?? loan.closedAt)
-            ? newZoneDate(
-                loan.endDate ?? loan.closedAt ?? newZoneDate()
-              ).getTime()
-            : undefined,
+        amount: loan.amount ?? 0,
+        active: !loan.endDate, // Loan is active if there's no end date
+        startDate: newZoneDate(loan.startDate ?? newZoneDate()).getTime(),
+        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
         totalInterestAmount: acc.totalInterestAmount,
       });
       // Store the most recent monthsPassedString

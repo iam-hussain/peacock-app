@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -15,6 +16,8 @@ import { format, startOfMonth, subMonths } from "date-fns";
 import { useMemo, useState } from "react";
 import { Line } from "react-chartjs-2";
 
+import { DataTable } from "@/components/atoms/data-table";
+import { CommonTableCell } from "@/components/atoms/table-component";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -87,6 +90,23 @@ const METRICS = [
   },
 ] as const;
 
+type MonthlySummary = {
+  monthStartDate: string;
+  totalDeposits: number;
+  memberBalance: number;
+  profitWithdrawals: number;
+  memberAdjustments: number;
+  currentLoanTaken: number;
+  totalInterestCollected: number;
+  interestBalance: number;
+  vendorInvestment: number;
+  vendorProfit: number;
+  pendingAmounts: number;
+  availableCash: number;
+  currentValue: number;
+  totalPortfolioValue: number;
+};
+
 export default function AnalyticsPage() {
   const [selectedRange, setSelectedRange] = useState<string>("1Y");
   const [visibleMetrics, setVisibleMetrics] = useState<Set<string>>(
@@ -117,8 +137,8 @@ export default function AnalyticsPage() {
 
   const summaries = data?.summaries || [];
 
-  // Extract nested data for chart
-  const flatSummaries = summaries.map((s: any) => ({
+  // Extract nested data for chart and table
+  const flatSummaries: MonthlySummary[] = summaries.map((s: any) => ({
     monthStartDate: s.monthStartDate,
     totalDeposits: s.memberFunds?.totalDeposits || 0,
     memberBalance: s.memberFunds?.memberBalance || 0,
@@ -134,6 +154,209 @@ export default function AnalyticsPage() {
     currentValue: s.valuation?.currentValue || 0,
     totalPortfolioValue: s.portfolio?.totalPortfolioValue || 0,
   }));
+
+  // Define table columns
+  const columns: ColumnDef<MonthlySummary>[] = useMemo(
+    () => [
+      {
+        id: "month",
+        accessorKey: "monthStartDate",
+        header: "Month",
+        enableSorting: true,
+        meta: { tooltip: "Month and year of the summary" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={format(new Date(row.original.monthStartDate), "MMM yyyy")}
+          />
+        ),
+      },
+      {
+        id: "totalDeposits",
+        accessorKey: "totalDeposits",
+        header: "Total Deposits",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Total deposits from all members" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.totalDeposits || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "memberBalance",
+        accessorKey: "memberBalance",
+        header: "Member Balance",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Total balance held by members" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.memberBalance || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "profitWithdrawals",
+        accessorKey: "profitWithdrawals",
+        header: "Profit Withdrawals",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total profit withdrawals by members",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.profitWithdrawals || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "memberAdjustments",
+        accessorKey: "memberAdjustments",
+        header: "Member Adjustments",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Manual adjustments made to member accounts",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.memberAdjustments || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "currentLoanTaken",
+        accessorKey: "currentLoanTaken",
+        header: "Current Loan Taken",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Outstanding loan amount" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.currentLoanTaken || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "totalInterestCollected",
+        accessorKey: "totalInterestCollected",
+        header: "Total Interest Collected",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total interest collected from loans",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.totalInterestCollected || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "interestBalance",
+        accessorKey: "interestBalance",
+        header: "Interest Balance",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Outstanding interest amount" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.interestBalance || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "vendorInvestment",
+        accessorKey: "vendorInvestment",
+        header: "Vendor Investment",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Total amount invested with vendors" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.vendorInvestment || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "vendorProfit",
+        accessorKey: "vendorProfit",
+        header: "Vendor Profit",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Profit earned from vendor investments",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.vendorProfit || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "pendingAmounts",
+        accessorKey: "pendingAmounts",
+        header: "Pending Amounts",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Amounts pending collection" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.pendingAmounts || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "availableCash",
+        accessorKey: "availableCash",
+        header: "Available Cash",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Cash available in club account" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.availableCash || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "currentValue",
+        accessorKey: "currentValue",
+        header: "Current Value",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Current value of club assets" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.currentValue || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "totalPortfolioValue",
+        accessorKey: "totalPortfolioValue",
+        header: "Total Portfolio Value",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total portfolio value including all assets",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.totalPortfolioValue || 0)}
+            className="text-right font-medium"
+          />
+        ),
+      },
+    ],
+    []
+  );
 
   // Toggle metric visibility
   const toggleMetric = (key: string) => {
@@ -320,83 +543,13 @@ export default function AnalyticsPage() {
             <CardTitle>Monthly Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2 sticky left-0 bg-card">
-                      Month
-                    </th>
-                    <th className="text-right p-2">Total Deposits</th>
-                    <th className="text-right p-2">Member Balance</th>
-                    <th className="text-right p-2">Profit Withdrawals</th>
-                    <th className="text-right p-2">Member Adjustments</th>
-                    <th className="text-right p-2">Current Loan Taken</th>
-                    <th className="text-right p-2">Total Interest Collected</th>
-                    <th className="text-right p-2">Interest Balance</th>
-                    <th className="text-right p-2">Vendor Investment</th>
-                    <th className="text-right p-2">Vendor Profit</th>
-                    <th className="text-right p-2">Pending Amounts</th>
-                    <th className="text-right p-2">Available Cash</th>
-                    <th className="text-right p-2">Current Value</th>
-                    <th className="text-right p-2">Total Portfolio Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {flatSummaries
-                    .slice(-12)
-                    .reverse()
-                    .map((summary: any, idx: number) => (
-                      <tr key={idx} className="border-b hover:bg-muted/50">
-                        <td className="p-2 sticky left-0 bg-card">
-                          {format(new Date(summary.monthStartDate), "MMM yyyy")}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.totalDeposits || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.memberBalance || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.profitWithdrawals || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.memberAdjustments || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.currentLoanTaken || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(
-                            summary.totalInterestCollected || 0
-                          )}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.interestBalance || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.vendorInvestment || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.vendorProfit || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.pendingAmounts || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.availableCash || 0)}
-                        </td>
-                        <td className="text-right p-2">
-                          {formatIndianNumber(summary.currentValue || 0)}
-                        </td>
-                        <td className="text-right p-2 font-medium">
-                          {formatIndianNumber(summary.totalPortfolioValue || 0)}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              columns={columns}
+              data={flatSummaries.reverse()}
+              frozenColumnKey="month"
+              isLoading={isLoading}
+              pageSize={10}
+            />
           </CardContent>
         </Card>
       )}

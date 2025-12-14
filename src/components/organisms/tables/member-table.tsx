@@ -62,7 +62,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalDepositAmount.toLocaleString("en-IN", {
+        label={(row.original.totalDepositAmount || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -76,7 +76,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalOffsetAmount.toLocaleString("en-IN", {
+        label={(row.original.totalOffsetAmount || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -90,12 +90,12 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalBalanceAmount.toLocaleString("en-IN", {
+        label={(row.original.totalBalanceAmount || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        greenLabel={row.original.totalBalanceAmount <= 0}
-        redLabel={row.original.totalBalanceAmount > 0}
+        greenLabel={(row.original.totalBalanceAmount || 0) <= 0}
+        redLabel={(row.original.totalBalanceAmount || 0) > 0}
       />
     ),
   },
@@ -106,14 +106,17 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalReturnAmount.toLocaleString("en-IN", {
+        label={(row.original.totalReturnAmount || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        subLabel={row.original.expectedReturnAmount.toLocaleString("en-IN", {
-          style: "currency",
-          currency: "INR",
-        })}
+        subLabel={(row.original.expectedReturnAmount || 0).toLocaleString(
+          "en-IN",
+          {
+            style: "currency",
+            currency: "INR",
+          }
+        )}
       />
     ),
   },
@@ -124,7 +127,7 @@ const baseColumns: ColumnDef<TransformedMember>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.netValue.toLocaleString("en-IN", {
+        label={(row.original.netValue || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}

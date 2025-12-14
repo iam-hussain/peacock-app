@@ -1,7 +1,10 @@
 import prisma from "@/db";
 import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
 import { getMemberTotalDepositUpToday } from "@/lib/config/club";
-import { ClubPassbookData, VendorPassbookData } from "@/lib/validators/type";
+import {
+  ClubFinancialSnapshot,
+  VendorFinancialSnapshot,
+} from "@/lib/validators/type";
 
 export async function getMemberClubStats() {
   const [members, clubPassbook, vendorPassbooks] = await Promise.all([
@@ -37,20 +40,20 @@ export async function getMemberClubStats() {
 
   const memberTotalDeposit = getMemberTotalDepositUpToday();
   const activeMemberCount = members.filter((m) => m.status === "ACTIVE").length;
-  const clubData = clubPassbook.payload as ClubPassbookData;
+  const clubData = clubPassbook.payload as ClubFinancialSnapshot;
 
   const totalVendorProfit = vendorPassbooks
     .map((v) => {
-      const { totalInvestment = 0, totalReturns = 0 } =
-        v.payload as VendorPassbookData;
-      return Math.max(totalReturns - totalInvestment, 0);
+      const { investmentTotal = 0, returnsTotal = 0 } =
+        v.payload as VendorFinancialSnapshot;
+      return Math.max(returnsTotal - investmentTotal, 0);
     })
     .reduce((a, b) => a + b, 0);
 
   const totalProfitCollected =
-    totalOffset + clubData.totalInterestPaid + totalVendorProfit;
+    totalOffset + clubData.interestCollectedTotal + totalVendorProfit;
   const availableProfit =
-    totalProfitCollected - clubData.totalMemberProfitWithdrawals;
+    totalProfitCollected - clubData.memberProfitWithdrawalsTotal;
   const totalReturnPerMember =
     activeMemberCount > 0 ? availableProfit / activeMemberCount : 0;
 
@@ -64,7 +67,8 @@ export async function getMemberClubStats() {
     0
   );
 
-  const totalInterestBalance = totalInterestAmount - clubData.totalInterestPaid;
+  const totalInterestBalance =
+    totalInterestAmount - clubData.interestCollectedTotal;
   const expectedLoanProfitPerMember =
     activeMemberCount > 0 ? totalInterestBalance / activeMemberCount : 0;
 

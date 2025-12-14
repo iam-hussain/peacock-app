@@ -46,6 +46,7 @@ interface DataTableProps<TData, TValue> {
   frozenColumnKey?: string;
   isLoading?: boolean;
   className?: string;
+  pageSize?: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -54,6 +55,7 @@ export function DataTable<TData, TValue>({
   frozenColumnKey,
   isLoading,
   className,
+  pageSize = 50,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -70,7 +72,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 50,
+        pageSize,
       },
     },
   });

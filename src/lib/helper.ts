@@ -10,9 +10,9 @@ import {
   newZoneDate,
 } from "@/lib/core/date";
 import {
-  ClubPassbookData,
-  MemberPassbookData,
-  VendorPassbookData,
+  ClubFinancialSnapshot,
+  MemberFinancialSnapshot,
+  VendorFinancialSnapshot,
 } from "@/lib/validators/type";
 
 /**
@@ -102,51 +102,55 @@ export const bulkPassbookUpdate = async (
 
 export const getDefaultPassbookData = (
   type: PassbookKind = "MEMBER"
-): ClubPassbookData | MemberPassbookData | VendorPassbookData => {
+):
+  | ClubFinancialSnapshot
+  | MemberFinancialSnapshot
+  | VendorFinancialSnapshot => {
   if (type === "MEMBER") {
     return {
-      periodicDepositAmount: 0,
-      offsetDepositAmount: 0,
-      totalDepositAmount: 0,
-      withdrawalAmount: 0,
-      profitWithdrawalAmount: 0,
-      accountBalance: 0,
-      clubHeldAmount: 0,
-      totalLoanTaken: 0,
-      totalLoanRepay: 0,
-      totalLoanBalance: 0,
-      totalInterestPaid: 0,
+      periodicDepositsTotal: 0,
+      offsetDepositsTotal: 0,
+      totalDeposits: 0,
+      withdrawalsTotal: 0,
+      profitWithdrawalsTotal: 0,
+      memberBalance: 0,
+      clubHeldBalance: 0,
+      loansPrincipalTaken: 0,
+      loansPrincipalRepaid: 0,
+      loansOutstanding: 0,
+      interestPaidTotal: 0,
     };
   }
   if (type === "CLUB") {
     return {
-      totalMemberPeriodicDeposits: 0,
-      totalMemberOffsetDeposits: 0,
-      totalMemberWithdrawals: 0,
-      totalMemberProfitWithdrawals: 0,
-      currentClubBalance: 0,
-      netClubBalance: 0,
-      totalInvestment: 0,
-      totalReturns: 0,
-      totalProfit: 0,
-      totalLoanTaken: 0,
-      totalLoanRepay: 0,
-      totalLoanBalance: 0,
-      totalInterestPaid: 0,
-      totalVendorProfit: 0,
+      memberPeriodicDepositsTotal: 0,
+      memberOffsetDepositsTotal: 0,
+      memberWithdrawalsTotal: 0,
+      memberProfitWithdrawalsTotal: 0,
+      availableCashBalance: 0,
+      netClubValue: 0,
+      vendorInvestmentTotal: 0,
+      vendorReturnsTotal: 0,
+      vendorProfitTotal: 0,
+      loansPrincipalDisbursed: 0,
+      loansPrincipalRepaid: 0,
+      loansOutstanding: 0,
+      interestCollectedTotal: 0,
     };
   }
   return {
-    totalInvestment: 0,
-    totalReturns: 0,
-    accountBalance: 0,
-    totalProfitAmount: 0,
+    investmentTotal: 0,
+    returnsTotal: 0,
+    currentBalance: 0,
+    profitTotal: 0,
   };
 };
 
 export function setPassbookUpdateQuery(
   passbook: Parameters<typeof prisma.passbook.update>[0],
-  calcData: Partial<ClubPassbookData | MemberPassbookData | VendorPassbookData>,
+  calcData: Partial<
+    ClubFinancialSnapshot | MemberFinancialSnapshot | VendorFinancialSnapshot
+  >,
   passData: Partial<any> = {}
 ): Parameters<typeof prisma.passbook.update>[0] {
   const payload: any = passbook.data.payload || {};

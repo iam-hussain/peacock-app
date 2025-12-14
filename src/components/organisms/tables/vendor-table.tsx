@@ -85,7 +85,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalInvestment.toLocaleString("en-IN", {
+        label={(row.original.totalInvestment || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
@@ -99,7 +99,7 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalReturns.toLocaleString("en-IN", {
+        label={(row.original.totalReturns || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
