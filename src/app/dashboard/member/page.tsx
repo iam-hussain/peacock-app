@@ -10,6 +10,7 @@ import { useMemo, useState } from "react";
 
 import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
+import { DesktopTableOnly } from "@/components/atoms/desktop-table-only";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { FilterChips } from "@/components/atoms/filter-chips";
 import { MemberCardSkeleton } from "@/components/atoms/member-card-skeleton";
@@ -17,6 +18,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
+import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchMembers } from "@/lib/query-options";
@@ -71,7 +73,7 @@ export default function MembersPage() {
   };
 
   const handleViewTransactions = (member: TransformedMember) => {
-    window.location.href = `/dashboard/transaction?member=${member.username}&type=LOAN_ALL`;
+    window.location.href = `/dashboard/transaction?member=${member.username}`;
   };
 
   const handleResetFilters = () => {
@@ -275,10 +277,17 @@ export default function MembersPage() {
   );
 
   // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+  const {
+    handleExportCsv,
+    handleScreenshot,
+    tableRef,
+    capturedAt,
+    identifier,
+  } = useTableExport({
     tableName: "members",
     columns,
     data: filteredMembers,
+    title: "Members",
   });
 
   return (
@@ -308,6 +317,18 @@ export default function MembersPage() {
         <PageHeader
           title="Members Overview"
           subtitle="View member details, funds managed, balances, and performance."
+          secondaryActions={[
+            {
+              label: "Export CSV",
+              icon: <Download className="h-4 w-4" />,
+              onClick: handleExportCsv,
+            },
+            {
+              label: "Screenshot",
+              icon: <Camera className="h-4 w-4" />,
+              onClick: handleScreenshot,
+            },
+          ]}
         />
       </div>
 
@@ -342,7 +363,7 @@ export default function MembersPage() {
         />
       </div>
 
-      {/* Desktop Table View */}
+      {/* Desktop Table View - Also used for mobile screenshots */}
       <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
@@ -351,6 +372,21 @@ export default function MembersPage() {
           isLoading={isLoading}
         />
       </div>
+
+      {/* Screenshot Area - Hidden, only for export */}
+      <ScreenshotArea
+        title="Members"
+        capturedAt={capturedAt}
+        identifier={identifier}
+      >
+        <div style={{ width: "100%", minWidth: 1200 }}>
+          <DesktopTableOnly
+            columns={columns.filter((col) => col.id !== "actions")}
+            data={filteredMembers}
+            frozenColumnKey="member"
+          />
+        </div>
+      </ScreenshotArea>
 
       {/* Mobile Card View */}
       <div className="lg:hidden space-y-4">
