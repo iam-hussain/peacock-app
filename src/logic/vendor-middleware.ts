@@ -1,5 +1,5 @@
 import { PassbookToUpdate } from "@/lib/validators/type";
-import { VendorPassbookData } from "@/lib/validators/type";
+import { VendorFinancialSnapshot } from "@/lib/validators/type";
 
 /**
  * Calculate vendor profits and update vendor passbooks
@@ -17,12 +17,12 @@ export function vendorCalcHandler(
       continue;
     }
 
-    const payload = vendorPassbook.data.payload as VendorPassbookData;
-    const totalInvestment = payload.totalInvestment || 0;
-    const totalReturns = payload.totalReturns || 0;
+    const payload = vendorPassbook.data.payload as VendorFinancialSnapshot;
+    const investmentTotal = payload.investmentTotal || 0;
+    const returnsTotal = payload.returnsTotal || 0;
 
     // Vendor profit is calculated as returns - investment
-    const totalProfit = Math.max(totalReturns - totalInvestment, 0);
+    const totalProfit = Math.max(returnsTotal - investmentTotal, 0);
 
     // Update the payload with calculated profit
     passbookToUpdate.set(vendorId, {
@@ -31,7 +31,7 @@ export function vendorCalcHandler(
         ...vendorPassbook.data,
         payload: {
           ...payload,
-          totalProfit,
+          profitTotal: totalProfit,
         },
       },
     });

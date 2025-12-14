@@ -5,8 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function moneyFormat(amount: number) {
-  return amount.toLocaleString("en-IN", {
+export function moneyFormat(amount: number | null | undefined) {
+  return (amount || 0).toLocaleString("en-IN", {
     style: "currency",
     currency: "INR",
   });
@@ -19,11 +19,12 @@ export function moneyFormat(amount: number) {
  * @returns Formatted string (e.g., "₹1.5L" for 1,50,000 or "₹2.5Cr" for 2,50,00,000)
  */
 export function formatIndianNumber(
-  value: number,
+  value: number | null | undefined,
   showCurrency: boolean = true
 ): string {
-  const absValue = Math.abs(value);
-  const prefix = value < 0 ? "-" : "";
+  const numValue = value || 0;
+  const absValue = Math.abs(numValue);
+  const prefix = numValue < 0 ? "-" : "";
   const currency = showCurrency ? "₹" : "";
 
   if (absValue >= 10000000) {

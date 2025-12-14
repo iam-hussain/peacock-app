@@ -72,11 +72,11 @@ const baseColumns: ColumnDef<TransformedLoan>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={row.original.totalLoanBalance.toLocaleString("en-IN", {
+        label={(row.original.totalLoanBalance || 0).toLocaleString("en-IN", {
           style: "currency",
           currency: "INR",
         })}
-        greenLabel={row.original.totalLoanBalance > 0}
+        greenLabel={(row.original.totalLoanBalance || 0) > 0}
       />
     ),
   },

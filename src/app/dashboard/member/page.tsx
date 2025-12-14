@@ -154,7 +154,7 @@ export default function MembersPage() {
           tooltip: "Total deposits contributed by this member.",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalDepositAmount;
+          const amount = row.original.totalDepositAmount || 0;
           return (
             <div className="text-right text-sm font-medium text-foreground">
               {moneyFormat(amount)}
@@ -173,7 +173,7 @@ export default function MembersPage() {
             "All manual member adjustments (offsets, corrections, waivers).",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalOffsetAmount;
+          const amount = row.original.totalOffsetAmount || 0;
           return (
             <div className="text-right text-sm font-medium text-foreground">
               {moneyFormat(amount)}
@@ -191,7 +191,7 @@ export default function MembersPage() {
           tooltip: "Amount still owed by the member. Negative = overpaid.",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalBalanceAmount;
+          const amount = row.original.totalBalanceAmount || 0;
           const isPositive = amount > 0;
           return (
             <div
@@ -214,7 +214,7 @@ export default function MembersPage() {
           tooltip: "Total profit/returns earned for this member.",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalReturnAmount;
+          const amount = row.original.totalReturnAmount || 0;
           return (
             <div className="text-right text-sm font-medium text-green-600">
               {moneyFormat(amount)}
@@ -232,7 +232,7 @@ export default function MembersPage() {
           tooltip: "Current value of this member's position including profit.",
         },
         cell: ({ row }) => {
-          const amount = row.original.netValue;
+          const amount = row.original.netValue || 0;
           return (
             <div className="text-right text-sm font-semibold text-foreground">
               {moneyFormat(amount)}

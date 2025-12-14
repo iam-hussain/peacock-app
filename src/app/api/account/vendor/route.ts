@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/db";
 import { newZoneDate } from "@/lib/core/date";
 import { chitCalculator } from "@/lib/helper";
-import { VendorPassbookData } from "@/lib/validators/type";
+import { VendorFinancialSnapshot } from "@/lib/validators/type";
 
 type VendorToTransform = Account & { passbook: Passbook | null };
 
@@ -42,9 +42,9 @@ export async function POST() {
 
 function transformVendorForTable(vendorInput: VendorToTransform) {
   const { passbook, ...vendor } = vendorInput;
-  const { totalInvestment, totalReturns } = passbook
-    ? (passbook.payload as VendorPassbookData)
-    : { totalInvestment: 0, totalReturns: 0 };
+  const { investmentTotal, returnsTotal } = passbook
+    ? (passbook.payload as VendorFinancialSnapshot)
+    : { investmentTotal: 0, returnsTotal: 0 };
 
   const statusData: {
     nextDueDate: number | null;
@@ -70,9 +70,9 @@ function transformVendorForTable(vendorInput: VendorToTransform) {
     endAt: endAtMs,
     status: vendor.active ? "Active" : "Disabled",
     active: vendor.active,
-    totalInvestment,
-    totalReturns,
-    totalProfitAmount: Math.max(totalReturns - totalInvestment, 0),
+    totalInvestment: investmentTotal,
+    totalReturns: returnsTotal,
+    totalProfitAmount: Math.max(returnsTotal - investmentTotal, 0),
     ...statusData,
     account: { ...vendorInput, passbook: null },
   };

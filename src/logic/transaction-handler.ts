@@ -12,7 +12,7 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { MemberPassbookData } from "@/lib/validators/type";
+import { MemberFinancialSnapshot } from "@/lib/validators/type";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
@@ -83,12 +83,12 @@ export const updatePassbookByTransaction = (
   if (transaction.type === "WITHDRAW" && !isRevert) {
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
-      const { periodicDepositAmount = 0, withdrawalAmount = 0 } = (toPassbook
-        .data.payload || {}) as MemberPassbookData;
-      const totalWithdrawalAmount = withdrawalAmount + transaction.amount;
+      const { periodicDepositsTotal = 0, withdrawalsTotal = 0 } = (toPassbook
+        .data.payload || {}) as MemberFinancialSnapshot;
+      const totalWithdrawalAmount = withdrawalsTotal + transaction.amount;
       const totalWithdrawalProfit =
-        totalWithdrawalAmount > periodicDepositAmount
-          ? totalWithdrawalAmount - periodicDepositAmount
+        totalWithdrawalAmount > periodicDepositsTotal
+          ? totalWithdrawalAmount - periodicDepositsTotal
           : 0;
       values.DEPOSIT_DIFF = totalWithdrawalProfit;
       values.AMOUNT = transaction.amount - totalWithdrawalProfit;
@@ -99,28 +99,28 @@ export const updatePassbookByTransaction = (
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
       const {
-        periodicDepositAmount = 0,
-        withdrawalAmount = 0,
-        profitWithdrawalAmount = 0,
-      } = (toPassbook.data.payload || {}) as MemberPassbookData;
+        periodicDepositsTotal = 0,
+        withdrawalsTotal = 0,
+        profitWithdrawalsTotal = 0,
+      } = (toPassbook.data.payload || {}) as MemberFinancialSnapshot;
 
       if (!isRevert) {
-        const totalWithdrawalAmount = withdrawalAmount + transaction.amount;
+        const totalWithdrawalAmount = withdrawalsTotal + transaction.amount;
         const totalWithdrawalProfit =
-          totalWithdrawalAmount > periodicDepositAmount
-            ? totalWithdrawalAmount - periodicDepositAmount
+          totalWithdrawalAmount > periodicDepositsTotal
+            ? totalWithdrawalAmount - periodicDepositsTotal
             : 0;
         values.DEPOSIT_DIFF = totalWithdrawalProfit;
         values.AMOUNT = transaction.amount - totalWithdrawalProfit;
       } else {
         // Revert case
         values.DEPOSIT_DIFF =
-          transaction.amount > profitWithdrawalAmount
-            ? profitWithdrawalAmount
+          transaction.amount > profitWithdrawalsTotal
+            ? profitWithdrawalsTotal
             : transaction.amount;
         values.AMOUNT =
-          transaction.amount > profitWithdrawalAmount
-            ? Math.max(transaction.amount - profitWithdrawalAmount, 0)
+          transaction.amount > profitWithdrawalsTotal
+            ? Math.max(transaction.amount - profitWithdrawalsTotal, 0)
             : 0;
       }
     }

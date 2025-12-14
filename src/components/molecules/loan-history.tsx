@@ -19,9 +19,9 @@ export function LoanHistory({
             <div className="flex justify-between w-full align-bottom items-center">
               <div>Transaction #{index + 1}</div>
               <div
-                className={`text-sm ${(item.isActive ?? item.active) ? "text-green-600" : "text-gray-500"}`}
+                className={`text-sm ${item.active ? "text-green-600" : "text-gray-500"}`}
               >
-                {(item.isActive ?? item.active) ? "Active" : "Inactive"}
+                {item.active ? "Active" : "Inactive"}
               </div>
             </div>
           </CardHeader>
@@ -35,7 +35,7 @@ export function LoanHistory({
                 <strong className="text-sm text-foreground/70 font-medium">
                   Amount:
                 </strong>{" "}
-                {moneyFormat(item.amount ?? item.principalAmount ?? 0)}
+                {moneyFormat(item.amount ?? 0)}
               </div>
               <div
                 className={cn("flex justify-between text-sm", {
@@ -55,7 +55,7 @@ export function LoanHistory({
                 <strong className="text-sm text-foreground/70 font-medium">
                   Interest Amount:
                 </strong>{" "}
-                {moneyFormat(item.interestAmount ?? item.accruedInterest ?? 0)}
+                {moneyFormat(item.interestAmount ?? 0)}
               </div>
               <div
                 className={cn("flex justify-between text-sm", {
@@ -65,9 +65,7 @@ export function LoanHistory({
                 <strong className="text-sm text-foreground/70 font-medium">
                   Start Date:
                 </strong>{" "}
-                {dateFormat(
-                  newZoneDate(item.startDate ?? item.startedAt ?? new Date())
-                )}
+                {dateFormat(newZoneDate(item.startDate ?? new Date()))}
               </div>
               <div
                 className={cn("flex justify-between text-sm", {
@@ -77,10 +75,8 @@ export function LoanHistory({
                 <strong className="text-sm text-foreground/70 font-medium">
                   End Date:
                 </strong>
-                {(item.isActive ?? item.active) ? "(Ongoing) - " : ""}
-                {dateFormat(
-                  newZoneDate((item.endDate ?? item.closedAt) || undefined)
-                )}
+                {item.active ? "(Ongoing) - " : ""}
+                {dateFormat(newZoneDate(item.endDate || undefined))}
               </div>
               <div
                 className={cn("flex justify-between text-sm", {
@@ -90,14 +86,13 @@ export function LoanHistory({
                 <strong className="text-sm text-foreground/70 font-medium">
                   Months Passed:
                 </strong>{" "}
-                {item.monthsPassed ?? item.monthsElapsed ?? 0} Months
+                {item.monthsPassed ?? 0} Months
               </div>
               <div className="flex justify-between text-sm">
                 <strong className="text-sm text-foreground/70 font-medium">
                   Days Passed:
                 </strong>{" "}
-                {item.daysPassed ?? item.daysElapsed ?? 0} of{" "}
-                {item.daysInMonth ?? item.daysInPeriod ?? 0} days
+                {item.daysPassed ?? 0} of {item.daysInMonth ?? 0} days
               </div>
             </div>
           </CardContent>

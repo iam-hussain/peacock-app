@@ -3,7 +3,7 @@ import { endOfMonth, startOfMonth } from "date-fns";
 
 import { clubConfig } from "@/lib/config/config";
 import { calculateMonthsDifference } from "@/lib/core/date";
-import { ClubPassbookData, PassbookToUpdate } from "@/lib/validators/type";
+import { ClubFinancialSnapshot, PassbookToUpdate } from "@/lib/validators/type";
 
 /**
  * Transforms club passbook data directly into a monthly snapshot entry
@@ -29,26 +29,26 @@ export async function calculateMonthlySnapshotFromPassbooks(
       return null;
     }
 
-    const clubData = clubPassbook.data.payload as ClubPassbookData;
+    const clubData = clubPassbook.data.payload as ClubFinancialSnapshot;
 
     // Calculate club age
     const clubAgeMonths =
       calculateMonthsDifference(clubConfig.startedAt, monthEndDate) + 1;
 
     // Transform club passbook data to snapshot format
-    const totalDeposits = clubData.totalMemberPeriodicDeposits || 0;
-    const memberAdjustments = clubData.totalMemberOffsetDeposits || 0;
-    const totalWithdrawals = clubData.totalMemberWithdrawals || 0;
-    const profitWithdrawals = clubData.totalMemberProfitWithdrawals || 0;
+    const totalDeposits = clubData.memberPeriodicDepositsTotal || 0;
+    const memberAdjustments = clubData.memberOffsetDepositsTotal || 0;
+    const totalWithdrawals = clubData.memberWithdrawalsTotal || 0;
+    const profitWithdrawals = clubData.memberProfitWithdrawalsTotal || 0;
 
     // Calculate member balance from member passbooks (sum of all member balances)
     let memberBalance =
-      (clubData?.totalMemberPeriodicDeposits || 0) -
-      (clubData?.totalMemberWithdrawals || 0);
+      (clubData?.memberPeriodicDepositsTotal || 0) -
+      (clubData?.memberWithdrawalsTotal || 0);
     // Loan data from club passbook
-    const totalLoanGiven = clubData.totalLoanTaken || 0;
-    const totalInterestCollected = clubData.totalInterestPaid || 0;
-    const currentLoanTaken = clubData.totalLoanBalance || 0;
+    const totalLoanGiven = clubData.loansPrincipalDisbursed || 0;
+    const totalInterestCollected = clubData.interestCollectedTotal || 0;
+    const currentLoanTaken = clubData.loansOutstanding || 0;
 
     // Calculate interest balance (expected interest - collected interest)
     const interestBalance = Math.max(
@@ -57,19 +57,20 @@ export async function calculateMonthlySnapshotFromPassbooks(
     );
 
     // Vendor data from club passbook
-    const vendorInvestment = clubData.totalInvestment || 0;
-    const vendorReturns = clubData.totalReturns || 0;
+    const vendorInvestment = clubData.vendorInvestmentTotal || 0;
+    const vendorReturns = clubData.vendorReturnsTotal || 0;
     const vendorProfit = Math.max(0, vendorReturns - vendorInvestment);
 
     const totalOffsetAmount = membersPassbooks
       .map((e) => e.joiningOffset + e.delayOffset)
       .reduce((a, b) => a + b, 0);
 
-    const totalVendorHolding = clubData.totalInvestment - clubData.totalReturns;
+    const totalVendorHolding =
+      clubData.vendorInvestmentTotal - clubData.vendorReturnsTotal;
     const totalInterestBalance =
       expectedTotalLoanInterestAmount - totalInterestCollected;
     const totalOffsetBalance =
-      totalOffsetAmount || 0 - clubData.totalMemberOffsetDeposits || 0;
+      totalOffsetAmount || 0 - clubData.memberOffsetDepositsTotal || 0;
 
     // Calculate derived values using dashboard calculator formulas
     const totalInvested = currentLoanTaken + totalVendorHolding;
@@ -79,11 +80,11 @@ export async function calculateMonthlySnapshotFromPassbooks(
       totalInterestCollected +
       vendorProfit -
       totalWithdrawals;
-    const availableCash = clubData?.currentClubBalance || 0;
+    const availableCash = clubData?.availableCashBalance || 0;
     const pendingAmounts = interestBalance + memberBalance;
     const totalPortfolioValue =
-      (clubData?.currentClubBalance || 0) +
-      (clubData?.totalLoanBalance || 0) +
+      (clubData?.availableCashBalance || 0) +
+      (clubData?.loansOutstanding || 0) +
       (totalVendorHolding || 0) +
       (totalInterestBalance || 0) +
       (totalOffsetBalance || 0);
