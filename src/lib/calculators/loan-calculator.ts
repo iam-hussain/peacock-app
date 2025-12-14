@@ -9,13 +9,23 @@ import { LoanHistoryEntry } from "@/lib/validators/type";
  * Fetches all loan transactions for a specific member
  */
 export function fetchLoanTransactionsForMember(memberId: string) {
-  return prisma.transaction.findMany({
-    where: {
-      OR: [{ fromId: memberId }, { toId: memberId }],
-      type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
-    },
-    orderBy: { occurredAt: "asc" },
-  });
+  return prisma.transaction
+    .findMany({
+      where: {
+        OR: [{ fromId: memberId }, { toId: memberId }],
+        type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
+      },
+      orderBy: { occurredAt: "asc" },
+    })
+    .then((transactions) => {
+      return transactions.filter((transaction) => {
+        return (
+          (transaction.type === "LOAN_TAKEN" &&
+            transaction.toId === memberId) ||
+          (transaction.type === "LOAN_REPAY" && transaction.fromId === memberId)
+        );
+      });
+    });
 }
 
 /**
