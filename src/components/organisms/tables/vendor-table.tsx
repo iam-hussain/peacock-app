@@ -47,7 +47,11 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={dateFormat(newZoneDate(row.original.startAt))}
+        label={
+          row.original.startAt
+            ? dateFormat(newZoneDate(row.original.startAt))
+            : "N/A"
+        }
         subLabel={
           row.original.endAt
             ? dateFormat(newZoneDate(row.original.endAt))

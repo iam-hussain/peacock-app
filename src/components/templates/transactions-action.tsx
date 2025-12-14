@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { GenericModal } from "../atoms/generic-modal";
 import { TransactionDeleteForm } from "../organisms/forms/transaction-delete-form";
 import { TransactionForm } from "../organisms/forms/transaction-form";
-import TransactionTable from "../organisms/tables/transaction-table";
+// import TransactionTable from "../organisms/tables/transaction-table"; // Removed - table functionality moved to page
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -36,7 +36,7 @@ const TransactionsAction = () => {
       </Box>
       <Box className="bg-background p-4 md:p-6 rounded-md width-avl">
         <Dialog open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
-          <TransactionTable accounts={accounts} handleAction={handleAction} />
+          {/* TransactionTable removed - use /dashboard/transaction page instead */}
           <GenericModal
             title={selected ? "Transactions" : "Add Transactions"}
             description={

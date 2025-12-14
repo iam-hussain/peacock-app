@@ -40,7 +40,8 @@ export async function PATCH(
     const hasWriteAccess =
       account.accessLevel === "WRITE" || account.accessLevel === "ADMIN";
 
-    let finalRead = typeof readAccess === "boolean" ? readAccess : hasReadAccess;
+    let finalRead =
+      typeof readAccess === "boolean" ? readAccess : hasReadAccess;
     let finalWrite =
       typeof writeAccess === "boolean" ? writeAccess : hasWriteAccess;
 
@@ -56,11 +57,7 @@ export async function PATCH(
     }
 
     const finalCanLogin =
-      typeof canLogin === "boolean"
-        ? canLogin
-        : finalAccessLevel === "ADMIN" ||
-          finalAccessLevel === "WRITE" ||
-          finalAccessLevel === "READ";
+      typeof canLogin === "boolean" ? canLogin : finalWrite || finalRead;
 
     const updateData: any = {
       accessLevel: finalAccessLevel,
@@ -90,8 +87,7 @@ export async function PATCH(
             updated.accessLevel === "WRITE" ||
             updated.accessLevel === "ADMIN",
           writeAccess:
-            updated.accessLevel === "WRITE" ||
-            updated.accessLevel === "ADMIN",
+            updated.accessLevel === "WRITE" || updated.accessLevel === "ADMIN",
           canLogin: updated.canLogin,
         },
       },

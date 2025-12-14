@@ -41,27 +41,27 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
     resolver: zodResolver(accountFormSchema),
     defaultValues: selected
       ? {
-        firstName: selected.firstName,
-        lastName: selected.lastName || "",
-        username: selected.username || "",
-        phone: selected.phone || "",
-        email: selected.email || "",
-        avatar: selected.avatar || "",
-        active: selected.active ?? true,
-        startAt: newZoneDate(selected.startAt || undefined),
-        endAt: undefined,
-      }
+          firstName: selected.firstName,
+          lastName: selected.lastName || "",
+          username: selected.username || "",
+          phone: selected.phone || "",
+          email: selected.email || "",
+          avatar: selected.avatar || "",
+          active: selected.active ?? true,
+          startAt: newZoneDate(selected.startAt || undefined),
+          endAt: undefined,
+        }
       : {
-        firstName: "",
-        lastName: "",
-        username: "",
-        phone: "",
-        email: "",
-        avatar: "",
-        active: true,
-        startAt: newZoneDate(),
-        endAt: undefined,
-      },
+          firstName: "",
+          lastName: "",
+          username: "",
+          phone: "",
+          email: "",
+          avatar: "",
+          active: true,
+          startAt: newZoneDate(),
+          endAt: undefined,
+        },
   });
 
   const mutation = useMutation({

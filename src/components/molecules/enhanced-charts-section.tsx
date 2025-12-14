@@ -24,9 +24,21 @@ import {
   SelectValue,
 } from "../ui/select";
 
-import { TransformedStatistics } from "@/app/api/statistics/route";
 import { clubAge } from "@/lib/core/date";
 import { formatIndianNumber } from "@/lib/ui/utils";
+
+type TransformedStatistics = {
+  currentClubBalance: number;
+  currentClubNetValue: number;
+  totalLoanBalance: number;
+  totalVendorHolding: number;
+  totalInterestBalance: number;
+  totalOffsetBalance: number;
+  totalMemberPeriodicDepositsBalance: number;
+  totalMemberPeriodicDeposits: number;
+  totalVendorProfit: number;
+  totalInterestPaid: number;
+};
 
 ChartJS.register(
   ArcElement,

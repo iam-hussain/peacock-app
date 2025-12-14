@@ -141,15 +141,20 @@ export default function VendorsPage() {
         cell: ({ row }) => {
           const vendor = row.original;
           const duration = getCycleDuration(vendor);
+          const startDate = vendor.startAt
+            ? dateFormat(newZoneDate(vendor.startAt))
+            : "N/A";
+          const endDate =
+            vendor.endAt !== null && vendor.endAt !== undefined
+              ? dateFormat(newZoneDate(vendor.endAt))
+              : null;
           return (
             <div className="flex flex-col">
-              <div className="text-sm text-foreground">
-                {dateFormat(newZoneDate(vendor.startAt))}
-              </div>
-              {vendor.endAt && (
+              <div className="text-sm text-foreground">{startDate}</div>
+              {endDate && (
                 <>
                   <div className="text-xs text-muted-foreground">
-                    → {dateFormat(newZoneDate(vendor.endAt))}
+                    → {endDate}
                   </div>
                   {duration && (
                     <div className="text-xs text-muted-foreground">

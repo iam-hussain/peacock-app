@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { TransactionForm } from "../organisms/forms/transaction-form";
 import { Button } from "../ui/button";
@@ -25,7 +24,6 @@ import {
 
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { cn } from "@/lib/ui/utils";
 
 interface TransactionFormDialogProps {
   open: boolean;
@@ -131,7 +129,9 @@ export function TransactionFormDialog({
     <>
       {!isDesktop && (
         <Drawer open={open} onOpenChange={onOpenChange}>
-          <DrawerContent className="max-h-[96vh]">{mobileContent}</DrawerContent>
+          <DrawerContent className="max-h-[96vh]">
+            {mobileContent}
+          </DrawerContent>
         </Drawer>
       )}
 

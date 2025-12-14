@@ -20,10 +20,12 @@ import {
 import { MemberDash } from "./member-dash";
 import { MemberDetails } from "./member-details";
 
-import { TransformedMemberStat } from "@/app/api/statistics/route";
 import { fetchMemberByUsername, fetchMembers } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
+
+// Type alias for member statistics (compatible with TransformedMember)
+type TransformedMemberStat = TransformedMember;
 
 interface MembersPreviewProps {
   initialMembers?: (TransformedMember | TransformedMemberStat)[];

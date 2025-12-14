@@ -3,7 +3,6 @@
 export const dynamic = "force-dynamic";
 
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import {
   ArrowDownCircle,
   Banknote,
@@ -49,12 +48,6 @@ export default function DashboardPage() {
 
   const isLoading = isSummaryLoading || isMembersLoading;
 
-  // Check if API returned an error (success: false)
-  const hasError =
-    summaryError ||
-    (summaryData && !summaryData.success) ||
-    (!isSummaryLoading && !summaryData);
-
   // Log errors for debugging
   if (summaryError || (summaryData && !summaryData.success)) {
     console.error(
@@ -69,14 +62,6 @@ export default function DashboardPage() {
       currency: "INR",
       maximumFractionDigits: 0,
     });
-
-  const formatDate = (date: Date | string) => {
-    try {
-      return format(new Date(date), "MMMM yyyy");
-    } catch {
-      return "N/A";
-    }
-  };
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-3">

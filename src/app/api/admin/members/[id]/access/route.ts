@@ -178,8 +178,7 @@ export async function PATCH(
             updated.accessLevel === "WRITE" ||
             updated.accessLevel === "ADMIN",
           writeAccess:
-            updated.accessLevel === "WRITE" ||
-            updated.accessLevel === "ADMIN",
+            updated.accessLevel === "WRITE" || updated.accessLevel === "ADMIN",
           role: updated.role,
           canLogin: updated.canLogin,
         },

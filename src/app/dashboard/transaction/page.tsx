@@ -694,7 +694,9 @@ export default function TransactionsPage() {
                 canWrite ? () => handleEditTransaction(transaction) : undefined
               }
               onDelete={
-                canWrite ? () => handleDeleteTransaction(transaction) : undefined
+                canWrite
+                  ? () => handleDeleteTransaction(transaction)
+                  : undefined
               }
             />
           );

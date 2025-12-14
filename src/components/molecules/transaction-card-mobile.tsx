@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { ArrowDown, ArrowRight, ArrowUp, MoreHorizontal } from "lucide-react"
-import Link from "next/link"
-import { useMemo } from "react"
+import { ArrowDown, ArrowRight, ArrowUp, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+import { useMemo } from "react";
 
-import { ClickableAvatar } from "../atoms/clickable-avatar"
-import { Card, CardContent } from "../ui/card"
+import { ClickableAvatar } from "../atoms/clickable-avatar";
+import { Badge } from "../ui/badge";
+import { Card, CardContent } from "../ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
-import { Badge } from "../ui/badge"
+} from "../ui/dropdown-menu";
 
-import { TransformedTransaction } from "@/app/api/transaction/route"
-import { transactionTypeHumanMap } from "@/lib/config/config"
-import { dateFormat, newZoneDate } from "@/lib/core/date"
-import { moneyFormat } from "@/lib/ui/utils"
+import { TransformedTransaction } from "@/app/api/transaction/route";
+import { transactionTypeHumanMap } from "@/lib/config/config";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import { moneyFormat } from "@/lib/ui/utils";
 
 interface TransactionCardMobileProps {
-  transaction: TransformedTransaction
-  onEdit?: (transaction: TransformedTransaction) => void
-  onDelete?: (transaction: TransformedTransaction) => void
+  transaction: TransformedTransaction;
+  onEdit?: (transaction: TransformedTransaction) => void;
+  onDelete?: (transaction: TransformedTransaction) => void;
 }
 
 const INFLOW_TYPES = [
@@ -32,9 +32,9 @@ const INFLOW_TYPES = [
   "VENDOR_RETURNS",
   "LOAN_REPAY",
   "LOAN_INTEREST",
-]
+];
 
-const OUTFLOW_TYPES = ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"]
+const OUTFLOW_TYPES = ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"];
 
 export function TransactionCardMobile({
   transaction,
@@ -42,32 +42,29 @@ export function TransactionCardMobile({
   onDelete,
 }: TransactionCardMobileProps) {
   const transactionType =
-    transaction.transactionType || (transaction as any).type
+    transaction.transactionType || (transaction as any).type;
   const primaryParty =
-    transactionType === "LOAN_TAKEN" ? transaction.to : transaction.from
+    transactionType === "LOAN_TAKEN" ? transaction.to : transaction.from;
 
-  const { isInflow, isOutflow, amountColor, amountPrefix, amountIcon } =
-    useMemo(() => {
-      const inflow = INFLOW_TYPES.includes(transactionType)
-      const outflow = OUTFLOW_TYPES.includes(transactionType)
-      return {
-        isInflow: inflow,
-        isOutflow: outflow,
-        amountColor: inflow
-          ? "text-success-foreground"
-          : outflow
-            ? "text-destructive"
-            : "text-muted-foreground",
-        amountPrefix: inflow ? "+" : outflow ? "−" : "",
-        amountIcon: inflow ? ArrowDown : outflow ? ArrowUp : ArrowRight,
-      }
-    }, [transactionType])
+  const { amountColor, amountPrefix, amountIcon } = useMemo(() => {
+    const inflow = INFLOW_TYPES.includes(transactionType);
+    const outflow = OUTFLOW_TYPES.includes(transactionType);
+    return {
+      amountColor: inflow
+        ? "text-success-foreground"
+        : outflow
+          ? "text-destructive"
+          : "text-muted-foreground",
+      amountPrefix: inflow ? "+" : outflow ? "−" : "",
+      amountIcon: inflow ? ArrowDown : outflow ? ArrowUp : ArrowRight,
+    };
+  }, [transactionType]);
 
   const handleEdit = () => {
-    onEdit?.(transaction)
-  }
+    onEdit?.(transaction);
+  };
 
-  const AmountIcon = amountIcon
+  const AmountIcon = amountIcon;
 
   return (
     <Card className="rounded-2xl border border-border/50 bg-card shadow-sm transition-all hover:shadow-md">
@@ -155,8 +152,7 @@ export function TransactionCardMobile({
                 transactionTypeHumanMap.PERIODIC_DEPOSIT}
             </Badge>
             <span className="text-xs text-muted-foreground truncate">
-              {(transaction as any).note ||
-                (transaction as any).description}
+              {(transaction as any).note || (transaction as any).description}
             </span>
           </div>
           <p className="text-xs text-muted-foreground shrink-0">
@@ -165,5 +161,5 @@ export function TransactionCardMobile({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

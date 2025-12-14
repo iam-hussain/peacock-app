@@ -4,9 +4,22 @@ import { ArrowRight, Minus, Plus } from "lucide-react";
 
 import { Card, CardContent } from "../ui/card";
 
-import { TransformedStatistics } from "@/app/api/statistics/route";
 import { moneyFormat } from "@/lib/ui/utils";
 import { cn } from "@/lib/ui/utils";
+
+// Type definition for statistics (matches enhanced-charts-section)
+type TransformedStatistics = {
+  currentClubBalance: number;
+  currentClubNetValue: number;
+  totalLoanBalance: number;
+  totalVendorHolding: number;
+  totalInterestBalance: number;
+  totalOffsetBalance: number;
+  totalMemberPeriodicDepositsBalance: number;
+  totalMemberPeriodicDeposits: number;
+  totalVendorProfit: number;
+  totalInterestPaid: number;
+};
 
 interface NetValueBreakdownProps {
   statistics: TransformedStatistics;

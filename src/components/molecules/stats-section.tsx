@@ -21,8 +21,24 @@ import {
 
 import { ModernStatCard } from "./modern-stat-card";
 
-import { TransformedStatistics } from "@/app/api/statistics/route";
 import { clubAge } from "@/lib/core/date";
+
+// Type definition for statistics (matches enhanced-charts-section)
+type TransformedStatistics = {
+  membersCount?: number;
+  currentClubBalance: number;
+  currentClubNetValue: number;
+  totalLoanBalance: number;
+  totalVendorHolding: number;
+  totalInterestBalance: number;
+  totalOffsetBalance: number;
+  totalMemberPeriodicDepositsBalance: number;
+  totalMemberPeriodicDeposits: number;
+  totalMemberProfitWithdrawals?: number;
+  totalOffsetAmount?: number;
+  totalVendorProfit: number;
+  totalInterestPaid: number;
+};
 
 interface StatsSectionProps {
   statistics: TransformedStatistics;
@@ -56,7 +72,7 @@ export function StatsSection({ statistics }: StatsSectionProps) {
       cards: [
         {
           title: "Active Members",
-          value: `${statistics.membersCount}`,
+          value: `${statistics.membersCount ?? 0}`,
           icon: <Users className="h-5 w-5" />,
           iconBgColor: "#E3F2FD",
         },
@@ -90,13 +106,13 @@ export function StatsSection({ statistics }: StatsSectionProps) {
       cards: [
         {
           title: "Withdrawals",
-          value: formatCurrency(statistics.totalMemberProfitWithdrawals),
+          value: formatCurrency(statistics.totalMemberProfitWithdrawals ?? 0),
           icon: <ArrowDownCircle className="h-5 w-5" />,
           iconBgColor: "#FBE9E7",
         },
         {
           title: "Member Adjustments",
-          value: formatCurrency(statistics.totalOffsetAmount),
+          value: formatCurrency(statistics.totalOffsetAmount ?? 0),
           icon: <SlidersHorizontal className="h-5 w-5" />,
           iconBgColor: "#E1F5FE",
         },

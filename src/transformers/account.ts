@@ -12,7 +12,7 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
     totalLoanTaken = 0,
     totalLoanRepay = 0,
     totalInterestPaid = 0,
-  } = passbook.payload as unknown as MemberPassbookData;
+  } = (passbook?.payload as unknown as MemberPassbookData) || {};
 
   // Calculate loan history on-the-fly from transactions
   const {
@@ -64,10 +64,8 @@ export function membersTableTransform(
   totalReturnAmount: number,
   expectedLoanProfit: number = 0
 ) {
-  const {
-    passbook: { delayOffset = 0, joiningOffset = 0 },
-    ...account
-  } = member;
+  const { passbook, ...account } = member;
+  const { delayOffset = 0, joiningOffset = 0 } = passbook || {};
   const {
     periodicDepositAmount = 0,
     offsetDepositAmount = 0,
@@ -76,7 +74,7 @@ export function membersTableTransform(
     accountBalance = 0,
     clubHeldAmount = 0,
     profitWithdrawalAmount = 0,
-  } = member.passbook.payload as unknown as MemberPassbookData;
+  } = (passbook?.payload as unknown as MemberPassbookData) || {};
 
   // Calculate total offset and balances
   const totalOffsetAmount = delayOffset + joiningOffset;

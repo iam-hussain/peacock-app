@@ -104,19 +104,26 @@ export async function getMemberLoanHistory(memberId: string) {
   const loanHistoryResult = loanHistory.reduce(
     (acc, loan) => {
       const interestCalc = calculateInterestByAmount(
-        loan.amount,
-        loan.startDate,
-        loan?.endDate
+        loan.amount ?? loan.principalAmount ?? 0,
+        loan.startDate ?? loan.startedAt ?? newZoneDate(),
+        loan?.endDate ?? loan?.closedAt
       );
       acc.totalInterestAmount += interestCalc.interestAmount;
       // Remove startDate and endDate from loan before spreading
       const { startDate: _startDate, endDate: _endDate } = loan;
       acc.loanHistory.push({
         ...interestCalc,
-        amount: loan.amount,
-        active: !loan.endDate, // Loan is active if there's no end date
-        startDate: newZoneDate(loan.startDate).getTime(),
-        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
+        amount: loan.amount ?? loan.principalAmount ?? 0,
+        active: !(loan.endDate ?? loan.closedAt), // Loan is active if there's no end date
+        startDate: newZoneDate(
+          loan.startDate ?? loan.startedAt ?? newZoneDate()
+        ).getTime(),
+        endDate:
+          (loan.endDate ?? loan.closedAt)
+            ? newZoneDate(
+                loan.endDate ?? loan.closedAt ?? newZoneDate()
+              ).getTime()
+            : undefined,
         totalInterestAmount: acc.totalInterestAmount,
       });
       // Store the most recent monthsPassedString

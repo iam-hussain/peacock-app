@@ -4,16 +4,27 @@ import prisma from "@/db";
    LOANS
 ================================ */
 export type LoanLedgerEntry = {
-  isActive: boolean;
-  principalAmount: number;
+  isActive?: boolean;
+  active?: boolean; // Legacy support
+  principalAmount?: number;
+  amount?: number; // Legacy support
 
-  startedAt: Date | string | number;
+  startedAt?: Date | string | number;
+  startDate?: Date | string | number; // Legacy support
   closedAt?: Date | string | number;
+  endDate?: Date | string | number; // Legacy support
 
   accruedInterest?: number;
+  interestAmount?: number; // Legacy support
+
   monthsElapsed?: number;
+  monthsPassed?: number; // Legacy support
+
   daysElapsed?: number;
+  daysPassed?: number; // Legacy support
+
   daysInPeriod?: number;
+  daysInMonth?: number; // Legacy support
 
   interestPerDay?: number;
   interestAccruedForPeriod?: number;

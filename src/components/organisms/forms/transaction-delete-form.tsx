@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
-import { toast } from "sonner"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { TransformedTransaction } from "@/app/api/transaction/route"
-import { transactionTypeHumanMap } from "@/lib/config/config"
-import { dateFormat, newZoneDate } from "@/lib/core/date"
-import fetcher from "@/lib/core/fetcher"
-import { moneyFormat } from "@/lib/ui/utils"
+import { TransformedTransaction } from "@/app/api/transaction/route";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { transactionTypeHumanMap } from "@/lib/config/config";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
+import { moneyFormat } from "@/lib/ui/utils";
 
 type TransactionDeleteFormProps = {
   transaction: TransformedTransaction;
@@ -25,11 +25,11 @@ export function TransactionDeleteForm({
   onSuccess,
   onCancel,
 }: TransactionDeleteFormProps) {
-  const queryClient = useQueryClient()
-  const [confirmText, setConfirmText] = useState("")
+  const queryClient = useQueryClient();
+  const [confirmText, setConfirmText] = useState("");
 
   const transactionType =
-    transaction.transactionType || (transaction as any).type
+    transaction.transactionType || (transaction as any).type;
 
   const { amountColor, amountPrefix } = useMemo(() => {
     const inflowTypes = [
@@ -39,10 +39,10 @@ export function TransactionDeleteForm({
       "VENDOR_RETURNS",
       "LOAN_REPAY",
       "LOAN_INTEREST",
-    ]
-    const outflowTypes = ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"]
-    const isInflow = inflowTypes.includes(transactionType)
-    const isOutflow = outflowTypes.includes(transactionType)
+    ];
+    const outflowTypes = ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"];
+    const isInflow = inflowTypes.includes(transactionType);
+    const isOutflow = outflowTypes.includes(transactionType);
     return {
       amountColor: isInflow
         ? "text-success-foreground"
@@ -50,28 +50,28 @@ export function TransactionDeleteForm({
           ? "text-destructive"
           : "text-foreground",
       amountPrefix: isInflow ? "+" : isOutflow ? "−" : "",
-    }
-  }, [transactionType])
+    };
+  }, [transactionType]);
 
   const mutation = useMutation({
     mutationFn: () => fetcher.delete(`/api/transaction/${transaction.id}`),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["all"] })
+      await queryClient.invalidateQueries({ queryKey: ["all"] });
 
-      toast.success("Transaction deleted successfully")
+      toast.success("Transaction deleted successfully");
 
       if (onSuccess) {
-        onSuccess()
+        onSuccess();
       }
     },
     onError: (error) => {
-      toast.error(`Error: ${error.message || "Failed to delete transaction"}`)
+      toast.error(`Error: ${error.message || "Failed to delete transaction"}`);
     },
-  })
+  });
 
   const handleDelete = async () => {
-    return await mutation.mutateAsync()
-  }
+    return await mutation.mutateAsync();
+  };
 
   return (
     <div className="space-y-4">
@@ -82,7 +82,9 @@ export function TransactionDeleteForm({
           <span className="text-lg font-bold">!</span>
         </div>
         <div className="space-y-1">
-          <p className="text-lg font-semibold text-foreground">Delete Transaction</p>
+          <p className="text-lg font-semibold text-foreground">
+            Delete Transaction
+          </p>
           <p className="text-sm text-muted-foreground">
             This action is permanent and cannot be undone.
           </p>
@@ -103,7 +105,9 @@ export function TransactionDeleteForm({
             </div>
             <div className="space-y-1">
               <p className="text-muted-foreground text-xs">Amount</p>
-              <p className={`text-lg font-semibold tabular-nums ${amountColor}`}>
+              <p
+                className={`text-lg font-semibold tabular-nums ${amountColor}`}
+              >
                 {amountPrefix}
                 {moneyFormat(transaction.amount)}
               </p>
@@ -148,7 +152,11 @@ export function TransactionDeleteForm({
 
       {/* Actions */}
       <div className="flex items-center justify-between gap-3 pt-2">
-        <Button variant="ghost" onClick={onCancel} disabled={mutation.isPending}>
+        <Button
+          variant="ghost"
+          onClick={onCancel}
+          disabled={mutation.isPending}
+        >
           Cancel
         </Button>
         <Button
@@ -160,5 +168,5 @@ export function TransactionDeleteForm({
         </Button>
       </div>
     </div>
-  )
+  );
 }

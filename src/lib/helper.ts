@@ -33,7 +33,7 @@ export function generateVendorUsername(
     .replace(/[^a-z0-9-]/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
-  return name
+  return name;
 }
 
 export const chitCalculator = (
