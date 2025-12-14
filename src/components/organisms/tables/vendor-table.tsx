@@ -22,9 +22,9 @@ import TableLayout from "../../atoms/table-layout";
 import { FilterBar } from "../../molecules/filter-bar-group";
 
 import { TransformedVendor } from "@/app/api/account/vendor/route";
-import { dateFormat, newZoneDate } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchVendors } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 const baseColumns: ColumnDef<TransformedVendor>[] = [
   {
@@ -47,7 +47,11 @@ const baseColumns: ColumnDef<TransformedVendor>[] = [
     ),
     cell: ({ row }) => (
       <CommonTableCell
-        label={dateFormat(newZoneDate(row.original.startAt))}
+        label={
+          row.original.startAt
+            ? dateFormat(newZoneDate(row.original.startAt))
+            : "N/A"
+        }
         subLabel={
           row.original.endAt
             ? dateFormat(newZoneDate(row.original.endAt))

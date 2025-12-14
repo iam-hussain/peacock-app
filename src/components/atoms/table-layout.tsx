@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 type TableLayoutProps<_T> = {
   table: any;

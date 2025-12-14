@@ -1,8 +1,8 @@
 "use client";
 
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-import { TransactionDeleteForm } from "../organisms/forms/transaction-delete-form";
 import { TransactionForm } from "../organisms/forms/transaction-form";
 import { Button } from "../ui/button";
 import {
@@ -21,11 +21,9 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "../ui/drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransformedTransaction } from "@/app/api/transaction/route";
-import { cn } from "@/lib/utils";
 
 interface TransactionFormDialogProps {
   open: boolean;
@@ -42,6 +40,23 @@ export function TransactionFormDialog({
   accounts,
   onSuccess,
 }: TransactionFormDialogProps) {
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== "undefined"
+      ? window.matchMedia("(min-width: 1024px)").matches
+      : false
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsDesktop(event.matches);
+    };
+
+    setIsDesktop(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
   const handleSuccess = () => {
     onOpenChange(false);
     onSuccess?.();
@@ -74,38 +89,13 @@ export function TransactionFormDialog({
 
       <div className="flex-1 overflow-y-auto px-4 py-6 -mx-4">
         <div className="px-4">
-          {isEditMode ? (
-            <Tabs defaultValue="update" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="update">Update</TabsTrigger>
-                <TabsTrigger value="delete">Delete</TabsTrigger>
-              </TabsList>
-              <TabsContent value="update" className="mt-0">
-                <TransactionForm
-                  accounts={accounts}
-                  selected={selected as any}
-                  onSuccess={handleSuccess}
-                  onCancel={handleSuccess}
-                  isMobile={true}
-                />
-              </TabsContent>
-              <TabsContent value="delete" className="mt-0">
-                <TransactionDeleteForm
-                  transaction={selected as any}
-                  onSuccess={handleSuccess}
-                  onCancel={handleSuccess}
-                />
-              </TabsContent>
-            </Tabs>
-          ) : (
-            <TransactionForm
-              accounts={accounts}
-              selected={selected as any}
-              onSuccess={handleSuccess}
-              onCancel={handleSuccess}
-              isMobile={true}
-            />
-          )}
+          <TransactionForm
+            accounts={accounts}
+            selected={selected as any}
+            onSuccess={handleSuccess}
+            onCancel={handleSuccess}
+            isMobile={true}
+          />
         </div>
       </div>
       <DrawerFooter className="border-t pt-4 pb-safe px-4">
@@ -125,59 +115,33 @@ export function TransactionFormDialog({
           {description}
         </DialogDescription>
       </DialogHeader>
-      {isEditMode ? (
-        <Tabs defaultValue="update" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="update">Update</TabsTrigger>
-            <TabsTrigger value="delete">Delete</TabsTrigger>
-          </TabsList>
-          <TabsContent value="update">
-            <TransactionForm
-              accounts={accounts}
-              selected={selected as any}
-              onSuccess={handleSuccess}
-              onCancel={handleSuccess}
-              isMobile={false}
-            />
-          </TabsContent>
-          <TabsContent value="delete">
-            <TransactionDeleteForm
-              transaction={selected as any}
-              onSuccess={handleSuccess}
-              onCancel={handleSuccess}
-            />
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <TransactionForm
-          accounts={accounts}
-          selected={selected as any}
-          onSuccess={handleSuccess}
-          onCancel={handleSuccess}
-          isMobile={false}
-        />
-      )}
+      <TransactionForm
+        accounts={accounts}
+        selected={selected as any}
+        onSuccess={handleSuccess}
+        onCancel={handleSuccess}
+        isMobile={false}
+      />
     </>
   );
 
   return (
     <>
-      {/* Mobile: Drawer */}
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[96vh]">{mobileContent}</DrawerContent>
-      </Drawer>
+      {!isDesktop && (
+        <Drawer open={open} onOpenChange={onOpenChange}>
+          <DrawerContent className="max-h-[96vh]">
+            {mobileContent}
+          </DrawerContent>
+        </Drawer>
+      )}
 
-      {/* Desktop: Dialog */}
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent
-          className={cn(
-            "max-w-[720px] max-h-[90vh] overflow-y-auto",
-            "lg:block hidden"
-          )}
-        >
-          {desktopContent}
-        </DialogContent>
-      </Dialog>
+      {isDesktop && (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="max-w-[720px] max-h-[90vh] overflow-y-auto">
+            {desktopContent}
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

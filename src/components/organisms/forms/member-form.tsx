@@ -21,9 +21,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { newZoneDate } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
-import { accountFormSchema, AccountFromSchema } from "@/lib/form-schema";
+import { newZoneDate } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
+import {
+  accountFormSchema,
+  AccountFromSchema,
+} from "@/lib/validators/form-schema";
 
 type MemberFormProps = {
   selected?: any;
@@ -64,7 +67,7 @@ export function MemberForm({ selected, onSuccess, onCancel }: MemberFormProps) {
   const mutation = useMutation({
     mutationFn: (body: any) =>
       fetcher.post("/api/account", {
-        body: { id: selected?.id, ...body, isMember: true },
+        body: { id: selected?.id, ...body, type: "MEMBER" },
       }),
     onSuccess: async (data: any) => {
       toast.success(

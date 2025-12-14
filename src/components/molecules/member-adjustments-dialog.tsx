@@ -24,8 +24,8 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 
-import fetcher from "@/lib/fetcher";
-import { moneyFormat } from "@/lib/utils";
+import fetcher from "@/lib/core/fetcher";
+import { moneyFormat } from "@/lib/ui/utils";
 
 const adjustmentsSchema = z.object({
   lateJoinAdjustment: z.number().min(0, "Amount must be positive"),

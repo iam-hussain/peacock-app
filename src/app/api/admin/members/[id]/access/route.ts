@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/core/auth";
 
 export async function PATCH(
   request: Request,
@@ -18,20 +18,12 @@ export async function PATCH(
     const body = await request.json();
     const { readAccess, writeAccess, role } = body;
 
-    console.log("Access update request:", {
-      id,
-      readAccess,
-      writeAccess,
-      role,
-    });
-
     const account = await prisma.account.findUnique({
       where: { id },
       select: {
         id: true,
-        isMember: true,
-        readAccess: true,
-        writeAccess: true,
+        type: true,
+        accessLevel: true,
         role: true,
       },
     });
@@ -40,7 +32,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
-    if (!account.isMember) {
+    if (!(account.type === "MEMBER")) {
       return NextResponse.json(
         { error: "Only member accounts can have access updated" },
         { status: 400 }
@@ -53,11 +45,15 @@ export async function PATCH(
     const writeAccessProvided = typeof writeAccess === "boolean";
     const roleProvided = role !== undefined && role !== null;
 
-    // Start with provided values or current values
-    let finalReadAccess = readAccessProvided ? readAccess : account.readAccess;
-    let finalWriteAccess = writeAccessProvided
-      ? writeAccess
-      : account.writeAccess;
+    const hasReadAccess =
+      account.accessLevel === "READ" ||
+      account.accessLevel === "WRITE" ||
+      account.accessLevel === "ADMIN";
+    const hasWriteAccess =
+      account.accessLevel === "WRITE" || account.accessLevel === "ADMIN";
+
+    let finalReadAccess = readAccessProvided ? readAccess : hasReadAccess;
+    let finalWriteAccess = writeAccessProvided ? writeAccess : hasWriteAccess;
     let finalRole = roleProvided ? role : account.role;
 
     // Ensure role is valid enum value
@@ -78,7 +74,6 @@ export async function PATCH(
       finalRole = "ADMIN";
       finalReadAccess = true;
       finalWriteAccess = true;
-      console.log("Admin role detected, setting Read and Write to true");
     }
     // 2. If Admin role is explicitly removed → keep Read/Write as is
     else if (roleProvided && role === "MEMBER") {
@@ -130,17 +125,33 @@ export async function PATCH(
       finalReadAccess = true;
     }
 
-    // Compute canLogin: allowed if any access is granted
+    // Compute target access level from booleans/role
+    let finalAccessLevel: "READ" | "WRITE" | "ADMIN" = "READ";
+    if (finalRole === "ADMIN") {
+      finalAccessLevel = "ADMIN";
+    } else if (finalWriteAccess) {
+      finalAccessLevel = "WRITE";
+    } else if (finalReadAccess) {
+      finalAccessLevel = "READ";
+    } else {
+      // No explicit read/write -> keep minimal READ to satisfy enum
+      finalAccessLevel = "READ";
+      finalReadAccess = false;
+      finalWriteAccess = false;
+    }
+
+    // canLogin mirrors any access granted or admin role
     const canLogin =
-      finalReadAccess || finalWriteAccess || finalRole === "ADMIN";
+      finalAccessLevel === "ADMIN" ||
+      finalAccessLevel === "WRITE" ||
+      finalAccessLevel === "READ";
 
     const updateData: any = {
-      readAccess: finalReadAccess,
-      writeAccess: finalWriteAccess,
+      accessLevel: finalAccessLevel,
       role: finalRole as "ADMIN" | "MEMBER" | "SUPER_ADMIN",
-      canLogin: canLogin, // Store computed value for backward compatibility
+      canLogin,
       accessUpdatedAt: new Date(),
-      accessUpdatedBy: currentUser.id === "admin" ? null : currentUser.id,
+      accessUpdatedById: currentUser.id === "admin" ? null : currentUser.id,
     };
 
     console.log("Updating account with:", updateData);
@@ -150,8 +161,7 @@ export async function PATCH(
       data: updateData,
       select: {
         id: true,
-        readAccess: true,
-        writeAccess: true,
+        accessLevel: true,
         role: true,
         canLogin: true,
       },
@@ -162,8 +172,13 @@ export async function PATCH(
         message: "Access updated successfully",
         account: {
           id: updated.id,
-          readAccess: updated.readAccess,
-          writeAccess: updated.writeAccess,
+          accessLevel: updated.accessLevel,
+          readAccess:
+            updated.accessLevel === "READ" ||
+            updated.accessLevel === "WRITE" ||
+            updated.accessLevel === "ADMIN",
+          writeAccess:
+            updated.accessLevel === "WRITE" || updated.accessLevel === "ADMIN",
           role: updated.role,
           canLogin: updated.canLogin,
         },

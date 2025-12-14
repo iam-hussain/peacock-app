@@ -4,7 +4,7 @@ export const fetchCache = "force-no-store";
 
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/core/auth";
 
 export async function POST() {
   try {
@@ -17,7 +17,7 @@ export async function POST() {
       );
     }
 
-    // Format user response
+    // Format user response with accessLevel
     const responseUser =
       user.kind === "admin"
         ? {
@@ -25,6 +25,7 @@ export async function POST() {
             username: "admin" as const,
             role: "SUPER_ADMIN" as const,
             id: "admin" as const,
+            accessLevel: "ADMIN" as const,
           }
         : user.kind === "admin-member"
           ? {
@@ -32,10 +33,15 @@ export async function POST() {
               accountId: user.accountId,
               id: user.id,
               role: "ADMIN" as const,
-              readAccess: user.readAccess,
-              writeAccess: user.writeAccess,
+              accessLevel: user.accessLevel,
             }
-          : user;
+          : {
+              kind: "member" as const,
+              accountId: user.accountId,
+              id: user.id,
+              role: "MEMBER" as const,
+              accessLevel: user.accessLevel,
+            };
 
     return NextResponse.json(
       { isLoggedIn: true, user: responseUser },

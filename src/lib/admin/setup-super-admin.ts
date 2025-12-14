@@ -1,6 +1,5 @@
-import { hashPassword } from "./auth";
-
 import prisma from "@/db";
+import { hashPassword } from "@/lib/core/auth";
 
 /**
  * Ensures super admin account exists in the database
@@ -35,13 +34,11 @@ export async function setupSuperAdmin() {
           where: { id: existingAdmin.id },
           data: {
             passwordHash,
-            readAccess: true,
-            writeAccess: true,
+            accessLevel: "ADMIN",
             active: true,
             role: "SUPER_ADMIN",
           },
         });
-        console.log("✅ Super admin password updated");
       }
       return;
     }
@@ -50,7 +47,7 @@ export async function setupSuperAdmin() {
     // First, we need to create a passbook for the admin
     const passbook = await prisma.passbook.create({
       data: {
-        type: "MEMBER",
+        kind: "MEMBER",
         payload: {},
         loanHistory: [],
         joiningOffset: 0,
@@ -68,15 +65,12 @@ export async function setupSuperAdmin() {
         username: adminUsername,
         passwordHash,
         role: "SUPER_ADMIN",
-        readAccess: true,
-        writeAccess: true,
+        accessLevel: "ADMIN",
         active: true,
-        isMember: true,
+        type: "MEMBER",
         passbookId: passbook.id,
       },
     });
-
-    console.log("✅ Super admin account created successfully");
   } catch (error: any) {
     console.error("❌ Error setting up super admin:", error);
     throw error;

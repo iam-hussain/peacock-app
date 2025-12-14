@@ -5,6 +5,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import {
+  offsetFormSchema,
+  OffsetFromSchema,
+} from "../../../lib/validators/form-schema";
 import { GenericModalFooter } from "../../atoms/generic-modal";
 import Box from "../../ui/box";
 
@@ -17,8 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import fetcher from "@/lib/fetcher";
-import { offsetFormSchema, OffsetFromSchema } from "@/lib/form-schema";
+import fetcher from "@/lib/core/fetcher";
 
 type OffsetFormProps = {
   passbookId: string;

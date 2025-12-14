@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { createSessionCookie, verifyPassword } from "@/lib/auth";
+import { createSessionCookie, verifyPassword } from "@/lib/core/auth";
 
 export async function POST(request: Request) {
   try {
@@ -42,8 +42,7 @@ export async function POST(request: Request) {
       await createSessionCookie({
         sub: "admin",
         role: "SUPER_ADMIN",
-        writeAccess: true,
-        readAccess: true,
+        accessLevel: "ADMIN",
         canLogin: true,
       });
 
@@ -57,19 +56,18 @@ export async function POST(request: Request) {
     }
 
     // Member/Admin login - try username or email
-    let account = await prisma.account.findFirst({
+    const account = await prisma.account.findFirst({
       where: {
         OR: [{ username: username }, { email: username }],
-        isMember: true,
+        type: "MEMBER",
         active: true,
       },
       select: {
         id: true,
         role: true,
+        accessLevel: true,
         passwordHash: true,
         canLogin: true,
-        readAccess: true,
-        writeAccess: true,
       },
     });
 
@@ -81,12 +79,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if login is enabled (computed from access flags)
-    // Login is allowed if user has Read, Write, or Admin access
-    const canLogin =
-      account.readAccess || account.writeAccess || account.role === "ADMIN";
-
-    if (!canLogin) {
+    // Check if login is enabled
+    if (!account.canLogin) {
       return NextResponse.json(
         {
           error:
@@ -101,14 +95,6 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Account not set up for login. Please contact admin." },
         { status: 401 }
-      );
-    }
-
-    // Check read access
-    if (!account.readAccess) {
-      return NextResponse.json(
-        { error: "Account does not have read access" },
-        { status: 403 }
       );
     }
 
@@ -131,21 +117,11 @@ export async function POST(request: Request) {
       data: { lastLoginAt: new Date() },
     });
 
-    // Determine role - use account role from DB, default to MEMBER
-    const accountRole: "ADMIN" | "MEMBER" =
-      account.role === "ADMIN" ? "ADMIN" : "MEMBER";
-
-    // For ADMIN role, ensure they have full access
-    const isAdmin = accountRole === "ADMIN";
-    const finalWriteAccess = isAdmin ? true : account.writeAccess;
-    const finalReadAccess = isAdmin ? true : account.readAccess;
-
     // Create session
     await createSessionCookie({
       sub: account.id,
-      role: accountRole,
-      writeAccess: finalWriteAccess,
-      readAccess: finalReadAccess,
+      role: account.role,
+      accessLevel: account.accessLevel,
       canLogin: account.canLogin,
     });
 
@@ -153,11 +129,13 @@ export async function POST(request: Request) {
       {
         message: "Login successful",
         user: {
-          kind: isAdmin ? ("admin-member" as const) : ("member" as const),
+          kind:
+            account.role === "ADMIN"
+              ? ("admin-member" as const)
+              : ("member" as const),
           accountId: account.id,
-          role: accountRole,
-          readAccess: finalReadAccess,
-          writeAccess: finalWriteAccess,
+          role: account.role,
+          accessLevel: account.accessLevel,
           canLogin: account.canLogin,
         },
       },

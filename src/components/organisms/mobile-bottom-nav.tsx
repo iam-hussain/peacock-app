@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 import { openSideBar } from "@/store/pageSlice";
 
 interface BottomNavItem {

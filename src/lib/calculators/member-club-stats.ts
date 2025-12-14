@@ -1,30 +1,42 @@
 import prisma from "@/db";
-import { getMemberTotalDepositUpToday } from "@/lib/club";
-import { getMemberLoanHistory } from "@/lib/loan-calculator";
-import { ClubPassbookData, VendorPassbookData } from "@/lib/type";
+import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
+import { getMemberTotalDepositUpToday } from "@/lib/config/club";
+import { ClubPassbookData, VendorPassbookData } from "@/lib/validators/type";
 
 export async function getMemberClubStats() {
   const [members, clubPassbook, vendorPassbooks] = await Promise.all([
     prisma.account.findMany({
-      where: { isMember: true },
+      where: { type: "MEMBER" },
       include: { passbook: true },
     }),
-    prisma.passbook.findFirstOrThrow({
-      where: { type: "CLUB" },
-      select: { payload: true },
-    }),
+    prisma.passbook
+      .findFirst({
+        where: { kind: "CLUB" },
+        select: { payload: true },
+      })
+      .then((club) => {
+        if (!club) {
+          throw new Error(
+            "CLUB passbook not found. Please run seed to initialize database."
+          );
+        }
+        return club;
+      }),
     prisma.passbook.findMany({
-      where: { type: "VENDOR" },
+      where: { kind: "VENDOR" },
       select: { payload: true },
     }),
   ]);
 
   const totalOffset = members
-    .map((m) => m.passbook.joiningOffset + m.passbook.delayOffset)
+    .filter((m) => m.passbook !== null)
+    .map(
+      (m) => (m.passbook?.joiningOffset || 0) + (m.passbook?.delayOffset || 0)
+    )
     .reduce((a, b) => a + b, 0);
 
   const memberTotalDeposit = getMemberTotalDepositUpToday();
-  const activeMemberCount = members.filter((m) => m.active).length;
+  const activeMemberCount = members.filter((m) => m.status === "ACTIVE").length;
   const clubData = clubPassbook.payload as ClubPassbookData;
 
   const totalVendorProfit = vendorPassbooks

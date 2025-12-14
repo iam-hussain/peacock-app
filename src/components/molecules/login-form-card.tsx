@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from "../ui/select";
 
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/core/fetcher";
 import { fetchAccountSelect } from "@/lib/query-options";
 
 const loginFormSchema = z.object({

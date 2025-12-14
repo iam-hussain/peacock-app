@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/core/auth";
 
 export async function GET() {
   try {
@@ -21,10 +21,11 @@ export async function GET() {
             lastName: "Admin",
             phone: null,
             email: null,
-            avatar: null,
+            avatarUrl: null,
             username: "admin",
-            readAccess: true,
-            writeAccess: true,
+            accessLevel: "ADMIN",
+            role: "SUPER_ADMIN",
+            type: "SYSTEM",
             active: true,
             lastLoginAt: null,
             createdAt: null,
@@ -51,10 +52,12 @@ export async function GET() {
         lastName: true,
         phone: true,
         email: true,
-        avatar: true,
+        avatarUrl: true,
         username: true,
-        readAccess: true,
-        writeAccess: true,
+        accessLevel: true,
+        role: true,
+        type: true,
+        canLogin: true,
         active: true,
         lastLoginAt: true,
         createdAt: true,
@@ -144,7 +147,7 @@ export async function PATCH(request: Request) {
         lastName: lastName ?? undefined,
         phone: phone ?? undefined,
         email: email ?? undefined,
-        avatar: avatar ?? undefined,
+        avatarUrl: avatar ?? undefined,
         username: username ?? undefined,
       },
       select: {
@@ -153,10 +156,12 @@ export async function PATCH(request: Request) {
         lastName: true,
         phone: true,
         email: true,
-        avatar: true,
+        avatarUrl: true,
         username: true,
-        readAccess: true,
-        writeAccess: true,
+        accessLevel: true,
+        role: true,
+        type: true,
+        canLogin: true,
         active: true,
         lastLoginAt: true,
         createdAt: true,

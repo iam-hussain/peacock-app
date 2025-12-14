@@ -1,14 +1,14 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { TRANSACTION_TYPE } from "@prisma/client";
+import { TransactionType } from "@prisma/client";
 
 import {
   ClubPassbookData,
   MemberPassbookData,
   VendorPassbookData,
-} from "@/lib/type";
+} from "@/lib/validators/type";
 
 export type TransactionPassbookConfig = {
-  [key in TRANSACTION_TYPE]: PassbookConfigAction;
+  [key in TransactionType]: PassbookConfigAction;
 };
 
 export type PassbookRecord =

@@ -22,8 +22,8 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
 import Typography from "../ui/typography";
 
-import { clubAge } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
+import { clubAge } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
 import { RootState } from "@/store";
 import { setIsLoggedIn } from "@/store/pageSlice";
 

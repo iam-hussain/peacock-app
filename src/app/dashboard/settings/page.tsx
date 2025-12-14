@@ -44,10 +44,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
-import { fileDateTime } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
+import { fileDateTime } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
 import { fetchMembers, fetchVendors } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
@@ -102,7 +102,7 @@ export default function SettingsPage() {
 
   // System Tools Mutations
   const returnsMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/recalculate"),
+    mutationFn: () => fetcher.post("/api/admin/recalculate"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["all"] });
       toast.success("Returns are recalculated successfully.");
@@ -139,7 +139,7 @@ export default function SettingsPage() {
   });
 
   const backupMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/action/backup"),
+    mutationFn: () => fetcher.post("/api/admin/backup"),
     onSuccess: async (data: any) => {
       const blob = new Blob([JSON.stringify(data)], {
         type: "application/json",
@@ -263,7 +263,13 @@ export default function SettingsPage() {
       },
       {
         id: "readAccess",
-        accessorKey: "account.readAccess",
+        accessorFn: (row) => {
+          const state = memberAccessState[row.account.id];
+          return (
+            state?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(row.account.accessLevel)
+          );
+        },
         header: "Read",
         enableSorting: true,
         meta: {
@@ -274,8 +280,12 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.account.readAccess;
-          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentRead =
+            memberState?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+          const currentWrite =
+            memberState?.write ??
+            ["WRITE", "ADMIN"].includes(member.account.accessLevel);
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 
@@ -315,7 +325,12 @@ export default function SettingsPage() {
       },
       {
         id: "writeAccess",
-        accessorKey: "account.writeAccess",
+        accessorFn: (row) => {
+          const state = memberAccessState[row.account.id];
+          return (
+            state?.write ?? ["WRITE", "ADMIN"].includes(row.account.accessLevel)
+          );
+        },
         header: "Write",
         enableSorting: true,
         meta: {
@@ -326,8 +341,12 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.account.readAccess;
-          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentRead =
+            memberState?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+          const currentWrite =
+            memberState?.write ??
+            ["WRITE", "ADMIN"].includes(member.account.accessLevel);
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 
@@ -367,7 +386,10 @@ export default function SettingsPage() {
       },
       {
         id: "adminAccess",
-        accessorKey: "account.role",
+        accessorFn: (row) => {
+          const state = memberAccessState[row.account.id];
+          return state?.admin ?? row.account.role === "ADMIN";
+        },
         header: "Admin",
         enableSorting: true,
         meta: {
@@ -378,8 +400,12 @@ export default function SettingsPage() {
         cell: ({ row }) => {
           const member = row.original;
           const memberState = memberAccessState[member.account.id];
-          const currentRead = memberState?.read ?? member.account.readAccess;
-          const currentWrite = memberState?.write ?? member.account.writeAccess;
+          const currentRead =
+            memberState?.read ??
+            ["READ", "WRITE", "ADMIN"].includes(member.account.accessLevel);
+          const currentWrite =
+            memberState?.write ??
+            ["WRITE", "ADMIN"].includes(member.account.accessLevel);
           const currentAdmin =
             memberState?.admin ?? member.account.role === "ADMIN";
 

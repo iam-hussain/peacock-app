@@ -26,9 +26,9 @@ import {
   displayDateTime,
   fileDateTime,
   newZoneDate,
-} from "@/lib/date";
+} from "@/lib/core/date";
 import { fetchLoans } from "@/lib/query-options";
-import { cn, moneyFormat } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/ui/utils";
 import { TransformedLoan } from "@/transformers/account";
 
 const baseColumns: ColumnDef<TransformedLoan>[] = [

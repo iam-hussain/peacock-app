@@ -10,6 +10,7 @@ import prisma from "@/db";
 /**
  * GET /api/dashboard/graphs?from=YYYY-MM&to=YYYY-MM
  * Get dashboard summaries for a date range (for graphs)
+ * Returns only fields required for charts - NO CALCULATIONS
  */
 export async function GET(request: NextRequest) {
   try {
@@ -51,28 +52,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const summaries =
-      (await (prisma as any).dashboardMonthlySummary?.findMany({
-        where: {
-          monthStartDate: {
-            gte: fromMonthStart,
-            lte: toMonthStart,
-          },
+    const summaries = await prisma.summary.findMany({
+      where: {
+        monthStartDate: {
+          gte: fromMonthStart,
+          lte: toMonthStart,
         },
-        orderBy: { monthStartDate: "asc" },
-      })) || [];
-
-    // Check if model exists
-    if (!(prisma as any).dashboardMonthlySummary) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Dashboard model not available. Please run: npx prisma generate && npx prisma migrate dev",
-        },
-        { status: 503 }
-      );
-    }
+      },
+      orderBy: { monthStartDate: "asc" },
+      select: {
+        monthStartDate: true,
+        availableCash: true,
+        totalInvested: true,
+        pendingAmounts: true,
+        currentValue: true,
+        totalPortfolioValue: true,
+        currentLoanTaken: true,
+        interestBalance: true,
+      },
+    });
 
     return NextResponse.json({
       success: true,

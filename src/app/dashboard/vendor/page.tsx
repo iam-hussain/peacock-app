@@ -18,9 +18,9 @@ import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useTableExport } from "@/hooks/use-table-export";
-import { dateFormat, newZoneDate } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchVendors } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 export default function VendorsPage() {
   const { data, isLoading } = useQuery(fetchVendors());
@@ -53,8 +53,11 @@ export default function VendorsPage() {
   }, [data?.vendors, searchQuery, statusFilter]);
 
   const handleViewDetails = (vendor: TransformedVendor) => {
-    // Navigate to vendor details if needed
-    console.log("View vendor details", vendor);
+    window.location.href = `/dashboard/vendor/${vendor.id}`;
+  };
+
+  const handleViewTransactions = (vendor: TransformedVendor) => {
+    window.location.href = `/dashboard/transaction?account=${vendor.id}`;
   };
 
   const handleResetFilters = () => {
@@ -138,15 +141,20 @@ export default function VendorsPage() {
         cell: ({ row }) => {
           const vendor = row.original;
           const duration = getCycleDuration(vendor);
+          const startDate = vendor.startAt
+            ? dateFormat(newZoneDate(vendor.startAt))
+            : "N/A";
+          const endDate =
+            vendor.endAt !== null && vendor.endAt !== undefined
+              ? dateFormat(newZoneDate(vendor.endAt))
+              : null;
           return (
             <div className="flex flex-col">
-              <div className="text-sm text-foreground">
-                {dateFormat(newZoneDate(vendor.startAt))}
-              </div>
-              {vendor.endAt && (
+              <div className="text-sm text-foreground">{startDate}</div>
+              {endDate && (
                 <>
                   <div className="text-xs text-muted-foreground">
-                    → {dateFormat(newZoneDate(vendor.endAt))}
+                    → {endDate}
                   </div>
                   {duration && (
                     <div className="text-xs text-muted-foreground">
@@ -235,7 +243,7 @@ export default function VendorsPage() {
           return (
             <RowActionsMenu
               onViewDetails={() => handleViewDetails(vendor)}
-              onViewTransactions={() => handleViewDetails(vendor)}
+              onViewTransactions={() => handleViewTransactions(vendor)}
             />
           );
         },
@@ -267,14 +275,14 @@ export default function VendorsPage() {
               label: "Export CSV",
               icon: <Download className="h-4 w-4" />,
               onClick: () => {
-                console.log("Export CSV");
+                // TODO: Implement CSV export
               },
             },
             {
               label: "Screenshot",
               icon: <Camera className="h-4 w-4" />,
               onClick: () => {
-                console.log("Screenshot");
+                // TODO: Implement screenshot
               },
             },
           ]}

@@ -6,7 +6,7 @@ import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { hashPassword, requireSuperAdmin } from "@/lib/auth";
+import { hashPassword, requireSuperAdmin } from "@/lib/core/auth";
 
 export async function POST(
   request: Request,
@@ -19,14 +19,14 @@ export async function POST(
 
     const account = await prisma.account.findUnique({
       where: { id },
-      select: { id: true, isMember: true },
+      select: { id: true, type: true },
     });
 
     if (!account) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
-    if (!account.isMember) {
+    if (!(account.type === "MEMBER")) {
       return NextResponse.json(
         { error: "Only member accounts can have passwords reset" },
         { status: 400 }

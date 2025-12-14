@@ -16,9 +16,9 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { useTableExport } from "@/hooks/use-table-export";
-import { dateFormat, newZoneDate } from "@/lib/date";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchLoans } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedLoan } from "@/transformers/account";
 
 export default function LoansPage() {
@@ -65,7 +65,7 @@ export default function LoansPage() {
   };
 
   const handleAddRepayment = (loan: TransformedLoan) => {
-    window.location.href = `/dashboard/transaction?member=${loan.username}&type=LOAN_REPAY`;
+    window.location.href = `/dashboard/transaction?member=${loan.username}&type=LOAN_ALL`;
   };
 
   const handleChangePassword = () => {

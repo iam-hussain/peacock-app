@@ -1,7 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { TRANSACTION_TYPE } from "@prisma/client";
+import { TransactionType } from "@prisma/client";
 
-import { newZoneDate } from "./date";
+import { newZoneDate } from "@/lib/core/date";
 
 type Stage = { name: string; amount: number; startDate: Date; endDate?: Date };
 
@@ -88,7 +88,7 @@ export const vendorTypeTransactionMap = {
 };
 
 // Transaction Type Map
-export const transactionTypeMap: { [key in TRANSACTION_TYPE]: string } = {
+export const transactionTypeMap: { [key in TransactionType]: string } = {
   PERIODIC_DEPOSIT: "Member's Deposit",
   OFFSET_DEPOSIT: "Member's Offset Deposit",
   WITHDRAW: "Member's Withdrawal",
@@ -102,7 +102,7 @@ export const transactionTypeMap: { [key in TRANSACTION_TYPE]: string } = {
 };
 
 // Transaction Type Human Map
-export const transactionTypeHumanMap: { [key in TRANSACTION_TYPE]: string } = {
+export const transactionTypeHumanMap: { [key in TransactionType]: string } = {
   PERIODIC_DEPOSIT: "Member's Monthly Deposit",
   OFFSET_DEPOSIT: "Member's Offset Deposit",
   WITHDRAW: "Member's Withdrawal",

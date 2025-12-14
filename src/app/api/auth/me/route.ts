@@ -4,7 +4,7 @@ export const fetchCache = "force-no-store";
 
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/core/auth";
 
 export async function GET() {
   const user = await getCurrentUser();

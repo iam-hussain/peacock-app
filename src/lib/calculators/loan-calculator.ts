@@ -1,9 +1,9 @@
 import { Transaction } from "@prisma/client";
 
 import prisma from "@/db";
-import { newZoneDate } from "@/lib/date";
+import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { LoanHistoryEntry } from "@/lib/type";
+import { LoanHistoryEntry } from "@/lib/validators/type";
 
 /**
  * Fetches all loan transactions for a specific member
@@ -12,9 +12,9 @@ export function fetchLoanTransactionsForMember(memberId: string) {
   return prisma.transaction.findMany({
     where: {
       OR: [{ fromId: memberId }, { toId: memberId }],
-      transactionType: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
+      type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
     },
-    orderBy: { transactionAt: "asc" },
+    orderBy: { occurredAt: "asc" },
   });
 }
 
@@ -46,25 +46,25 @@ export function calculateLoanDetails(transactions: Transaction[]) {
   let prevLoan: any = null;
 
   transactions.forEach((transaction) => {
-    const { transactionAt, transactionType, amount } = transaction;
+    const { occurredAt, type: transactionType, amount } = transaction;
 
     if (transactionType === "LOAN_TAKEN") {
       if (prevLoan) {
         loanHistory.push(
-          getOneLoanDetails(prevLoan.amount, prevLoan.startDate, transactionAt)
+          getOneLoanDetails(prevLoan.amount, prevLoan.startDate, occurredAt)
         );
       }
       accountBalance = accountBalance + amount;
       prevLoan = {
         active: true,
         amount: accountBalance,
-        startDate: newZoneDate(transactionAt),
+        startDate: newZoneDate(occurredAt),
         transactionType,
       };
     } else if (transactionType === "LOAN_REPAY") {
       if (prevLoan) {
         loanHistory.push(
-          getOneLoanDetails(accountBalance, prevLoan.startDate, transactionAt)
+          getOneLoanDetails(accountBalance, prevLoan.startDate, occurredAt)
         );
         prevLoan = null;
       }
@@ -74,7 +74,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
         prevLoan = {
           active: true,
           amount: accountBalance,
-          startDate: newZoneDate(transactionAt),
+          startDate: newZoneDate(occurredAt),
           transactionType,
         };
       }
@@ -104,19 +104,26 @@ export async function getMemberLoanHistory(memberId: string) {
   const loanHistoryResult = loanHistory.reduce(
     (acc, loan) => {
       const interestCalc = calculateInterestByAmount(
-        loan.amount,
-        loan.startDate,
-        loan?.endDate
+        loan.amount ?? loan.principalAmount ?? 0,
+        loan.startDate ?? loan.startedAt ?? newZoneDate(),
+        loan?.endDate ?? loan?.closedAt
       );
       acc.totalInterestAmount += interestCalc.interestAmount;
       // Remove startDate and endDate from loan before spreading
       const { startDate: _startDate, endDate: _endDate } = loan;
       acc.loanHistory.push({
         ...interestCalc,
-        amount: loan.amount,
-        active: !loan.endDate, // Loan is active if there's no end date
-        startDate: newZoneDate(loan.startDate).getTime(),
-        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
+        amount: loan.amount ?? loan.principalAmount ?? 0,
+        active: !(loan.endDate ?? loan.closedAt), // Loan is active if there's no end date
+        startDate: newZoneDate(
+          loan.startDate ?? loan.startedAt ?? newZoneDate()
+        ).getTime(),
+        endDate:
+          (loan.endDate ?? loan.closedAt)
+            ? newZoneDate(
+                loan.endDate ?? loan.closedAt ?? newZoneDate()
+              ).getTime()
+            : undefined,
         totalInterestAmount: acc.totalInterestAmount,
       });
       // Store the most recent monthsPassedString

@@ -2,7 +2,7 @@ import { cva, VariantProps } from "class-variance-authority";
 import clsx from "clsx";
 import React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 const typographyStyles = cva("w-auto text-foreground", {
   variants: {

@@ -1,4 +1,5 @@
-// Optimized Prisma schema for better performance and readability.
+// Modern Fintech-aligned Prisma Schema
+// Clean separation: Identity, Finance, Analytics
 
 generator client {
   provider = "prisma-client-js"
@@ -9,80 +10,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ROLE {
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum AccountRole {
   SUPER_ADMIN
   ADMIN
   MEMBER
 }
 
-model Account {
-  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
-  firstName           String
-  lastName            String?
-  // Auth
-  username            String        @unique // for login (required, unique)
-  email               String? // for login (enforce uniqueness in app logic for non-null values)
-  passwordHash        String? // bcrypt hash; null for vendor-only accounts
-  // Access control
-  role                ROLE          @default(MEMBER)
-  readAccess          Boolean       @default(true)
-  writeAccess         Boolean       @default(false)
-  canLogin            Boolean       @default(false)
-  // Audit fields for access control
-  accessUpdatedAt     DateTime?
-  accessUpdatedBy     String?       @db.ObjectId
-  phone               String?
-  avatar              String?
-  startAt             DateTime      @default(now())
-  endAt               DateTime?
-  active              Boolean       @default(true)
-  isMember            Boolean       @default(true)
-  passbook            Passbook      @relation(fields: [passbookId], references: [id], onDelete: Cascade)
-  passbookId          String        @unique @db.ObjectId
-  fromTransaction     Transaction[] @relation("FromAccount")
-  toTransaction       Transaction[] @relation("ToAccount")
-  // Audit relations
-  createdTransactions Transaction[] @relation("CreatedBy")
-  updatedTransactions Transaction[] @relation("UpdatedBy")
-  lastLoginAt         DateTime?
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+enum AccountType {
+  MEMBER
+  VENDOR
+  CLUB
+  SYSTEM
 }
 
-model Transaction {
-  id              String             @id @default(auto()) @map("_id") @db.ObjectId
-  amount          Float              @default(0)
-  transactionType TRANSACTION_TYPE   @default(PERIODIC_DEPOSIT)
-  transactionAt   DateTime           @default(now())
-  method          TRANSACTION_METHOD @default(ACCOUNT)
-  from            Account            @relation("FromAccount", fields: [fromId], references: [id], onDelete: Cascade)
-  fromId          String             @db.ObjectId
-  to              Account            @relation("ToAccount", fields: [toId], references: [id], onDelete: Cascade)
-  toId            String             @db.ObjectId
-  // Audit trail
-  createdBy       Account?           @relation("CreatedBy", fields: [createdById], references: [id])
-  createdById     String?            @db.ObjectId
-  updatedBy       Account?           @relation("UpdatedBy", fields: [updatedById], references: [id])
-  updatedById     String?            @db.ObjectId
-  note            String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+  CLOSED
 }
 
-model Passbook {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  type          PASSBOOK_TYPE @default(VENDOR)
-  payload       Json          @default("{}")
-  loanHistory   Json          @default("[]")
-  joiningOffset Float         @default(0)
-  delayOffset   Float         @default(0)
-  account       Account?
-  isChit        Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+enum AccessLevel {
+  READ
+  WRITE
+  ADMIN
 }
 
-enum TRANSACTION_METHOD {
+enum TransactionMethod {
   CASH
   ACCOUNT
   UPI
@@ -90,7 +48,7 @@ enum TRANSACTION_METHOD {
   CHEQUE
 }
 
-enum TRANSACTION_TYPE {
+enum TransactionType {
   PERIODIC_DEPOSIT
   OFFSET_DEPOSIT
   WITHDRAW
@@ -103,49 +61,197 @@ enum TRANSACTION_TYPE {
   LOAN_INTEREST
 }
 
-enum PASSBOOK_TYPE {
+enum PassbookKind {
   MEMBER
   VENDOR
   CLUB
 }
 
-model DashboardMonthlySummary {
-  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
-  monthStartDate         DateTime
-  monthEndDate           DateTime
-  // Members
-  activeMembers          Int      @default(0)
-  clubAgeMonths          Int      @default(0)
-  // Member Funds
-  totalDeposits          Float    @default(0)
-  memberBalance          Float    @default(0)
-  // Member Outflow
-  profitWithdrawals      Float    @default(0)
-  memberAdjustments      Float    @default(0)
-  // Loans - Lifetime
-  totalLoanGiven         Float    @default(0)
-  totalInterestCollected Float    @default(0)
-  // Loans - Active / Outstanding
-  currentLoanTaken       Float    @default(0)
-  interestBalance        Float    @default(0)
-  // Vendor
-  vendorInvestment       Float    @default(0)
-  vendorProfit           Float    @default(0)
-  // Cash Flow
-  totalInvested          Float    @default(0)
-  pendingAmounts         Float    @default(0)
-  // Valuation
-  availableCash          Float    @default(0)
-  currentValue           Float    @default(0)
-  // Portfolio
-  totalPortfolioValue    Float    @default(0)
-  // System
-  recalculatedAt         DateTime @default(now())
-  recalculatedByAdminId  String?  @db.ObjectId
-  isLocked               Boolean  @default(false)
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+// ============================================================================
+// ACCOUNT - Identity + Access Only
+// ============================================================================
 
-  @@unique([monthStartDate])
-  @@index([monthEndDate])
+model Account {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Classification
+  type   AccountType   @default(MEMBER)
+  role   AccountRole   @default(MEMBER)
+  status AccountStatus @default(ACTIVE)
+
+  // Identity
+  firstName String
+  lastName  String?
+  phone     String?
+  avatarUrl String? @map("avatar")
+
+  // Authentication
+  username     String  @unique
+  email        String?
+  passwordHash String?
+  canLogin     Boolean @default(false)
+
+  // Authorization (single source of truth)
+  accessLevel AccessLevel @default(READ)
+
+  // Audit
+  accessUpdatedAt   DateTime?
+  accessUpdatedById String?   @db.ObjectId
+
+  // Legacy passbook (read-only) - TRANSITIONAL
+  passbookId String?   @unique @db.ObjectId
+  passbook   Passbook? @relation(fields: [passbookId], references: [id])
+
+  // Transactions
+  outgoingTransactions Transaction[] @relation("FromAccount")
+  incomingTransactions Transaction[] @relation("ToAccount")
+  createdTransactions  Transaction[] @relation("CreatedBy")
+  updatedTransactions  Transaction[] @relation("UpdatedBy")
+
+  // Lifecycle
+  startedAt DateTime  @default(now()) @map("startAt")
+  endedAt   DateTime? @map("endAt")
+  active    Boolean   @default(true)
+
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ============================================================================
+// TRANSACTION - Financial Source of Truth
+// ============================================================================
+
+model Transaction {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Parties
+  fromId String  @db.ObjectId
+  toId   String  @db.ObjectId
+  from   Account @relation("FromAccount", fields: [fromId], references: [id], onDelete: Cascade)
+  to     Account @relation("ToAccount", fields: [toId], references: [id], onDelete: Cascade)
+
+  // Financial
+  amount   Float
+  currency String @default("INR")
+
+  // Classification
+  type   TransactionType   @default(PERIODIC_DEPOSIT) @map("transactionType")
+  method TransactionMethod @default(ACCOUNT)
+
+  // Timing
+  occurredAt DateTime  @default(now()) @map("transactionAt")
+  postedAt   DateTime? // When it was processed/confirmed
+
+  // Metadata
+  referenceId String? // External reference (cheque #, UPI ref, etc)
+  description String?  @map("note")
+  tags        String[] @default([])
+
+  // Audit
+  createdById String?  @db.ObjectId
+  createdBy   Account? @relation("CreatedBy", fields: [createdById], references: [id])
+  updatedById String?  @db.ObjectId
+  updatedBy   Account? @relation("UpdatedBy", fields: [updatedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([occurredAt])
+  @@index([type, occurredAt])
+  @@index([fromId, occurredAt])
+  @@index([toId, occurredAt])
+  @@index([method])
+}
+
+// ============================================================================
+// PASSBOOK - Legacy / Transitional (Read-Only)
+// ============================================================================
+
+model Passbook {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Legacy JSON payloads (DO NOT USE FOR NEW FEATURES)
+  payload     Json? @default("{}")
+  loanHistory Json? @default("[]")
+
+  kind PassbookKind @default(MEMBER) @map("type")
+
+  // Link to account
+  account   Account?
+  accountId String?
+
+  // Calculated fields (deprecated - use Transaction aggregations)
+  currentBalance   Float @default(0)
+  totalDeposits    Float @default(0)
+  totalWithdrawals Float @default(0)
+
+  // Adjustments (legacy)
+  joiningOffset Float @default(0)
+  delayOffset   Float @default(0)
+
+  // Metadata
+  meta             Json?
+  version          Int       @default(0)
+  lastCalculatedAt DateTime?
+  isChit           Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([kind])
+  @@map("passbooks")
+}
+
+// ============================================================================
+// SUMMARY - Monthly Snapshot (Dashboard & Graph Source of Truth)
+// ============================================================================
+
+model Summary {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Period
+  monthStartDate DateTime
+  monthEndDate   DateTime
+
+  // Members
+  activeMembers Int @default(0)
+  clubAgeMonths Int @default(0)
+
+  // Member Funds
+  totalDeposits     Float @default(0)
+  memberBalance     Float @default(0)
+  profitWithdrawals Float @default(0)
+  memberAdjustments Float @default(0)
+
+  // Loans - Lifetime
+  totalLoanGiven         Float @default(0)
+  totalInterestCollected Float @default(0)
+
+  // Loans - Active / Outstanding
+  currentLoanTaken Float @default(0)
+  interestBalance  Float @default(0)
+
+  // Vendor
+  vendorInvestment Float @default(0)
+  vendorProfit     Float @default(0)
+
+  // Cash Flow
+  totalInvested  Float @default(0)
+  pendingAmounts Float @default(0)
+
+  // Valuation
+  availableCash Float @default(0)
+  currentValue  Float @default(0)
+
+  // Portfolio
+  totalPortfolioValue Float @default(0)
+
+  // System
+  recalculatedAt        DateTime @default(now())
+  recalculatedByAdminId String?  @db.ObjectId
+  isLocked              Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

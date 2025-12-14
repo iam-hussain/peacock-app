@@ -3,8 +3,8 @@ import Box from "../ui/box";
 import Typography from "../ui/typography";
 
 import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]/route";
-import { dateFormat, displayDateTime } from "@/lib/date";
-import { cn } from "@/lib/utils";
+import { dateFormat, displayDateTime } from "@/lib/core/date";
+import { cn } from "@/lib/ui/utils";
 
 // MemberDetails.tsx
 export function MemberDetails({

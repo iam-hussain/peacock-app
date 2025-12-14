@@ -1,7 +1,7 @@
 import React from "react";
 import { FaCircle } from "react-icons/fa";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 const icons = {
   FaCircle,

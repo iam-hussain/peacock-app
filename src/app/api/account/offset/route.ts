@@ -11,7 +11,7 @@ import prisma from "@/db";
 // Only admins can adjust member offsets (Write users cannot edit members)
 export async function POST(request: Request) {
   try {
-    const { requireAdmin } = await import("@/lib/auth");
+    const { requireAdmin } = await import("@/lib/core/auth");
     await requireAdmin();
 
     const { passbookId, joiningOffset, delayOffset } = await request.json();

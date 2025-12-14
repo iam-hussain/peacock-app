@@ -6,17 +6,17 @@ import { Transaction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { clubData } from "@/lib/config";
-import { newZoneDate } from "@/lib/date";
+import { clubData } from "@/lib/config/config";
+import { newZoneDate } from "@/lib/core/date";
 
 type AccountDetails = {
   id: string;
   username: string;
   firstName: string;
   lastName: string | null;
-  avatar: string | null;
-  active: boolean;
-  isMember: boolean;
+  avatarUrl: string | null;
+  status: "ACTIVE" | "INACTIVE" | "BLOCKED" | "CLOSED";
+  type: "MEMBER" | "VENDOR" | "CLUB" | "SYSTEM";
 };
 
 type AuditAccountDetails = {
@@ -34,7 +34,7 @@ type TransactionToTransform = Transaction & {
 
 export async function POST(request: Request) {
   try {
-    const { requireAuth } = await import("@/lib/auth");
+    const { requireAuth } = await import("@/lib/core/auth");
     await requireAuth();
 
     const queryParams = getQueryParams(request.url);
@@ -78,7 +78,7 @@ function getQueryParams(url: string) {
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),
     endDate: searchParams.get("endDate"),
-    sortField: searchParams.get("sortField") || "transactionAt",
+    sortField: searchParams.get("sortField") || "occurredAt",
     sortOrder: searchParams.get("sortOrder") || "desc",
   };
 }
@@ -95,7 +95,23 @@ function createFilters({
     filters.OR = [{ fromId: accountId }, { toId: accountId }];
   }
   if (transactionType) {
-    filters.transactionType = transactionType;
+    const mapMultiType = (value: string) => {
+      if (value === "LOAN_ALL") {
+        return ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"];
+      }
+      if (value.includes(",")) {
+        return value
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+      }
+      return value;
+    };
+    const mappedType = mapMultiType(transactionType);
+    filters.type =
+      Array.isArray(mappedType) && mappedType.length > 0
+        ? { in: mappedType }
+        : mappedType;
     if (accountId && transactionType !== "FUNDS_TRANSFER") {
       if (
         [
@@ -121,7 +137,7 @@ function createFilters({
   if (startDate && endDate)
     if (
       sortField &&
-      (sortField === "transactionAt" || sortField === "createdAt")
+      (sortField === "occurredAt" || sortField === "createdAt")
     ) {
       filters[sortField] = {
         gte: newZoneDate(startDate),
@@ -155,9 +171,9 @@ function fetchTransactions(
           username: true,
           firstName: true,
           lastName: true,
-          avatar: true,
-          active: true,
-          isMember: true,
+          avatarUrl: true,
+          status: true,
+          type: true,
         },
       },
       to: {
@@ -166,9 +182,9 @@ function fetchTransactions(
           username: true,
           firstName: true,
           lastName: true,
-          avatar: true,
-          active: true,
-          isMember: true,
+          avatarUrl: true,
+          status: true,
+          type: true,
         },
       },
       createdBy: {
@@ -198,38 +214,40 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       ...transaction.from,
       name: fromName,
       sub: "",
-      avatar: transaction.from.avatar
-        ? `/image/${transaction.from.avatar}`
+      avatar: transaction.from.avatarUrl
+        ? `/image/${transaction.from.avatarUrl}`
         : undefined,
-      link: transaction.from.isMember
-        ? `/dashboard/member/${transaction.from.username}`
-        : undefined,
+      link:
+        transaction.from.type === "MEMBER"
+          ? `/dashboard/member/${transaction.from.username}`
+          : undefined,
     },
     to: {
       ...transaction.to,
       name: toName,
       sub: "",
-      avatar: transaction.to.avatar
-        ? `/image/${transaction.to.avatar}`
+      avatar: transaction.to.avatarUrl
+        ? `/image/${transaction.to.avatarUrl}`
         : undefined,
-      link: transaction.to.isMember
-        ? `/dashboard/member/${transaction.to.username}`
-        : undefined,
+      link:
+        transaction.to.type === "MEMBER"
+          ? `/dashboard/member/${transaction.to.username}`
+          : undefined,
     },
   };
 
-  if (["LOAN_TAKEN"].includes(transaction.transactionType)) {
+  if (["LOAN_TAKEN"].includes(transaction.type)) {
     updated.to.sub = "Loan Account";
   }
 
-  if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.transactionType)) {
+  if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.type)) {
     updated.from.sub = "Loan Account";
     updated.to.sub = "Club Account";
   }
 
   if (
     ["WITHDRAW", "LOAN_TAKEN", "VENDOR_INVEST", "FUNDS_TRANSFER"].includes(
-      transaction.transactionType
+      transaction.type
     )
   ) {
     updated.from.sub = "Club Account";
@@ -244,7 +262,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       "LOAN_REPAY",
       "LOAN_INTEREST",
       "FUNDS_TRANSFER",
-    ].includes(transaction.transactionType)
+    ].includes(transaction.type)
   ) {
     updated.to.sub = clubData.sub;
     updated.to.avatar = clubData.avatar;
@@ -260,6 +278,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
   return {
     ...transaction,
     ...updated,
+    transactionType: transaction.type,
     createdByName,
     updatedByName,
     createdById: transaction.createdById,

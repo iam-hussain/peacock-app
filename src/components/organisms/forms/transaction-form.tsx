@@ -6,13 +6,11 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { DatePickerForm } from "../../atoms/date-picker-form";
-import { GenericModalFooter } from "../../atoms/generic-modal";
-import Box from "../../ui/box";
-import { Button } from "../../ui/button";
-
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
-import { TransformedTransaction } from "@/app/api/transaction/route";
+import { DatePickerForm } from "@/components/atoms/date-picker-form";
+import { GenericModalFooter } from "@/components/atoms/generic-modal";
+import Box from "@/components/ui/box";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -30,17 +28,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { transactionTypeHumanMap } from "@/lib/config";
-import { newZoneDate } from "@/lib/date";
-import fetcher from "@/lib/fetcher";
+import { transactionTypeHumanMap } from "@/lib/config/config";
+import { newZoneDate } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
 import {
   TransactionFormSchema,
   transactionFormSchema,
-} from "@/lib/form-schema";
+} from "@/lib/validators/form-schema";
 
 type TransactionFormProps = {
   accounts: TransformedAccountSelect[];
-  selected: null | TransformedTransaction;
+  selected?: any | null;
   onSuccess: () => void;
   onCancel?: () => void;
   isMobile?: boolean;
@@ -57,8 +55,8 @@ export function TransactionForm({
 
   const [members, vendors] = useMemo(() => {
     return [
-      accounts.filter((e) => e.isMember),
-      accounts.filter((e) => !e.isMember),
+      accounts.filter((account) => account.isMember),
+      accounts.filter((account) => !account.isMember),
     ];
   }, [accounts]);
 
@@ -66,13 +64,16 @@ export function TransactionForm({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: selected
       ? {
-          fromId: selected?.fromId || "",
-          toId: selected?.toId || "",
-          transactionType: selected.transactionType as any,
-          method: (selected.method as any) || "ACCOUNT",
+          fromId: selected.fromId || "",
+          toId: selected.toId || "",
+          transactionType:
+            selected.type || selected.transactionType || "PERIODIC_DEPOSIT",
+          method: selected.method || "ACCOUNT",
           amount: selected.amount || 0,
-          note: selected.note || "",
-          transactionAt: newZoneDate(selected.transactionAt || undefined),
+          note: selected.description || selected.note || "",
+          transactionAt: selected.occurredAt
+            ? newZoneDate(selected.occurredAt)
+            : newZoneDate(),
         }
       : {
           fromId: "",
@@ -88,106 +89,75 @@ export function TransactionForm({
   const transactionType = form.watch("transactionType") || "PERIODIC_DEPOSIT";
 
   const formToLabels = useMemo(() => {
-    if (transactionType === "WITHDRAW") {
-      return ["Club - FROM", "Member - TO"];
-    }
-    if (["FUNDS_TRANSFER"].includes(transactionType)) {
+    if (transactionType === "WITHDRAW") return ["Club - FROM", "Member - TO"];
+    if (["FUNDS_TRANSFER"].includes(transactionType))
       return ["Club - FROM", "Club - TO"];
-    }
-
-    if (["VENDOR_RETURNS"].includes(transactionType)) {
+    if (["VENDOR_RETURNS"].includes(transactionType))
       return ["Vendor - FROM", "Club - TO"];
-    }
-
-    if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transactionType)) {
+    if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transactionType))
       return ["Loan - FROM", "Club - TO"];
-    }
-
-    if (transactionType === "VENDOR_INVEST") {
+    if (transactionType === "VENDOR_INVEST")
       return ["Club - FROM", "Vendor - TO"];
-    }
-
-    if (transactionType === "LOAN_TAKEN") {
-      return ["Club - FROM", "Loan - TO"];
-    }
-
+    if (transactionType === "LOAN_TAKEN") return ["Club - FROM", "Loan - TO"];
     return ["Member - FROM", "Club - TO"];
   }, [transactionType]);
 
   const formToValues = useMemo(() => {
-    if (["VENDOR_RETURNS"].includes(transactionType)) {
-      return [vendors, members];
-    }
-
-    if (transactionType === "VENDOR_INVEST") {
-      return [members, vendors];
-    }
-
+    if (["VENDOR_RETURNS"].includes(transactionType)) return [vendors, members];
+    if (transactionType === "VENDOR_INVEST") return [members, vendors];
     return [members, members];
   }, [transactionType, members, vendors]);
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => fetcher.delete(`/api/transaction/${id}`),
     onSuccess: async () => {},
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Error: ${error.message || "Failed to delete transaction"}`);
     },
   });
 
   const mutation = useMutation({
     mutationFn: (body: any) =>
-      fetcher.post("/api/transaction/add", {
-        body: { createdAt: selected?.transactionAt, ...body },
+      fetcher.post("/api/transaction/create", {
+        body,
       }),
     onSuccess: async ({ transaction }: any = {}) => {
-      if (!selected) form.reset(transaction); // Reset form after submission
-      if (selected && selected?.id) {
+      if (!selected) {
+        form.reset({
+          ...transaction,
+          transactionAt: transaction?.occurredAt
+            ? newZoneDate(transaction.occurredAt)
+            : newZoneDate(),
+          note: transaction?.description || "",
+        });
+      }
+      if (selected?.id) {
         await deleteMutation.mutateAsync(selected.id);
       }
 
       await queryClient.invalidateQueries({ queryKey: ["all"] });
 
-      const recalculatedIds = new Set();
-      if (
-        selected?.transactionType &&
-        selected?.transactionType === "LOAN_TAKEN" &&
-        selected?.toId
-      ) {
-        recalculatedIds.add(selected?.toId);
-      }
-      if (
-        selected?.transactionType &&
-        selected?.transactionType === "LOAN_REPAY" &&
-        selected?.fromId
-      ) {
-        recalculatedIds.add(selected?.fromId);
-      }
-      if (transactionType === "LOAN_TAKEN" && transaction?.toId) {
-        recalculatedIds.add(transaction?.toId);
-      }
-      if (transactionType === "LOAN_REPAY" && transaction?.fromId) {
-        recalculatedIds.add(transaction?.fromId);
-      }
-
-      if (selected) {
-        toast.success("Transaction successfully updated!");
-      } else {
-        toast.success("Transaction successfully added!");
-      }
-      if (onSuccess) {
-        onSuccess();
-      }
+      toast.success(
+        selected
+          ? "Transaction successfully updated!"
+          : "Transaction successfully added!"
+      );
+      onSuccess?.();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(
         error.message || "An unexpected error occurred. Please try again."
       );
     },
   });
 
-  async function onSubmit(variables: TransactionFormSchema) {
-    return await mutation.mutateAsync(variables as any);
-  }
+  const onSubmit = async (values: TransactionFormSchema) => {
+    return await mutation.mutateAsync({
+      ...values,
+      occurredAt: values.transactionAt,
+      description: values.note,
+    });
+  };
 
   const isSubmitting = mutation.isPending || deleteMutation.isPending;
 
@@ -198,7 +168,6 @@ export function TransactionForm({
         onSubmit={form.handleSubmit(onSubmit)}
         className={isMobile ? "w-full space-y-6" : "w-full max-w-2xl space-y-6"}
       >
-        {/* Transaction Type Selection */}
         <FormField
           control={form.control}
           name="transactionType"
@@ -233,7 +202,6 @@ export function TransactionForm({
 
         {isMobile ? (
           <>
-            {/* Member Selection - Mobile: Stacked */}
             <FormField
               control={form.control}
               name="fromId"
@@ -266,7 +234,6 @@ export function TransactionForm({
               )}
             />
 
-            {/* Vendor Selection - Mobile: Stacked */}
             <FormField
               control={form.control}
               name="toId"
@@ -301,7 +268,6 @@ export function TransactionForm({
           </>
         ) : (
           <Box preset={"grid-split"}>
-            {/* Member Selection - Desktop: Side by side */}
             <FormField
               control={form.control}
               name="fromId"
@@ -334,7 +300,6 @@ export function TransactionForm({
               )}
             />
 
-            {/* Vendor Selection - Desktop: Side by side */}
             <FormField
               control={form.control}
               name="toId"
@@ -371,7 +336,6 @@ export function TransactionForm({
 
         {isMobile ? (
           <>
-            {/* Amount Input - Mobile: Stacked */}
             <FormField
               control={form.control}
               name="amount"
@@ -386,8 +350,8 @@ export function TransactionForm({
                       placeholder="Enter amount"
                       className="h-11 rounded-lg"
                       {...field}
-                      onChange={(e) => {
-                        const value = e.target.value;
+                      onChange={(event) => {
+                        const value = event.target.value;
                         field.onChange(value === "" ? "" : Number(value));
                       }}
                     />
@@ -399,7 +363,7 @@ export function TransactionForm({
                 </FormItem>
               )}
             />
-            {/* Transaction Date - Mobile: Stacked */}
+
             <FormField
               control={form.control}
               name="transactionAt"
@@ -424,7 +388,6 @@ export function TransactionForm({
           </>
         ) : (
           <Box preset={"grid-split"}>
-            {/* Amount Input - Desktop: Side by side */}
             <FormField
               control={form.control}
               name="amount"
@@ -439,8 +402,8 @@ export function TransactionForm({
                       placeholder="Enter amount"
                       className="h-11 rounded-lg"
                       {...field}
-                      onChange={(e) => {
-                        const value = e.target.value;
+                      onChange={(event) => {
+                        const value = event.target.value;
                         field.onChange(value === "" ? "" : Number(value));
                       }}
                     />
@@ -452,7 +415,7 @@ export function TransactionForm({
                 </FormItem>
               )}
             />
-            {/* Transaction Date - Desktop: Side by side */}
+
             <FormField
               control={form.control}
               name="transactionAt"
@@ -477,7 +440,6 @@ export function TransactionForm({
           </Box>
         )}
 
-        {/* Note Input */}
         <FormField
           control={form.control}
           name="note"
@@ -498,7 +460,6 @@ export function TransactionForm({
           )}
         />
 
-        {/* Submit Button */}
         {!isMobile && (
           <GenericModalFooter
             actionLabel={selected ? "Update Transaction" : "Add Transaction"}

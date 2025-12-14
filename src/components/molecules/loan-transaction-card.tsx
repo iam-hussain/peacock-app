@@ -14,9 +14,9 @@ import { Badge } from "../ui/badge";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Separator } from "../ui/separator";
 
-import { dateFormat, newZoneDate } from "@/lib/date";
-import { LoanHistoryEntry } from "@/lib/type";
-import { moneyFormat } from "@/lib/utils";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
+import { moneyFormat } from "@/lib/ui/utils";
+import { LoanHistoryEntry } from "@/lib/validators/type";
 
 interface LoanTransactionCardProps {
   transaction: LoanHistoryEntry;
@@ -46,21 +46,40 @@ export function LoanTransactionCard({
                   Loan Cycle #{index}
                 </span>
                 <Badge
-                  variant={transaction.active ? "default" : "secondary"}
+                  variant={
+                    (transaction.isActive ?? transaction.active)
+                      ? "default"
+                      : "secondary"
+                  }
                   className={
-                    transaction.active
+                    (transaction.isActive ?? transaction.active)
                       ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
                       : ""
                   }
                 >
-                  {transaction.active ? "Active" : "Inactive"}
+                  {(transaction.isActive ?? transaction.active)
+                    ? "Active"
+                    : "Inactive"}
                 </Badge>
               </div>
               <div className="mt-1 flex items-center gap-4 text-xs text-muted-foreground">
                 <span>
-                  {dateFormat(newZoneDate(transaction.startDate))} →{" "}
-                  {transaction.endDate
-                    ? dateFormat(newZoneDate(transaction.endDate))
+                  {dateFormat(
+                    newZoneDate(
+                      transaction.startDate ??
+                        transaction.startedAt ??
+                        new Date()
+                    )
+                  )}{" "}
+                  →{" "}
+                  {(transaction.endDate ?? transaction.closedAt)
+                    ? dateFormat(
+                        newZoneDate(
+                          transaction.endDate ??
+                            transaction.closedAt ??
+                            new Date()
+                        )
+                      )
                     : "Ongoing"}
                 </span>
               </div>
@@ -69,10 +88,15 @@ export function LoanTransactionCard({
           <div className="flex items-center gap-4">
             <div className="text-right">
               <div className="text-sm font-semibold text-foreground">
-                {moneyFormat(transaction.amount)}
+                {moneyFormat(
+                  transaction.amount ?? transaction.principalAmount ?? 0
+                )}
               </div>
               <div className="text-xs text-muted-foreground">
-                Interest: {moneyFormat(transaction.interestAmount || 0)}
+                Interest:{" "}
+                {moneyFormat(
+                  transaction.interestAmount ?? transaction.accruedInterest ?? 0
+                )}
               </div>
             </div>
             {isExpanded ? (
@@ -97,15 +121,18 @@ export function LoanTransactionCard({
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Months Passed:</span>
                 <span className="font-medium text-slate-500 dark:text-slate-400">
-                  {transaction.monthsPassed} months {transaction.daysPassed}{" "}
-                  days
+                  {transaction.monthsPassed ?? transaction.monthsElapsed ?? 0}{" "}
+                  months{" "}
+                  {transaction.daysPassed ?? transaction.daysElapsed ?? 0} days
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Days in Cycle:</span>
                 <span className="font-medium text-foreground">
-                  {transaction.daysPassed} of {transaction.daysInMonth} days
+                  {transaction.daysPassed ?? transaction.daysElapsed ?? 0} of{" "}
+                  {transaction.daysInMonth ?? transaction.daysInPeriod ?? 0}{" "}
+                  days
                 </span>
               </div>
             </div>
@@ -113,21 +140,37 @@ export function LoanTransactionCard({
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">Start Date:</span>
                 <span className="font-medium text-foreground">
-                  {dateFormat(newZoneDate(transaction.startDate))}
+                  {dateFormat(
+                    newZoneDate(
+                      transaction.startDate ??
+                        transaction.startedAt ??
+                        new Date()
+                    )
+                  )}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">End Date:</span>
                 <span className="font-medium text-foreground">
-                  {transaction.endDate
-                    ? dateFormat(newZoneDate(transaction.endDate))
+                  {(transaction.endDate ?? transaction.closedAt)
+                    ? dateFormat(
+                        newZoneDate(
+                          transaction.endDate ??
+                            transaction.closedAt ??
+                            new Date()
+                        )
+                      )
                     : "Ongoing"}
                 </span>
               </div>
-              {transaction.active &&
-                transaction.daysPassed !== undefined &&
-                transaction.daysInMonth !== undefined &&
-                transaction.daysPassed > transaction.daysInMonth * 0.8 && (
+              {(transaction.isActive ?? transaction.active) &&
+                (transaction.daysPassed ?? transaction.daysElapsed) !==
+                  undefined &&
+                (transaction.daysInMonth ?? transaction.daysInPeriod) !==
+                  undefined &&
+                (transaction.daysPassed ?? transaction.daysElapsed ?? 0) >
+                  (transaction.daysInMonth ?? transaction.daysInPeriod ?? 0) *
+                    0.8 && (
                   <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500">
                     <AlertTriangle className="h-4 w-4" />
                     <span>Approaching due date</span>

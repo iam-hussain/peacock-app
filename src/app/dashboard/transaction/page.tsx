@@ -1,8 +1,9 @@
 "use client";
 
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowDown,
@@ -29,16 +30,24 @@ import { PaginationControls } from "@/components/molecules/pagination-controls";
 import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
 import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
+import { TransactionDeleteForm } from "@/components/organisms/forms/transaction-delete-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { useTableExport } from "@/hooks/use-table-export";
-import { transactionTypeMap } from "@/lib/config";
-import { dateFormat, newZoneDate } from "@/lib/date";
+import { transactionTypeMap } from "@/lib/config/config";
+import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchAccountSelect, fetchTransactions } from "@/lib/query-options";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 export default function TransactionsPage() {
+  const queryClient = useQueryClient();
   const { canWrite } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -49,11 +58,14 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
+    useState<TransformedTransaction | null>(null);
+  const [selectedTransactionForDelete, setSelectedTransactionForDelete] =
     useState<TransformedTransaction | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const urlFilterApplied = useRef(false);
@@ -74,6 +86,7 @@ export default function TransactionsPage() {
       pageSize?: number;
       page?: number;
       clearMember?: boolean;
+      search?: string | null;
     }) => {
       const params = new URLSearchParams();
 
@@ -118,34 +131,26 @@ export default function TransactionsPage() {
         }
       }
 
-      // Handle date filters
-      // Check if the key exists in updates object (even if value is undefined)
+      // Handle date filters with short YYYY-MM-DD strings
+      const formatDateParam = (date?: Date | null) =>
+        date ? date.toISOString().slice(0, 10) : null;
+
       if ("startDate" in updates) {
-        if (updates.startDate && updates.startDate !== null) {
-          params.set("startDate", updates.startDate.toISOString());
-        } else {
-          // Explicitly delete if null or undefined
-          params.delete("startDate");
-        }
+        const val = formatDateParam(updates.startDate);
+        if (val) params.set("startDate", val);
+        else params.delete("startDate");
       } else {
         const existingStartDate = searchParams.get("startDate");
-        if (existingStartDate) {
-          params.set("startDate", existingStartDate);
-        }
+        if (existingStartDate) params.set("startDate", existingStartDate);
       }
 
       if ("endDate" in updates) {
-        if (updates.endDate && updates.endDate !== null) {
-          params.set("endDate", updates.endDate.toISOString());
-        } else {
-          // Explicitly delete if null or undefined
-          params.delete("endDate");
-        }
+        const val = formatDateParam(updates.endDate);
+        if (val) params.set("endDate", val);
+        else params.delete("endDate");
       } else {
         const existingEndDate = searchParams.get("endDate");
-        if (existingEndDate) {
-          params.set("endDate", existingEndDate);
-        }
+        if (existingEndDate) params.set("endDate", existingEndDate);
       }
 
       // Handle page size - always include in URL
@@ -156,8 +161,7 @@ export default function TransactionsPage() {
         if (existingPageSize) {
           params.set("pageSize", existingPageSize);
         } else {
-          // Default to 25 if not specified
-          params.set("pageSize", "25");
+          params.set("pageSize", "10");
         }
       }
 
@@ -169,12 +173,27 @@ export default function TransactionsPage() {
         if (existingPage) {
           params.set("page", existingPage);
         } else {
-          // Default to 1 if not specified
           params.set("page", "1");
         }
       }
 
-      const newURL = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      // Handle search
+      if (updates.search !== undefined) {
+        if (updates.search && updates.search.trim().length > 0) {
+          params.set("q", updates.search.trim());
+        } else {
+          params.delete("q");
+        }
+      } else {
+        const existingSearch = searchParams.get("q");
+        if (existingSearch) {
+          params.set("q", existingSearch);
+        }
+      }
+
+      const newURL = `${pathname}${
+        params.toString() ? `?${params.toString()}` : ""
+      }`;
       router.push(newURL, { scroll: false });
     },
     [pathname, router, searchParams, accounts]
@@ -184,7 +203,6 @@ export default function TransactionsPage() {
   useEffect(() => {
     if (!isMounted) return;
     if (isInitialMount.current && accounts.length > 0) {
-      // Read account filter from URL (by member slug or account ID)
       const memberSlug = searchParams.get("member");
       const accountParam = searchParams.get("account");
 
@@ -203,13 +221,11 @@ export default function TransactionsPage() {
         }
       }
 
-      // Read type filter
       const typeParam = searchParams.get("type");
       if (typeParam) {
         setTypeFilter(typeParam);
       }
 
-      // Read date filters
       const startDateParam = searchParams.get("startDate");
       if (startDateParam) {
         setStartDate(new Date(startDateParam));
@@ -219,47 +235,62 @@ export default function TransactionsPage() {
         setEndDate(new Date(endDateParam));
       }
 
-      // Read page size
       const pageSizeParam = searchParams.get("pageSize");
       if (pageSizeParam) {
         setPageSize(parseInt(pageSizeParam, 10));
       }
 
-      // Read page
       const pageParam = searchParams.get("page");
       if (pageParam) {
         setCurrentPage(parseInt(pageParam, 10));
+      }
+
+      const searchParam = searchParams.get("q");
+      if (searchParam) {
+        setSearchQuery(searchParam);
       }
 
       isInitialMount.current = false;
     }
   }, [searchParams, accounts, isMounted]);
 
-  // Track previous filter values to detect changes
-  const prevFilters = useRef({ accountFilter, typeFilter, startDate, endDate });
+  const prevFilters = useRef({
+    accountFilter,
+    typeFilter,
+    startDate,
+    endDate,
+    searchQuery,
+  });
   const prevPage = useRef(currentPage);
   const prevPageSize = useRef(pageSize);
 
-  // Update URL when filters change - reset page to 1
   useEffect(() => {
-    if (!isMounted || !isInitialMount.current) return;
+    if (!isMounted || isInitialMount.current) return;
     const filtersChanged =
       prevFilters.current.accountFilter !== accountFilter ||
       prevFilters.current.typeFilter !== typeFilter ||
       prevFilters.current.startDate?.getTime() !== startDate?.getTime() ||
-      prevFilters.current.endDate?.getTime() !== endDate?.getTime();
+      prevFilters.current.endDate?.getTime() !== endDate?.getTime() ||
+      prevFilters.current.searchQuery !== searchQuery;
 
     if (filtersChanged) {
       setCurrentPage(1);
-      prevFilters.current = { accountFilter, typeFilter, startDate, endDate };
+      prevFilters.current = {
+        accountFilter,
+        typeFilter,
+        startDate,
+        endDate,
+        searchQuery,
+      };
       updateURL({
         account: accountFilter,
         type: typeFilter,
         startDate,
         endDate,
         pageSize,
-        page: 1, // Reset to page 1 when filters change
+        page: 1,
         clearMember: accountFilter === "all",
+        search: searchQuery,
       });
     }
   }, [
@@ -270,11 +301,11 @@ export default function TransactionsPage() {
     pageSize,
     updateURL,
     isMounted,
+    searchQuery,
   ]);
 
-  // Update URL when page or pageSize change (but not from filter changes)
   useEffect(() => {
-    if (!isMounted || !isInitialMount.current) return;
+    if (!isMounted || isInitialMount.current) return;
     const pageChanged = prevPage.current !== currentPage;
     const pageSizeChanged = prevPageSize.current !== pageSize;
 
@@ -289,6 +320,7 @@ export default function TransactionsPage() {
         pageSize,
         page: currentPage,
         clearMember: accountFilter === "all",
+        search: searchQuery,
       });
     }
   }, [
@@ -300,28 +332,36 @@ export default function TransactionsPage() {
     endDate,
     updateURL,
     isMounted,
+    searchQuery,
   ]);
 
-  // Build query options
   const queryOptions = useMemo(
     () => ({
       accountId: accountFilter === "all" ? "" : accountFilter,
       transactionType: typeFilter === "all" ? "" : typeFilter,
-      startDate: startDate ? startDate.toISOString() : undefined,
-      endDate: endDate ? endDate.toISOString() : undefined,
+      startDate: startDate ? startDate.toISOString().slice(0, 10) : undefined,
+      endDate: endDate ? endDate.toISOString().slice(0, 10) : undefined,
       limit: pageSize,
       page: currentPage,
-      sortField: "transactionAt",
+      search: searchQuery.trim(),
+      sortField: "occurredAt",
       sortOrder: "desc" as const,
     }),
-    [accountFilter, typeFilter, startDate, endDate, pageSize, currentPage]
+    [
+      accountFilter,
+      typeFilter,
+      startDate,
+      endDate,
+      pageSize,
+      currentPage,
+      searchQuery,
+    ]
   );
 
   const { data, isLoading, isError } = useQuery(
     fetchTransactions(queryOptions)
   );
 
-  // Use transactions directly from API (filtering is done server-side)
   const transactions = useMemo(
     () => data?.transactions || [],
     [data?.transactions]
@@ -329,13 +369,11 @@ export default function TransactionsPage() {
   const totalTransactions = data?.total || 0;
   const totalPages = data?.totalPages || 1;
 
-  // Calculate inflow/outflow summary
   const _summary = useMemo(() => {
     let inflow = 0;
     let outflow = 0;
 
     transactions.forEach((t) => {
-      // Inflow: money coming TO club
       if (
         [
           "PERIODIC_DEPOSIT",
@@ -347,20 +385,16 @@ export default function TransactionsPage() {
         ].includes(t.transactionType)
       ) {
         inflow += t.amount;
-      }
-      // Outflow: money going FROM club
-      else if (
+      } else if (
         ["WITHDRAW", "VENDOR_INVEST", "LOAN_TAKEN"].includes(t.transactionType)
       ) {
         outflow += t.amount;
       }
-      // Transfers are neutral
     });
 
     return { inflow, outflow };
   }, [transactions]);
 
-  // Determine transaction direction and color
   const getTransactionDirection = (transaction: TransformedTransaction) => {
     const isInflow = [
       "PERIODIC_DEPOSIT",
@@ -398,6 +432,11 @@ export default function TransactionsPage() {
     setDialogOpen(true);
   };
 
+  const handleDeleteTransaction = (transaction: TransformedTransaction) => {
+    setSelectedTransactionForDelete(transaction);
+    setDeleteDialogOpen(true);
+  };
+
   const handleViewTransaction = (transaction: TransformedTransaction) => {
     setSelectedTransaction(transaction);
     setDialogOpen(true);
@@ -409,9 +448,8 @@ export default function TransactionsPage() {
     setTypeFilter("all");
     setStartDate(undefined);
     setEndDate(undefined);
-    setPageSize(25);
+    setPageSize(10);
     setCurrentPage(1);
-    // Clear all URL parameters - navigate to clean URL
     router.push(pathname, { scroll: false });
   };
 
@@ -426,12 +464,12 @@ export default function TransactionsPage() {
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
   };
 
-  // All transaction type options (for filter drawer)
   const allTransactionTypeOptions = [
     { label: "All Types", value: "all" },
+    { label: "All Loan Activity", value: "LOAN_ALL" },
     { label: "Member's Deposit", value: "PERIODIC_DEPOSIT" },
     { label: "Member's Offset Deposit", value: "OFFSET_DEPOSIT" },
     { label: "Member's Withdrawal", value: "WITHDRAW" },
@@ -444,16 +482,14 @@ export default function TransactionsPage() {
     { label: "Loan Interest", value: "LOAN_INTEREST" },
   ];
 
-  // Account options
   const accountOptions = [
     { label: "All Accounts", value: "all" },
     ...accounts.map((acc) => ({
-      label: acc.name,
+      label: acc.name || acc.username || acc.id,
       value: acc.id,
     })),
   ];
 
-  // Define columns for desktop table
   const columns: ColumnDef<TransformedTransaction>[] = useMemo(
     () => [
       {
@@ -469,7 +505,7 @@ export default function TransactionsPage() {
           const account = transaction.from;
           const memberLink =
             account.link ||
-            (account.isMember
+            (account.type === "MEMBER"
               ? `/dashboard/member/${account.username}`
               : undefined);
           return (
@@ -528,7 +564,7 @@ export default function TransactionsPage() {
           const account = transaction.to;
           const memberLink =
             account.link ||
-            (account.isMember
+            (account.type === "MEMBER"
               ? `/dashboard/member/${account.username}`
               : undefined);
           return (
@@ -583,13 +619,11 @@ export default function TransactionsPage() {
           tooltip:
             "Type of transaction (deposit, withdrawal, loan, transfer, etc.).",
         },
-        cell: ({ row }) => {
-          return (
-            <div className="text-sm text-foreground">
-              {transactionTypeMap[row.original.transactionType]}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="text-sm text-foreground">
+            {transactionTypeMap[row.original.transactionType]}
+          </div>
+        ),
       },
       {
         id: "amount",
@@ -615,19 +649,17 @@ export default function TransactionsPage() {
       },
       {
         id: "occurred",
-        accessorKey: "transactionAt",
+        accessorKey: "occurredAt",
         header: "Transaction At",
         enableSorting: true,
         meta: {
           tooltip: "When this transaction actually happened.",
         },
-        cell: ({ row }) => {
-          return (
-            <div className="text-sm text-foreground">
-              {dateFormat(newZoneDate(row.original.transactionAt))}
-            </div>
-          );
-        },
+        cell: ({ row }) => (
+          <div className="text-sm text-foreground">
+            {dateFormat(newZoneDate(row.original.occurredAt))}
+          </div>
+        ),
       },
       {
         id: "recorded",
@@ -661,6 +693,11 @@ export default function TransactionsPage() {
               onEdit={
                 canWrite ? () => handleEditTransaction(transaction) : undefined
               }
+              onDelete={
+                canWrite
+                  ? () => handleDeleteTransaction(transaction)
+                  : undefined
+              }
             />
           );
         },
@@ -669,12 +706,7 @@ export default function TransactionsPage() {
     [canWrite]
   );
 
-  // Table export functionality
-  const {
-    handleExportCsv,
-    handleScreenshot,
-    tableRef: _tableRef,
-  } = useTableExport({
+  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
     tableName: "transactions",
     columns,
     data: transactions,
@@ -682,7 +714,6 @@ export default function TransactionsPage() {
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
-      {/* Desktop Header */}
       <div className="hidden lg:block">
         <PageHeader
           title="Transaction History"
@@ -715,7 +746,6 @@ export default function TransactionsPage() {
         />
       </div>
 
-      {/* Mobile Header */}
       <div className="lg:hidden space-y-2">
         <h1 className="text-xl font-semibold text-foreground">
           Transaction History
@@ -727,7 +757,6 @@ export default function TransactionsPage() {
         </p>
       </div>
 
-      {/* Desktop Filter Bar */}
       <div className="hidden lg:block">
         <FilterBar
           searchValue={searchQuery}
@@ -750,14 +779,12 @@ export default function TransactionsPage() {
             endDate,
             onStartDateChange: (date) => {
               setStartDate(date);
-              // If new start date is after end date, clear end date
               if (date && endDate && date > endDate) {
                 setEndDate(undefined);
               }
             },
             onEndDateChange: (date) => {
               setEndDate(date);
-              // If new end date is before start date, clear start date
               if (date && startDate && date < startDate) {
                 setStartDate(undefined);
               }
@@ -772,9 +799,7 @@ export default function TransactionsPage() {
         />
       </div>
 
-      {/* Mobile Filters */}
       <div className="lg:hidden flex items-center gap-2">
-        {/* Search Bar */}
         <div className="flex-1">
           <SearchBarMobile
             value={searchQuery}
@@ -782,8 +807,6 @@ export default function TransactionsPage() {
             placeholder="Search transactions..."
           />
         </div>
-
-        {/* Filter Button */}
         <Button
           variant="outline"
           size="default"
@@ -795,7 +818,6 @@ export default function TransactionsPage() {
         </Button>
       </div>
 
-      {/* Error State */}
       {isError && (
         <Card className="border-destructive bg-destructive/10">
           <CardContent className="p-4">
@@ -815,8 +837,7 @@ export default function TransactionsPage() {
         </Card>
       )}
 
-      {/* Desktop Table View */}
-      <div className="hidden lg:block">
+      <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
           data={transactions}
@@ -825,7 +846,6 @@ export default function TransactionsPage() {
         />
       </div>
 
-      {/* Mobile Card View */}
       <div className="lg:hidden space-y-4 pb-20">
         {isLoading ? (
           <div className="space-y-4">
@@ -839,7 +859,8 @@ export default function TransactionsPage() {
               <TransactionCardMobile
                 key={transaction.id}
                 transaction={transaction}
-                onClick={() => handleEditTransaction(transaction)}
+                onEdit={() => handleEditTransaction(transaction)}
+                onDelete={() => handleDeleteTransaction(transaction)}
               />
             ))}
           </div>
@@ -857,7 +878,6 @@ export default function TransactionsPage() {
         )}
       </div>
 
-      {/* Pagination Controls */}
       {totalPages > 0 && (
         <PaginationControls
           currentPage={currentPage}
@@ -872,7 +892,6 @@ export default function TransactionsPage() {
         />
       )}
 
-      {/* Filter Drawer (Mobile) */}
       <TransactionFilterDrawer
         open={filterDrawerOpen}
         onOpenChange={setFilterDrawerOpen}
@@ -883,7 +902,6 @@ export default function TransactionsPage() {
         startDate={startDate}
         onStartDateChange={(date) => {
           setStartDate(date);
-          // If new start date is after end date, clear end date
           if (date && endDate && date > endDate) {
             setEndDate(undefined);
           }
@@ -891,7 +909,6 @@ export default function TransactionsPage() {
         endDate={endDate}
         onEndDateChange={(date) => {
           setEndDate(date);
-          // If new end date is before start date, clear start date
           if (date && startDate && date < startDate) {
             setStartDate(undefined);
           }
@@ -904,10 +921,8 @@ export default function TransactionsPage() {
         onReset={handleResetFilters}
       />
 
-      {/* Mobile FAB */}
       {canWrite && <FloatingActionButton onClick={handleAddTransaction} />}
 
-      {/* Transaction Form Dialog */}
       <TransactionFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -917,6 +932,36 @@ export default function TransactionsPage() {
           window.location.reload();
         }}
       />
+
+      <Dialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) setSelectedTransactionForDelete(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Transaction</DialogTitle>
+          </DialogHeader>
+          {selectedTransactionForDelete && (
+            <TransactionDeleteForm
+              transaction={selectedTransactionForDelete}
+              onSuccess={async () => {
+                setDeleteDialogOpen(false);
+                setSelectedTransactionForDelete(null);
+                await queryClient.invalidateQueries({
+                  queryKey: ["all", "transaction"],
+                });
+              }}
+              onCancel={() => {
+                setDeleteDialogOpen(false);
+                setSelectedTransactionForDelete(null);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

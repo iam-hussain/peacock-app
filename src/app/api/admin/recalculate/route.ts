@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { requireSuperAdmin } from "@/lib/auth";
+import { requireSuperAdmin } from "@/lib/core/auth";
 import { resetAllTransactionMiddlewareHandler } from "@/logic/reset-handler";
 
 export async function POST() {

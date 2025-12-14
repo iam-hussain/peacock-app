@@ -8,8 +8,8 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
-import { clearCache } from "@/lib/cache";
-import { fileDateTime } from "@/lib/date";
+import { clearCache } from "@/lib/core/cache";
+import { fileDateTime } from "@/lib/core/date";
 
 export async function POST() {
   revalidateTag("api");

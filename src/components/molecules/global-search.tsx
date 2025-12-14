@@ -18,9 +18,9 @@ import { Input } from "../ui/input";
 import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
 
-import fetcher from "@/lib/fetcher";
-import { cn } from "@/lib/utils";
-import { moneyFormat } from "@/lib/utils";
+import fetcher from "@/lib/core/fetcher";
+import { cn } from "@/lib/ui/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 interface SearchResult {
   members: Array<{
@@ -49,8 +49,8 @@ interface SearchResult {
     fromName: string;
     toName: string;
     amount: number;
-    transactionType: string;
-    transactionAt: number;
+    type: string;
+    occurredAt: number;
   }>;
 }
 
@@ -292,7 +292,7 @@ export function GlobalSearch({
                             {tx.fromName} → {tx.toName}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {moneyFormat(tx.amount)} • {tx.transactionType}
+                            {moneyFormat(tx.amount)} • {tx.type}
                           </p>
                         </div>
                       </CustomLink>

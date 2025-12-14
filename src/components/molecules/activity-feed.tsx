@@ -12,7 +12,7 @@ import {
 import { Card, CardContent } from "../ui/card";
 
 import { fetchTransactions } from "@/lib/query-options";
-import { cn, moneyFormat } from "@/lib/utils";
+import { cn, moneyFormat } from "@/lib/ui/utils";
 
 interface ActivityFeedProps {
   limit?: number;
@@ -38,7 +38,7 @@ interface ActivityItem {
   toName?: string;
   fromSub?: string;
   toSub?: string;
-  transactionAt: number;
+  occurredAt: number;
   description?: string;
 }
 
@@ -149,7 +149,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
       limit,
       accountId: "",
       transactionType: "",
-      sortField: "transactionAt",
+      sortField: "occurredAt",
       sortOrder: "desc",
     })
   );
@@ -157,13 +157,13 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
   const activities: ActivityItem[] =
     data?.transactions?.map((tx: any) => ({
       id: tx.id,
-      type: tx.transactionType,
+      type: tx.type || tx.transactionType,
       amount: tx.amount,
       fromName: tx.from?.name || tx.fromName,
       toName: tx.to?.name || tx.toName,
       fromSub: tx.from?.sub,
       toSub: tx.to?.sub,
-      transactionAt: tx.transactionAt,
+      occurredAt: tx.occurredAt,
       description: tx.description,
     })) || [];
 
@@ -221,7 +221,7 @@ export function ActivityFeed({ limit = 10 }: ActivityFeedProps) {
                     </p>
                     <span className="text-xs text-muted-foreground">·</span>
                     <p className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(activity.transactionAt), {
+                      {formatDistanceToNow(new Date(activity.occurredAt), {
                         addSuffix: true,
                       })}
                     </p>

@@ -24,7 +24,7 @@ import {
 } from "../ui/select";
 import { Separator } from "../ui/separator";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 
 interface TransactionFilterDrawerProps {
   open: boolean;
@@ -130,7 +130,7 @@ export function TransactionFilterDrawer({
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full min-w-[200px] justify-start text-left font-normal",
                       !startDate && "text-muted-foreground"
                     )}
                   >
@@ -160,7 +160,7 @@ export function TransactionFilterDrawer({
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full min-w-[200px] justify-start text-left font-normal",
                       !endDate && "text-muted-foreground"
                     )}
                   >

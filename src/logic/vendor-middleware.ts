@@ -1,67 +1,41 @@
-/* eslint-disable unused-imports/no-unused-vars */
+import { PassbookToUpdate } from "@/lib/validators/type";
+import { VendorPassbookData } from "@/lib/validators/type";
 
-import prisma from "@/db";
-import {
-  initializePassbookToUpdate,
-  setPassbookUpdateQuery,
-} from "@/lib/helper";
-import { PassbookToUpdate, VendorPassbookData } from "@/lib/type";
-
-const getVendorsPassbook = () => {
-  return prisma.passbook.findMany({
-    where: {
-      type: { in: ["CLUB", "VENDOR"] },
-    },
-    select: {
-      id: true,
-      type: true,
-      payload: true,
-      account: {
-        select: {
-          id: true,
-        },
-      },
-    },
-  });
-};
-
+/**
+ * Calculate vendor profits and update vendor passbooks
+ * @param passbookToUpdate - Map of passbook updates
+ * @param vendorIds - Array of vendor account IDs
+ * @returns Updated passbook map with vendor calculations
+ */
 export function vendorCalcHandler(
   passbookToUpdate: PassbookToUpdate,
-  ids: string[]
-) {
-  let totalVendorProfit = 0;
-  ids.forEach((each) => {
-    const vendor = passbookToUpdate.get(each);
-    if (vendor) {
-      const { totalInvestment = 0, totalReturns = 0 } = vendor.data
-        .payload as VendorPassbookData;
-      const totalProfitAmount = Math.max(totalReturns - totalInvestment, 0);
-      passbookToUpdate.set(
-        each,
-        setPassbookUpdateQuery(vendor, { totalProfitAmount })
-      );
-      totalVendorProfit = totalVendorProfit + totalProfitAmount;
+  vendorIds: string[]
+): PassbookToUpdate {
+  for (const vendorId of vendorIds) {
+    const vendorPassbook = passbookToUpdate.get(vendorId);
+    if (!vendorPassbook || vendorPassbook.data.kind !== "VENDOR") {
+      continue;
     }
-  });
-  const clubPassbook = passbookToUpdate.get("CLUB");
-  if (clubPassbook) {
-    passbookToUpdate.set(
-      "CLUB",
-      setPassbookUpdateQuery(clubPassbook, {
-        totalVendorProfit,
-      })
-    );
+
+    const payload = vendorPassbook.data.payload as VendorPassbookData;
+    const totalInvestment = payload.totalInvestment || 0;
+    const totalReturns = payload.totalReturns || 0;
+
+    // Vendor profit is calculated as returns - investment
+    const totalProfit = Math.max(totalReturns - totalInvestment, 0);
+
+    // Update the payload with calculated profit
+    passbookToUpdate.set(vendorId, {
+      ...vendorPassbook,
+      data: {
+        ...vendorPassbook.data,
+        payload: {
+          ...payload,
+          totalProfit,
+        },
+      },
+    });
   }
 
-  return passbookToUpdate;
-}
-
-export async function vendorMiddlewareHandler() {
-  const passbooks = await getVendorsPassbook();
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
-  passbookToUpdate = vendorCalcHandler(
-    passbookToUpdate,
-    passbooks.filter((e) => e.type === "VENDOR").map((e) => e.id)
-  );
   return passbookToUpdate;
 }

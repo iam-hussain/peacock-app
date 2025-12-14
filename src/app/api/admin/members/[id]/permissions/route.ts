@@ -5,7 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/core/auth";
 
 export async function PATCH(
   request: Request,
@@ -19,44 +19,59 @@ export async function PATCH(
 
     const account = await prisma.account.findUnique({
       where: { id },
-      select: { id: true, isMember: true },
+      select: { id: true, type: true, accessLevel: true },
     });
 
     if (!account) {
       return NextResponse.json({ error: "Account not found" }, { status: 404 });
     }
 
-    if (!account.isMember) {
+    if (!(account.type === "MEMBER")) {
       return NextResponse.json(
         { error: "Only member accounts can have permissions updated" },
         { status: 400 }
       );
     }
 
+    const hasReadAccess =
+      account.accessLevel === "READ" ||
+      account.accessLevel === "WRITE" ||
+      account.accessLevel === "ADMIN";
+    const hasWriteAccess =
+      account.accessLevel === "WRITE" || account.accessLevel === "ADMIN";
+
+    let finalRead =
+      typeof readAccess === "boolean" ? readAccess : hasReadAccess;
+    let finalWrite =
+      typeof writeAccess === "boolean" ? writeAccess : hasWriteAccess;
+
+    let finalAccessLevel: "READ" | "WRITE" | "ADMIN" = "READ";
+    if (finalWrite) {
+      finalAccessLevel = "WRITE";
+    } else if (finalRead) {
+      finalAccessLevel = "READ";
+    } else {
+      finalAccessLevel = "READ";
+      finalRead = false;
+      finalWrite = false;
+    }
+
+    const finalCanLogin =
+      typeof canLogin === "boolean" ? canLogin : finalWrite || finalRead;
+
     const updateData: any = {
+      accessLevel: finalAccessLevel,
+      canLogin: finalCanLogin,
       accessUpdatedAt: new Date(),
       accessUpdatedBy: currentUser.id === "admin" ? null : currentUser.id,
     };
-
-    if (typeof readAccess === "boolean") {
-      updateData.readAccess = readAccess;
-    }
-
-    if (typeof writeAccess === "boolean") {
-      updateData.writeAccess = writeAccess;
-    }
-
-    if (typeof canLogin === "boolean") {
-      updateData.canLogin = canLogin;
-    }
 
     const updated = await prisma.account.update({
       where: { id },
       data: updateData,
       select: {
         id: true,
-        readAccess: true,
-        writeAccess: true,
+        accessLevel: true,
         canLogin: true,
       },
     });
@@ -66,8 +81,13 @@ export async function PATCH(
         message: "Access updated successfully",
         account: {
           id: updated.id,
-          readAccess: updated.readAccess,
-          writeAccess: updated.writeAccess,
+          accessLevel: updated.accessLevel,
+          readAccess:
+            updated.accessLevel === "READ" ||
+            updated.accessLevel === "WRITE" ||
+            updated.accessLevel === "ADMIN",
+          writeAccess:
+            updated.accessLevel === "WRITE" || updated.accessLevel === "ADMIN",
           canLogin: updated.canLogin,
         },
       },

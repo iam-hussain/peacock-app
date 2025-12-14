@@ -28,9 +28,9 @@ import {
   displayDateTime,
   fileDateTime,
   newZoneDate,
-} from "@/lib/date";
+} from "@/lib/core/date";
 import { fetchMembers } from "@/lib/query-options";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 const baseColumns: ColumnDef<TransformedMember>[] = [

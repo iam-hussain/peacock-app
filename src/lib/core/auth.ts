@@ -11,11 +11,13 @@ const JWT_SECRET = new TextEncoder().encode(
 const COOKIE_NAME = "pc_auth";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+export type AccessLevel = "READ" | "WRITE" | "ADMIN";
+export type AccountRole = "SUPER_ADMIN" | "ADMIN" | "MEMBER";
+
 export type AuthUser = {
   id: string;
-  role: "SUPER_ADMIN" | "ADMIN" | "MEMBER";
-  readAccess: boolean;
-  writeAccess: boolean;
+  role: AccountRole;
+  accessLevel: AccessLevel;
   canLogin: boolean;
 };
 
@@ -25,34 +27,30 @@ export type CurrentUser =
       username: "admin";
       role: "SUPER_ADMIN";
       id: "admin";
+      accessLevel: "ADMIN";
       canLogin: true;
-      readAccess: true;
-      writeAccess: true;
     }
   | {
       kind: "admin-member";
       accountId: string;
       id: string;
       role: "ADMIN";
+      accessLevel: "ADMIN";
       canLogin: boolean;
-      readAccess: boolean;
-      writeAccess: boolean;
     }
   | {
       kind: "member";
       accountId: string;
       id: string;
       role: "MEMBER";
-      readAccess: boolean;
-      writeAccess: boolean;
+      accessLevel: AccessLevel;
       canLogin: boolean;
     };
 
 type JWTPayload = {
   sub: string; // "admin" or accountId
-  role: "SUPER_ADMIN" | "ADMIN" | "MEMBER";
-  readAccess: boolean;
-  writeAccess: boolean;
+  role: AccountRole;
+  accessLevel: AccessLevel;
   canLogin: boolean;
   exp?: number;
 };
@@ -67,8 +65,7 @@ export async function createSessionCookie(payload: Omit<JWTPayload, "exp">) {
   const token = await new SignJWT({
     sub: payload.sub,
     role: payload.role,
-    readAccess: payload.readAccess,
-    writeAccess: payload.writeAccess,
+    accessLevel: payload.accessLevel,
     canLogin: payload.canLogin,
   } as JWTPayload)
     .setProtectedHeader({ alg: "HS256" })
@@ -120,9 +117,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         username: "admin",
         role: "SUPER_ADMIN",
         id: "admin",
+        accessLevel: "ADMIN",
         canLogin: true,
-        readAccess: true,
-        writeAccess: true,
       };
     }
 
@@ -132,8 +128,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         accountId: payload.sub,
         id: payload.sub,
         role: "ADMIN",
-        readAccess: payload.readAccess ?? true,
-        writeAccess: payload.writeAccess ?? true,
+        accessLevel: "ADMIN",
         canLogin: payload.canLogin ?? true,
       };
     }
@@ -144,8 +139,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
         accountId: payload.sub,
         id: payload.sub,
         role: "MEMBER",
-        readAccess: payload.readAccess ?? true,
-        writeAccess: payload.writeAccess ?? false,
+        accessLevel: payload.accessLevel ?? "READ",
         canLogin: payload.canLogin ?? false,
       };
     }
@@ -168,8 +162,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     return {
       id: "admin",
       role: "SUPER_ADMIN",
-      readAccess: true,
-      writeAccess: true,
+      accessLevel: "ADMIN",
       canLogin: true,
     };
   }
@@ -178,8 +171,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     return {
       id: user.accountId,
       role: "ADMIN",
-      readAccess: user.readAccess,
-      writeAccess: user.writeAccess,
+      accessLevel: "ADMIN",
       canLogin: user.canLogin,
     };
   }
@@ -187,8 +179,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
   return {
     id: user.accountId,
     role: "MEMBER",
-    readAccess: user.readAccess,
-    writeAccess: user.writeAccess,
+    accessLevel: user.accessLevel,
     canLogin: user.canLogin,
   };
 }
@@ -206,20 +197,13 @@ export async function requireAuth(): Promise<CurrentUser> {
 
 /**
  * Requires write access - throws if user doesn't have write permission
- * Note: Write access is restricted to transactions only, not account/member management
+ * Write access allows managing transactions
  */
 export async function requireWriteAccess(): Promise<CurrentUser> {
   const user = await requireAuth();
 
-  if (user.kind === "admin") {
-    return user;
-  }
-
-  if (user.kind === "admin-member") {
-    return user;
-  }
-
-  if (user.kind === "member" && user.writeAccess) {
+  // ADMIN access level includes WRITE permissions
+  if (user.accessLevel === "ADMIN" || user.accessLevel === "WRITE") {
     return user;
   }
 
@@ -228,34 +212,36 @@ export async function requireWriteAccess(): Promise<CurrentUser> {
 
 /**
  * Helper to check if user can manage accounts (members/vendors)
- * Only admins can manage accounts - Write users cannot
+ * Only ADMIN access level can manage accounts
  */
 export function canManageAccounts(user: CurrentUser): boolean {
-  return user.kind === "admin" || user.kind === "admin-member";
+  return user.accessLevel === "ADMIN";
 }
 
 /**
  * Helper to check if user can edit transactions
- * Admins and Write users can edit transactions
+ * ADMIN and WRITE access levels can edit transactions
  */
 export function canManageTransactions(user: CurrentUser): boolean {
-  if (user.kind === "admin" || user.kind === "admin-member") {
-    return true;
-  }
-  if (user.kind === "member" && user.writeAccess) {
-    return true;
-  }
-  return false;
+  return user.accessLevel === "ADMIN" || user.accessLevel === "WRITE";
 }
 
 /**
- * Requires admin access (SUPER_ADMIN or ADMIN role) - throws if not admin
+ * Helper to check if user has read access
+ * All authenticated users have at least READ access
+ */
+export function hasReadAccess(_user: CurrentUser): boolean {
+  return true; // All authenticated users can read
+}
+
+/**
+ * Requires admin access (ADMIN access level) - throws if not admin
  * Allows creating/editing accounts, members, vendors, etc.
  */
 export async function requireAdmin(): Promise<CurrentUser> {
   const user = await requireAuth();
 
-  if (user.kind === "admin" || user.kind === "admin-member") {
+  if (user.accessLevel === "ADMIN") {
     return user;
   }
 
@@ -264,17 +250,18 @@ export async function requireAdmin(): Promise<CurrentUser> {
 
 /**
  * Requires super admin access only - throws if not super admin
- * Only SUPER_ADMIN (from ENV) can access this
+ * Only SUPER_ADMIN role (from ENV) can access this
  */
 export async function requireSuperAdmin(): Promise<{
   kind: "admin";
   username: "admin";
   role: "SUPER_ADMIN";
   id: "admin";
+  accessLevel: "ADMIN";
 }> {
   const user = await requireAuth();
 
-  if (user.kind === "admin") {
+  if (user.kind === "admin" && user.role === "SUPER_ADMIN") {
     return user;
   }
 

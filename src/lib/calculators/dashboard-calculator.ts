@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { endOfMonth, startOfMonth } from "date-fns";
 
-import { clubConfig } from "@/lib/config";
-import { calculateMonthsDifference } from "@/lib/date";
-import { ClubPassbookData, PassbookToUpdate } from "@/lib/type";
+import { clubConfig } from "@/lib/config/config";
+import { calculateMonthsDifference } from "@/lib/core/date";
+import { ClubPassbookData, PassbookToUpdate } from "@/lib/validators/type";
 
 /**
  * Transforms club passbook data directly into a monthly snapshot entry
@@ -14,7 +14,7 @@ export async function calculateMonthlySnapshotFromPassbooks(
   allPassbooks: PassbookToUpdate,
   activeMembers: number,
   expectedTotalLoanInterestAmount: number
-): Promise<Prisma.DashboardMonthlySummaryCreateInput | null> {
+): Promise<Prisma.SummaryCreateInput | null> {
   try {
     const clubPassbook = allPassbooks.get("CLUB");
     let membersPassbooks: any[] = [];

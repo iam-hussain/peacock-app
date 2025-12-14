@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 import sharp from "sharp";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/core/auth";
 
 export async function POST(request: Request) {
   try {

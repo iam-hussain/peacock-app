@@ -18,7 +18,6 @@ class Cache {
           stdTTL: 300, // Cache time-to-live in seconds (5 minutes)
           checkperiod: 60, // Check for expired keys every minute
         });
-        console.log("Cache instance created 🌍🌍🌍🌍🐳🐳🐳🐳");
       }
       Cache.instance = global.nodeCache;
     }
@@ -30,16 +29,9 @@ export function clearCache() {
   if (global.nodeCache) {
     const catchState = global.nodeCache.getStats();
     if (catchState.keys > 0) {
-      console.log(`🌟🌟🌟🌟1️⃣1️⃣: ${JSON.stringify(catchState)}`);
       global.nodeCache.flushAll();
       global.nodeCache.flushStats();
-      console.log(`Cache cleared after API call 📟😎🌟🌟🌟🌟`);
-      console.log(
-        `🌟🌟🌟🌟💀💀: ${JSON.stringify(global.nodeCache.getStats())}`
-      );
     }
-  } else {
-    console.log(`No Cache instance found 🔴🔴🌟🌟🌟🌟`);
   }
 }
 

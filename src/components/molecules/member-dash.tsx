@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { DashboardCard } from "../atoms/dashboard-card";
 
 import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]/route";
-import { moneyFormat } from "@/lib/utils";
+import { moneyFormat } from "@/lib/ui/utils";
 
 export function MemberDash({ member }: GetMemberByUsernameResponse) {
   return (
