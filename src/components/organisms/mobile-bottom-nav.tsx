@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  FolderSync,
-  LayoutDashboard,
-  MoreHorizontal,
-  Users,
-} from "lucide-react";
+import { FolderSync, MoreHorizontal, Receipt, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { useDispatch } from "react-redux";
@@ -24,9 +19,9 @@ interface BottomNavItem {
 }
 
 const bottomNavItems: BottomNavItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Users, label: "Members", href: "/dashboard/member" },
   { icon: FolderSync, label: "Loans", href: "/dashboard/loan" },
+  { icon: Receipt, label: "Transaction", href: "/dashboard/transaction" },
   { icon: MoreHorizontal, label: "More", href: "#", isMore: true },
 ];
 
@@ -35,9 +30,6 @@ export function MobileBottomNav() {
   const dispatch = useDispatch();
 
   const isActive = (href: string) => {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard";
-    }
     if (href === "#") return false;
     return pathname.startsWith(href);
   };

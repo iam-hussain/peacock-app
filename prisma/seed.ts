@@ -155,12 +155,12 @@ async function seed() {
   console.log("🗑️  Clearing existing data...");
   // 1. Delete transactions first (no dependencies)
   await prisma.transaction.deleteMany();
-  // 2. Delete accounts (this will automatically clear passbookId references)
-  await prisma.account.deleteMany();
-  // 3. Delete passbooks (after accounts are deleted)
-  await prisma.passbook.deleteMany();
   // 4. Delete summaries
   await prisma.summary.deleteMany();
+  // 3. Delete passbooks (after accounts are deleted)
+  await prisma.passbook.deleteMany();
+  // 2. Delete accounts (this will automatically clear passbookId references)
+  await prisma.account.deleteMany();
   console.log("✅ Cleared all existing data\n");
 
   // Transform and insert passbooks first

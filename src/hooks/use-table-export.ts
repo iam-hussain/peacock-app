@@ -1,15 +1,18 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import html2canvas from "html2canvas";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
+
+import { exportScreenshot } from "@/lib/ui/export-screenshot";
 
 interface UseTableExportOptions<TData> {
   tableName: string;
   columns: ColumnDef<TData>[];
   data: TData[];
   filenamePrefix?: string;
+  title?: string;
+  identifier?: string;
 }
 
 /**
@@ -23,8 +26,11 @@ export function useTableExport<TData>({
   columns,
   data,
   filenamePrefix = "peacock-club",
+  title,
+  identifier,
 }: UseTableExportOptions<TData>) {
   const tableRef = useRef<HTMLDivElement>(null);
+  const [capturedAt, setCapturedAt] = useState<Date | undefined>(undefined);
 
   /**
    * Generate filename with timestamp
@@ -203,69 +209,59 @@ export function useTableExport<TData>({
   ]);
 
   /**
-   * Capture and export table as screenshot
+   * Generate filename for screenshot (without extension)
+   */
+  const generateScreenshotFilename = useCallback(() => {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 19).replace(/:/g, "-");
+    const sanitizedTitle = title
+      ? title.toLowerCase().replace(/\s+/g, "-")
+      : tableName;
+    return `${filenamePrefix}-${sanitizedTitle}-${dateStr}`;
+  }, [filenamePrefix, tableName, title]);
+
+  /**
+   * Capture and export table as screenshot using branded template
    */
   const handleScreenshot = useCallback(async () => {
-    const element = tableRef.current;
-    if (!element) {
-      toast.error("Table element not found");
+    const node = document.getElementById("export-root");
+    if (!node) {
+      toast.error(
+        "ScreenshotArea not found. Please wrap your table in ScreenshotArea component."
+      );
       return;
     }
 
     try {
+      // Set captured timestamp right before export
+      const now = new Date();
+      setCapturedAt(now);
+
+      // Wait a tick to ensure the timestamp is rendered
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       toast.loading("Capturing screenshot...", { id: "screenshot" });
 
-      const width = element.scrollWidth;
-      const height = element.scrollHeight;
-
-      // Capture with html2canvas using full content size (no crop)
-      const canvas = await html2canvas(element, {
-        scale: 2, // Higher resolution for crisp export
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        width,
-        height,
-        windowWidth: width,
-        windowHeight: height,
-        scrollX: 0,
-        scrollY: 0,
+      const filename = generateScreenshotFilename();
+      await exportScreenshot(filename, {
+        pixelRatio: 2,
+        quality: 1.0,
       });
 
-      // Convert canvas to blob
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            toast.error("Failed to create screenshot", { id: "screenshot" });
-            return;
-          }
-
-          // Trigger download
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = generateFilename("png");
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-
-          toast.success("Screenshot exported successfully", {
-            id: "screenshot",
-          });
-        },
-        "image/png",
-        1.0
-      );
+      toast.success("Screenshot exported successfully", {
+        id: "screenshot",
+      });
     } catch (error) {
       console.error("Error capturing screenshot:", error);
       toast.error("Failed to capture screenshot", { id: "screenshot" });
     }
-  }, [generateFilename]);
+  }, [generateScreenshotFilename]);
 
   return {
     handleExportCsv,
     handleScreenshot,
     tableRef,
+    capturedAt,
+    identifier,
   };
 }

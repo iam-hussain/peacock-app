@@ -10,11 +10,13 @@ import { useMemo, useState } from "react";
 
 import { TransformedVendor } from "@/app/api/account/vendor/route";
 import { DataTable } from "@/components/atoms/data-table";
+import { DesktopTableOnly } from "@/components/atoms/desktop-table-only";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
+import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useTableExport } from "@/hooks/use-table-export";
@@ -254,13 +256,16 @@ export default function VendorsPage() {
 
   // Table export functionality
   const {
-    handleExportCsv: _handleExportCsv,
-    handleScreenshot: _handleScreenshot,
+    handleExportCsv,
+    handleScreenshot,
     tableRef,
+    capturedAt,
+    identifier,
   } = useTableExport({
     tableName: "vendors",
     columns,
     data: filteredVendors,
+    title: "Vendors",
   });
 
   return (
@@ -274,29 +279,35 @@ export default function VendorsPage() {
             {
               label: "Export CSV",
               icon: <Download className="h-4 w-4" />,
-              onClick: () => {
-                // TODO: Implement CSV export
-              },
+              onClick: handleExportCsv,
             },
             {
               label: "Screenshot",
               icon: <Camera className="h-4 w-4" />,
-              onClick: () => {
-                // TODO: Implement screenshot
-              },
+              onClick: handleScreenshot,
             },
           ]}
         />
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden space-y-2 px-4 pt-2">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Vendors Overview
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          View vendor investments, cycles, returns, and performance.
-        </p>
+      <div className="lg:hidden">
+        <PageHeader
+          title="Vendors Overview"
+          subtitle="View vendor investments, cycles, returns, and performance."
+          secondaryActions={[
+            {
+              label: "Export CSV",
+              icon: <Download className="h-4 w-4" />,
+              onClick: handleExportCsv,
+            },
+            {
+              label: "Screenshot",
+              icon: <Camera className="h-4 w-4" />,
+              onClick: handleScreenshot,
+            },
+          ]}
+        />
       </div>
 
       {/* Desktop Filter Bar */}
@@ -320,7 +331,7 @@ export default function VendorsPage() {
         />
       </div>
 
-      {/* Desktop Table View */}
+      {/* Desktop Table View - Also used for mobile screenshots */}
       <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
@@ -329,6 +340,21 @@ export default function VendorsPage() {
           isLoading={isLoading}
         />
       </div>
+
+      {/* Screenshot Area - Hidden, only for export */}
+      <ScreenshotArea
+        title="Vendors"
+        capturedAt={capturedAt}
+        identifier={identifier}
+      >
+        <div style={{ width: "100%", minWidth: 1200 }}>
+          <DesktopTableOnly
+            columns={columns.filter((col) => col.id !== "actions")}
+            data={filteredVendors}
+            frozenColumnKey="vendor"
+          />
+        </div>
+      </ScreenshotArea>
 
       {/* Mobile Card View */}
       <div className="lg:hidden space-y-4">

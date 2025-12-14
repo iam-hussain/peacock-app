@@ -21,12 +21,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TransformedTransaction } from "@/app/api/transaction/route";
 import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
+import { DesktopTableOnly } from "@/components/atoms/desktop-table-only";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { FloatingActionButton } from "@/components/molecules/floating-action-button";
 import { PaginationControls } from "@/components/molecules/pagination-controls";
+import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
 import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
@@ -706,10 +708,17 @@ export default function TransactionsPage() {
     [canWrite]
   );
 
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+  const {
+    handleExportCsv,
+    handleScreenshot,
+    tableRef,
+    capturedAt,
+    identifier,
+  } = useTableExport({
     tableName: "transactions",
     columns,
     data: transactions,
+    title: "Transactions",
   });
 
   return (
@@ -746,15 +755,27 @@ export default function TransactionsPage() {
         />
       </div>
 
-      <div className="lg:hidden space-y-2">
-        <h1 className="text-xl font-semibold text-foreground">
-          Transaction History
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {canWrite
-            ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
-            : "Read-only access. Contact admin to request write access."}
-        </p>
+      <div className="lg:hidden">
+        <PageHeader
+          title="Transaction History"
+          subtitle={
+            canWrite
+              ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
+              : "Read-only access. Contact admin to request write access."
+          }
+          secondaryActions={[
+            {
+              label: "Export CSV",
+              icon: <Download className="h-4 w-4" />,
+              onClick: handleExportCsv,
+            },
+            {
+              label: "Screenshot",
+              icon: <Camera className="h-4 w-4" />,
+              onClick: handleScreenshot,
+            },
+          ]}
+        />
       </div>
 
       <div className="hidden lg:block">
@@ -837,6 +858,7 @@ export default function TransactionsPage() {
         </Card>
       )}
 
+      {/* Desktop Table View - Also used for mobile screenshots */}
       <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
@@ -845,6 +867,21 @@ export default function TransactionsPage() {
           isLoading={isLoading}
         />
       </div>
+
+      {/* Screenshot Area - Hidden, only for export */}
+      <ScreenshotArea
+        title="Transactions"
+        capturedAt={capturedAt}
+        identifier={identifier}
+      >
+        <div style={{ width: "100%", minWidth: 1400 }}>
+          <DesktopTableOnly
+            columns={columns.filter((col) => col.id !== "actions")}
+            data={transactions}
+            frozenColumnKey="from"
+          />
+        </div>
+      </ScreenshotArea>
 
       <div className="lg:hidden space-y-4 pb-20">
         {isLoading ? (

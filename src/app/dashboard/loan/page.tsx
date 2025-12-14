@@ -10,11 +10,13 @@ import { useMemo, useState } from "react";
 
 import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
+import { DesktopTableOnly } from "@/components/atoms/desktop-table-only";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { FilterChips } from "@/components/atoms/filter-chips";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
+import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/core/date";
 import { fetchLoans } from "@/lib/query-options";
@@ -260,10 +262,17 @@ export default function LoansPage() {
   );
 
   // Table export functionality
-  const { handleExportCsv, handleScreenshot, tableRef } = useTableExport({
+  const {
+    handleExportCsv,
+    handleScreenshot,
+    tableRef,
+    capturedAt,
+    identifier,
+  } = useTableExport({
     tableName: "loans",
     columns,
     data: filteredLoans,
+    title: "Loans",
   });
 
   return (
@@ -296,13 +305,23 @@ export default function LoansPage() {
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden space-y-2 px-4 pt-2">
-        <h1 className="text-2xl font-semibold text-foreground">
-          Loans Overview
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Track member loans, repayments, and outstanding balances.
-        </p>
+      <div className="lg:hidden">
+        <PageHeader
+          title="Loans Overview"
+          subtitle="Track member loans, repayments, and outstanding balances."
+          secondaryActions={[
+            {
+              label: "Export CSV",
+              icon: <Download className="h-4 w-4" />,
+              onClick: handleExportCsv,
+            },
+            {
+              label: "Screenshot",
+              icon: <Camera className="h-4 w-4" />,
+              onClick: handleScreenshot,
+            },
+          ]}
+        />
       </div>
 
       {/* Desktop Filter Bar */}
@@ -326,7 +345,7 @@ export default function LoansPage() {
         />
       </div>
 
-      {/* Desktop Table View */}
+      {/* Desktop Table View - Also used for mobile screenshots */}
       <div ref={tableRef} className="hidden lg:block">
         <DataTable
           columns={columns}
@@ -335,6 +354,21 @@ export default function LoansPage() {
           isLoading={isLoading}
         />
       </div>
+
+      {/* Screenshot Area - Hidden, only for export */}
+      <ScreenshotArea
+        title="Loans"
+        capturedAt={capturedAt}
+        identifier={identifier}
+      >
+        <div style={{ width: "100%", minWidth: 1200 }}>
+          <DesktopTableOnly
+            columns={columns.filter((col) => col.id !== "actions")}
+            data={filteredLoans}
+            frozenColumnKey="member"
+          />
+        </div>
+      </ScreenshotArea>
 
       {/* Mobile Card View */}
       <div className="lg:hidden space-y-4">
