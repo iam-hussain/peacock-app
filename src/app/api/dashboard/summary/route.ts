@@ -6,6 +6,7 @@ import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { transformSummaryToDashboardData } from "@/lib/transformers/dashboard-summary";
 
 /**
  * GET /api/dashboard/summary?month=YYYY-MM
@@ -55,65 +56,33 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Structure response according to financial domain semantics
+    // Calculate pending adjustments dynamically (not stored in Summary table)
+    // Total expected = sum of all members' (joiningOffset + delayOffset)
+    // Total received = summary.memberAdjustments
+    const allMemberPassbooks = await prisma.passbook.findMany({
+      where: { kind: "MEMBER" },
+      select: { joiningOffset: true, delayOffset: true },
+    });
+
+    const totalExpectedAdjustments = allMemberPassbooks.reduce(
+      (sum, pb) => sum + (pb.joiningOffset || 0) + (pb.delayOffset || 0),
+      0
+    );
+    const totalReceivedAdjustments = summary.memberAdjustments || 0;
+    const pendingAdjustments = Math.max(
+      0,
+      totalExpectedAdjustments - totalReceivedAdjustments
+    );
+
+    // Transform summary to dashboard data structure using common transformer
+    const dashboardData = transformSummaryToDashboardData(summary);
+
+    // Add pending adjustments to the transformed data
+    dashboardData.memberOutflow.pendingAdjustments = pendingAdjustments;
+
     const response = {
       success: true,
-      data: {
-        // Members
-        members: {
-          activeMembers: summary.activeMembers,
-          clubAgeMonths: summary.clubAgeMonths,
-        },
-        // Member Funds
-        memberFunds: {
-          totalDeposits: summary.totalDeposits,
-          memberBalance: summary.memberBalance,
-        },
-        // Member Outflow
-        memberOutflow: {
-          profitWithdrawals: summary.profitWithdrawals,
-          memberAdjustments: summary.memberAdjustments,
-        },
-        // Loans - Lifetime
-        loans: {
-          lifetime: {
-            totalLoanGiven: summary.totalLoanGiven,
-            totalInterestCollected: summary.totalInterestCollected,
-          },
-          // Loans - Outstanding
-          outstanding: {
-            currentLoanTaken: summary.currentLoanTaken,
-            interestBalance: summary.interestBalance,
-          },
-        },
-        // Vendor
-        vendor: {
-          vendorInvestment: summary.vendorInvestment,
-          vendorProfit: summary.vendorProfit,
-        },
-        // Cash Flow
-        cashFlow: {
-          totalInvested: summary.totalInvested,
-          pendingAmounts: summary.pendingAmounts,
-        },
-        // Valuation
-        valuation: {
-          availableCash: summary.availableCash,
-          currentValue: summary.currentValue,
-        },
-        // Portfolio
-        portfolio: {
-          totalPortfolioValue: summary.totalPortfolioValue,
-        },
-        // System Metadata
-        systemMeta: {
-          monthStartDate: summary.monthStartDate,
-          monthEndDate: summary.monthEndDate,
-          recalculatedAt: summary.recalculatedAt,
-          recalculatedByAdminId: summary.recalculatedByAdminId,
-          isLocked: summary.isLocked,
-        },
-      },
+      data: dashboardData,
     };
 
     return NextResponse.json(response);

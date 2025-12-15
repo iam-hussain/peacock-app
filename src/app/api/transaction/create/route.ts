@@ -35,7 +35,21 @@ export async function POST(request: Request) {
       },
     });
 
-    await transactionEntryHandler(created as any);
+    // Process transaction and update passbooks
+    // If this fails, the transaction exists in DB but passbook is out of sync
+    // This is logged as an error and should trigger a recalculation
+    try {
+      await transactionEntryHandler(created as any);
+    } catch (handlerError: any) {
+      console.error(
+        `⚠️ Transaction ${created.id} created but passbook update failed. ` +
+          `Transaction exists in database but passbooks may be out of sync. ` +
+          `Run recalculation to fix. Error: ${handlerError.message}`
+      );
+      // Still return success for the transaction creation, but log the error
+      // The transaction exists, but passbooks need to be recalculated
+      // In production, you might want to queue a background job to retry or recalculate
+    }
 
     return NextResponse.json({ transaction: created }, { status: 201 });
   } catch (error: any) {

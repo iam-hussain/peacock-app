@@ -43,26 +43,48 @@ export const calculateMonthsPaid = (totalPaid: number): number => {
   return totalMonths;
 };
 
-export const getClubTotalDepositUpToday = (membersCount: number): number => {
-  const perMember = getMemberTotalDepositUpToday();
-
-  return perMember * membersCount;
+export const clubMonthsFromStart = (_current: Date = new Date()) => {
+  const current = newZoneDate(_current);
+  return calculateMonthsDifference(current, clubConfig.startedAt) + 1;
 };
 
-export const clubMonthsFromStart = () => {
-  return calculateMonthsDifference(newZoneDate(), clubConfig.startedAt) + 1;
-};
+const minDate = (a: Date, b: Date) => (a.getTime() <= b.getTime() ? a : b);
 
-export const getMemberTotalDepositUpToday = () => {
-  const values = clubConfig.stages.map((e) => {
-    const diff = calculateMonthsDifference(
-      newZoneDate(e?.endDate || undefined),
-      newZoneDate(e.startDate)
-    );
-    return diff * e.amount;
-  });
+/**
+ * Total deposit expected from ONE member up to `endDate`
+ */
+export const getMemberTotalDeposit = (endDate: Date = new Date()): number => {
+  const end = newZoneDate(endDate);
 
-  return values.reduce((a, b) => {
-    return a + Math.abs(b);
+  return clubConfig.stages.reduce((total, stage) => {
+    const stageStart = newZoneDate(stage.startDate);
+
+    // If stage hasn't started yet → no contribution
+    if (end.getTime() <= stageStart.getTime()) {
+      return total;
+    }
+
+    // Cap stage end to the earlier of (stage.endDate, endDate)
+    const stageEnd = stage.endDate
+      ? minDate(newZoneDate(stage.endDate), end)
+      : end;
+
+    if (stageEnd.getTime() <= stageStart.getTime()) {
+      return total;
+    }
+
+    const months = calculateMonthsDifference(stageEnd, stageStart);
+    return total + months * stage.amount;
   }, 0);
+};
+
+/**
+ * Total deposit expected from the whole club
+ */
+export const getClubTotalDeposit = (
+  membersCount: number,
+  endDate: Date = new Date()
+): number => {
+  const perMember = getMemberTotalDeposit(endDate);
+  return perMember * Math.max(0, membersCount);
 };

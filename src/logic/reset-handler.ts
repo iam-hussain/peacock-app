@@ -1,20 +1,24 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
-import { endOfMonth, startOfMonth } from "date-fns";
+import {
+  eachMonthOfInterval,
+  endOfMonth,
+  isSameMonth,
+  startOfMonth,
+} from "date-fns";
 
 import { updatePassbookByTransaction } from "./transaction-handler";
 
 import prisma from "@/db";
 import { calculateMonthlySnapshotFromPassbooks } from "@/lib/calculators/dashboard-calculator";
-import { calculateLoanDetails } from "@/lib/calculators/loan-calculator";
+import { calculateExpectedTotalLoanInterestAmountFromTransactions } from "@/lib/calculators/expected-interest";
+import { clubConfig } from "@/lib/config/config";
 import { clearCache } from "@/lib/core/cache";
-import { calculateInterestByAmount } from "@/lib/helper";
 import {
   bulkPassbookUpdate,
   fetchAllPassbook,
   initializePassbookToUpdate,
 } from "@/lib/helper";
-import { vendorCalcHandler } from "@/logic/vendor-middleware";
 
 export async function resetAllTransactionMiddlewareHandler(
   shouldUpdatePassbooks = true,
@@ -23,11 +27,28 @@ export async function resetAllTransactionMiddlewareHandler(
   clearCache();
   await prisma.summary.deleteMany();
 
-  const [transactions, passbooks, activeMemberCount] = await Promise.all([
+  const [transactions, passbooks, activeAccounts] = await Promise.all([
     prisma.transaction.findMany({ orderBy: { occurredAt: "asc" } }),
     fetchAllPassbook(),
-    prisma.account.count({ where: { type: "MEMBER", active: true } }),
+    prisma.account.findMany({
+      where: { type: "MEMBER", active: true },
+      select: { id: true },
+    }),
   ]);
+
+  const activeMemberCount = activeAccounts.length;
+  const activeMemberIds = activeAccounts.map((account) => account.id);
+
+  const activeMemberPassbooks = passbooks.filter((passbook) =>
+    activeMemberIds.includes(passbook.account?.id || "")
+  );
+  const totalActiveMemberAdjustments = activeMemberPassbooks.reduce(
+    (sum, passbook) =>
+      sum +
+      (Number(passbook.joiningOffset) || 0) +
+      (Number(passbook.delayOffset) || 0),
+    0
+  );
 
   // Cast passbooks to expected type for initializePassbookToUpdate
   let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
@@ -40,16 +61,78 @@ export async function resetAllTransactionMiddlewareHandler(
 
   // Group transactions by month
   const transactionsByMonth: Map<string, typeof transactions> = new Map();
+  const totalTransactionCount = transactions.length;
+
+  const clubStartDate = clubConfig.startedAt;
+  const clubCurrentDate = new Date();
+
+  // Extract all months between clubStartDate and clubCurrentDate
+  const startMonth = startOfMonth(clubStartDate);
+  const endMonth = startOfMonth(clubCurrentDate);
+  const allMonths = eachMonthOfInterval({
+    start: startMonth,
+    end: endMonth,
+  });
+
+  // Initialize transactionsByMonth with all months (empty arrays)
+  allMonths.forEach((month) => {
+    const monthKey = month.toISOString();
+    transactionsByMonth.set(monthKey, []);
+  });
+
+  // Populate transactionsByMonth with actual transactions
   transactions.forEach((tx) => {
     const monthKey = startOfMonth(tx.occurredAt).toISOString();
-    if (!transactionsByMonth.has(monthKey)) {
-      transactionsByMonth.set(monthKey, []);
+    if (transactionsByMonth.has(monthKey)) {
+      transactionsByMonth.get(monthKey)!.push(tx);
+    } else {
+      // If transaction is outside the expected range, still add it
+      // (this handles edge cases where transactions exist before club start)
+      if (!transactionsByMonth.has(monthKey)) {
+        transactionsByMonth.set(monthKey, []);
+      }
+      transactionsByMonth.get(monthKey)!.push(tx);
     }
-    transactionsByMonth.get(monthKey)!.push(tx);
+  });
+
+  // Validate: Ensure no transactions were lost during grouping
+  const groupedTransactionCount = Array.from(
+    transactionsByMonth.values()
+  ).reduce((sum, monthTxs) => sum + monthTxs.length, 0);
+
+  if (totalTransactionCount !== groupedTransactionCount) {
+    console.error(
+      `❌ TRANSACTION COUNT MISMATCH: ` +
+        `Total: ${totalTransactionCount}, Grouped: ${groupedTransactionCount}, ` +
+        `Missing: ${totalTransactionCount - groupedTransactionCount}`
+    );
+    throw new Error(
+      `Transaction grouping failed: ${totalTransactionCount} transactions input, ` +
+        `${groupedTransactionCount} transactions grouped. ` +
+        `${totalTransactionCount - groupedTransactionCount} transactions missing!`
+    );
+  }
+
+  // Log transaction counts per month
+  console.log(`📊 Transaction grouping validation:`);
+  console.log(`   Total transactions: ${totalTransactionCount}`);
+  console.log(`   Transactions grouped: ${groupedTransactionCount}`);
+  console.log(`   Months with transactions: ${transactionsByMonth.size}`);
+
+  // Log per-month counts (sorted chronologically for readability)
+  const sortedMonthKeys = Array.from(transactionsByMonth.keys()).sort();
+  sortedMonthKeys.forEach((monthKey) => {
+    const monthTxs = transactionsByMonth.get(monthKey)!;
+    const monthDate = new Date(monthKey);
+    const monthLabel = monthDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+    });
+    console.log(`   ${monthLabel}: ${monthTxs.length} transactions`);
   });
 
   // Sort months chronologically
-  const sortedMonths = Array.from(transactionsByMonth.keys()).sort();
+  const sortedMonths = sortedMonthKeys;
 
   // Monthly snapshots to create
   const monthlySnapshots: any[] = [];
@@ -58,7 +141,9 @@ export async function resetAllTransactionMiddlewareHandler(
   for (const monthKey of sortedMonths) {
     const monthTransactions = transactionsByMonth.get(monthKey)!;
     const monthStart = new Date(monthKey);
-    const monthEnd = endOfMonth(monthStart);
+    const monthEnd = isSameMonth(monthStart, new Date())
+      ? new Date()
+      : endOfMonth(monthStart); // if this month then new date else current month end
 
     // Process all transactions for this month
     for (const transaction of monthTransactions) {
@@ -68,62 +153,27 @@ export async function resetAllTransactionMiddlewareHandler(
       );
     }
 
-    // Calculate vendor profits after transactions
-    const vendorIds = Array.from(passbookToUpdate.keys()).filter(
-      (id) => passbookToUpdate.get(id)?.data.kind === "VENDOR"
-    );
-    passbookToUpdate = vendorCalcHandler(passbookToUpdate, vendorIds);
-
-    // Calculate loan interest for this month
-    const loanAccounts = Array.from(passbookToUpdate.keys()).filter((id) => {
-      const pb = passbookToUpdate.get(id);
-      return pb?.data.kind === "MEMBER";
-    });
-
-    for (const accountId of loanAccounts) {
-      const passbook = passbookToUpdate.get(accountId);
-      if (!passbook) continue;
-
-      // loanHistory is stored as JSON, need to parse it
-      const loanHistoryData = passbook.data.loanHistory as any;
-      const loanTransactions = Array.isArray(loanHistoryData)
-        ? loanHistoryData
-        : [];
-
-      const loanDetails = calculateLoanDetails(loanTransactions);
-      if (
-        loanDetails &&
-        typeof loanDetails.totalLoanBalance === "number" &&
-        loanDetails.totalLoanBalance > 0
-      ) {
-        const interestResult = calculateInterestByAmount(
-          loanDetails.totalLoanBalance,
-          monthStart,
-          monthEnd
-        );
-        if (interestResult.interestAmount > 0) {
-          passbookToUpdate = updatePassbookByTransaction(passbookToUpdate, {
-            id: `loan-interest-${accountId}-${monthKey}`,
-            fromId: accountId,
-            toId: "CLUB",
-            amount: interestResult.interestAmount,
-            type: "LOAN_INTEREST",
-            occurredAt: monthEnd,
-            method: "ACCOUNT",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          } as any);
-        }
-      }
-    }
-
     // Create monthly snapshot if needed
     if (shouldUpdateDashboard) {
+      const currentMonthTransactions = transactions.filter(
+        (tx) => tx.occurredAt <= monthEnd
+      );
+
+      // Calculate expected total loan interest amount from existing transactions
+      // Filter transactions to only include those up to this month's end date
+      // This avoids fetching from database multiple times
+      const { expectedTotalLoanInterestAmount } =
+        calculateExpectedTotalLoanInterestAmountFromTransactions(
+          currentMonthTransactions,
+          monthEnd
+        );
+
       const snapshot = await calculateMonthlySnapshotFromPassbooks(
         monthStart,
         passbookToUpdate,
         activeMemberCount,
-        0 // expectedTotalLoanInterestAmount - calculate if needed
+        expectedTotalLoanInterestAmount,
+        totalActiveMemberAdjustments
       );
       if (snapshot) {
         monthlySnapshots.push(snapshot);

@@ -60,8 +60,8 @@ export const calculateMonthsDifference = (
   return Math.abs(differenceInCalendarMonths(a, b || newZoneDate()));
 };
 
-export const clubAge = () => {
-  const current = newZoneDate();
+export const clubAge = (_current: Date = new Date()) => {
+  const current = newZoneDate(_current);
   const clubStart = newZoneDate("09/01/2020");
 
   // Calculate the difference in years, months, and days

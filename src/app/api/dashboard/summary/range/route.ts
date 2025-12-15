@@ -6,6 +6,7 @@ import { endOfMonth, parse, startOfMonth } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { transformSummaryToDashboardData } from "@/lib/transformers/dashboard-summary";
 
 /**
  * GET /api/dashboard/summary/range?from=YYYY-MM&to=YYYY-MM
@@ -64,78 +65,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Structure response - return array of monthly snapshots
+    // Structure response - return array of monthly snapshots using common transformer
     const response = {
       success: true,
       from: fromParam,
       to: toParam,
       count: summaries.length,
-      summaries: summaries.map((summary) => ({
-        // Period
-        monthStartDate: summary.monthStartDate,
-        monthEndDate: summary.monthEndDate,
-
-        // Members
-        members: {
-          activeMembers: summary.activeMembers,
-          clubAgeMonths: summary.clubAgeMonths,
-        },
-
-        // Member Funds
-        memberFunds: {
-          totalDeposits: summary.totalDeposits,
-          memberBalance: summary.memberBalance,
-        },
-
-        // Member Outflow
-        memberOutflow: {
-          profitWithdrawals: summary.profitWithdrawals,
-          memberAdjustments: summary.memberAdjustments,
-        },
-
-        // Loans - Lifetime
-        loans: {
-          lifetime: {
-            totalLoanGiven: summary.totalLoanGiven,
-            totalInterestCollected: summary.totalInterestCollected,
-          },
-          // Loans - Outstanding
-          outstanding: {
-            currentLoanTaken: summary.currentLoanTaken,
-            interestBalance: summary.interestBalance,
-          },
-        },
-
-        // Vendor
-        vendor: {
-          vendorInvestment: summary.vendorInvestment,
-          vendorProfit: summary.vendorProfit,
-        },
-
-        // Cash Flow
-        cashFlow: {
-          totalInvested: summary.totalInvested,
-          pendingAmounts: summary.pendingAmounts,
-        },
-
-        // Valuation
-        valuation: {
-          availableCash: summary.availableCash,
-          currentValue: summary.currentValue,
-        },
-
-        // Portfolio
-        portfolio: {
-          totalPortfolioValue: summary.totalPortfolioValue,
-        },
-
-        // System Metadata
-        systemMeta: {
-          recalculatedAt: summary.recalculatedAt,
-          recalculatedByAdminId: summary.recalculatedByAdminId,
-          isLocked: summary.isLocked,
-        },
-      })),
+      summaries: summaries.map((summary) =>
+        transformSummaryToDashboardData(summary)
+      ),
     };
 
     return NextResponse.json(response);

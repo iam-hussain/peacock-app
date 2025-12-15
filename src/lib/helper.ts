@@ -210,7 +210,9 @@ export function fetchAllPassbook() {
       id: true,
       kind: true,
       payload: true,
-      account: { select: { id: true } },
+      joiningOffset: true,
+      delayOffset: true,
+      account: { select: { id: true, firstName: true, lastName: true } },
     },
   });
 }

@@ -88,7 +88,7 @@ export function StatsSection({ statistics }: StatsSectionProps) {
       title: "MEMBER FUNDS",
       cards: [
         {
-          title: "Total Deposits",
+          title: "Member Deposits",
           value: formatCurrency(statistics.totalMemberPeriodicDeposits),
           icon: <CircleDollarSign className="h-5 w-5" />,
           iconBgColor: "#E8F5E9",

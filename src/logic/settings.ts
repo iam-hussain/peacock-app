@@ -24,16 +24,21 @@ export type PassbookConfigAction = {
   FROM?: {
     ADD?: Partial<Record<MemberOrVendorKeys, PassbookConfigActionValue>>;
     SUB?: Partial<Record<MemberOrVendorKeys, PassbookConfigActionValue>>;
+    EQUAL?: Partial<Record<MemberOrVendorKeys, PassbookConfigActionValue>>;
   };
   TO?: {
     ADD?: Partial<Record<MemberOrVendorKeys, PassbookConfigActionValue>>;
     SUB?: Partial<Record<MemberOrVendorKeys, PassbookConfigActionValue>>;
+    EQUAL?: Partial<Record<MemberOrVendorKeys, PassbookConfigActionValue>>;
   };
   CLUB?: {
     ADD?: Partial<
       Record<keyof ClubFinancialSnapshot, PassbookConfigActionValue>
     >;
     SUB?: Partial<
+      Record<keyof ClubFinancialSnapshot, PassbookConfigActionValue>
+    >;
+    EQUAL?: Partial<
       Record<keyof ClubFinancialSnapshot, PassbookConfigActionValue>
     >;
   };
@@ -111,7 +116,9 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
   },
   VENDOR_INVEST: {
     FROM: { SUB: { clubHeldBalance: "AMOUNT" } },
-    TO: { ADD: { investmentTotal: "AMOUNT", currentBalance: "AMOUNT" } },
+    TO: {
+      ADD: { investmentTotal: "AMOUNT", currentBalance: "AMOUNT" },
+    },
     CLUB: {
       ADD: { vendorInvestmentTotal: "AMOUNT" },
       SUB: { availableCashBalance: "AMOUNT" },

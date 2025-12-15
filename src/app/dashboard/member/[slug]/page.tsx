@@ -155,7 +155,7 @@ export default function MemberPage({ params }: { params: { slug: string } }) {
                 )}
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-muted-foreground">
-                    Total Deposits
+                    Member Deposits
                   </span>
                   <span className="text-sm font-semibold text-foreground">
                     {moneyFormat(member.totalDepositAmount || 0)}

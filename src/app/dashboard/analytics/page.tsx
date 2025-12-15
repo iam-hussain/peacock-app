@@ -43,46 +43,70 @@ const TIME_RANGES = [
 ] as const;
 
 const METRICS = [
-  { key: "totalDeposits", label: "Total Deposits", color: "rgb(34, 197, 94)" },
-  { key: "memberBalance", label: "Member Balance", color: "rgb(59, 130, 246)" },
-  {
-    key: "profitWithdrawals",
-    label: "Profit Withdrawals",
-    color: "rgb(234, 179, 8)",
-  },
+  // Club Snapshot
+  { key: "activeMembers", label: "Active Members", color: "rgb(59, 130, 246)" },
+  { key: "clubAgeMonths", label: "Club Age", color: "rgb(168, 85, 247)" },
+  // Member Funds
+  { key: "totalDeposits", label: "Member Deposits", color: "rgb(34, 197, 94)" },
   {
     key: "memberAdjustments",
     label: "Member Adjustments",
     color: "rgb(168, 85, 247)",
   },
+  // Member Pending
+  { key: "memberPending", label: "Member Pending", color: "rgb(251, 146, 60)" },
+  {
+    key: "adjustmentsPending",
+    label: "Adjustments Pending",
+    color: "rgb(239, 68, 68)",
+  },
+  // Loans – Lifetime
+  {
+    key: "totalLoanGiven",
+    label: "Total Loan Given",
+    color: "rgb(59, 130, 246)",
+  },
+  {
+    key: "totalInterestCollected",
+    label: "Total Interest Collected",
+    color: "rgb(34, 197, 94)",
+  },
+  // Loans – Active
   {
     key: "currentLoanTaken",
     label: "Current Loan Taken",
     color: "rgb(239, 68, 68)",
   },
   {
-    key: "totalInterestCollected",
-    label: "Total Interest Collected",
-    color: "rgb(236, 72, 153)",
-  },
-  {
-    key: "interestBalance",
-    label: "Interest Balance",
+    key: "interestPending",
+    label: "Interest Pending",
     color: "rgb(251, 146, 60)",
   },
+  // Vendor Transactions
   {
     key: "vendorInvestment",
     label: "Vendor Investment",
     color: "rgb(14, 165, 233)",
   },
   { key: "vendorProfit", label: "Vendor Profit", color: "rgb(20, 184, 166)" },
+  // Profit Summary
+  { key: "currentProfit", label: "Current Profit", color: "rgb(20, 184, 166)" },
   {
-    key: "pendingAmounts",
-    label: "Pending Amounts",
+    key: "profitWithdrawals",
+    label: "Profit Withdrawals",
+    color: "rgb(234, 179, 8)",
+  },
+  // Cash Flow Position
+  { key: "totalInvested", label: "Total Invested", color: "rgb(59, 130, 246)" },
+  {
+    key: "totalPending",
+    label: "Total Pending",
     color: "rgb(245, 158, 11)",
   },
+  // Valuation & Liquidity
   { key: "availableCash", label: "Available Cash", color: "rgb(34, 197, 94)" },
   { key: "currentValue", label: "Current Value", color: "rgb(16, 185, 129)" },
+  // Portfolio Summary
   {
     key: "totalPortfolioValue",
     label: "Total Portfolio Value",
@@ -92,25 +116,47 @@ const METRICS = [
 
 type MonthlySummary = {
   monthStartDate: string;
+  // Club Snapshot
+  activeMembers: number;
+  clubAgeMonths: number;
+  // Member Funds
   totalDeposits: number;
-  memberBalance: number;
-  profitWithdrawals: number;
   memberAdjustments: number;
-  currentLoanTaken: number;
+  // Member Pending
+  memberPending: number;
+  adjustmentsPending: number;
+  // Loans – Lifetime
+  totalLoanGiven: number;
   totalInterestCollected: number;
-  interestBalance: number;
+  // Loans – Active
+  currentLoanTaken: number;
+  interestPending: number;
+  // Vendor Transactions
   vendorInvestment: number;
   vendorProfit: number;
-  pendingAmounts: number;
+  // Profit Summary
+  currentProfit: number;
+  profitWithdrawals: number;
+  // Cash Flow Position
+  totalInvested: number;
+  totalPending: number;
+  // Valuation & Liquidity
   availableCash: number;
   currentValue: number;
+  // Portfolio Summary
   totalPortfolioValue: number;
 };
 
 export default function AnalyticsPage() {
   const [selectedRange, setSelectedRange] = useState<string>("1Y");
   const [visibleMetrics, setVisibleMetrics] = useState<Set<string>>(
-    new Set(["availableCash", "currentValue", "totalPortfolioValue"])
+    new Set([
+      "availableCash",
+      "currentValue",
+      "totalPortfolioValue",
+      "totalDeposits",
+      "totalInvested",
+    ])
   );
 
   // Calculate date range
@@ -138,22 +184,40 @@ export default function AnalyticsPage() {
   const summaries = data?.summaries || [];
 
   // Extract nested data for chart and table
-  const flatSummaries: MonthlySummary[] = summaries.map((s: any) => ({
-    monthStartDate: s.monthStartDate,
-    totalDeposits: s.memberFunds?.totalDeposits || 0,
-    memberBalance: s.memberFunds?.memberBalance || 0,
-    profitWithdrawals: s.memberOutflow?.profitWithdrawals || 0,
-    memberAdjustments: s.memberOutflow?.memberAdjustments || 0,
-    currentLoanTaken: s.loans?.outstanding?.currentLoanTaken || 0,
-    totalInterestCollected: s.loans?.lifetime?.totalInterestCollected || 0,
-    interestBalance: s.loans?.outstanding?.interestBalance || 0,
-    vendorInvestment: s.vendor?.vendorInvestment || 0,
-    vendorProfit: s.vendor?.vendorProfit || 0,
-    pendingAmounts: s.cashFlow?.pendingAmounts || 0,
-    availableCash: s.valuation?.availableCash || 0,
-    currentValue: s.valuation?.currentValue || 0,
-    totalPortfolioValue: s.portfolio?.totalPortfolioValue || 0,
-  }));
+  const flatSummaries: MonthlySummary[] = summaries
+    .map((s: any) => ({
+      monthStartDate: s.systemMeta?.monthStartDate,
+      // Club Snapshot
+      activeMembers: s.members?.activeMembers || 0,
+      clubAgeMonths: s.members?.clubAgeMonths || 0,
+      // Member Funds
+      totalDeposits: s.memberFunds?.totalDeposits || 0,
+      memberAdjustments: s.memberOutflow?.memberAdjustments || 0,
+      // Member Pending
+      memberPending: s.memberFunds?.memberBalance || 0,
+      adjustmentsPending: s.memberOutflow?.pendingAdjustments || 0,
+      // Loans – Lifetime
+      totalLoanGiven: s.loans?.lifetime?.totalLoanGiven || 0,
+      totalInterestCollected: s.loans?.lifetime?.totalInterestCollected || 0,
+      // Loans – Active
+      currentLoanTaken: s.loans?.outstanding?.currentLoanTaken || 0,
+      interestPending: s.loans?.outstanding?.interestBalance || 0,
+      // Vendor Transactions
+      vendorInvestment: s.vendor?.vendorInvestment || 0,
+      vendorProfit: s.vendor?.vendorProfit || 0,
+      // Profit Summary
+      currentProfit: s.vendor?.vendorProfit || 0,
+      profitWithdrawals: s.memberOutflow?.profitWithdrawals || 0,
+      // Cash Flow Position
+      totalInvested: s.cashFlow?.totalInvested || 0,
+      totalPending: s.cashFlow?.pendingAmounts || 0,
+      // Valuation & Liquidity
+      availableCash: s.valuation?.availableCash || 0,
+      currentValue: s.valuation?.currentValue || 0,
+      // Portfolio Summary
+      totalPortfolioValue: s.portfolio?.totalPortfolioValue || 0,
+    }))
+    .filter((s) => s.monthStartDate); // Filter out entries with invalid dates
 
   // Define table columns
   const columns: ColumnDef<MonthlySummary>[] = useMemo(
@@ -164,50 +228,51 @@ export default function AnalyticsPage() {
         header: "Month",
         enableSorting: true,
         meta: { tooltip: "Month and year of the summary" },
+        cell: ({ row }) => {
+          const date = new Date(row.original.monthStartDate);
+          if (isNaN(date.getTime())) {
+            return <CommonTableCell label="Invalid Date" />;
+          }
+          return <CommonTableCell label={format(date, "MMM yyyy")} />;
+        },
+      },
+      // Club Snapshot
+      {
+        id: "activeMembers",
+        accessorKey: "activeMembers",
+        header: "Active Members",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Number of active members" },
         cell: ({ row }) => (
           <CommonTableCell
-            label={format(new Date(row.original.monthStartDate), "MMM yyyy")}
+            label={String(row.original.activeMembers || 0)}
+            className="text-right"
           />
         ),
       },
       {
+        id: "clubAgeMonths",
+        accessorKey: "clubAgeMonths",
+        header: "Club Age",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Club age in months" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={`${row.original.clubAgeMonths || 0} months`}
+            className="text-right"
+          />
+        ),
+      },
+      // Member Funds
+      {
         id: "totalDeposits",
         accessorKey: "totalDeposits",
-        header: "Total Deposits",
+        header: "Member Deposits",
         enableSorting: true,
         meta: { align: "right", tooltip: "Total deposits from all members" },
         cell: ({ row }) => (
           <CommonTableCell
             label={formatIndianNumber(row.original.totalDeposits || 0)}
-            className="text-right"
-          />
-        ),
-      },
-      {
-        id: "memberBalance",
-        accessorKey: "memberBalance",
-        header: "Member Balance",
-        enableSorting: true,
-        meta: { align: "right", tooltip: "Total balance held by members" },
-        cell: ({ row }) => (
-          <CommonTableCell
-            label={formatIndianNumber(row.original.memberBalance || 0)}
-            className="text-right"
-          />
-        ),
-      },
-      {
-        id: "profitWithdrawals",
-        accessorKey: "profitWithdrawals",
-        header: "Profit Withdrawals",
-        enableSorting: true,
-        meta: {
-          align: "right",
-          tooltip: "Total profit withdrawals by members",
-        },
-        cell: ({ row }) => (
-          <CommonTableCell
-            label={formatIndianNumber(row.original.profitWithdrawals || 0)}
             className="text-right"
           />
         ),
@@ -228,15 +293,49 @@ export default function AnalyticsPage() {
           />
         ),
       },
+      // Member Pending
       {
-        id: "currentLoanTaken",
-        accessorKey: "currentLoanTaken",
-        header: "Current Loan Taken",
+        id: "memberPending",
+        accessorKey: "memberPending",
+        header: "Member Pending",
         enableSorting: true,
-        meta: { align: "right", tooltip: "Outstanding loan amount" },
+        meta: { align: "right", tooltip: "Total pending balance from members" },
         cell: ({ row }) => (
           <CommonTableCell
-            label={formatIndianNumber(row.original.currentLoanTaken || 0)}
+            label={formatIndianNumber(row.original.memberPending || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "adjustmentsPending",
+        accessorKey: "adjustmentsPending",
+        header: "Adjustments Pending",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Pending adjustments not yet received",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.adjustmentsPending || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      // Loans – Lifetime
+      {
+        id: "totalLoanGiven",
+        accessorKey: "totalLoanGiven",
+        header: "Total Loan Given",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total amount of loans given to members",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.totalLoanGiven || 0)}
             className="text-right"
           />
         ),
@@ -257,19 +356,34 @@ export default function AnalyticsPage() {
           />
         ),
       },
+      // Loans – Active
       {
-        id: "interestBalance",
-        accessorKey: "interestBalance",
-        header: "Interest Balance",
+        id: "currentLoanTaken",
+        accessorKey: "currentLoanTaken",
+        header: "Current Loan Taken",
         enableSorting: true,
-        meta: { align: "right", tooltip: "Outstanding interest amount" },
+        meta: { align: "right", tooltip: "Outstanding loan amount" },
         cell: ({ row }) => (
           <CommonTableCell
-            label={formatIndianNumber(row.original.interestBalance || 0)}
+            label={formatIndianNumber(row.original.currentLoanTaken || 0)}
             className="text-right"
           />
         ),
       },
+      {
+        id: "interestPending",
+        accessorKey: "interestPending",
+        header: "Interest Pending",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Outstanding interest amount" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.interestPending || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      // Vendor Transactions
       {
         id: "vendorInvestment",
         accessorKey: "vendorInvestment",
@@ -299,19 +413,70 @@ export default function AnalyticsPage() {
           />
         ),
       },
+      // Profit Summary
       {
-        id: "pendingAmounts",
-        accessorKey: "pendingAmounts",
-        header: "Pending Amounts",
+        id: "currentProfit",
+        accessorKey: "currentProfit",
+        header: "Current Profit",
         enableSorting: true,
-        meta: { align: "right", tooltip: "Amounts pending collection" },
+        meta: {
+          align: "right",
+          tooltip: "Current profit from vendor investments",
+        },
         cell: ({ row }) => (
           <CommonTableCell
-            label={formatIndianNumber(row.original.pendingAmounts || 0)}
+            label={formatIndianNumber(row.original.currentProfit || 0)}
             className="text-right"
           />
         ),
       },
+      {
+        id: "profitWithdrawals",
+        accessorKey: "profitWithdrawals",
+        header: "Profit Withdrawals",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total profit withdrawals by members",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.profitWithdrawals || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      // Cash Flow Position
+      {
+        id: "totalInvested",
+        accessorKey: "totalInvested",
+        header: "Total Invested",
+        enableSorting: true,
+        meta: {
+          align: "right",
+          tooltip: "Total amount invested (loans + vendor investments)",
+        },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.totalInvested || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      {
+        id: "totalPending",
+        accessorKey: "totalPending",
+        header: "Total Pending",
+        enableSorting: true,
+        meta: { align: "right", tooltip: "Total amounts pending collection" },
+        cell: ({ row }) => (
+          <CommonTableCell
+            label={formatIndianNumber(row.original.totalPending || 0)}
+            className="text-right"
+          />
+        ),
+      },
+      // Valuation & Liquidity
       {
         id: "availableCash",
         accessorKey: "availableCash",
@@ -338,6 +503,7 @@ export default function AnalyticsPage() {
           />
         ),
       },
+      // Portfolio Summary
       {
         id: "totalPortfolioValue",
         accessorKey: "totalPortfolioValue",
@@ -373,9 +539,13 @@ export default function AnalyticsPage() {
   const chartData = useMemo(() => {
     if (!flatSummaries.length) return null;
 
-    const labels = flatSummaries.map((s: any) =>
-      format(new Date(s.monthStartDate), "MMM yyyy")
-    );
+    const labels = flatSummaries.map((s: any) => {
+      const date = new Date(s.monthStartDate);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return format(date, "MMM yyyy");
+    });
 
     const datasets = METRICS.filter((m) => visibleMetrics.has(m.key)).map(
       (metric) => ({
