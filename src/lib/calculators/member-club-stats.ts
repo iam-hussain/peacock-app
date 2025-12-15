@@ -1,6 +1,6 @@
 import prisma from "@/db";
 import { getMemberLoanHistory } from "@/lib/calculators/loan-calculator";
-import { getMemberTotalDepositUpToday } from "@/lib/config/club";
+import { getMemberTotalDeposit } from "@/lib/config/club";
 import {
   ClubFinancialSnapshot,
   VendorFinancialSnapshot,
@@ -38,7 +38,7 @@ export async function getMemberClubStats() {
     )
     .reduce((a, b) => a + b, 0);
 
-  const memberTotalDeposit = getMemberTotalDepositUpToday();
+  const memberTotalDeposit = getMemberTotalDeposit();
   const activeMemberCount = members.filter((m) => m.status === "ACTIVE").length;
   const clubData = clubPassbook.payload as ClubFinancialSnapshot;
 

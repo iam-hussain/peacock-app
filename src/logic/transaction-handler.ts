@@ -12,7 +12,7 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { MemberFinancialSnapshot } from "@/lib/validators/type";
+import { MemberFinancialSnapshot, VendorFinancialSnapshot } from "@/lib/validators/type";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
@@ -39,6 +39,12 @@ function getPassbookUpdateQuery(
       Object.entries(action?.SUB || {}).map(([key, value]) => [
         key,
         Number(data[key as string] || 0) - values[value],
+      ])
+    ),
+    ...Object.fromEntries(
+      Object.entries(action?.EQUAL || {}).map(([key, value]) => [
+        key,
+        values[value],
       ])
     ),
   });
@@ -80,6 +86,7 @@ export const updatePassbookByTransaction = (
     TOTAL: transaction.amount,
   };
 
+  // Withdraw Transaction Handler (Revert)
   if (transaction.type === "WITHDRAW" && !isRevert) {
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
@@ -95,6 +102,7 @@ export const updatePassbookByTransaction = (
     }
   }
 
+  // Withdraw Transaction Handler (Non Revert and Revert)
   if (transaction.type === "WITHDRAW") {
     const toPassbook = passbookToUpdate.get(transaction.toId);
     if (toPassbook) {
@@ -103,7 +111,7 @@ export const updatePassbookByTransaction = (
         withdrawalsTotal = 0,
         profitWithdrawalsTotal = 0,
       } = (toPassbook.data.payload || {}) as MemberFinancialSnapshot;
-
+      // Non Revert case
       if (!isRevert) {
         const totalWithdrawalAmount = withdrawalsTotal + transaction.amount;
         const totalWithdrawalProfit =
@@ -155,16 +163,58 @@ export async function transactionEntryHandler(
   created: Transaction,
   isDelete: boolean = false
 ) {
-  const passbooks = await getTractionPassbook(created);
-  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
+  try {
+    const passbooks = await getTractionPassbook(created);
 
-  passbookToUpdate = updatePassbookByTransaction(
-    passbookToUpdate,
-    created,
-    isDelete
-  );
+    // Validate CLUB passbook exists for LOAN_INTEREST transactions
+    if (created.type === 'LOAN_INTEREST') {
+      const clubPassbook = passbooks.find(p => p.kind === 'CLUB');
+      if (!clubPassbook) {
+        const error = new Error(
+          `CLUB passbook not found for LOAN_INTEREST transaction ${created.id}. ` +
+          `This will cause interestCollectedTotal to be out of sync.`
+        );
+        console.error('❌', error.message);
+        throw error;
+      }
+    }
 
-  // Loan history is now calculated on-the-fly from transactions
-  // No need to store or recalculate loanHistory in passbook
-  return bulkPassbookUpdate(passbookToUpdate);
+    let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
+
+    passbookToUpdate = updatePassbookByTransaction(
+      passbookToUpdate,
+      created,
+      isDelete
+    );
+
+    // Validate CLUB passbook is in the update map for LOAN_INTEREST
+    if (created.type === 'LOAN_INTEREST' && !passbookToUpdate.has('CLUB')) {
+      const error = new Error(
+        `CLUB passbook not in update map for LOAN_INTEREST transaction ${created.id}. ` +
+        `This will cause interestCollectedTotal to be out of sync.`
+      );
+      console.error('❌', error.message);
+      throw error;
+    }
+
+    // Loan history is now calculated on-the-fly from transactions
+    // No need to store or recalculate loanHistory in passbook
+    await bulkPassbookUpdate(passbookToUpdate);
+
+    // Log successful processing for LOAN_INTEREST transactions
+    if (created.type === 'LOAN_INTEREST') {
+      console.log(
+        `✅ Processed LOAN_INTEREST: ₹${created.amount.toLocaleString('en-IN')} ` +
+        `(ID: ${created.id}, fromId: ${created.fromId}, toId: ${created.toId})`
+      );
+    }
+  } catch (error) {
+    console.error(
+      `❌ Failed to process transaction ${created.id} (type: ${created.type}):`,
+      error
+    );
+    // Re-throw to ensure caller knows the transaction processing failed
+    // This is critical - if passbook update fails, the transaction exists but passbook is out of sync
+    throw error;
+  }
 }

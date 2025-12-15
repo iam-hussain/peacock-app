@@ -1,6 +1,8 @@
 import { Transaction } from "@prisma/client";
+import { endOfMonth } from "date-fns";
 
 import prisma from "@/db";
+import { clubConfig } from "@/lib/config/config";
 import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
 import { LoanHistoryEntry } from "@/lib/validators/type";
@@ -111,12 +113,28 @@ export async function getMemberLoanHistory(memberId: string) {
   const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
 
   // Recalculate interest for each entry (same as transformLoanForTable does)
+  // Use endOfMonth for consistency with expected interest calculation
+  const clubStartDate = newZoneDate(clubConfig.startedAt);
+  const currentMonthEnd = endOfMonth(newZoneDate());
+
   const loanHistoryResult = loanHistory.reduce(
     (acc, loan) => {
+      // Use loan end date if available, otherwise use current month end (not current date)
+      // This ensures consistency with expected interest calculation which uses monthEnd
+      // Also ensure start date is not before club start date (same as expected calculation)
+      const loanStartDate = loan.startDate
+        ? newZoneDate(loan.startDate)
+        : newZoneDate();
+      const actualStartDate = loanStartDate < clubStartDate ? clubStartDate : loanStartDate;
+
+      const loanEndDate = loan?.endDate
+        ? newZoneDate(loan.endDate)
+        : currentMonthEnd;
+
       const interestCalc = calculateInterestByAmount(
         loan.amount ?? 0,
-        loan.startDate ?? newZoneDate(),
-        loan?.endDate
+        actualStartDate,
+        loanEndDate
       );
       acc.totalInterestAmount += interestCalc.interestAmount;
       // Remove startDate and endDate from loan before spreading

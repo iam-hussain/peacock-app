@@ -1,9 +1,16 @@
 import { Prisma } from "@prisma/client";
 import { endOfMonth, startOfMonth } from "date-fns";
 
-import { clubConfig } from "@/lib/config/config";
-import { calculateMonthsDifference } from "@/lib/core/date";
-import { ClubFinancialSnapshot, PassbookToUpdate } from "@/lib/validators/type";
+import { clubMonthsFromStart } from "@/lib/config/club";
+import {
+  calculateExpectedTotalLoanInterestAmount,
+} from "@/lib/calculators/expected-interest";
+import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
+import {
+  ClubFinancialSnapshot,
+  PassbookToUpdate,
+  VendorFinancialSnapshot,
+} from "@/lib/validators/type";
 
 /**
  * Transforms club passbook data directly into a monthly snapshot entry
@@ -13,7 +20,7 @@ export async function calculateMonthlySnapshotFromPassbooks(
   monthStartDate: Date,
   allPassbooks: PassbookToUpdate,
   activeMembers: number,
-  expectedTotalLoanInterestAmount: number
+  expectedTotalLoanInterestAmount?: number,
 ): Promise<Prisma.SummaryCreateInput | null> {
   try {
     const clubPassbook = allPassbooks.get("CLUB");
@@ -32,85 +39,64 @@ export async function calculateMonthlySnapshotFromPassbooks(
     const clubData = clubPassbook.data.payload as ClubFinancialSnapshot;
 
     // Calculate club age
-    const clubAgeMonths =
-      calculateMonthsDifference(clubConfig.startedAt, monthEndDate) + 1;
+    const clubAgeMonths = clubMonthsFromStart(monthEndDate);
 
-    // Transform club passbook data to snapshot format
-    const totalDeposits = clubData.memberPeriodicDepositsTotal || 0;
-    const memberAdjustments = clubData.memberOffsetDepositsTotal || 0;
-    const totalWithdrawals = clubData.memberWithdrawalsTotal || 0;
-    const profitWithdrawals = clubData.memberProfitWithdrawalsTotal || 0;
+    // Extract vendor passbooks from allPassbooks
+    const vendorPassbooks = Array.from(allPassbooks.entries())
+      .filter(([key, entry]) => {
+        // Check if this is a vendor passbook (not CLUB, not MEMBER array)
+        if (key === "CLUB") return false;
+        if (key === "MEMBER") return false;
+        // Individual vendor entries have account IDs as keys
+        return entry?.data?.kind === "VENDOR";
+      })
+      .map(([_, entry]) => ({
+        payload: entry.data.payload as VendorFinancialSnapshot,
+      }));
 
-    // Calculate member balance from member passbooks (sum of all member balances)
-    let memberBalance =
-      (clubData?.memberPeriodicDepositsTotal || 0) -
-      (clubData?.memberWithdrawalsTotal || 0);
-    // Loan data from club passbook
-    const totalLoanGiven = clubData.loansPrincipalDisbursed || 0;
-    const totalInterestCollected = clubData.interestCollectedTotal || 0;
-    const currentLoanTaken = clubData.loansOutstanding || 0;
+    // Transform club passbook to summary structure using common transformer
+    // Debug: Log values being passed
+    if (clubData.interestCollectedTotal === 0) {
+      console.warn(
+        `⚠️  Snapshot for ${monthStart.toISOString().split('T')[0]}: ` +
+        `clubData.interestCollectedTotal=${clubData.interestCollectedTotal}`
+      );
+    }
 
-    // Calculate interest balance (expected interest - collected interest)
-    const interestBalance = Math.max(
-      0,
-      expectedTotalLoanInterestAmount - totalInterestCollected
-    );
+    const summaryData = transformClubPassbookToSummary({
+      clubData,
+      activeMembers,
+      clubAgeMonths,
+      expectedTotalLoanInterestAmount,
+      totalLoanInterestAmount: clubData.interestCollectedTotal || 0,
+      vendorPassbooks,
+      monthStartDate: monthStart,
+      monthEndDate,
+      recalculatedAt: new Date(),
+    });
 
-    // Vendor data from club passbook
-    const vendorInvestment = clubData.vendorInvestmentTotal || 0;
-    const vendorReturns = clubData.vendorReturnsTotal || 0;
-    const vendorProfit = Math.max(0, vendorReturns - vendorInvestment);
-
-    const totalOffsetAmount = membersPassbooks
-      .map((e) => e.joiningOffset + e.delayOffset)
-      .reduce((a, b) => a + b, 0);
-
-    const totalVendorHolding =
-      clubData.vendorInvestmentTotal - clubData.vendorReturnsTotal;
-    const totalInterestBalance =
-      expectedTotalLoanInterestAmount - totalInterestCollected;
-    const totalOffsetBalance =
-      totalOffsetAmount || 0 - clubData.memberOffsetDepositsTotal || 0;
-
-    // Calculate derived values using dashboard calculator formulas
-    const totalInvested = currentLoanTaken + totalVendorHolding;
-    const currentValue =
-      totalDeposits +
-      memberAdjustments +
-      totalInterestCollected +
-      vendorProfit -
-      totalWithdrawals;
-    const availableCash = clubData?.availableCashBalance || 0;
-    const pendingAmounts = interestBalance + memberBalance;
-    const totalPortfolioValue =
-      (clubData?.availableCashBalance || 0) +
-      (clubData?.loansOutstanding || 0) +
-      (totalVendorHolding || 0) +
-      (totalInterestBalance || 0) +
-      (totalOffsetBalance || 0);
-
-    // Return transformed snapshot
+    // Return transformed snapshot (mapping summary structure to Prisma Summary format)
     return {
       monthStartDate: monthStart,
       monthEndDate,
-      activeMembers,
-      clubAgeMonths,
-      totalDeposits,
-      memberBalance,
-      profitWithdrawals,
-      memberAdjustments,
-      totalLoanGiven,
-      totalInterestCollected,
-      currentLoanTaken,
-      interestBalance,
-      vendorInvestment,
-      vendorProfit,
-      totalInvested,
-      pendingAmounts,
-      availableCash,
-      currentValue,
-      totalPortfolioValue,
-      recalculatedAt: new Date(),
+      activeMembers: summaryData.members.activeMembers,
+      clubAgeMonths: summaryData.members.clubAgeMonths,
+      totalDeposits: summaryData.memberFunds.totalDeposits,
+      memberBalance: summaryData.memberFunds.memberBalance,
+      profitWithdrawals: summaryData.memberOutflow.profitWithdrawals,
+      memberAdjustments: summaryData.memberOutflow.memberAdjustments,
+      totalLoanGiven: summaryData.loans.lifetime.totalLoanGiven,
+      totalInterestCollected: summaryData.loans.lifetime.totalInterestCollected,
+      currentLoanTaken: summaryData.loans.outstanding.currentLoanTaken,
+      interestBalance: summaryData.loans.outstanding.interestBalance,
+      vendorInvestment: summaryData.vendor.vendorInvestment,
+      vendorProfit: summaryData.vendor.vendorProfit,
+      totalInvested: summaryData.cashFlow.totalInvested,
+      pendingAmounts: summaryData.cashFlow.pendingAmounts,
+      availableCash: summaryData.valuation.availableCash,
+      currentValue: summaryData.valuation.currentValue,
+      totalPortfolioValue: summaryData.portfolio.totalPortfolioValue,
+      recalculatedAt: summaryData.systemMeta.recalculatedAt,
     };
   } catch (error) {
     console.error(

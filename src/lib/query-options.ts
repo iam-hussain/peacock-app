@@ -28,28 +28,28 @@ export const fetchAuthStatus = () =>
       fetcher.post("/api/auth/status") as never as {
         isLoggedIn: boolean;
         user:
-          | {
-              kind: "admin";
-              username: "admin";
-              role: "SUPER_ADMIN";
-              id: "admin";
-              accessLevel: "ADMIN";
-            }
-          | {
-              kind: "admin-member";
-              accountId: string;
-              id: string;
-              role: "ADMIN";
-              accessLevel: "ADMIN";
-            }
-          | {
-              kind: "member";
-              accountId: string;
-              id: string;
-              role: "MEMBER";
-              accessLevel: "READ" | "WRITE" | "ADMIN";
-            }
-          | null;
+        | {
+          kind: "admin";
+          username: "admin";
+          role: "SUPER_ADMIN";
+          id: "admin";
+          accessLevel: "ADMIN";
+        }
+        | {
+          kind: "admin-member";
+          accountId: string;
+          id: string;
+          role: "ADMIN";
+          accessLevel: "ADMIN";
+        }
+        | {
+          kind: "member";
+          accountId: string;
+          id: string;
+          role: "MEMBER";
+          accessLevel: "READ" | "WRITE" | "ADMIN";
+        }
+        | null;
       },
     ...noRefetchConfigs,
   });
@@ -152,6 +152,7 @@ export const fetchDashboardSummary = (month?: string) =>
             memberOutflow: {
               profitWithdrawals: number;
               memberAdjustments: number;
+              pendingAdjustments?: number;
             };
             loans: {
               lifetime: {
@@ -194,8 +195,8 @@ export const fetchDashboardSummary = (month?: string) =>
         // Return error response structure for proper error handling
         const errorMessage =
           error?.message ||
-          error?.response?.data?.error ||
-          error?.response?.status === 404
+            error?.response?.data?.error ||
+            error?.response?.status === 404
             ? "No dashboard data found. Please run recalculation first."
             : "Failed to fetch dashboard summary";
         return {
@@ -205,6 +206,83 @@ export const fetchDashboardSummary = (month?: string) =>
       }
     },
     retry: false, // Don't retry on 503/404 errors
+    ...noRefetchConfigs,
+  });
+
+export const fetchDashboardClubPassbook = () =>
+  queryOptions({
+    queryKey: ["dashboard", "club-passbook"],
+    staleTime: 0, // Always consider stale to ensure fresh data
+    gcTime: 0, // Don't cache to ensure fresh data on every fetch
+    queryFn: async () => {
+      try {
+        const response = await fetcher.get("/api/dashboard/club-passbook");
+        return response as {
+          success: boolean;
+          data?: {
+            members: {
+              activeMembers: number;
+              clubAgeMonths: number;
+            };
+            memberFunds: {
+              totalDeposits: number;
+              memberBalance: number;
+            };
+            memberOutflow: {
+              profitWithdrawals: number;
+              memberAdjustments: number;
+              pendingAdjustments?: number;
+            };
+            loans: {
+              lifetime: {
+                totalLoanGiven: number;
+                totalInterestCollected: number;
+              };
+              outstanding: {
+                currentLoanTaken: number;
+                interestBalance: number;
+              };
+            };
+            vendor: {
+              vendorInvestment: number;
+              vendorProfit: number;
+            };
+            cashFlow: {
+              totalInvested: number;
+              pendingAmounts: number;
+            };
+            valuation: {
+              availableCash: number;
+              currentValue: number;
+            };
+            portfolio: {
+              totalPortfolioValue: number;
+            };
+            systemMeta: {
+              monthStartDate: Date | null;
+              monthEndDate: Date | null;
+              recalculatedAt: Date;
+              recalculatedByAdminId: string | null;
+              isLocked: boolean;
+            };
+          };
+          error?: string;
+        };
+      } catch (error: any) {
+        console.error("Error fetching club passbook:", error);
+        const errorMessage =
+          error?.message ||
+            error?.response?.data?.error ||
+            error?.response?.status === 404
+            ? "CLUB passbook not found. Please run seed to initialize database."
+            : "Failed to fetch club passbook";
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      }
+    },
+    retry: false,
     ...noRefetchConfigs,
   });
 
