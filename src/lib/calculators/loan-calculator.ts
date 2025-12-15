@@ -125,7 +125,8 @@ export async function getMemberLoanHistory(memberId: string) {
       const loanStartDate = loan.startDate
         ? newZoneDate(loan.startDate)
         : newZoneDate();
-      const actualStartDate = loanStartDate < clubStartDate ? clubStartDate : loanStartDate;
+      const actualStartDate =
+        loanStartDate < clubStartDate ? clubStartDate : loanStartDate;
 
       const loanEndDate = loan?.endDate
         ? newZoneDate(loan.endDate)

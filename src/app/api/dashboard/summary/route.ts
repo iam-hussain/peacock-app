@@ -69,7 +69,10 @@ export async function GET(request: NextRequest) {
       0
     );
     const totalReceivedAdjustments = summary.memberAdjustments || 0;
-    const pendingAdjustments = Math.max(0, totalExpectedAdjustments - totalReceivedAdjustments);
+    const pendingAdjustments = Math.max(
+      0,
+      totalExpectedAdjustments - totalReceivedAdjustments
+    );
 
     // Transform summary to dashboard data structure using common transformer
     const dashboardData = transformSummaryToDashboardData(summary);

@@ -43,8 +43,8 @@ export async function POST(request: Request) {
     } catch (handlerError: any) {
       console.error(
         `⚠️ Transaction ${created.id} created but passbook update failed. ` +
-        `Transaction exists in database but passbooks may be out of sync. ` +
-        `Run recalculation to fix. Error: ${handlerError.message}`
+          `Transaction exists in database but passbooks may be out of sync. ` +
+          `Run recalculation to fix. Error: ${handlerError.message}`
       );
       // Still return success for the transaction creation, but log the error
       // The transaction exists, but passbooks need to be recalculated

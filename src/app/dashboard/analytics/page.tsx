@@ -233,9 +233,7 @@ export default function AnalyticsPage() {
           if (isNaN(date.getTime())) {
             return <CommonTableCell label="Invalid Date" />;
           }
-          return (
-            <CommonTableCell label={format(date, "MMM yyyy")} />
-          );
+          return <CommonTableCell label={format(date, "MMM yyyy")} />;
         },
       },
       // Club Snapshot

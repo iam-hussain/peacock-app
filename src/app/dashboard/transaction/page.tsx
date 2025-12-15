@@ -17,8 +17,10 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { TransformedTransaction } from "@/app/api/transaction/route";
+import { GetTransactionResponse } from "@/app/api/transaction/route";
 import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { DesktopTableOnly } from "@/components/atoms/desktop-table-only";
@@ -45,6 +47,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useTableExport } from "@/hooks/use-table-export";
 import { transactionTypeMap } from "@/lib/config/config";
 import { dateFormat, newZoneDate } from "@/lib/core/date";
+import fetcher from "@/lib/core/fetcher";
 import { fetchAccountSelect, fetchTransactions } from "@/lib/query-options";
 import { moneyFormat } from "@/lib/ui/utils";
 
@@ -60,7 +63,7 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -163,7 +166,7 @@ export default function TransactionsPage() {
         if (existingPageSize) {
           params.set("pageSize", existingPageSize);
         } else {
-          params.set("pageSize", "10");
+          params.set("pageSize", "25");
         }
       }
 
@@ -343,7 +346,7 @@ export default function TransactionsPage() {
       transactionType: typeFilter === "all" ? "" : typeFilter,
       startDate: startDate ? startDate.toISOString().slice(0, 10) : undefined,
       endDate: endDate ? endDate.toISOString().slice(0, 10) : undefined,
-      limit: pageSize,
+      limit: pageSize === 0 ? 10000 : pageSize, // 0 means show all (use large limit)
       page: currentPage,
       search: searchQuery.trim(),
       sortField: "occurredAt",
@@ -450,7 +453,7 @@ export default function TransactionsPage() {
     setTypeFilter("all");
     setStartDate(undefined);
     setEndDate(undefined);
-    setPageSize(10);
+    setPageSize(25);
     setCurrentPage(1);
     router.push(pathname, { scroll: false });
   };
@@ -708,18 +711,222 @@ export default function TransactionsPage() {
     [canWrite]
   );
 
-  const {
-    handleExportCsv,
-    handleScreenshot,
-    tableRef,
-    capturedAt,
-    identifier,
-  } = useTableExport({
-    tableName: "transactions",
-    columns,
-    data: transactions,
-    title: "Transactions",
-  });
+  // Fetch all transactions for CSV export (without pagination)
+  const fetchAllTransactionsForExport = useCallback(async () => {
+    // Fetch all pages of data by making multiple requests if needed
+    // First, get the total count with current filters
+    const firstPageOptions = {
+      accountId: accountFilter === "all" ? "" : accountFilter,
+      transactionType: typeFilter === "all" ? "" : typeFilter,
+      startDate: startDate ? startDate.toISOString().slice(0, 10) : undefined,
+      endDate: endDate ? endDate.toISOString().slice(0, 10) : undefined,
+      limit: 1000, // Fetch 1000 at a time
+      page: 1,
+      sortField: "occurredAt",
+      sortOrder: "desc" as const,
+    };
+
+    const params = new URLSearchParams({
+      page: firstPageOptions.page.toString(),
+      limit: firstPageOptions.limit.toString(),
+      accountId: firstPageOptions.accountId.trim(),
+      transactionType: firstPageOptions.transactionType.trim(),
+      sortField: firstPageOptions.sortField,
+      sortOrder: firstPageOptions.sortOrder,
+      ...(firstPageOptions.startDate
+        ? { startDate: firstPageOptions.startDate }
+        : {}),
+      ...(firstPageOptions.endDate
+        ? { endDate: firstPageOptions.endDate }
+        : {}),
+    });
+
+    const firstResponse = (await fetcher.post(
+      `/api/transaction?${params.toString()}`
+    )) as unknown as GetTransactionResponse;
+
+    let allTransactions = [...firstResponse.transactions];
+    const totalPages = firstResponse.totalPages;
+
+    // Fetch remaining pages if any
+    if (totalPages > 1) {
+      const remainingPages = Array.from(
+        { length: totalPages - 1 },
+        (_, i) => i + 2
+      );
+      const remainingResponses = await Promise.all(
+        remainingPages.map(async (page) => {
+          const pageParams = new URLSearchParams({
+            page: page.toString(),
+            limit: firstPageOptions.limit.toString(),
+            accountId: firstPageOptions.accountId.trim(),
+            transactionType: firstPageOptions.transactionType.trim(),
+            sortField: firstPageOptions.sortField,
+            sortOrder: firstPageOptions.sortOrder,
+            ...(firstPageOptions.startDate
+              ? { startDate: firstPageOptions.startDate }
+              : {}),
+            ...(firstPageOptions.endDate
+              ? { endDate: firstPageOptions.endDate }
+              : {}),
+          });
+          return fetcher.post(
+            `/api/transaction?${pageParams.toString()}`
+          ) as unknown as GetTransactionResponse;
+        })
+      );
+
+      remainingResponses.forEach((response) => {
+        allTransactions = [...allTransactions, ...response.transactions];
+      });
+    }
+
+    // Apply search filter client-side if search query exists
+    if (searchQuery.trim()) {
+      const searchLower = searchQuery.toLowerCase().trim();
+      allTransactions = allTransactions.filter((tx) => {
+        const fromName = tx.from?.name?.toLowerCase() || "";
+        const toName = tx.to?.name?.toLowerCase() || "";
+        const type = tx.transactionType?.toLowerCase() || "";
+        const amount = tx.amount?.toString() || "";
+        return (
+          fromName.includes(searchLower) ||
+          toName.includes(searchLower) ||
+          type.includes(searchLower) ||
+          amount.includes(searchLower)
+        );
+      });
+    }
+
+    return allTransactions;
+  }, [accountFilter, typeFilter, startDate, endDate, searchQuery]);
+
+  // Helper function to escape CSV values
+  const escapeCsvValue = useCallback((value: unknown): string => {
+    if (value === null || value === undefined) return "";
+    const stringValue = String(value);
+    if (/[,"\n]/.test(stringValue)) {
+      return `"${stringValue.replace(/"/g, '""')}"`;
+    }
+    return stringValue;
+  }, []);
+
+  const { handleScreenshot, tableRef, capturedAt, identifier } = useTableExport(
+    {
+      tableName: "transactions",
+      columns,
+      data: transactions,
+      title: "Transactions",
+    }
+  );
+
+  // Custom CSV export handler that fetches all data
+  const handleExportCsv = useCallback(async () => {
+    try {
+      toast.loading("Fetching all transactions for export...", {
+        id: "csv-export",
+      });
+
+      // Fetch all transactions
+      const allTransactions = await fetchAllTransactionsForExport();
+
+      // Filter out action columns
+      const dataColumns = columns.filter((col) => {
+        const header =
+          typeof col.header === "string" ? col.header : col.id || "Column";
+        const isActionColumn =
+          header.toLowerCase().includes("action") ||
+          col.id === "actions" ||
+          (col.meta as any)?.tooltip?.toLowerCase().includes("action");
+        return !isActionColumn;
+      });
+
+      // Build CSV content
+      const csvRows: string[] = [];
+
+      // Add headers
+      const headers = dataColumns.map((col) => {
+        const header =
+          typeof col.header === "string"
+            ? col.header
+            : (col.meta as any)?.tooltip?.split(".")[0] || col.id || "Column";
+        return escapeCsvValue(header);
+      });
+      csvRows.push(headers.join(","));
+
+      // Add data rows
+      allTransactions.forEach((row: TransformedTransaction) => {
+        const values = dataColumns.map((col) => {
+          const accessorKey =
+            "accessorKey" in col ? (col.accessorKey as string) : undefined;
+          let value: any = undefined;
+
+          if (accessorKey) {
+            const keys = String(accessorKey).split(".");
+            value = row as any;
+            for (const key of keys) {
+              value = value?.[key];
+              if (value === undefined || value === null) break;
+            }
+          } else if (col.id) {
+            // Handle special cases for column IDs
+            if (col.id === "type") {
+              // Use the mapped transaction type name
+              value =
+                transactionTypeMap[row.transactionType] || row.transactionType;
+            } else if (col.id === "amount") {
+              // Format amount as currency string
+              value = moneyFormat(row.amount);
+            } else if (col.id === "occurredAt") {
+              // Format date
+              value = dateFormat(newZoneDate(row.occurredAt));
+            } else if (col.id === "from") {
+              value = row.from?.name || "";
+            } else if (col.id === "to") {
+              value = row.to?.name || "";
+            } else {
+              value = (row as any)[col.id];
+            }
+          }
+
+          if (value === null || value === undefined) return "";
+          if (typeof value === "number") return String(value);
+          if (value instanceof Date) return dateFormat(newZoneDate(value));
+          if (typeof value === "object" && value !== null) {
+            if ("name" in value) return String(value.name);
+            if ("label" in value) return String(value.label);
+            if ("value" in value) return String(value.value);
+            return JSON.stringify(value);
+          }
+          return String(value);
+        });
+        csvRows.push(values.map((v) => escapeCsvValue(v)).join(","));
+      });
+
+      // Create CSV blob
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      // Trigger download
+      const link = document.createElement("a");
+      link.href = url;
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 19).replace(/:/g, "-");
+      link.download = `peacock-club-transactions-${dateStr}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success(`Exported ${allTransactions.length} transactions to CSV`, {
+        id: "csv-export",
+      });
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      toast.error("Failed to export CSV", { id: "csv-export" });
+    }
+  }, [columns, fetchAllTransactionsForExport, escapeCsvValue]);
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
@@ -814,7 +1021,7 @@ export default function TransactionsPage() {
           pageSize={{
             value: pageSize,
             onChange: setPageSize,
-            options: [10, 25, 50],
+            options: [0, 25, 50, 75, 100],
           }}
           onReset={handleResetFilters}
         />

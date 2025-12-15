@@ -2,9 +2,6 @@ import { Prisma } from "@prisma/client";
 import { endOfMonth, startOfMonth } from "date-fns";
 
 import { clubMonthsFromStart } from "@/lib/config/club";
-import {
-  calculateExpectedTotalLoanInterestAmount,
-} from "@/lib/calculators/expected-interest";
 import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
@@ -20,16 +17,16 @@ export async function calculateMonthlySnapshotFromPassbooks(
   monthStartDate: Date,
   allPassbooks: PassbookToUpdate,
   activeMembers: number,
-  expectedTotalLoanInterestAmount?: number,
+  expectedTotalLoanInterestAmount: number,
+  totalActiveMemberAdjustments: number
 ): Promise<Prisma.SummaryCreateInput | null> {
   try {
     const clubPassbook = allPassbooks.get("CLUB");
-    let membersPassbooks: any[] = [];
-    const memberEntry = allPassbooks.get("MEMBER");
-    if (Array.isArray(memberEntry)) {
-      membersPassbooks = memberEntry.map((e: any) => e.data.payload);
-    }
-    const monthEndDate = endOfMonth(monthStartDate);
+
+    const monthEndDate =
+      endOfMonth(monthStartDate) > new Date()
+        ? new Date()
+        : endOfMonth(monthStartDate);
     const monthStart = startOfMonth(monthStartDate);
 
     if (!clubPassbook || !clubPassbook.data?.payload) {
@@ -37,6 +34,9 @@ export async function calculateMonthlySnapshotFromPassbooks(
     }
 
     const clubData = clubPassbook.data.payload as ClubFinancialSnapshot;
+
+    const pendingAdjustments =
+      totalActiveMemberAdjustments - (clubData.memberOffsetDepositsTotal || 0);
 
     // Calculate club age
     const clubAgeMonths = clubMonthsFromStart(monthEndDate);
@@ -54,25 +54,16 @@ export async function calculateMonthlySnapshotFromPassbooks(
         payload: entry.data.payload as VendorFinancialSnapshot,
       }));
 
-    // Transform club passbook to summary structure using common transformer
-    // Debug: Log values being passed
-    if (clubData.interestCollectedTotal === 0) {
-      console.warn(
-        `⚠️  Snapshot for ${monthStart.toISOString().split('T')[0]}: ` +
-        `clubData.interestCollectedTotal=${clubData.interestCollectedTotal}`
-      );
-    }
-
     const summaryData = transformClubPassbookToSummary({
       clubData,
       activeMembers,
       clubAgeMonths,
       expectedTotalLoanInterestAmount,
-      totalLoanInterestAmount: clubData.interestCollectedTotal || 0,
       vendorPassbooks,
       monthStartDate: monthStart,
       monthEndDate,
       recalculatedAt: new Date(),
+      pendingAdjustments,
     });
 
     // Return transformed snapshot (mapping summary structure to Prisma Summary format)

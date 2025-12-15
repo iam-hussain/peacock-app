@@ -5,10 +5,8 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { calculateExpectedTotalLoanInterestAmountFromDb } from "@/lib/calculators/expected-interest";
 import { clubMonthsFromStart } from "@/lib/config/club";
-import {
-  calculateExpectedTotalLoanInterestAmountFromDb,
-} from "@/lib/calculators/expected-interest";
 import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
@@ -73,7 +71,10 @@ export async function GET() {
       0
     );
     const totalReceivedAdjustments = clubData.memberOffsetDepositsTotal || 0;
-    const pendingAdjustments = Math.max(0, totalExpectedAdjustments - totalReceivedAdjustments);
+    const pendingAdjustments = Math.max(
+      0,
+      totalExpectedAdjustments - totalReceivedAdjustments
+    );
 
     // Transform club passbook to summary structure using common transformer
     const summaryData = transformClubPassbookToSummary({

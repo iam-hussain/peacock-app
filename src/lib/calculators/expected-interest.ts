@@ -2,10 +2,7 @@ import { Transaction } from "@prisma/client";
 import { endOfMonth } from "date-fns";
 
 import prisma from "@/db";
-import {
-  calculateLoanDetails,
-  fetchLoanTransactionsForMember,
-} from "@/lib/calculators/loan-calculator";
+import { calculateLoanDetails } from "@/lib/calculators/loan-calculator";
 import { clubConfig } from "@/lib/config/config";
 import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
@@ -88,7 +85,7 @@ export function calculateExpectedTotalLoanInterestAmountFromTransactions(
   try {
     // Get club start date and end date (current month end if not provided)
     const clubStartDate = newZoneDate(clubConfig.startedAt);
-    const monthEnd = endDate ? endOfMonth(endDate) : endOfMonth(newZoneDate());
+    const monthEnd = endDate ? new Date(endDate) : new Date();
 
     // Filter loan transactions from club start to end date
     const allLoanTransactions = allTransactions.filter(
@@ -97,11 +94,6 @@ export function calculateExpectedTotalLoanInterestAmountFromTransactions(
         tx.occurredAt >= clubStartDate &&
         tx.occurredAt <= monthEnd
     );
-
-    const allLoanInterestTransactions = allTransactions.filter(
-      (tx) => tx.type === "LOAN_INTEREST" && tx.occurredAt >= clubStartDate && tx.occurredAt <= monthEnd
-    );
-
 
     // Group transactions by member (toId for LOAN_TAKEN, fromId for LOAN_REPAY)
     const memberTransactionsMap = new Map<string, typeof allLoanTransactions>();
@@ -122,21 +114,11 @@ export function calculateExpectedTotalLoanInterestAmountFromTransactions(
         memberTransactionsMap.get(memberId)!.push(transaction);
       }
     });
-
     // Calculate interest for each member's loans
     const memberLoanHistories = Array.from(memberTransactionsMap.entries()).map(
-      ([memberId, transactions]) => {
-        // Filter transactions to only include relevant ones for this member
-        const filteredTransactions = transactions.filter((transaction) => {
-          return (
-            (transaction.type === "LOAN_TAKEN" &&
-              transaction.toId === memberId) ||
-            (transaction.type === "LOAN_REPAY" && transaction.fromId === memberId)
-          );
-        });
-
+      ([_memberId, transactions]) => {
         // Calculate loan details from transactions
-        const { loanHistory } = calculateLoanDetails(filteredTransactions);
+        const { loanHistory } = calculateLoanDetails(transactions);
 
         // Calculate interest for each loan entry from club start to current month end
         return loanHistory.map((loan) => {
@@ -148,9 +130,13 @@ export function calculateExpectedTotalLoanInterestAmountFromTransactions(
             loanStartDate < clubStartDate ? clubStartDate : loanStartDate;
 
           // Use loan end date if available, otherwise use month end
-          const loanEndDate = loan.endDate
-            ? newZoneDate(loan.endDate)
-            : monthEnd;
+          let loanEndDate: Date;
+          if (loan.endDate) {
+            const endDateObj = newZoneDate(loan.endDate);
+            loanEndDate = monthEnd < endDateObj ? monthEnd : endDateObj;
+          } else {
+            loanEndDate = monthEnd;
+          }
 
           // Calculate interest from actual start to end date
           const { interestAmount } = calculateInterestByAmount(

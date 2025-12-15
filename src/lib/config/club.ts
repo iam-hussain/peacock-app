@@ -48,15 +48,12 @@ export const clubMonthsFromStart = (_current: Date = new Date()) => {
   return calculateMonthsDifference(current, clubConfig.startedAt) + 1;
 };
 
-const minDate = (a: Date, b: Date) =>
-  a.getTime() <= b.getTime() ? a : b;
+const minDate = (a: Date, b: Date) => (a.getTime() <= b.getTime() ? a : b);
 
 /**
  * Total deposit expected from ONE member up to `endDate`
  */
-export const getMemberTotalDeposit = (
-  endDate: Date = new Date()
-): number => {
+export const getMemberTotalDeposit = (endDate: Date = new Date()): number => {
   const end = newZoneDate(endDate);
 
   return clubConfig.stages.reduce((total, stage) => {

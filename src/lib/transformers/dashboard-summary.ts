@@ -1,10 +1,11 @@
 import { Prisma } from "@prisma/client";
 
+import { getClubTotalDeposit } from "../config/club";
+
 import {
   ClubFinancialSnapshot,
   VendorFinancialSnapshot,
 } from "@/lib/validators/type";
-import { getClubTotalDeposit } from "../config/club";
 
 /**
  * Dashboard summary response structure
@@ -75,7 +76,6 @@ export type TransformClubPassbookOptions = {
   activeMembers: number;
   clubAgeMonths: number;
   expectedTotalLoanInterestAmount?: number;
-  totalLoanInterestAmount?: number;
   vendorPassbooks?: Array<{ payload: VendorFinancialSnapshot }>;
   monthStartDate?: Date | null;
   monthEndDate?: Date | null;
@@ -97,7 +97,6 @@ export function transformClubPassbookToSummary(
     activeMembers,
     clubAgeMonths,
     expectedTotalLoanInterestAmount = 0,
-    totalLoanInterestAmount = 0,
     vendorPassbooks = [],
     monthStartDate = null,
     monthEndDate = null,
@@ -107,10 +106,11 @@ export function transformClubPassbookToSummary(
   } = options;
 
   // Calculate total deposits (periodic only)
-  const totalDeposits = getClubTotalDeposit(activeMembers, monthEndDate || new Date()) || 0;
+  const totalDeposits =
+    getClubTotalDeposit(activeMembers, monthEndDate || new Date()) || 0;
 
   // Calculate member balance (deposits - withdrawals)
-  const memberBalance = clubData.memberPeriodicDepositsTotal - totalDeposits
+  const memberBalance = clubData.memberPeriodicDepositsTotal - totalDeposits;
 
   // Calculate interest balance (expected interest - collected interest)
   const interestBalance = Math.max(
@@ -125,9 +125,10 @@ export function transformClubPassbookToSummary(
     return total + profit;
   }, 0);
 
-
   // Calculate vendor holding
-  const totalVendorInvestment = (clubData.vendorInvestmentTotal || 0) - ((clubData.vendorReturnsTotal || 0) - vendorProfit)
+  const totalVendorInvestment =
+    (clubData.vendorInvestmentTotal || 0) -
+    ((clubData.vendorReturnsTotal || 0) - vendorProfit);
 
   // Calculate total invested (outstanding loans + vendor holding)
   const totalInvested =
@@ -141,11 +142,15 @@ export function transformClubPassbookToSummary(
   const availableCash = clubData.availableCashBalance || 0;
 
   // Calculate current value
-  const currentValue = (clubData.memberPeriodicDepositsTotal || 0) + (clubData.memberOffsetDepositsTotal || 0) + (clubData.interestCollectedTotal || 0) + vendorProfit - (clubData.memberWithdrawalsTotal || 0);
+  const currentValue =
+    (clubData.memberPeriodicDepositsTotal || 0) +
+    (clubData.memberOffsetDepositsTotal || 0) +
+    (clubData.interestCollectedTotal || 0) +
+    vendorProfit -
+    (clubData.memberWithdrawalsTotal || 0);
 
   // Calculate total portfolio value
   const totalPortfolioValue = currentValue + pendingAmounts;
-
 
   return {
     // Members
@@ -170,7 +175,7 @@ export function transformClubPassbookToSummary(
         totalLoanGiven: clubData.loansPrincipalDisbursed || 0,
         // Use totalLoanInterestAmount from transactions instead of passbook value
         // because passbook may be reset during recalculation (isClean: true)
-        totalInterestCollected: totalLoanInterestAmount || clubData.interestCollectedTotal || 0,
+        totalInterestCollected: clubData.interestCollectedTotal || 0,
       },
       // Loans - Outstanding
       outstanding: {

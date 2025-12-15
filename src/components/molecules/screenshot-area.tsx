@@ -31,7 +31,7 @@ export function ScreenshotArea({
       id="export-root"
       style={{
         background: "#F6F7FB",
-        padding: 72,
+        padding: 48,
         position: "absolute",
         left: "-9999px",
         top: 0,

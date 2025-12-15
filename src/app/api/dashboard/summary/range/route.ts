@@ -71,7 +71,9 @@ export async function GET(request: NextRequest) {
       from: fromParam,
       to: toParam,
       count: summaries.length,
-      summaries: summaries.map((summary) => transformSummaryToDashboardData(summary)),
+      summaries: summaries.map((summary) =>
+        transformSummaryToDashboardData(summary)
+      ),
     };
 
     return NextResponse.json(response);

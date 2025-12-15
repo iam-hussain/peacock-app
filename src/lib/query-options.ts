@@ -28,28 +28,28 @@ export const fetchAuthStatus = () =>
       fetcher.post("/api/auth/status") as never as {
         isLoggedIn: boolean;
         user:
-        | {
-          kind: "admin";
-          username: "admin";
-          role: "SUPER_ADMIN";
-          id: "admin";
-          accessLevel: "ADMIN";
-        }
-        | {
-          kind: "admin-member";
-          accountId: string;
-          id: string;
-          role: "ADMIN";
-          accessLevel: "ADMIN";
-        }
-        | {
-          kind: "member";
-          accountId: string;
-          id: string;
-          role: "MEMBER";
-          accessLevel: "READ" | "WRITE" | "ADMIN";
-        }
-        | null;
+          | {
+              kind: "admin";
+              username: "admin";
+              role: "SUPER_ADMIN";
+              id: "admin";
+              accessLevel: "ADMIN";
+            }
+          | {
+              kind: "admin-member";
+              accountId: string;
+              id: string;
+              role: "ADMIN";
+              accessLevel: "ADMIN";
+            }
+          | {
+              kind: "member";
+              accountId: string;
+              id: string;
+              role: "MEMBER";
+              accessLevel: "READ" | "WRITE" | "ADMIN";
+            }
+          | null;
       },
     ...noRefetchConfigs,
   });
@@ -195,8 +195,8 @@ export const fetchDashboardSummary = (month?: string) =>
         // Return error response structure for proper error handling
         const errorMessage =
           error?.message ||
-            error?.response?.data?.error ||
-            error?.response?.status === 404
+          error?.response?.data?.error ||
+          error?.response?.status === 404
             ? "No dashboard data found. Please run recalculation first."
             : "Failed to fetch dashboard summary";
         return {
@@ -272,8 +272,8 @@ export const fetchDashboardClubPassbook = () =>
         console.error("Error fetching club passbook:", error);
         const errorMessage =
           error?.message ||
-            error?.response?.data?.error ||
-            error?.response?.status === 404
+          error?.response?.data?.error ||
+          error?.response?.status === 404
             ? "CLUB passbook not found. Please run seed to initialize database."
             : "Failed to fetch club passbook";
         return {

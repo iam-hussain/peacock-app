@@ -38,11 +38,13 @@ export type PassbookConfigAction = {
     SUB?: Partial<
       Record<keyof ClubFinancialSnapshot, PassbookConfigActionValue>
     >;
-    EQUAL?: Partial<Record<keyof ClubFinancialSnapshot, PassbookConfigActionValue>>;
+    EQUAL?: Partial<
+      Record<keyof ClubFinancialSnapshot, PassbookConfigActionValue>
+    >;
   };
 };
 
-export type PassbookConfigActionValue = "AMOUNT" | "DEPOSIT_DIFF" | "TOTAL"
+export type PassbookConfigActionValue = "AMOUNT" | "DEPOSIT_DIFF" | "TOTAL";
 
 export const transactionPassbookSettings: TransactionPassbookConfig = {
   PERIODIC_DEPOSIT: {
@@ -119,7 +121,7 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     },
     CLUB: {
       ADD: { vendorInvestmentTotal: "AMOUNT" },
-      SUB: { availableCashBalance: "AMOUNT" }
+      SUB: { availableCashBalance: "AMOUNT" },
     },
   },
   VENDOR_RETURNS: {
@@ -129,7 +131,7 @@ export const transactionPassbookSettings: TransactionPassbookConfig = {
     },
     TO: { ADD: { clubHeldBalance: "AMOUNT" } },
     CLUB: {
-      ADD: { availableCashBalance: "AMOUNT", vendorReturnsTotal: "AMOUNT" }
+      ADD: { availableCashBalance: "AMOUNT", vendorReturnsTotal: "AMOUNT" },
     },
   },
   LOAN_TAKEN: {

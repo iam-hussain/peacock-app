@@ -12,7 +12,7 @@ import {
   initializePassbookToUpdate,
   setPassbookUpdateQuery,
 } from "@/lib/helper";
-import { MemberFinancialSnapshot, VendorFinancialSnapshot } from "@/lib/validators/type";
+import { MemberFinancialSnapshot } from "@/lib/validators/type";
 
 type PassbookConfigActionValueMap = {
   [key in PassbookConfigActionValue]: number;
@@ -167,14 +167,14 @@ export async function transactionEntryHandler(
     const passbooks = await getTractionPassbook(created);
 
     // Validate CLUB passbook exists for LOAN_INTEREST transactions
-    if (created.type === 'LOAN_INTEREST') {
-      const clubPassbook = passbooks.find(p => p.kind === 'CLUB');
+    if (created.type === "LOAN_INTEREST") {
+      const clubPassbook = passbooks.find((p) => p.kind === "CLUB");
       if (!clubPassbook) {
         const error = new Error(
           `CLUB passbook not found for LOAN_INTEREST transaction ${created.id}. ` +
-          `This will cause interestCollectedTotal to be out of sync.`
+            `This will cause interestCollectedTotal to be out of sync.`
         );
-        console.error('❌', error.message);
+        console.error("❌", error.message);
         throw error;
       }
     }
@@ -188,12 +188,12 @@ export async function transactionEntryHandler(
     );
 
     // Validate CLUB passbook is in the update map for LOAN_INTEREST
-    if (created.type === 'LOAN_INTEREST' && !passbookToUpdate.has('CLUB')) {
+    if (created.type === "LOAN_INTEREST" && !passbookToUpdate.has("CLUB")) {
       const error = new Error(
         `CLUB passbook not in update map for LOAN_INTEREST transaction ${created.id}. ` +
-        `This will cause interestCollectedTotal to be out of sync.`
+          `This will cause interestCollectedTotal to be out of sync.`
       );
-      console.error('❌', error.message);
+      console.error("❌", error.message);
       throw error;
     }
 
@@ -202,10 +202,10 @@ export async function transactionEntryHandler(
     await bulkPassbookUpdate(passbookToUpdate);
 
     // Log successful processing for LOAN_INTEREST transactions
-    if (created.type === 'LOAN_INTEREST') {
+    if (created.type === "LOAN_INTEREST") {
       console.log(
-        `✅ Processed LOAN_INTEREST: ₹${created.amount.toLocaleString('en-IN')} ` +
-        `(ID: ${created.id}, fromId: ${created.fromId}, toId: ${created.toId})`
+        `✅ Processed LOAN_INTEREST: ₹${created.amount.toLocaleString("en-IN")} ` +
+          `(ID: ${created.id}, fromId: ${created.fromId}, toId: ${created.toId})`
       );
     }
   } catch (error) {

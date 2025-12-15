@@ -37,8 +37,8 @@ export async function DELETE(
     } catch (handlerError: any) {
       console.error(
         `⚠️ Transaction ${id} deletion: passbook revert failed. ` +
-        `Transaction will be deleted but passbooks may be out of sync. ` +
-        `Run recalculation to fix. Error: ${handlerError.message}`
+          `Transaction will be deleted but passbooks may be out of sync. ` +
+          `Run recalculation to fix. Error: ${handlerError.message}`
       );
       // Continue with deletion even if passbook revert failed
       // The transaction will be deleted, but passbooks need recalculation
