@@ -13,17 +13,10 @@ import {
   Tooltip,
 } from "chart.js";
 import { format, startOfMonth, subMonths } from "date-fns";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import { Line } from "react-chartjs-2";
 
-import { DataTable } from "@/components/atoms/data-table";
-import { CommonTableCell } from "@/components/atoms/table-component";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetchDashboardGraphs } from "@/lib/query-options";
-import { formatIndianNumber } from "@/lib/ui/utils";
-
+// Register Chart.js components (only once)
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -33,6 +26,24 @@ ChartJS.register(
   Legend,
   Filler
 );
+
+// Dynamically import heavy chart component
+const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[500px] flex items-center justify-center text-muted-foreground">
+      Loading chart...
+    </div>
+  ),
+});
+
+import { DataTable } from "@/components/atoms/data-table";
+import { CommonTableCell } from "@/components/atoms/table-component";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetchDashboardGraphs } from "@/lib/query-options";
+import { formatIndianNumber } from "@/lib/ui/utils";
 
 const TIME_RANGES = [
   { label: "1M", months: 1 },

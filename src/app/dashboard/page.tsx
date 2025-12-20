@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -22,10 +20,40 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
 
-import { ActivityFeed } from "@/components/molecules/activity-feed";
-import { MembersPreview } from "@/components/molecules/members-preview";
+// Dynamically import heavy components
+const ActivityFeed = dynamic(
+  () =>
+    import("@/components/molecules/activity-feed").then(
+      (mod) => mod.ActivityFeed
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-32 flex items-center justify-center text-muted-foreground">
+        Loading activity...
+      </div>
+    ),
+  }
+);
+
+const MembersPreview = dynamic(
+  () =>
+    import("@/components/molecules/members-preview").then(
+      (mod) => mod.MembersPreview
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-48 flex items-center justify-center text-muted-foreground">
+        Loading members...
+      </div>
+    ),
+  }
+);
+
 import { ModernStatCard } from "@/components/molecules/modern-stat-card";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { Button } from "@/components/ui/button";
@@ -87,15 +115,18 @@ export default function DashboardPage() {
   const { data: membersData, isLoading: isMembersLoading } =
     useQuery(fetchMembers());
 
-  // Select data source based on toggle
-  const data =
-    dataSource === "summary"
-      ? summaryData?.success
-        ? summaryData?.data
-        : undefined
-      : clubPassbookData?.success
-        ? clubPassbookData?.data
-        : undefined;
+  // Memoize data source selection
+  const data = useMemo(
+    () =>
+      dataSource === "summary"
+        ? summaryData?.success
+          ? summaryData?.data
+          : undefined
+        : clubPassbookData?.success
+          ? clubPassbookData?.data
+          : undefined,
+    [dataSource, summaryData, clubPassbookData]
+  );
 
   // Debug: Log which data source is active and what interest balance is shown
   if (data?.loans?.outstanding?.interestBalance !== undefined) {
@@ -104,12 +135,20 @@ export default function DashboardPage() {
     );
   }
 
-  const isLoading =
-    dataSource === "summary"
-      ? isSummaryLoading || isMembersLoading
-      : isClubPassbookLoading || isMembersLoading;
+  // Memoize loading state
+  const isLoading = useMemo(
+    () =>
+      dataSource === "summary"
+        ? isSummaryLoading || isMembersLoading
+        : isClubPassbookLoading || isMembersLoading,
+    [dataSource, isSummaryLoading, isMembersLoading, isClubPassbookLoading]
+  );
 
-  const members = membersData?.members || [];
+  // Memoize members data
+  const members = useMemo(
+    () => membersData?.members || [],
+    [membersData?.members]
+  );
 
   // Log errors for debugging
   if (dataSource === "summary") {
@@ -128,12 +167,16 @@ export default function DashboardPage() {
     }
   }
 
-  const formatCurrency = (value: number) =>
-    (value || 0).toLocaleString("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    });
+  // Memoize currency formatter
+  const formatCurrency = useMemo(
+    () => (value: number) =>
+      (value || 0).toLocaleString("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+      }),
+    []
+  );
 
   const handleScreenshot = async () => {
     try {

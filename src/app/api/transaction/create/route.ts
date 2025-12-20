@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { requireWriteAccess } from "@/lib/core/auth";
+import { invalidateTransactionCaches } from "@/lib/core/cache-invalidation";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function POST(request: Request) {
@@ -50,6 +51,9 @@ export async function POST(request: Request) {
       // The transaction exists, but passbooks need to be recalculated
       // In production, you might want to queue a background job to retry or recalculate
     }
+
+    // Clear all caches after transaction creation
+    await invalidateTransactionCaches();
 
     return NextResponse.json({ transaction: created }, { status: 201 });
   } catch (error: any) {

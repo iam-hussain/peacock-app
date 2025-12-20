@@ -10,6 +10,7 @@ import {
   Copy,
   Database,
   Download,
+  RefreshCw,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
@@ -52,7 +53,6 @@ import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
   const { isAdmin, canManageAccounts, user } = useAuth();
-  const isSuperAdmin = user?.kind === "admin" && user?.role === "SUPER_ADMIN";
   const queryClient = useQueryClient();
 
   // Track access state for each member to handle optimistic updates
@@ -92,21 +92,22 @@ export default function SettingsPage() {
   const [selectedMemberForPasswordReset, setSelectedMemberForPasswordReset] =
     useState<TransformedMember | null>(null);
   const [newPassword, setNewPassword] = useState<string | null>(null);
-  const [recalculateReturnsDialogOpen, setRecalculateReturnsDialogOpen] =
+  const [recalculatePassbookDialogOpen, setRecalculatePassbookDialogOpen] =
     useState(false);
-  const [recalculateDashboardDialogOpen, setRecalculateDashboardDialogOpen] =
+  const [recalculateAnalyticsDialogOpen, setRecalculateAnalyticsDialogOpen] =
     useState(false);
   const [backupDownloadLink, setBackupDownloadLink] = useState<string | null>(
     null
   );
+  const [clearCacheDialogOpen, setClearCacheDialogOpen] = useState(false);
 
   // System Tools Mutations
-  const returnsMutation = useMutation({
+  const passbookRecalcMutation = useMutation({
     mutationFn: () => fetcher.post("/api/admin/recalculate"),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["all"] });
-      toast.success("Returns are recalculated successfully.");
-      setRecalculateReturnsDialogOpen(false);
+      toast.success("Passbook recalculated successfully.");
+      setRecalculatePassbookDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(
@@ -115,23 +116,23 @@ export default function SettingsPage() {
     },
   });
 
-  const dashboardRecalcMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/admin/dashboard/recalculate"),
+  const analyticsRecalcMutation = useMutation({
+    mutationFn: () => fetcher.post("/api/admin/summary/recalculate"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["all", "statistic"] });
-      toast.success("Dashboard data recalculated successfully.");
-      setRecalculateDashboardDialogOpen(false);
+      toast.success("Analytics data recalculated successfully.");
+      setRecalculateAnalyticsDialogOpen(false);
     },
     onError: (error: any) => {
-      console.error("Dashboard recalculation error:", error);
+      console.error("Analytics recalculation error:", error);
       const errorMessage =
         error?.response?.data?.error ||
         error?.message ||
-        "Failed to recalculate dashboard data. Please try again.";
+        "Failed to recalculate analytics data. Please try again.";
       toast.error(errorMessage);
       // Close dialog on error so user can see the error and try again if needed
-      setRecalculateDashboardDialogOpen(false);
+      setRecalculateAnalyticsDialogOpen(false);
     },
     onSettled: () => {
       // This runs whether success or error - ensures state is reset
@@ -147,6 +148,33 @@ export default function SettingsPage() {
       const downloadUrl = URL.createObjectURL(blob);
       setBackupDownloadLink(downloadUrl);
       toast.success("Data backup done successfully, download now.");
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
+    },
+  });
+
+  const clearCacheMutation = useMutation({
+    mutationFn: () => fetcher.post("/api/admin/clear-cache"),
+    onSuccess: async () => {
+      // Clear all React Query cache
+      await queryClient.invalidateQueries();
+      await queryClient.clear();
+
+      // Clear sessionStorage cache
+      if (typeof window !== "undefined") {
+        const cacheKeys = Object.keys(sessionStorage);
+        cacheKeys.forEach((key) => {
+          if (key.startsWith("etag:") || key.startsWith("data:")) {
+            sessionStorage.removeItem(key);
+          }
+        });
+      }
+
+      toast.success("All caches cleared successfully.");
+      setClearCacheDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(
@@ -598,8 +626,8 @@ export default function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Recalculate Returns - Super Admin Only */}
-          {isSuperAdmin && (
+          {/* Recalculate Passbook - Admin and Super Admin */}
+          {isAdmin && (
             <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
               <div className="flex items-start gap-4 flex-1">
                 <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
@@ -607,25 +635,34 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex-1 space-y-1">
                   <h3 className="text-sm font-semibold text-foreground">
-                    Recalculate Returns
+                    Recalculate Passbook
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Recompute all member returns based on the latest rules.
+                    Recompute all passbook data by processing all transactions
+                    in chronological order. This updates member, vendor, and
+                    club passbooks.
                   </p>
                 </div>
               </div>
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setRecalculateReturnsDialogOpen(true)}
-                disabled={returnsMutation.isPending || backupMutation.isPending}
+                onClick={() => setRecalculatePassbookDialogOpen(true)}
+                disabled={
+                  passbookRecalcMutation.isPending ||
+                  analyticsRecalcMutation.isPending ||
+                  backupMutation.isPending ||
+                  clearCacheMutation.isPending
+                }
               >
-                {returnsMutation.isPending ? "Running..." : "Recalculate"}
+                {passbookRecalcMutation.isPending
+                  ? "Running..."
+                  : "Recalculate"}
               </Button>
             </div>
           )}
 
-          {/* Recalculate Dashboard - Admin Only */}
+          {/* Recalculate Analytics - Admin and Super Admin */}
           {isAdmin && (
             <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
               <div className="flex items-start gap-4 flex-1">
@@ -634,11 +671,11 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex-1 space-y-1">
                   <h3 className="text-sm font-semibold text-foreground">
-                    Recalculate Dashboard Data
+                    Recalculate Analytics
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Recompute all monthly dashboard snapshots from transaction
-                    history. This ensures all dashboard metrics are accurate and
+                    Recompute all monthly summary snapshots from transaction
+                    history. This ensures all analytics metrics are accurate and
                     auditable.
                   </p>
                 </div>
@@ -646,14 +683,15 @@ export default function SettingsPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setRecalculateDashboardDialogOpen(true)}
+                onClick={() => setRecalculateAnalyticsDialogOpen(true)}
                 disabled={
-                  dashboardRecalcMutation.isPending ||
-                  returnsMutation.isPending ||
-                  backupMutation.isPending
+                  analyticsRecalcMutation.isPending ||
+                  passbookRecalcMutation.isPending ||
+                  backupMutation.isPending ||
+                  clearCacheMutation.isPending
                 }
               >
-                {dashboardRecalcMutation.isPending
+                {analyticsRecalcMutation.isPending
                   ? "Running..."
                   : "Recalculate"}
               </Button>
@@ -691,15 +729,50 @@ export default function SettingsPage() {
                 size="sm"
                 onClick={() => backupMutation.mutate()}
                 disabled={
-                  dashboardRecalcMutation.isPending ||
-                  returnsMutation.isPending ||
-                  backupMutation.isPending
+                  analyticsRecalcMutation.isPending ||
+                  passbookRecalcMutation.isPending ||
+                  backupMutation.isPending ||
+                  clearCacheMutation.isPending
                 }
               >
                 {backupMutation.isPending ? "Backing up..." : "Create Backup"}
               </Button>
             </div>
           </div>
+
+          {/* Clear Cache - Admin Only */}
+          {isAdmin && (
+            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="rounded-lg p-2.5 bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                  <RefreshCw className="h-5 w-5" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Clear All Caches
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Clear all server and client-side caches to ensure fresh
+                    data. This includes React Query cache, sessionStorage, and
+                    server caches.
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setClearCacheDialogOpen(true)}
+                disabled={
+                  analyticsRecalcMutation.isPending ||
+                  passbookRecalcMutation.isPending ||
+                  backupMutation.isPending ||
+                  clearCacheMutation.isPending
+                }
+              >
+                {clearCacheMutation.isPending ? "Clearing..." : "Clear Cache"}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -833,53 +906,56 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Recalculate Returns Confirmation Dialog */}
+      {/* Recalculate Passbook Confirmation Dialog */}
       <Dialog
-        open={recalculateReturnsDialogOpen}
-        onOpenChange={setRecalculateReturnsDialogOpen}
+        open={recalculatePassbookDialogOpen}
+        onOpenChange={setRecalculatePassbookDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Recalculate Returns?</DialogTitle>
+            <DialogTitle>Recalculate Passbook?</DialogTitle>
             <DialogDescription>
-              This will recompute returns for all members. It won&apos;t delete
-              data but may update balances.
+              This will recompute all passbook data by processing all
+              transactions in chronological order. This updates member, vendor,
+              and club passbooks. It won&apos;t delete data but may update
+              balances.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <Button
               variant="outline"
-              onClick={() => setRecalculateReturnsDialogOpen(false)}
+              onClick={() => setRecalculatePassbookDialogOpen(false)}
+              disabled={passbookRecalcMutation.isPending}
             >
               Cancel
             </Button>
             <Button
-              onClick={() => returnsMutation.mutate()}
-              disabled={returnsMutation.isPending}
+              onClick={() => passbookRecalcMutation.mutate()}
+              disabled={passbookRecalcMutation.isPending}
             >
-              {returnsMutation.isPending ? "Running..." : "Confirm"}
+              {passbookRecalcMutation.isPending ? "Running..." : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Recalculate Dashboard Confirmation Dialog */}
+      {/* Recalculate Analytics Confirmation Dialog */}
       <Dialog
-        open={recalculateDashboardDialogOpen}
+        open={recalculateAnalyticsDialogOpen}
         onOpenChange={(open) => {
           // Only allow closing if not currently running
-          if (!dashboardRecalcMutation.isPending) {
-            setRecalculateDashboardDialogOpen(open);
+          if (!analyticsRecalcMutation.isPending) {
+            setRecalculateAnalyticsDialogOpen(open);
           }
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Recalculate Dashboard Data?</DialogTitle>
+            <DialogTitle>Recalculate Analytics?</DialogTitle>
             <DialogDescription>
-              This will recalculate all monthly dashboard snapshots from the
-              first transaction to the current month. This process may take a
-              few minutes depending on the amount of historical data.
+              This will recalculate all monthly summary snapshots from the first
+              transaction to the current month. This process may take a few
+              minutes depending on the amount of historical data.
               <br />
               <br />
               <strong>Warning:</strong> This will overwrite existing monthly
@@ -890,21 +966,59 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               onClick={() => {
-                if (!dashboardRecalcMutation.isPending) {
-                  setRecalculateDashboardDialogOpen(false);
+                if (!analyticsRecalcMutation.isPending) {
+                  setRecalculateAnalyticsDialogOpen(false);
                 }
               }}
-              disabled={dashboardRecalcMutation.isPending}
+              disabled={analyticsRecalcMutation.isPending}
             >
               Cancel
             </Button>
             <Button
-              onClick={() => dashboardRecalcMutation.mutate()}
-              disabled={dashboardRecalcMutation.isPending}
+              onClick={() => analyticsRecalcMutation.mutate()}
+              disabled={analyticsRecalcMutation.isPending}
             >
-              {dashboardRecalcMutation.isPending
+              {analyticsRecalcMutation.isPending
                 ? "Recalculating..."
                 : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Clear Cache Confirmation Dialog */}
+      <Dialog
+        open={clearCacheDialogOpen}
+        onOpenChange={setClearCacheDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear All Caches?</DialogTitle>
+            <DialogDescription>
+              This will clear all caches including:
+              <br />
+              • Server-side caches (Next.js route cache, NodeCache)
+              <br />
+              • Client-side caches (React Query cache, sessionStorage ETags)
+              <br />
+              <br />
+              After clearing, all data will be fetched fresh from the database.
+              This may temporarily slow down the next few requests.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setClearCacheDialogOpen(false)}
+              disabled={clearCacheMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => clearCacheMutation.mutate()}
+              disabled={clearCacheMutation.isPending}
+            >
+              {clearCacheMutation.isPending ? "Clearing..." : "Clear Cache"}
             </Button>
           </DialogFooter>
         </DialogContent>

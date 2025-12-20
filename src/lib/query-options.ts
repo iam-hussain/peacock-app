@@ -14,11 +14,28 @@ type GetStatisticsResponse = {
   error?: string;
 };
 
+// Base config for queries that should cache but not auto-refetch
 const noRefetchConfigs = {
   refetchOnMount: false,
-  refetchInactive: true,
-  refetchOnReconnect: true,
   refetchOnWindowFocus: false,
+  refetchOnReconnect: true,
+  // Cache for 2 minutes (data is considered fresh for 30s, then stale but cached for 2min)
+  staleTime: 30 * 1000,
+  gcTime: 2 * 60 * 1000,
+};
+
+// Config for frequently changing data (dashboard, transactions)
+const frequentDataConfig = {
+  ...noRefetchConfigs,
+  staleTime: 15 * 1000, // Fresh for 15 seconds
+  gcTime: 1 * 60 * 1000, // Cache for 1 minute
+};
+
+// Config for relatively static data (members, vendors, accounts)
+const staticDataConfig = {
+  ...noRefetchConfigs,
+  staleTime: 2 * 60 * 1000, // Fresh for 2 minutes
+  gcTime: 10 * 60 * 1000, // Cache for 10 minutes
 };
 
 export const fetchAuthStatus = () =>
@@ -51,7 +68,7 @@ export const fetchAuthStatus = () =>
             }
           | null;
       },
-    ...noRefetchConfigs,
+    ...staticDataConfig, // Auth status doesn't change frequently
   });
 
 export const fetchMemberByUsername = (username: string) =>
@@ -69,7 +86,7 @@ export const fetchMembers = () =>
     queryKey: ["all", "member", "account"],
     queryFn: () =>
       fetcher.post("/api/account/member") as unknown as GetMemberResponse,
-    ...noRefetchConfigs,
+    ...staticDataConfig, // Members list changes infrequently
   });
 
 export const fetchVendors = () =>
@@ -77,7 +94,7 @@ export const fetchVendors = () =>
     queryKey: ["all", "vendor", "account"],
     queryFn: () =>
       fetcher.post("/api/account/vendor") as unknown as GetVendorResponse,
-    ...noRefetchConfigs,
+    ...staticDataConfig, // Vendors list changes infrequently
   });
 
 export const fetchLoans = () =>
@@ -85,7 +102,7 @@ export const fetchLoans = () =>
     queryKey: ["all", "loan", "account"],
     queryFn: () =>
       fetcher.post("/api/account/loan") as unknown as GetLoanResponse,
-    ...noRefetchConfigs,
+    ...frequentDataConfig, // Loans can change more frequently
   });
 
 export const fetchAccountSelect = () =>
@@ -95,7 +112,7 @@ export const fetchAccountSelect = () =>
       fetcher.post(
         "/api/account/select"
       ) as never as TransformedAccountSelect[],
-    ...noRefetchConfigs,
+    ...staticDataConfig, // Account select list changes infrequently
   });
 
 export const fetchStatistics = () =>
@@ -124,7 +141,7 @@ export const fetchTransactions = (options: any) => {
       fetcher.post(
         `/api/transaction?${params.toString()}`
       ) as unknown as GetTransactionResponse,
-    ...noRefetchConfigs,
+    ...frequentDataConfig, // Transactions change frequently
   });
 };
 
@@ -207,14 +224,12 @@ export const fetchDashboardSummary = (month?: string) =>
       }
     },
     retry: false, // Don't retry on 503/404 errors
-    ...noRefetchConfigs,
+    ...frequentDataConfig, // Dashboard data changes frequently
   });
 
 export const fetchDashboardClubPassbook = () =>
   queryOptions({
     queryKey: ["dashboard", "club-passbook"],
-    staleTime: 0, // Always consider stale to ensure fresh data
-    gcTime: 0, // Don't cache to ensure fresh data on every fetch
     queryFn: async () => {
       try {
         const response = await fetcher.get("/api/dashboard/club-passbook");
@@ -285,7 +300,7 @@ export const fetchDashboardClubPassbook = () =>
       }
     },
     retry: false,
-    ...noRefetchConfigs,
+    ...frequentDataConfig, // Club passbook data changes frequently
   });
 
 export const fetchDashboardGraphs = (from: string, to: string) =>
@@ -301,5 +316,5 @@ export const fetchDashboardGraphs = (from: string, to: string) =>
         count: number;
         summaries: any[];
       }>,
-    ...noRefetchConfigs,
+    ...staticDataConfig, // Historical graph data doesn't change
   });

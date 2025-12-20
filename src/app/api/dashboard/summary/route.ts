@@ -85,7 +85,22 @@ export async function GET(request: NextRequest) {
       data: dashboardData,
     };
 
-    return NextResponse.json(response);
+    // Generate ETag from summary's recalculatedAt timestamp for cache validation
+    const etag = `"${summary.recalculatedAt.getTime()}"`;
+
+    // Check if client has cached version
+    const ifNoneMatch = request.headers.get("if-none-match");
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, { status: 304 }); // Not Modified
+    }
+
+    return NextResponse.json(response, {
+      headers: {
+        "Cache-Control": "private, no-cache, must-revalidate", // Don't cache at CDN, but allow browser cache with validation
+        ETag: etag,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   } catch (error) {
     console.error("Error fetching dashboard summary:", error);
     return NextResponse.json(

@@ -15,13 +15,28 @@ class Cache {
     if (!Cache.instance) {
       if (typeof global.nodeCache === "undefined") {
         global.nodeCache = new NodeCache({
-          stdTTL: 300, // Cache time-to-live in seconds (5 minutes)
+          stdTTL: 300, // Default cache time-to-live in seconds (5 minutes)
           checkperiod: 60, // Check for expired keys every minute
+          useClones: false, // Better performance - don't clone cached values
+          maxKeys: 1000, // Limit cache size to prevent memory issues
         });
       }
       Cache.instance = global.nodeCache;
     }
     return Cache.instance;
+  }
+
+  // Helper method to get cache with custom TTL
+  public static get(key: string): any {
+    return Cache.getInstance().get(key);
+  }
+
+  // Helper method to set cache with custom TTL
+  public static set(key: string, value: any, ttl?: number): boolean {
+    if (ttl !== undefined) {
+      return Cache.getInstance().set(key, value, ttl);
+    }
+    return Cache.getInstance().set(key, value);
   }
 }
 

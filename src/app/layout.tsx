@@ -23,6 +23,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-paper">
+      <head>
+        {/* Resource Hints for Performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        {/* Preload critical assets */}
+        <link
+          rel="preload"
+          href="/peacock.svg"
+          as="image"
+          type="image/svg+xml"
+        />
+      </head>
       <body className="bg-paper">
         <Analytics />
         <QueryProvider>

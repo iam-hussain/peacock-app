@@ -37,6 +37,7 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
   const [selectedMemberSlug, setSelectedMemberSlug] = useState<string | null>(
     null
   );
+  const [displayLimit, setDisplayLimit] = useState(24); // Limit initial render
 
   const { data } = useQuery(fetchMembers());
   const members = data?.members || initialMembers;
@@ -66,9 +67,17 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
       );
     }
 
-    // Return all filtered members
+    // Return filtered members (limited for performance)
     return filtered;
   }, [members, filterStatus, searchQuery]);
+
+  // Memoize displayed members (paginated)
+  const displayedMembers = useMemo(
+    () => filteredMembers.slice(0, displayLimit),
+    [filteredMembers, displayLimit]
+  );
+
+  const hasMore = filteredMembers.length > displayLimit;
 
   const handleMemberClick = (username: string) => {
     setSelectedMemberSlug(username);
@@ -117,48 +126,62 @@ export function MembersPreview({ initialMembers = [] }: MembersPreviewProps) {
           </div>
 
           {/* Members Grid */}
-          {filteredMembers.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-              {filteredMembers.map((member) => (
-                <button
-                  key={member.username}
-                  onClick={() => handleMemberClick(member.username)}
-                  className="group flex flex-col items-center gap-2 rounded-lg p-3 transition-colors hover:bg-muted/50"
-                >
-                  <ClickableAvatar
-                    src={member.avatar}
-                    alt={member.name}
-                    name={member.name}
-                    href={member.link}
-                    size="lg"
-                  />
-                  <div className="text-center">
-                    <p className="text-xs font-medium text-foreground line-clamp-1">
-                      {member.name}
-                    </p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">
-                      {member.active ? (
-                        <span className="inline-flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                          Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1">
-                          <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                          Inactive
-                        </span>
-                      )}
-                    </p>
-                    {"totalDepositAmount" in member &&
-                      member.totalDepositAmount > 0 && (
-                        <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-                          {moneyFormat(member.totalDepositAmount)}
-                        </p>
-                      )}
-                  </div>
-                </button>
-              ))}
-            </div>
+          {displayedMembers.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                {displayedMembers.map((member) => (
+                  <button
+                    key={member.username}
+                    onClick={() => handleMemberClick(member.username)}
+                    className="group flex flex-col items-center gap-2 rounded-lg p-3 transition-colors hover:bg-muted/50"
+                  >
+                    <ClickableAvatar
+                      src={member.avatar}
+                      alt={member.name}
+                      name={member.name}
+                      href={member.link}
+                      size="lg"
+                    />
+                    <div className="text-center">
+                      <p className="text-xs font-medium text-foreground line-clamp-1">
+                        {member.name}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground">
+                        {member.active ? (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                            Active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
+                            Inactive
+                          </span>
+                        )}
+                      </p>
+                      {"totalDepositAmount" in member &&
+                        member.totalDepositAmount > 0 && (
+                          <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                            {moneyFormat(member.totalDepositAmount)}
+                          </p>
+                        )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="flex justify-center pt-4">
+                  <button
+                    onClick={() => setDisplayLimit((prev) => prev + 24)}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    Load more ({filteredMembers.length - displayLimit}{" "}
+                    remaining)
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="py-8 text-center text-sm text-muted-foreground">
               No members found
