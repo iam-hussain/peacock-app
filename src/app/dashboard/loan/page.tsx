@@ -155,16 +155,16 @@ export default function LoansPage() {
         },
       },
       {
-        id: "amountTaken",
-        accessorKey: "totalLoanTaken",
-        header: "Amount Taken",
+        id: "currentLoanActive",
+        accessorKey: "totalLoanBalance",
+        header: "Current Loan Active",
         enableSorting: true,
         meta: {
           align: "right",
-          tooltip: "Total loan amount taken by this member.",
+          tooltip: "Current active loan balance (outstanding amount).",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalLoanTaken || 0;
+          const amount = row.original.totalLoanBalance || 0;
           return (
             <div className="text-right text-sm font-medium text-foreground">
               {moneyFormat(amount)}
@@ -433,10 +433,10 @@ export default function LoansPage() {
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">
-                        Amount Taken
+                        Current Loan Active
                       </div>
                       <div className="text-sm font-medium text-foreground">
-                        {moneyFormat(loan.totalLoanTaken || 0)}
+                        {moneyFormat(loan.totalLoanBalance || 0)}
                       </div>
                     </div>
                     <div>
