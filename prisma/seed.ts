@@ -1,12 +1,12 @@
-import { PrismaClient } from "@prisma/client"
-import { readFileSync } from "fs"
-import path from "path"
+import { PrismaClient } from "@prisma/client";
+import { readFileSync } from "fs";
+import path from "path";
 
 const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],
-})
+});
 
-const toDate = (value: any) => (value ? new Date(value) : null)
+const toDate = (value: any) => (value ? new Date(value) : null);
 
 const buildDefaultClubPassbook = () => ({
   kind: "CLUB",
@@ -37,42 +37,42 @@ const buildDefaultClubPassbook = () => ({
   lastCalculatedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-})
+});
 
 async function seed() {
-  console.log("🌱 Starting database seed...\n")
+  console.log("🌱 Starting database seed...\n");
 
   const backupFilePath = path.join(
     process.cwd(),
     "public",
     "peacock_backup.json"
-  )
+  );
 
-  console.log(`📂 Reading backup from: ${backupFilePath}`)
-  const backupData = JSON.parse(readFileSync(backupFilePath, "utf8"))
+  console.log(`📂 Reading backup from: ${backupFilePath}`);
+  const backupData = JSON.parse(readFileSync(backupFilePath, "utf8"));
 
-  console.log(`📊 Backup contains:`)
-  console.log(`   - ${backupData.account?.length || 0} accounts`)
-  console.log(`   - ${backupData.transaction?.length || 0} transactions`)
-  console.log(`   - ${backupData.passbook?.length || 0} passbooks\n`)
+  console.log(`📊 Backup contains:`);
+  console.log(`   - ${backupData.account?.length || 0} accounts`);
+  console.log(`   - ${backupData.transaction?.length || 0} transactions`);
+  console.log(`   - ${backupData.passbook?.length || 0} passbooks\n`);
 
   // Clear existing data (order matters due to foreign key constraints)
-  console.log("🗑️  Clearing existing data...")
+  console.log("🗑️  Clearing existing data...");
   // 1. Delete transactions first (no dependencies)
-  await prisma.transaction.deleteMany()
+  await prisma.transaction.deleteMany();
   // 2. Delete summaries
-  await prisma.summary.deleteMany()
+  await prisma.summary.deleteMany();
   // 3. Delete passbooks (after accounts are deleted)
-  await prisma.passbook.deleteMany()
+  await prisma.passbook.deleteMany();
   // 4. Delete accounts (this will automatically clear passbookId references)
-  await prisma.account.deleteMany()
-  console.log("✅ Cleared all existing data\n")
+  await prisma.account.deleteMany();
+  console.log("✅ Cleared all existing data\n");
 
   // Transform and insert passbooks first
-  console.log("📚 Transforming and seeding passbooks...")
+  console.log("📚 Transforming and seeding passbooks...");
   const passbooksWithDefaults = backupData.passbook.map((passbook: any) => {
     const { createdAt, updatedAt, lastCalculatedAt, ...passbookBase } =
-      passbook
+      passbook;
     return {
       ...passbookBase,
       // Ensure kind is set (already in new format)
@@ -91,19 +91,19 @@ async function seed() {
       isChit: passbook.isChit ?? true,
       payload: passbook.payload ?? {},
       loanHistory: passbook.loanHistory ?? [],
-    }
-  })
+    };
+  });
   const hasClubPassbook = passbooksWithDefaults.some(
     (p: any) => p.kind === "CLUB"
-  )
+  );
   if (!hasClubPassbook) {
-    passbooksWithDefaults.push(buildDefaultClubPassbook())
+    passbooksWithDefaults.push(buildDefaultClubPassbook());
   }
-  await prisma.passbook.createMany({ data: passbooksWithDefaults })
-  console.log(`✅ Created ${passbooksWithDefaults.length} passbooks\n`)
+  await prisma.passbook.createMany({ data: passbooksWithDefaults });
+  console.log(`✅ Created ${passbooksWithDefaults.length} passbooks\n`);
 
   // Transform accounts (already in new schema format)
-  console.log("👥 Transforming accounts...")
+  console.log("👥 Transforming accounts...");
   const accountsWithDefaults = backupData.account.map((account: any) => {
     const {
       createdAt,
@@ -113,14 +113,15 @@ async function seed() {
       endedAt,
       accessUpdatedAt,
       ...accountBase
-    } = account
+    } = account;
 
     return {
       ...accountBase,
       // Ensure required fields have defaults
       type: account.type || "MEMBER",
       role: account.role || "MEMBER",
-      status: account.status || (account.active === false ? "INACTIVE" : "ACTIVE"),
+      status:
+        account.status || (account.active === false ? "INACTIVE" : "ACTIVE"),
       accessLevel: account.accessLevel || "READ",
       canLogin: account.canLogin ?? false,
       // Handle dates
@@ -136,38 +137,38 @@ async function seed() {
       phone: account.phone || null,
       avatarUrl: account.avatarUrl || null,
       accessUpdatedById: account.accessUpdatedById || null,
-    }
-  })
+    };
+  });
 
-  console.log(`📝 Account type distribution:`)
+  console.log(`📝 Account type distribution:`);
   const typeCount = accountsWithDefaults.reduce((acc: any, a: any) => {
-    acc[a.type] = (acc[a.type] || 0) + 1
-    return acc
-  }, {})
+    acc[a.type] = (acc[a.type] || 0) + 1;
+    return acc;
+  }, {});
   Object.entries(typeCount).forEach(([type, count]) => {
-    console.log(`   - ${type}: ${count}`)
-  })
+    console.log(`   - ${type}: ${count}`);
+  });
 
-  console.log(`🔐 Access level distribution:`)
+  console.log(`🔐 Access level distribution:`);
   const accessCount = accountsWithDefaults.reduce((acc: any, a: any) => {
-    acc[a.accessLevel] = (acc[a.accessLevel] || 0) + 1
-    return acc
-  }, {})
+    acc[a.accessLevel] = (acc[a.accessLevel] || 0) + 1;
+    return acc;
+  }, {});
   Object.entries(accessCount).forEach(([level, count]) => {
-    console.log(`   - ${level}: ${count}`)
-  })
+    console.log(`   - ${level}: ${count}`);
+  });
 
   await prisma.account.createMany({
     data: accountsWithDefaults,
-  })
-  console.log(`✅ Created ${accountsWithDefaults.length} accounts\n`)
+  });
+  console.log(`✅ Created ${accountsWithDefaults.length} accounts\n`);
 
   // Transform transactions (already in new schema format)
-  console.log("💸 Seeding transactions...")
+  console.log("💸 Seeding transactions...");
   const transactionsWithDefaults = backupData.transaction.map(
     (transaction: any) => {
       const { createdAt, updatedAt, occurredAt, postedAt, ...transactionBase } =
-        transaction
+        transaction;
 
       return {
         ...transactionBase,
@@ -186,43 +187,43 @@ async function seed() {
         tags: transaction.tags || [],
         createdById: transaction.createdById || null,
         updatedById: transaction.updatedById || null,
-      }
+      };
     }
-  )
+  );
 
   await prisma.transaction.createMany({
     data: transactionsWithDefaults,
-  })
-  console.log(`✅ Created ${transactionsWithDefaults.length} transactions\n`)
+  });
+  console.log(`✅ Created ${transactionsWithDefaults.length} transactions\n`);
 
   // Summary statistics
-  console.log("📊 Seed Summary:")
+  console.log("📊 Seed Summary:");
   const finalCounts = await Promise.all([
     prisma.account.count(),
     prisma.transaction.count(),
     prisma.passbook.count(),
-  ])
-  console.log(`   - Accounts: ${finalCounts[0]}`)
-  console.log(`   - Transactions: ${finalCounts[1]}`)
-  console.log(`   - Passbooks: ${finalCounts[2]}`)
+  ]);
+  console.log(`   - Accounts: ${finalCounts[0]}`);
+  console.log(`   - Transactions: ${finalCounts[1]}`);
+  console.log(`   - Passbooks: ${finalCounts[2]}`);
 
   const superAdmins = await prisma.account.count({
     where: { role: "SUPER_ADMIN" },
-  })
-  console.log(`   - Super Admins: ${superAdmins}`)
+  });
+  console.log(`   - Super Admins: ${superAdmins}`);
 
-  console.log("\n✨ Database seeded successfully!")
+  console.log("\n✨ Database seeded successfully!");
 }
 
 seed()
   .then(() => {
-    console.log("\n🎉 Seed completed!")
-    process.exit(0)
+    console.log("\n🎉 Seed completed!");
+    process.exit(0);
   })
   .catch((error) => {
-    console.error("\n❌ Seed failed:", error)
-    process.exit(1)
+    console.error("\n❌ Seed failed:", error);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });

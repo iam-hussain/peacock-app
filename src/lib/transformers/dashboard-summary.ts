@@ -46,6 +46,7 @@ export type DashboardSummaryData = {
   };
   // Cash Flow
   cashFlow: {
+    totalProfit: number;
     totalInvested: number;
     pendingAmounts: number;
   };
@@ -119,9 +120,11 @@ export function transformClubPassbookToSummary(
   );
 
   // Calculate vendor profit by summing profits from each vendor passbook
+  // Profit is calculated as returnsTotal - investmentTotal (not from stored profitTotal)
   const vendorProfit = vendorPassbooks.reduce((total, vendorPassbook) => {
     const vendorData = vendorPassbook.payload as VendorFinancialSnapshot;
-    const profit = vendorData.profitTotal || 0;
+    const { investmentTotal = 0, returnsTotal = 0 } = vendorData;
+    const profit = Math.max(returnsTotal - investmentTotal, 0);
     return total + profit;
   }, 0);
 
@@ -190,6 +193,7 @@ export function transformClubPassbookToSummary(
     },
     // Cash Flow
     cashFlow: {
+      totalProfit: vendorProfit + clubData.interestCollectedTotal,
       totalInvested,
       pendingAmounts,
     },
@@ -255,6 +259,7 @@ export function transformSummaryToDashboardData(
     },
     // Cash Flow
     cashFlow: {
+      totalProfit: summary.vendorProfit + summary.totalInterestCollected,
       totalInvested: summary.totalInvested,
       pendingAmounts: summary.pendingAmounts,
     },

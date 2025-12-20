@@ -206,7 +206,7 @@ export default function AnalyticsPage() {
       vendorInvestment: s.vendor?.vendorInvestment || 0,
       vendorProfit: s.vendor?.vendorProfit || 0,
       // Profit Summary
-      currentProfit: s.vendor?.vendorProfit || 0,
+      currentProfit: s.cashFlow?.totalProfit || 0,
       profitWithdrawals: s.memberOutflow?.profitWithdrawals || 0,
       // Cash Flow Position
       totalInvested: s.cashFlow?.totalInvested || 0,
