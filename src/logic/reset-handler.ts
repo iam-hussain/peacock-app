@@ -20,46 +20,10 @@ import {
   initializePassbookToUpdate,
 } from "@/lib/helper";
 
-export async function resetAllTransactionMiddlewareHandler(
-  shouldUpdatePassbooks = true,
-  shouldUpdateDashboard = true
-) {
-  clearCache();
-  await prisma.summary.deleteMany();
-
-  const [transactions, passbooks, activeAccounts] = await Promise.all([
-    prisma.transaction.findMany({ orderBy: { occurredAt: "asc" } }),
-    fetchAllPassbook(),
-    prisma.account.findMany({
-      where: { type: "MEMBER", active: true },
-      select: { id: true },
-    }),
-  ]);
-
-  const activeMemberCount = activeAccounts.length;
-  const activeMemberIds = activeAccounts.map((account) => account.id);
-
-  const activeMemberPassbooks = passbooks.filter((passbook) =>
-    activeMemberIds.includes(passbook.account?.id || "")
-  );
-  const totalActiveMemberAdjustments = activeMemberPassbooks.reduce(
-    (sum, passbook) =>
-      sum +
-      (Number(passbook.joiningOffset) || 0) +
-      (Number(passbook.delayOffset) || 0),
-    0
-  );
-
-  // Cast passbooks to expected type for initializePassbookToUpdate
-  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
-
-  if (transactions.length === 0 && shouldUpdatePassbooks) {
-    // No transactions, just update passbooks
-    await bulkPassbookUpdate(passbookToUpdate);
-    return;
-  }
-
-  // Group transactions by month
+/**
+ * Helper function to group transactions by month
+ */
+function groupTransactionsByMonth(transactions: any[]) {
   const transactionsByMonth: Map<string, typeof transactions> = new Map();
   const totalTransactionCount = transactions.length;
 
@@ -131,14 +95,204 @@ export async function resetAllTransactionMiddlewareHandler(
     console.log(`   ${monthLabel}: ${monthTxs.length} transactions`);
   });
 
-  // Sort months chronologically
-  const sortedMonths = sortedMonthKeys;
+  return { transactionsByMonth, sortedMonthKeys };
+}
+
+/**
+ * Recalculate passbooks only
+ * Processes all transactions and updates passbook data
+ */
+export async function recalculatePassbooks() {
+  clearCache();
+
+  const [transactions, passbooks] = await Promise.all([
+    prisma.transaction.findMany({ orderBy: { occurredAt: "asc" } }),
+    fetchAllPassbook(),
+  ]);
+
+  // Cast passbooks to expected type for initializePassbookToUpdate
+  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
+
+  if (transactions.length === 0) {
+    // No transactions, just update passbooks
+    await bulkPassbookUpdate(passbookToUpdate);
+    return;
+  }
+
+  // Group transactions by month
+  const { transactionsByMonth, sortedMonthKeys } =
+    groupTransactionsByMonth(transactions);
+
+  // Process each month
+  for (const monthKey of sortedMonthKeys) {
+    const monthTransactions = transactionsByMonth.get(monthKey)!;
+
+    // Process all transactions for this month
+    for (const transaction of monthTransactions) {
+      passbookToUpdate = updatePassbookByTransaction(
+        passbookToUpdate,
+        transaction
+      );
+    }
+  }
+
+  // Update passbooks
+  await bulkPassbookUpdate(passbookToUpdate);
+
+  clearCache();
+}
+
+/**
+ * Recalculate summary snapshots only
+ * Processes all transactions and creates monthly summary snapshots
+ */
+export async function recalculateSummary() {
+  clearCache();
+  await prisma.summary.deleteMany();
+
+  const [transactions, passbooks, activeAccounts] = await Promise.all([
+    prisma.transaction.findMany({ orderBy: { occurredAt: "asc" } }),
+    fetchAllPassbook(),
+    prisma.account.findMany({
+      where: { type: "MEMBER", active: true },
+      select: { id: true },
+    }),
+  ]);
+
+  const activeMemberCount = activeAccounts.length;
+  const activeMemberIds = activeAccounts.map((account) => account.id);
+
+  const activeMemberPassbooks = passbooks.filter((passbook) =>
+    activeMemberIds.includes(passbook.account?.id || "")
+  );
+  const totalActiveMemberAdjustments = activeMemberPassbooks.reduce(
+    (sum, passbook) =>
+      sum +
+      (Number(passbook.joiningOffset) || 0) +
+      (Number(passbook.delayOffset) || 0),
+    0
+  );
+
+  // Cast passbooks to expected type for initializePassbookToUpdate
+  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
+
+  if (transactions.length === 0) {
+    // No transactions, no snapshots to create
+    clearCache();
+    return;
+  }
+
+  // Group transactions by month
+  const { transactionsByMonth, sortedMonthKeys } =
+    groupTransactionsByMonth(transactions);
 
   // Monthly snapshots to create
   const monthlySnapshots: any[] = [];
 
   // Process each month
-  for (const monthKey of sortedMonths) {
+  for (const monthKey of sortedMonthKeys) {
+    const monthTransactions = transactionsByMonth.get(monthKey)!;
+    const monthStart = new Date(monthKey);
+    const monthEnd = isSameMonth(monthStart, new Date())
+      ? new Date()
+      : endOfMonth(monthStart); // if this month then new date else current month end
+
+    // Process all transactions for this month
+    for (const transaction of monthTransactions) {
+      passbookToUpdate = updatePassbookByTransaction(
+        passbookToUpdate,
+        transaction
+      );
+    }
+
+    // Create monthly snapshot
+    const currentMonthTransactions = transactions.filter(
+      (tx) => tx.occurredAt <= monthEnd
+    );
+
+    // Calculate expected total loan interest amount from existing transactions
+    // Filter transactions to only include those up to this month's end date
+    // This avoids fetching from database multiple times
+    const { expectedTotalLoanInterestAmount } =
+      calculateExpectedTotalLoanInterestAmountFromTransactions(
+        currentMonthTransactions,
+        monthEnd
+      );
+
+    const snapshot = await calculateMonthlySnapshotFromPassbooks(
+      monthStart,
+      passbookToUpdate,
+      activeMemberCount,
+      expectedTotalLoanInterestAmount,
+      totalActiveMemberAdjustments
+    );
+    if (snapshot) {
+      monthlySnapshots.push(snapshot);
+    }
+  }
+
+  // Bulk insert monthly snapshots
+  if (monthlySnapshots.length > 0) {
+    await prisma.summary.createMany({
+      data: monthlySnapshots,
+    });
+  }
+
+  clearCache();
+}
+
+/**
+ * Recalculate both passbooks and summary (analytics)
+ * This is the combined function that does both operations
+ */
+export async function resetAllTransactionMiddlewareHandler(
+  shouldUpdatePassbooks = true,
+  shouldUpdateDashboard = true
+) {
+  clearCache();
+  await prisma.summary.deleteMany();
+
+  const [transactions, passbooks, activeAccounts] = await Promise.all([
+    prisma.transaction.findMany({ orderBy: { occurredAt: "asc" } }),
+    fetchAllPassbook(),
+    prisma.account.findMany({
+      where: { type: "MEMBER", active: true },
+      select: { id: true },
+    }),
+  ]);
+
+  const activeMemberCount = activeAccounts.length;
+  const activeMemberIds = activeAccounts.map((account) => account.id);
+
+  const activeMemberPassbooks = passbooks.filter((passbook) =>
+    activeMemberIds.includes(passbook.account?.id || "")
+  );
+  const totalActiveMemberAdjustments = activeMemberPassbooks.reduce(
+    (sum, passbook) =>
+      sum +
+      (Number(passbook.joiningOffset) || 0) +
+      (Number(passbook.delayOffset) || 0),
+    0
+  );
+
+  // Cast passbooks to expected type for initializePassbookToUpdate
+  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
+
+  if (transactions.length === 0 && shouldUpdatePassbooks) {
+    // No transactions, just update passbooks
+    await bulkPassbookUpdate(passbookToUpdate);
+    return;
+  }
+
+  // Group transactions by month
+  const { transactionsByMonth, sortedMonthKeys } =
+    groupTransactionsByMonth(transactions);
+
+  // Monthly snapshots to create
+  const monthlySnapshots: any[] = [];
+
+  // Process each month
+  for (const monthKey of sortedMonthKeys) {
     const monthTransactions = transactionsByMonth.get(monthKey)!;
     const monthStart = new Date(monthKey);
     const monthEnd = isSameMonth(monthStart, new Date())

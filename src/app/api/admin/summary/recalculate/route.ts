@@ -5,31 +5,33 @@ export const fetchCache = "force-no-store";
 import { NextRequest, NextResponse } from "next/server";
 
 import { requireAdmin } from "@/lib/core/auth";
+import { invalidateDashboardCaches } from "@/lib/core/cache-invalidation";
 import { handleAuthError } from "@/lib/core/error-handler";
-import { resetAllTransactionMiddlewareHandler } from "@/logic/reset-handler";
+import { recalculateSummary } from "@/logic/reset-handler";
 
 /**
- * POST /api/admin/dashboard/recalculate
- * Recalculate all monthly dashboard snapshots
+ * POST /api/admin/summary/recalculate
+ * Recalculate all monthly summary snapshots (analytics)
  * Admin-only endpoint
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAdmin();
-    const adminId = user.kind === "admin-member" ? user.accountId : null;
+    await requireAdmin();
 
     // Optional: Check for force flag in body
     const body = await request.json().catch(() => ({}));
     const _force = body.force === true;
 
-    if (adminId !== null) {
-      // Recalculate all snapshots
-      // This is a long-running operation, so we'll let it complete
-      await resetAllTransactionMiddlewareHandler(false, true);
-    }
+    // Recalculate summary snapshots only
+    // This is a long-running operation, so we'll let it complete
+    await recalculateSummary();
+
+    // Clear all caches after summary recalculation
+    await invalidateDashboardCaches();
+
     return NextResponse.json({
       success: true,
-      message: "Dashboard data recalculated successfully",
+      message: "Analytics data recalculated successfully",
     });
   } catch (error: any) {
     if (
@@ -39,11 +41,11 @@ export async function POST(request: NextRequest) {
       return handleAuthError(error);
     }
 
-    console.error("Error recalculating dashboard:", error);
+    console.error("Error recalculating summary:", error);
 
     // Return proper error response
     const errorMessage =
-      error?.message || "Failed to recalculate dashboard data";
+      error?.message || "Failed to recalculate analytics data";
     return NextResponse.json(
       {
         success: false,

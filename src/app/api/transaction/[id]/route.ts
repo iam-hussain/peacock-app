@@ -2,11 +2,11 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { requireWriteAccess } from "@/lib/core/auth";
+import { invalidateTransactionCaches } from "@/lib/core/cache-invalidation";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 export async function DELETE(
@@ -47,7 +47,9 @@ export async function DELETE(
     // Delete the transaction
     await prisma.transaction.delete({ where: { id } });
 
-    revalidatePath("*");
+    // Clear all caches after transaction deletion
+    await invalidateTransactionCaches();
+
     return NextResponse.json(
       { message: "Transaction deleted successfully." },
       { status: 200 }

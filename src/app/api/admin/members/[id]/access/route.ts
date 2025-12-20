@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { requireAdmin } from "@/lib/core/auth";
+import { invalidateAccountCaches } from "@/lib/core/cache-invalidation";
 
 export async function PATCH(
   request: Request,
@@ -166,6 +167,9 @@ export async function PATCH(
         canLogin: true,
       },
     });
+
+    // Clear all caches after access update
+    await invalidateAccountCaches();
 
     return NextResponse.json(
       {

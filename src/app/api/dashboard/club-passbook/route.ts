@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { calculateExpectedTotalLoanInterestAmountFromDb } from "@/lib/calculators/expected-interest";
@@ -18,7 +18,7 @@ import {
  * Get dashboard data from CLUB passbook - transforms ClubFinancialSnapshot to match summary structure
  * Returns structured financial data from Club passbook payload
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Fetch club passbook
     const clubPassbook = await prisma.passbook.findFirst({
@@ -39,13 +39,13 @@ export async function GET() {
 
     const clubData = clubPassbook.payload as ClubFinancialSnapshot;
 
-    // Fetch active members count and calculate club age
-    const members = await prisma.account.findMany({
-      where: { type: "MEMBER" },
-      select: { status: true, createdAt: true },
+    // Fetch active members count - optimized query
+    const activeMembers = await prisma.account.count({
+      where: {
+        type: "MEMBER",
+        status: "ACTIVE",
+      },
     });
-
-    const activeMembers = members.filter((m) => m.status === "ACTIVE").length;
 
     // Calculate club age in months
     const clubAgeMonths = clubMonthsFromStart();
@@ -99,7 +99,22 @@ export async function GET() {
       data: summaryData,
     };
 
-    return NextResponse.json(response);
+    // Generate ETag from club passbook's updatedAt timestamp for cache validation
+    const etag = `"${clubPassbook.updatedAt.getTime()}"`;
+
+    // Check if client has cached version
+    const ifNoneMatch = request.headers.get("if-none-match");
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, { status: 304 }); // Not Modified
+    }
+
+    return NextResponse.json(response, {
+      headers: {
+        "Cache-Control": "private, no-cache, must-revalidate", // Don't cache at CDN, but allow browser cache with validation
+        ETag: etag,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   } catch (error) {
     console.error("Error fetching club passbook:", error);
     return NextResponse.json(

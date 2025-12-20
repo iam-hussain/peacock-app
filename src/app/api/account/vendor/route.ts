@@ -3,7 +3,7 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { Account, Passbook } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { newZoneDate } from "@/lib/core/date";
@@ -12,7 +12,7 @@ import { VendorFinancialSnapshot } from "@/lib/validators/type";
 
 type VendorToTransform = Account & { passbook: Passbook | null };
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     const { requireAuth } = await import("@/lib/core/auth");
     await requireAuth();
@@ -27,7 +27,25 @@ export async function POST() {
       .sort((a, b) => (a.name > b.name ? 1 : -1))
       .sort((a, b) => (a.active > b.active ? -1 : 1));
 
-    return NextResponse.json({ vendors: transformedVendors });
+    const response = { vendors: transformedVendors };
+
+    // Generate ETag from response content hash for cache validation
+    const responseString = JSON.stringify(response);
+    const etag = `"${Buffer.from(responseString).toString("base64").slice(0, 16)}"`;
+
+    // Check if client has cached version
+    const ifNoneMatch = request.headers.get("if-none-match");
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, { status: 304 }); // Not Modified
+    }
+
+    return NextResponse.json(response, {
+      headers: {
+        "Cache-Control": "private, no-cache, must-revalidate",
+        ETag: etag,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
   } catch (error: any) {
     console.error("Error fetching vendors:", error);
     if (error.message === "Unauthorized") {

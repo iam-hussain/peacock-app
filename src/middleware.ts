@@ -1,77 +1,45 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-const allowedOrigins = [
-  "http://localhost:3000/",
-  "https://peacock-club.vercel.app",
-];
-const corsOptions = {
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
-
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // CORS Handling
-  const origin = request.headers.get("origin") ?? "";
-  const isAllowedOrigin = allowedOrigins.includes(origin);
-  const isPreflight = request.method === "OPTIONS";
-
-  if (isPreflight) {
-    const preflightHeaders = {
-      ...(isAllowedOrigin && { "Access-Control-Allow-Origin": origin }),
-      ...corsOptions,
-    };
-    return NextResponse.json({}, { headers: preflightHeaders });
-  }
-
-  // Route protection for /dashboard routes
-  if (pathname.startsWith("/dashboard")) {
-    const sessionCookie = request.cookies.get("pc_auth")?.value;
-
-    if (!sessionCookie) {
-      // Redirect to home page if no session
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
-    }
-
-    // Verify JWT token
-    try {
-      const { jwtVerify } = await import("jose");
-      const JWT_SECRET = new TextEncoder().encode(
-        process.env.JWT_SECRET || "default-secret-change-in-production"
-      );
-
-      await jwtVerify(sessionCookie, JWT_SECRET);
-    } catch {
-      // Invalid or expired token - redirect to home
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      // Clear invalid cookie
-      const response = NextResponse.redirect(url);
-      response.cookies.set("pc_auth", "", {
-        maxAge: 0,
-        path: "/",
-      });
-      return response;
-    }
-  }
-
-  // Handle CORS for simple requests
+// Performance and security middleware
+export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  if (isAllowedOrigin) {
-    response.headers.set("Access-Control-Allow-Origin", origin);
+  // Add performance headers for all routes
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  // Add compression hint for API routes (actual compression handled by Next.js)
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    // Compression is handled by Next.js config, but we can add hints
+    response.headers.set("Vary", "Accept-Encoding");
   }
 
-  Object.entries(corsOptions).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
+  // Add cache headers for static assets
+  if (
+    request.nextUrl.pathname.match(
+      /\.(jpg|jpeg|png|gif|svg|ico|webp|avif|woff|woff2|ttf|eot)$/
+    )
+  ) {
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=31536000, immutable"
+    );
+  }
 
   return response;
 }
 
+// Run middleware on all routes
 export const config = {
-  matcher: ["/dashboard/:path*", "/api/:path*"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };

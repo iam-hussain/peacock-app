@@ -3,11 +3,11 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { unlink } from "fs/promises";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
+import { invalidateAccountCaches } from "@/lib/core/cache-invalidation";
 import { newZoneDate } from "@/lib/core/date";
 import { generateVendorUsername, getDefaultPassbookData } from "@/lib/helper";
 
@@ -226,6 +226,9 @@ export async function POST(request: Request) {
         }
       }
 
+      // Clear all caches after account update
+      await invalidateAccountCaches();
+
       return NextResponse.json({ account: updated }, { status: 200 });
     }
 
@@ -269,8 +272,9 @@ export async function POST(request: Request) {
       data: createData,
     });
 
-    revalidatePath("*");
-    revalidateTag("api");
+    // Clear all caches after account creation
+    await invalidateAccountCaches();
+
     return NextResponse.json({ account: commonData }, { status: 200 });
   } catch (error: any) {
     console.error("Error creating/updating member:", error);
