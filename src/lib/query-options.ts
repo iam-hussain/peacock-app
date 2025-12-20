@@ -169,6 +169,7 @@ export const fetchDashboardSummary = (month?: string) =>
               vendorProfit: number;
             };
             cashFlow: {
+              totalProfit: number;
               totalInvested: number;
               pendingAmounts: number;
             };
@@ -248,6 +249,7 @@ export const fetchDashboardClubPassbook = () =>
               vendorProfit: number;
             };
             cashFlow: {
+              totalProfit: number;
               totalInvested: number;
               pendingAmounts: number;
             };

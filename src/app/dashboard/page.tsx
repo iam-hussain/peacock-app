@@ -415,7 +415,7 @@ export default function DashboardPage() {
                 isLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  formatCurrency(data?.vendor?.vendorProfit || 0)
+                  formatCurrency(data?.cashFlow?.totalProfit || 0)
                 )
               }
               icon={<TrendingUp className="h-5 w-5" />}
@@ -700,7 +700,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Current Profit"
-                value={formatCurrency(data?.vendor?.vendorProfit || 0)}
+                value={formatCurrency(data?.cashFlow?.totalProfit || 0)}
                 icon={<TrendingUp className="h-5 w-5" />}
                 iconBgColor="#16A34A"
               />
