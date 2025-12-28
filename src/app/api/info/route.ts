@@ -39,16 +39,6 @@ import {
  *                   items:
  *                     type: object
  *                   description: Array of vendor accounts
- *                 club:
- *                   type: array
- *                   items:
- *                     type: object
- *                   description: Array of club accounts
- *                 system:
- *                   type: array
- *                   items:
- *                     type: object
- *                   description: Array of system accounts
  *                 clubConfig:
  *                   type: object
  *                   description: Club configuration including stages, start date, and interest settings
