@@ -81,6 +81,38 @@ import {
  *                 transactionTypeHumanMap:
  *                   type: object
  *                   description: Mapping of transaction types to human-readable descriptions
+ *                 configDetails:
+ *                   type: object
+ *                   description: Detailed documentation explaining the purpose and meaning of each configuration element
+ *                   properties:
+ *                     clubConfig:
+ *                       type: object
+ *                       properties:
+ *                         purpose:
+ *                           type: string
+ *                         details:
+ *                           type: object
+ *                     clubData:
+ *                       type: object
+ *                       properties:
+ *                         purpose:
+ *                           type: string
+ *                         details:
+ *                           type: object
+ *                     transactionTypeMap:
+ *                       type: object
+ *                       properties:
+ *                         purpose:
+ *                           type: string
+ *                         details:
+ *                           type: string
+ *                     transactionTypeHumanMap:
+ *                       type: object
+ *                       properties:
+ *                         purpose:
+ *                           type: string
+ *                         details:
+ *                           type: string
  *       401:
  *         description: Unauthorized
  *       500:
@@ -88,8 +120,44 @@ import {
  */
 export async function GET() {
   try {
-    // Fetch member from account table only
+    // Fetch all accounts from account table
     const accounts = await prisma.account.findMany();
+
+    // Config details and purpose documentation
+    const configDetails = {
+      clubConfig: {
+        purpose:
+          "Defines the club's operational stages, deposit amounts, and interest calculation settings",
+        details: {
+          startedAt: "The date when the club officially started operations",
+          stages:
+            "Array of deposit stages (e.g., alpha, bravo) with their respective amounts and date ranges",
+          alpha: "First deposit stage with lower monthly contribution amount",
+          bravo: "Second deposit stage with higher monthly contribution amount",
+          dayInterestFrom:
+            "Date from which daily interest calculations are applied to loans",
+        },
+      },
+      clubData: {
+        purpose: "Display information for the club including name and avatar",
+        details: {
+          sub: "Club display name shown in the application",
+          avatar: "Path to the club's logo/avatar image",
+        },
+      },
+      transactionTypeMap: {
+        purpose:
+          "Maps transaction type enums to short display names for UI components",
+        details:
+          "Used for displaying transaction types in tables, forms, and reports",
+      },
+      transactionTypeHumanMap: {
+        purpose:
+          "Maps transaction type enums to detailed human-readable descriptions",
+        details:
+          "Used for tooltips, help text, and detailed transaction explanations",
+      },
+    };
 
     return NextResponse.json(
       {
@@ -101,6 +169,7 @@ export async function GET() {
         clubData: clubData,
         transactionTypeMap: transactionTypeMap,
         transactionTypeHumanMap: transactionTypeHumanMap,
+        configDetails: configDetails,
       },
       { status: 200 }
     );

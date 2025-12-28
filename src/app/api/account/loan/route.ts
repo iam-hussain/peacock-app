@@ -57,42 +57,53 @@ import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
  *         description: Server error
  */
 export async function POST(request: NextRequest) {
-  const loans = await prisma.account.findMany({
-    where: { type: "MEMBER" },
-    include: { passbook: true },
-  });
+  try {
+    const loans = await prisma.account.findMany({
+      where: { type: "MEMBER" },
+      include: { passbook: true },
+    });
 
-  const transformedLoans = await Promise.all(
-    loans.map((loan) =>
-      loan.passbook ? transformLoanForTable(loan as any) : null
-    )
-  );
+    const transformedLoans = await Promise.all(
+      loans.map((loan) =>
+        loan.passbook ? transformLoanForTable(loan as any) : null
+      )
+    );
 
-  const filteredLoans = transformedLoans
-    .filter((e): e is NonNullable<typeof e> => Boolean(e))
-    .filter((e) => e.active || e.loanHistory.length > 0)
-    .sort((a, b) => (a.name > b.name ? 1 : -1))
-    .sort((a, b) => (a.active > b.active ? -1 : 1));
+    const filteredLoans = transformedLoans
+      .filter((e): e is NonNullable<typeof e> => Boolean(e))
+      .filter((e) => e.active || e.loanHistory.length > 0)
+      .sort((a, b) => (a.name > b.name ? 1 : -1))
+      .sort((a, b) => (a.active > b.active ? -1 : 1));
 
-  const response = { accounts: filteredLoans };
+    const response = { accounts: filteredLoans };
 
-  // Generate ETag from response content hash for cache validation
-  const responseString = JSON.stringify(response);
-  const etag = `"${Buffer.from(responseString).toString("base64").slice(0, 16)}"`;
+    // Generate ETag from response content hash for cache validation
+    const responseString = JSON.stringify(response);
+    const etag = `"${Buffer.from(responseString).toString("base64").slice(0, 16)}"`;
 
-  // Check if client has cached version
-  const ifNoneMatch = request.headers.get("if-none-match");
-  if (ifNoneMatch === etag) {
-    return new NextResponse(null, { status: 304 }); // Not Modified
+    // Check if client has cached version
+    const ifNoneMatch = request.headers.get("if-none-match");
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, { status: 304 }); // Not Modified
+    }
+
+    return NextResponse.json(response, {
+      headers: {
+        "Cache-Control": "private, no-cache, must-revalidate",
+        ETag: etag,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  } catch (error: any) {
+    console.error("Error fetching loan accounts:", error);
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.json(
+      { error: "Failed to fetch loan accounts" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(response, {
-    headers: {
-      "Cache-Control": "private, no-cache, must-revalidate",
-      ETag: etag,
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
 }
 
 export type GetLoanResponse = { accounts: TransformedLoan[] };
