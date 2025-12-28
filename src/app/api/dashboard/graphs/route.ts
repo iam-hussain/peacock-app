@@ -8,9 +8,71 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/db";
 
 /**
- * GET /api/dashboard/graphs?from=YYYY-MM&to=YYYY-MM
- * Get dashboard summaries for a date range (for graphs)
- * Returns only fields required for charts - NO CALCULATIONS
+ * @swagger
+ * /api/dashboard/graphs:
+ *   get:
+ *     summary: Get dashboard summaries for date range
+ *     description: Returns dashboard summaries for a date range, optimized for graph/chart visualization. Returns only fields required for charts with no calculations.
+ *     tags: [Dashboard]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: from
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^\d{4}-\d{2}$'
+ *           example: "2024-01"
+ *         description: Start month in YYYY-MM format
+ *       - in: query
+ *         name: to
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^\d{4}-\d{2}$'
+ *           example: "2024-12"
+ *         description: End month in YYYY-MM format
+ *     responses:
+ *       200:
+ *         description: List of dashboard summaries
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 summaries:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Summary'
+ *       400:
+ *         description: Invalid parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: "Both from and to parameters are required (format: YYYY-MM)"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
  */
 export async function GET(request: NextRequest) {
   try {

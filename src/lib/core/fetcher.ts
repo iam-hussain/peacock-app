@@ -1,12 +1,28 @@
 export interface FetcherOptions {
-  header?: any;
-  body?: any;
+  header?: Record<string, string>;
+  body?: unknown;
 }
 
-const fetcher = async (
+type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
+
+export interface FetcherPropsOptions {
+  method?: HttpMethod;
+  header?: Record<string, string>;
+  body?: unknown;
+  tags?: string[];
+}
+
+interface FetcherError extends Error {
+  response?: {
+    data: unknown;
+    status: number;
+  };
+}
+
+const fetcher = async <T = unknown>(
   path: string,
   options?: FetcherPropsOptions
-): Promise<any> => {
+): Promise<T> => {
   const {
     method = "GET",
     header = {},
@@ -60,18 +76,18 @@ const fetcher = async (
         }
       }
       // If no cached data, return empty object (shouldn't happen)
-      return {};
+      return {} as T;
     }
 
     const responseData = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       const errorMessage =
-        responseData?.message ||
-        responseData?.error ||
+        (responseData as { message?: string })?.message ||
+        (responseData as { error?: string })?.error ||
         `Request failed with status ${response.status}`;
-      const error = new Error(errorMessage);
-      (error as any).response = { data: responseData, status: response.status };
+      const error = new Error(errorMessage) as FetcherError;
+      error.response = { data: responseData, status: response.status };
       throw error;
     }
 
@@ -141,37 +157,44 @@ const fetcher = async (
       }
     }
 
-    return responseData;
-  } catch (err: any) {
+    return responseData as T;
+  } catch (err) {
     console.error(err);
-    throw new Error(err?.message || err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    throw new Error(errorMessage);
   }
 };
 
-export interface FetcherPropsOptions {
-  method?: string;
-  header?: any;
-  body?: any;
-  tags?: string[];
-}
 // Function to fetch data using the GET method
-fetcher.get = (path: string, options: FetcherOptions = {}) => {
-  return fetcher(path, { method: "GET", ...options });
+fetcher.get = <T = unknown>(
+  path: string,
+  options: FetcherOptions = {}
+): Promise<T> => {
+  return fetcher<T>(path, { method: "GET", ...options });
 };
 
 // Function to fetch data using the POST method
-fetcher.post = (path: string, options: FetcherOptions = {}) => {
-  return fetcher(path, { method: "POST", ...options });
+fetcher.post = <T = unknown>(
+  path: string,
+  options: FetcherOptions = {}
+): Promise<T> => {
+  return fetcher<T>(path, { method: "POST", ...options });
 };
 
 // Function to fetch data using the PATCH method
-fetcher.patch = (path: string, options: FetcherOptions = {}) => {
-  return fetcher(path, { method: "PATCH", ...options });
+fetcher.patch = <T = unknown>(
+  path: string,
+  options: FetcherOptions = {}
+): Promise<T> => {
+  return fetcher<T>(path, { method: "PATCH", ...options });
 };
 
 // Function to fetch data using the DELETE method
-fetcher.delete = (path: string, options: FetcherOptions = {}) => {
-  return fetcher(path, { method: "DELETE", ...options });
+fetcher.delete = <T = unknown>(
+  path: string,
+  options: FetcherOptions = {}
+): Promise<T> => {
+  return fetcher<T>(path, { method: "DELETE", ...options });
 };
 
 export default fetcher;

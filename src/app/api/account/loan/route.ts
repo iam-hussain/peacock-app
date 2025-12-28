@@ -6,6 +6,56 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/db";
 import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
 
+/**
+ * @swagger
+ * /api/account/loan:
+ *   post:
+ *     summary: Get loan accounts
+ *     description: Retrieves all member accounts with loan information, including active loans and loan history. Results are sorted by name and active status.
+ *     tags: [Account]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: List of loan accounts
+ *         headers:
+ *           ETag:
+ *             description: ETag for cache validation
+ *             schema:
+ *               type: string
+ *           Cache-Control:
+ *             description: Cache control directives
+ *             schema:
+ *               type: string
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accounts:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: Account ID
+ *                       name:
+ *                         type: string
+ *                         description: Member name
+ *                       active:
+ *                         type: boolean
+ *                         description: Whether loan is currently active
+ *                       loanHistory:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                         description: Historical loan records
+ *       304:
+ *         description: Not Modified - client has cached version
+ *       500:
+ *         description: Server error
+ */
 export async function POST(request: NextRequest) {
   const loans = await prisma.account.findMany({
     where: { type: "MEMBER" },

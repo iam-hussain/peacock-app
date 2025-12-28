@@ -36,7 +36,7 @@ async function truncate() {
       for (let i = 0; i < accounts.length; i++) {
         const tempObjectId = new ObjectId().toString();
         await prisma.account.update({
-          where: { id: accounts[i].id },
+          where: { id: accounts[i]?.id || "" },
           data: { passbookId: tempObjectId },
         });
       }

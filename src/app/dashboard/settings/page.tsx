@@ -52,7 +52,7 @@ import { moneyFormat } from "@/lib/ui/utils";
 import { TransformedMember } from "@/transformers/account";
 
 export default function SettingsPage() {
-  const { isAdmin, canManageAccounts, user } = useAuth();
+  const { isAdmin, canManageAccounts } = useAuth();
   const queryClient = useQueryClient();
 
   // Track access state for each member to handle optimistic updates
@@ -216,7 +216,9 @@ export default function SettingsPage() {
 
   const resetPasswordMutation = useMutation({
     mutationFn: (memberId: string) =>
-      fetcher.post(`/api/admin/members/${memberId}/reset-password`),
+      fetcher.post<{ message: string; newPassword: string }>(
+        `/api/admin/members/${memberId}/reset-password`
+      ),
     onSuccess: async (data: { newPassword: string }) => {
       setNewPassword(data.newPassword);
       await queryClient.invalidateQueries({ queryKey: ["all"] });

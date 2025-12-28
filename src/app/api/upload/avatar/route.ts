@@ -8,6 +8,79 @@ import sharp from "sharp";
 
 import { requireAdmin } from "@/lib/core/auth";
 
+/**
+ * @swagger
+ * /api/upload/avatar:
+ *   post:
+ *     summary: Upload avatar image
+ *     description: Uploads and processes an avatar image. Requires admin access. Image is resized to 200x200px and converted to JPEG.
+ *     tags: [Upload]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - file
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file (max 5MB, will be resized to 200x200px)
+ *               oldImageUrl:
+ *                 type: string
+ *                 description: URL of old image to delete (optional)
+ *                 example: "/image/avatar_13.jpeg"
+ *     responses:
+ *       200:
+ *         description: Avatar uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                   description: Public URL of the uploaded image
+ *                   example: "/image/avatar_1234567890_abc123.jpg"
+ *                 filename:
+ *                   type: string
+ *                   description: Generated filename
+ *                   example: "avatar_1234567890_abc123.jpg"
+ *       400:
+ *         description: Invalid file or file too large
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: File size must be less than 5MB
+ *       401:
+ *         description: Unauthorized - admin access required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Failed to upload avatar
+ */
 export async function POST(request: Request) {
   try {
     await requireAdmin();

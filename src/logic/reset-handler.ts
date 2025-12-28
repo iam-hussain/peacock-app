@@ -1,5 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
+import { Transaction } from "@prisma/client";
 import {
   eachMonthOfInterval,
   endOfMonth,
@@ -20,11 +21,15 @@ import {
   initializePassbookToUpdate,
 } from "@/lib/helper";
 
+type SummaryCreateManyArgs = NonNullable<
+  Parameters<typeof prisma.summary.createMany>[0]
+>;
+
 /**
  * Helper function to group transactions by month
  */
-function groupTransactionsByMonth(transactions: any[]) {
-  const transactionsByMonth: Map<string, typeof transactions> = new Map();
+function groupTransactionsByMonth(transactions: Transaction[]) {
+  const transactionsByMonth: Map<string, Transaction[]> = new Map();
   const totalTransactionCount = transactions.length;
 
   const clubStartDate = clubConfig.startedAt;
@@ -110,8 +115,8 @@ export async function recalculatePassbooks() {
     fetchAllPassbook(),
   ]);
 
-  // Cast passbooks to expected type for initializePassbookToUpdate
-  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
+  // Initialize passbook update map
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
 
   if (transactions.length === 0) {
     // No transactions, just update passbooks
@@ -173,8 +178,8 @@ export async function recalculateSummary() {
     0
   );
 
-  // Cast passbooks to expected type for initializePassbookToUpdate
-  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
+  // Initialize passbook update map
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
 
   if (transactions.length === 0) {
     // No transactions, no snapshots to create
@@ -187,7 +192,7 @@ export async function recalculateSummary() {
     groupTransactionsByMonth(transactions);
 
   // Monthly snapshots to create
-  const monthlySnapshots: any[] = [];
+  const monthlySnapshots: SummaryCreateManyArgs["data"] = [];
 
   // Process each month
   for (const monthKey of sortedMonthKeys) {
@@ -275,8 +280,8 @@ export async function resetAllTransactionMiddlewareHandler(
     0
   );
 
-  // Cast passbooks to expected type for initializePassbookToUpdate
-  let passbookToUpdate = initializePassbookToUpdate(passbooks as any, true);
+  // Initialize passbook update map
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
 
   if (transactions.length === 0 && shouldUpdatePassbooks) {
     // No transactions, just update passbooks
@@ -289,7 +294,7 @@ export async function resetAllTransactionMiddlewareHandler(
     groupTransactionsByMonth(transactions);
 
   // Monthly snapshots to create
-  const monthlySnapshots: any[] = [];
+  const monthlySnapshots: SummaryCreateManyArgs["data"] = [];
 
   // Process each month
   for (const monthKey of sortedMonthKeys) {

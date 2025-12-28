@@ -70,7 +70,11 @@ export const bulkPassbookUpdate = async (
   const values = Array.from(items.values());
 
   if (values.length === 1) {
-    const updated = await prisma.passbook.update(values[0]);
+    const firstValue = values[0];
+    if (!firstValue) {
+      return null;
+    }
+    const updated = await prisma.passbook.update(firstValue);
     return updated;
   }
 

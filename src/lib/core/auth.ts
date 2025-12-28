@@ -2,11 +2,9 @@ import bcrypt from "bcryptjs";
 import { jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET ||
-    process.env.AUTH_SECRET ||
-    "default-secret-change-in-production"
-);
+import { getJwtSecret } from "@/lib/config/env";
+
+const JWT_SECRET = new TextEncoder().encode(getJwtSecret());
 
 const COOKIE_NAME = "pc_auth";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days

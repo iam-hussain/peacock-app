@@ -26,7 +26,7 @@ function getPassbookUpdateQuery(
     | PassbookConfigAction["FROM"]
     | PassbookConfigAction["TO"]
 ): Parameters<typeof prisma.passbook.update>[0] {
-  const data: any = passbook.data.payload || {};
+  const data = (passbook.data?.payload || {}) as Record<string, unknown>;
 
   return setPassbookUpdateQuery(passbook, {
     ...Object.fromEntries(
@@ -69,12 +69,18 @@ type PassbookToUpdate = Map<
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
+type TransactionPassbooks = {
+  FROM: string;
+  TO: string;
+  CLUB: "CLUB";
+};
+
 export const updatePassbookByTransaction = (
   passbookToUpdate: PassbookToUpdate,
   transaction: Transaction,
-  isRevert: Boolean = false
+  isRevert: boolean = false
 ) => {
-  const transactionPassbooks: any = {
+  const transactionPassbooks: TransactionPassbooks = {
     FROM: transaction.fromId,
     TO: transaction.toId,
     CLUB: "CLUB",
@@ -137,17 +143,22 @@ export const updatePassbookByTransaction = (
   Object.entries(transactionPassbookSettings).forEach(
     ([transactionType, passbooksOf]) => {
       if (transaction.type === transactionType) {
-        Object.entries(passbooksOf).forEach(([passbookOf, action]: any[]) => {
-          const currentPassbook = passbookToUpdate.get(
-            transactionPassbooks[passbookOf]
-          );
-          if (currentPassbook) {
-            let currentAction = action;
+        Object.entries(passbooksOf).forEach(([passbookOf, action]) => {
+          const typedAction =
+            action as PassbookConfigAction[keyof PassbookConfigAction];
+          const passbookKey =
+            transactionPassbooks[passbookOf as keyof TransactionPassbooks];
+          const currentPassbook = passbookToUpdate.get(passbookKey);
+          if (currentPassbook && typedAction) {
+            let currentAction = typedAction;
             if (isRevert) {
-              currentAction = { ADD: action.SUB, SUB: action.ADD };
+              currentAction = {
+                ADD: typedAction.SUB,
+                SUB: typedAction.ADD,
+              } as typeof typedAction;
             }
             passbookToUpdate.set(
-              transactionPassbooks[passbookOf],
+              passbookKey,
               getPassbookUpdateQuery(currentPassbook, values, currentAction)
             );
           }

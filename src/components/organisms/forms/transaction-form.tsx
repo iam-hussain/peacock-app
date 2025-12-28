@@ -208,7 +208,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[0]} *
+                    {formToLabels[0] ?? "From"} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -217,11 +217,11 @@ export function TransactionForm({
                     >
                       <SelectTrigger className="h-11 rounded-lg">
                         <SelectValue
-                          placeholder={`Select ${formToLabels[0].toLowerCase()}`}
+                          placeholder={`Select ${(formToLabels[0] ?? "item").toLowerCase()}`}
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {formToValues[0].map((member) => (
+                        {(formToValues[0] ?? []).map((member) => (
                           <SelectItem key={member.id} value={member.id}>
                             {member.name}
                           </SelectItem>
@@ -240,7 +240,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[1]} *
+                    {formToLabels[1] ?? "To"} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -249,11 +249,11 @@ export function TransactionForm({
                     >
                       <SelectTrigger className="h-11 rounded-lg">
                         <SelectValue
-                          placeholder={`Select ${formToLabels[1].toLowerCase()}`}
+                          placeholder={`Select ${(formToLabels[1] ?? "item").toLowerCase()}`}
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {formToValues[1].map((vendor) => (
+                        {(formToValues[1] ?? []).map((vendor) => (
                           <SelectItem key={vendor.id} value={vendor.id}>
                             {vendor.name}
                           </SelectItem>
@@ -274,7 +274,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[0]} *
+                    {formToLabels[0] ?? "From"} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -283,11 +283,11 @@ export function TransactionForm({
                     >
                       <SelectTrigger className="h-11 rounded-lg">
                         <SelectValue
-                          placeholder={`Select ${formToLabels[0].toLowerCase()}`}
+                          placeholder={`Select ${(formToLabels[0] ?? "item").toLowerCase()}`}
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {formToValues[0].map((member) => (
+                        {(formToValues[0] ?? []).map((member) => (
                           <SelectItem key={member.id} value={member.id}>
                             {member.name}
                           </SelectItem>
@@ -306,7 +306,7 @@ export function TransactionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
-                    {formToLabels[1]} *
+                    {formToLabels[1] ?? "To"} *
                   </FormLabel>
                   <FormControl>
                     <Select
@@ -315,11 +315,11 @@ export function TransactionForm({
                     >
                       <SelectTrigger className="h-11 rounded-lg">
                         <SelectValue
-                          placeholder={`Select ${formToLabels[1].toLowerCase()}`}
+                          placeholder={`Select ${(formToLabels[1] ?? "item").toLowerCase()}`}
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {formToValues[1].map((vendor) => (
+                        {(formToValues[1] ?? []).map((vendor) => (
                           <SelectItem key={vendor.id} value={vendor.id}>
                             {vendor.name}
                           </SelectItem>

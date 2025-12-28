@@ -73,9 +73,11 @@ export function useTableExport<TData>({
     if (typeof column.header === "function") {
       // Try to get header from meta or accessorKey as fallback
       const meta = column.meta as { tooltip?: string } | undefined;
-      if (meta?.tooltip) {
+      const tooltip = meta?.tooltip;
+      if (tooltip) {
         // Use tooltip as header if available
-        return meta.tooltip.split(".")[0]; // Take first sentence
+        const firstSentence = tooltip.split(".")[0];
+        return firstSentence ?? tooltip; // Take first sentence or fallback to full tooltip
       }
 
       // Fallback to accessorKey or id
@@ -125,7 +127,8 @@ export function useTableExport<TData>({
 
       // If value is a date, format it
       if (value instanceof Date) {
-        return escapeCsvValue(value.toISOString().split("T")[0]);
+        const datePart = value.toISOString().split("T")[0];
+        return escapeCsvValue(datePart ?? value.toISOString());
       }
 
       // If value is an object with common properties, extract meaningful data

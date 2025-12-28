@@ -6,6 +6,50 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/core/auth";
 
+/**
+ * @swagger
+ * /api/auth/status:
+ *   post:
+ *     summary: Check authentication status
+ *     description: Returns whether the user is logged in and their user information
+ *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Authentication status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isLoggedIn:
+ *                   type: boolean
+ *                   description: Whether user is authenticated
+ *                 user:
+ *                   oneOf:
+ *                     - type: object
+ *                       properties:
+ *                         kind:
+ *                           type: string
+ *                           enum: [admin, admin-member, member]
+ *                         username:
+ *                           type: string
+ *                           description: Username (for admin)
+ *                         accountId:
+ *                           type: string
+ *                           description: Account ID (for members)
+ *                         id:
+ *                           type: string
+ *                           description: User ID
+ *                         role:
+ *                           type: string
+ *                           enum: [SUPER_ADMIN, ADMIN, MEMBER]
+ *                         accessLevel:
+ *                           type: string
+ *                           enum: [ADMIN, MEMBER]
+ *                     - type: "null"
+ */
 export async function POST() {
   try {
     const user = await getCurrentUser();

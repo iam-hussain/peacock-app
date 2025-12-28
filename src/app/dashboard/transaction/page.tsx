@@ -849,7 +849,7 @@ export default function TransactionsPage() {
         const header =
           typeof col.header === "string"
             ? col.header
-            : (col.meta as any)?.tooltip?.split(".")[0] || col.id || "Column";
+            : ((col.meta as any)?.tooltip?.split(".")[0] ?? col.id ?? "Column");
         return escapeCsvValue(header);
       });
       csvRows.push(headers.join(","));

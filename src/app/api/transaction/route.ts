@@ -32,6 +32,134 @@ type TransactionToTransform = Transaction & {
   updatedBy: AuditAccountDetails | null;
 };
 
+/**
+ * @swagger
+ * /api/transaction:
+ *   post:
+ *     summary: Get transactions list
+ *     description: Retrieves a paginated list of transactions with filtering and sorting options. Requires authentication.
+ *     tags: [Transaction]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *           minimum: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of transactions per page
+ *       - in: query
+ *         name: accountId
+ *         schema:
+ *           type: string
+ *         description: Filter by account ID (from or to)
+ *       - in: query
+ *         name: transactionType
+ *         schema:
+ *           type: string
+ *           enum: [DEPOSIT, WITHDRAWAL, LOAN, LOAN_REPAYMENT, INTEREST, FEE, TRANSFER, LOAN_ALL]
+ *         description: Filter by transaction type
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Start date for date range filter
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: End date for date range filter
+ *       - in: query
+ *         name: sortField
+ *         schema:
+ *           type: string
+ *           default: occurredAt
+ *           enum: [occurredAt, createdAt, amount]
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           default: desc
+ *           enum: [asc, desc]
+ *         description: Sort order
+ *     responses:
+ *       200:
+ *         description: List of transactions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       fromId:
+ *                         type: string
+ *                       toId:
+ *                         type: string
+ *                       amount:
+ *                         type: number
+ *                       type:
+ *                         type: string
+ *                       occurredAt:
+ *                         type: string
+ *                         format: date-time
+ *                       from:
+ *                         type: object
+ *                         description: Source account details
+ *                       to:
+ *                         type: object
+ *                         description: Destination account details
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of transactions
+ *                 page:
+ *                   type: integer
+ *                   description: Current page number
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Total number of pages
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 export async function POST(request: Request) {
   try {
     const { requireAuth } = await import("@/lib/core/auth");

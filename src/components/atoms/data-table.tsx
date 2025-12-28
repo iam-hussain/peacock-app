@@ -350,17 +350,29 @@ export function DataTable<TData, TValue>({
                 {/* Member Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    {flexRender(
-                      memberCell?.column.columnDef.cell || columns[0].cell!,
-                      memberData || row.getVisibleCells()[0].getContext()
-                    )}
+                    {(() => {
+                      const visibleCells = row.getVisibleCells();
+                      const firstCell = visibleCells[0];
+                      const cellDef =
+                        memberCell?.column.columnDef.cell ||
+                        columns[0]?.cell ||
+                        (() => null);
+                      const context = memberData || firstCell?.getContext();
+                      return context && cellDef
+                        ? flexRender(cellDef, context)
+                        : null;
+                    })()}
                   </div>
-                  {flexRender(
-                    columns[columns.length - 1].cell!,
-                    row
-                      .getVisibleCells()
-                      [row.getVisibleCells().length - 1].getContext()
-                  )}
+                  {(() => {
+                    const visibleCells = row.getVisibleCells();
+                    const lastCell = visibleCells[visibleCells.length - 1];
+                    const lastColumn = columns[columns.length - 1];
+                    const cellDef = lastColumn?.cell;
+                    const context = lastCell?.getContext();
+                    return cellDef && context
+                      ? flexRender(cellDef, context)
+                      : null;
+                  })()}
                 </div>
 
                 {/* Financial Data Grid */}

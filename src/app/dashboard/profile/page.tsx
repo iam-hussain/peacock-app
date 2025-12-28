@@ -84,7 +84,7 @@ export default function ProfilePage() {
   const isSuperAdmin = user?.kind === "admin";
 
   // Fetch profile data (will return virtual profile for super-admin)
-  const { data: profileData, isLoading: isProfileLoading } = useQuery({
+  const { data: profileData, isLoading: isProfileLoading } = useQuery<any>({
     queryKey: ["profile"],
     queryFn: () => fetcher.get("/api/profile"),
   });

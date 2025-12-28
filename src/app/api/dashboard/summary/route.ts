@@ -9,9 +9,109 @@ import prisma from "@/db";
 import { transformSummaryToDashboardData } from "@/lib/transformers/dashboard-summary";
 
 /**
- * GET /api/dashboard/summary?month=YYYY-MM
- * Get dashboard summary for a specific month (or latest if no month provided)
- * Returns structured financial data from Summary table - NO CALCULATIONS
+ * @swagger
+ * /api/dashboard/summary:
+ *   get:
+ *     summary: Get dashboard summary
+ *     description: Returns structured financial data from Summary table for a specific month or the latest summary if no month provided. No calculations performed - data comes directly from database.
+ *     tags: [Dashboard]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: string
+ *           pattern: '^\d{4}-\d{2}$'
+ *           example: "2024-01"
+ *         description: Month in YYYY-MM format. If not provided, returns latest summary.
+ *     responses:
+ *       200:
+ *         description: Dashboard summary data
+ *         headers:
+ *           ETag:
+ *             description: ETag for cache validation
+ *             schema:
+ *               type: string
+ *           Cache-Control:
+ *             description: Cache control directives
+ *             schema:
+ *               type: string
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   description: Dashboard financial data structure
+ *                   properties:
+ *                     availableCash:
+ *                       type: number
+ *                       description: Available cash balance
+ *                     totalInvested:
+ *                       type: number
+ *                       description: Total invested amount
+ *                     currentValue:
+ *                       type: number
+ *                       description: Current portfolio value
+ *                     totalPortfolioValue:
+ *                       type: number
+ *                       description: Total portfolio value
+ *                     currentLoanTaken:
+ *                       type: number
+ *                       description: Current loan amount
+ *                     interestBalance:
+ *                       type: number
+ *                       description: Interest balance
+ *                     memberOutflow:
+ *                       type: object
+ *                       properties:
+ *                         pendingAdjustments:
+ *                           type: number
+ *                           description: Pending member adjustments
+ *       304:
+ *         description: Not Modified - client has cached version
+ *       400:
+ *         description: Invalid month format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Invalid month format. Use YYYY-MM
+ *       404:
+ *         description: Summary not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
  */
 export async function GET(request: NextRequest) {
   try {

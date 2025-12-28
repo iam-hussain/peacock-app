@@ -133,7 +133,11 @@ export function EnhancedChartsSection({
     if (selectedRange === "all-time") {
       return club.inMonth;
     } else if (selectedRange.startsWith("year-")) {
-      const yearIndex = parseInt(selectedRange.split("-")[1]) - 1;
+      const yearPart = selectedRange.split("-")[1];
+      if (!yearPart) {
+        return 12;
+      }
+      const yearIndex = parseInt(yearPart) - 1;
       const yearOption = yearOptions[yearIndex];
       if (yearOption) {
         const months =
