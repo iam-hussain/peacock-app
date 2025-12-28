@@ -26,67 +26,6 @@ export const clubConfig = {
   dayInterestFrom: newZoneDate("06/01/2024"),
 };
 
-// Member Transaction Type Map
-export const memberTransactionTypeMap = {
-  PERIODIC_DEPOSIT: "Periodic Deposit",
-  OFFSET_DEPOSIT: "Offset Deposit",
-  WITHDRAW: "Withdraw",
-  REJOIN: "Rejoin",
-  FUNDS_TRANSFER: "Funds Transfer",
-};
-
-// Member Vendor Role Map
-export const memberVendorRoleMap = {
-  DEFAULT: "Default",
-  MEDIATOR: "Mediator",
-  SELF: "Self",
-};
-
-// Passbook Type Map
-export const passbookTypeMap = {
-  MEMBER: "Member",
-  VENDOR: "Vendor",
-  CLUB: "Club",
-};
-
-// Period Map
-export const periodMap = {
-  NONE: "None",
-  DAY: "Day",
-  WEEK: "Week",
-  MONTH: "Month",
-  YEAR: "Year",
-};
-
-export const transactionMethodMap = {
-  CASH: "Cash",
-  ACCOUNT: "Account",
-  UPI: "UPI",
-  BANK: "Bank",
-  CHEQUE: "Cheque",
-};
-
-// Vendor Type Map
-export const vendorTypeMap: any = {
-  DEFAULT: "Default",
-  CHIT: "Chit",
-  LEND: "Loan",
-  BANK: "Bank",
-};
-
-// Vendor Type Map
-export const vendorCreateTypeMap = {
-  DEFAULT: "Default",
-  CHIT: "Chit",
-  BANK: "Bank",
-};
-
-// Vendor Type Map
-export const vendorTypeTransactionMap = {
-  DEFAULT: "Default/Chit",
-  LEND: "Member Loan",
-};
-
 // Transaction Type Map
 export const transactionTypeMap: { [key in TransactionType]: string } = {
   PERIODIC_DEPOSIT: "Member's Deposit",
