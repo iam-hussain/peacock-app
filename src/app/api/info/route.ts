@@ -163,8 +163,6 @@ export async function GET() {
       {
         member: accounts.filter((account) => account.type === "MEMBER"),
         vendor: accounts.filter((account) => account.type === "VENDOR"),
-        club: accounts.filter((account) => account.type === "CLUB"),
-        system: accounts.filter((account) => account.type === "SYSTEM"),
         clubConfig: clubConfig,
         clubData: clubData,
         transactionTypeMap: transactionTypeMap,
