@@ -39,6 +39,7 @@ export type LoanLedgerEntry = {
  * principal amount, dates, and interest calculations.
  */
 export type LoanHistoryEntry = {
+  index: number;
   /** Indicates if the loan is currently active */
   active: boolean;
   /** Principal amount of the loan */

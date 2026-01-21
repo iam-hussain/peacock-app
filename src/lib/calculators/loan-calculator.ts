@@ -34,12 +34,14 @@ export function fetchLoanTransactionsForMember(memberId: string) {
  * Creates a single loan history entry with interest calculation
  */
 const getOneLoanDetails = (
+  index: number,
   amount: number,
   start: Date | string,
   end: Date | string = newZoneDate()
 ): LoanHistoryEntry => {
   const data = calculateInterestByAmount(amount, start, end);
   return {
+    index,
     active: false,
     amount,
     ...data,
@@ -63,11 +65,12 @@ export function calculateLoanDetails(transactions: Transaction[]) {
     if (transactionType === "LOAN_TAKEN") {
       if (prevLoan) {
         loanHistory.push(
-          getOneLoanDetails(prevLoan.amount, prevLoan.startDate, occurredAt)
+          getOneLoanDetails(loanHistory.length, prevLoan.amount, prevLoan.startDate, occurredAt)
         );
       }
       accountBalance = accountBalance + amount;
       prevLoan = {
+        index: loanHistory.length,
         active: true,
         amount: accountBalance,
         startDate: newZoneDate(occurredAt),
@@ -76,7 +79,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
     } else if (transactionType === "LOAN_REPAY") {
       if (prevLoan) {
         loanHistory.push(
-          getOneLoanDetails(accountBalance, prevLoan.startDate, occurredAt)
+          getOneLoanDetails(loanHistory.length, accountBalance, prevLoan.startDate, occurredAt)
         );
         prevLoan = null;
       }
@@ -84,6 +87,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
 
       if (accountBalance > 0) {
         prevLoan = {
+          index: loanHistory.length,
           active: true,
           amount: accountBalance,
           startDate: newZoneDate(occurredAt),
@@ -95,6 +99,7 @@ export function calculateLoanDetails(transactions: Transaction[]) {
 
   if (accountBalance > 0 && prevLoan) {
     loanHistory.push({
+      index: loanHistory.length,
       active: true,
       amount: accountBalance,
       startDate: prevLoan.startDate.getTime(),
@@ -128,9 +133,13 @@ export async function getMemberLoanHistory(memberId: string) {
       const actualStartDate =
         loanStartDate < clubStartDate ? clubStartDate : loanStartDate;
 
-      const loanEndDate = loan?.endDate
+      let loanEndDate = loan?.endDate
         ? newZoneDate(loan.endDate)
         : currentMonthEnd;
+
+      if (loan.index === loanHistory.length - 1 && !loan.endDate) {
+        loanEndDate = newZoneDate();
+      }
 
       const interestCalc = calculateInterestByAmount(
         loan.amount ?? 0,
