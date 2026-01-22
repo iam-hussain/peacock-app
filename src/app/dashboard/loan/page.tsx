@@ -33,6 +33,9 @@ export default function LoansPage() {
     if (loan.totalLoanBalance > 0) {
       return { label: "Active", color: "bg-blue-500" };
     }
+    if (loan.totalInterestBalance > 0) {
+      return { label: "Pending", color: "bg-red-500" };
+    }
     return { label: "Cleared", color: "bg-green-500" };
   };
 
@@ -164,7 +167,7 @@ export default function LoansPage() {
           tooltip: "Total loan amount taken by this member.",
         },
         cell: ({ row }) => {
-          const amount = row.original.totalLoanTaken || 0;
+          const amount = row.original.totalLoanBalance || 0;
           return (
             <div className="text-right text-sm font-medium text-foreground">
               {moneyFormat(amount)}
@@ -185,11 +188,7 @@ export default function LoansPage() {
           const amount = row.original.totalInterestPaid || 0;
           return (
             <div className="text-right text-sm font-medium text-green-600 dark:text-green-500">
-              {amount === 0 ? (
-                <span className="text-muted-foreground/50">-</span>
-              ) : (
-                moneyFormat(amount)
-              )}
+              {moneyFormat(amount)}
             </div>
           );
         },
@@ -207,13 +206,12 @@ export default function LoansPage() {
           const amount = row.original.totalInterestBalance || 0;
           return (
             <div
-              className={`text-right text-sm font-medium ${
-                amount > 0
-                  ? "text-destructive"
-                  : amount === 0
-                    ? "text-muted-foreground/50"
-                    : "text-green-600 dark:text-green-500"
-              }`}
+              className={`text-right text-sm font-medium ${amount > 0
+                ? "text-destructive"
+                : amount === 0
+                  ? "text-muted-foreground/50"
+                  : "text-green-600 dark:text-green-500"
+                }`}
             >
               {amount === 0 ? "-" : moneyFormat(amount)}
             </div>
@@ -444,9 +442,7 @@ export default function LoansPage() {
                         Interest Paid
                       </div>
                       <div className="text-sm font-medium text-green-600 dark:text-green-500">
-                        {loan.totalInterestPaid === 0
-                          ? "-"
-                          : moneyFormat(loan.totalInterestPaid)}
+                        {moneyFormat(loan.totalInterestPaid)}
                       </div>
                     </div>
                     <div>
@@ -454,15 +450,12 @@ export default function LoansPage() {
                         Interest Outstanding
                       </div>
                       <div
-                        className={`text-sm font-medium ${
-                          loan.totalInterestBalance > 0
-                            ? "text-destructive"
-                            : "text-muted-foreground/50"
-                        }`}
+                        className={`text-sm font-medium ${loan.totalInterestBalance > 0
+                          ? "text-destructive"
+                          : "text-muted-foreground/50"
+                          }`}
                       >
-                        {loan.totalInterestBalance === 0
-                          ? "-"
-                          : moneyFormat(loan.totalInterestBalance)}
+                        {moneyFormat(loan.totalInterestBalance)}
                       </div>
                     </div>
                     {loan.startAt && loan.totalLoanBalance > 0 && (
