@@ -206,12 +206,13 @@ export default function LoansPage() {
           const amount = row.original.totalInterestBalance || 0;
           return (
             <div
-              className={`text-right text-sm font-medium ${amount > 0
-                ? "text-destructive"
-                : amount === 0
-                  ? "text-muted-foreground/50"
-                  : "text-green-600 dark:text-green-500"
-                }`}
+              className={`text-right text-sm font-medium ${
+                amount > 0
+                  ? "text-destructive"
+                  : amount === 0
+                    ? "text-muted-foreground/50"
+                    : "text-green-600 dark:text-green-500"
+              }`}
             >
               {amount === 0 ? "-" : moneyFormat(amount)}
             </div>
@@ -450,10 +451,11 @@ export default function LoansPage() {
                         Interest Outstanding
                       </div>
                       <div
-                        className={`text-sm font-medium ${loan.totalInterestBalance > 0
-                          ? "text-destructive"
-                          : "text-muted-foreground/50"
-                          }`}
+                        className={`text-sm font-medium ${
+                          loan.totalInterestBalance > 0
+                            ? "text-destructive"
+                            : "text-muted-foreground/50"
+                        }`}
                       >
                         {moneyFormat(loan.totalInterestBalance)}
                       </div>

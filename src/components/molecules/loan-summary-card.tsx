@@ -102,10 +102,11 @@ export function LoanSummaryCard({
               Interest Balance (Due)
             </span>
             <span
-              className={`text-sm font-semibold ${interestBalance > 0
+              className={`text-sm font-semibold ${
+                interestBalance > 0
                   ? "text-destructive"
                   : "text-muted-foreground"
-                }`}
+              }`}
             >
               {moneyFormat(interestBalance)}
             </span>
