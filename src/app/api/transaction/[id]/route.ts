@@ -1,13 +1,167 @@
+import { NextResponse } from "next/server";
+
+import { TransformedTransaction } from "@/app/api/transaction/route";
+import prisma from "@/db";
+import { clubData } from "@/lib/config/config";
+import { requireWriteAccess } from "@/lib/core/auth";
+import { invalidateTransactionCaches } from "@/lib/core/cache-invalidation";
+import { newZoneDate } from "@/lib/core/date";
+import { transactionEntryHandler } from "@/logic/transaction-handler";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { NextResponse } from "next/server";
+async function findTransaction(id: string) {
+  return prisma.transaction.findUnique({
+    where: { id },
+    include: {
+      from: {
+        select: {
+          id: true,
+          username: true,
+          firstName: true,
+          lastName: true,
+          avatarUrl: true,
+          status: true,
+          type: true,
+        },
+      },
+      to: {
+        select: {
+          id: true,
+          username: true,
+          firstName: true,
+          lastName: true,
+          avatarUrl: true,
+          status: true,
+          type: true,
+        },
+      },
+      createdBy: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      updatedBy: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+}
 
-import prisma from "@/db";
-import { requireWriteAccess } from "@/lib/core/auth";
-import { invalidateTransactionCaches } from "@/lib/core/cache-invalidation";
-import { transactionEntryHandler } from "@/logic/transaction-handler";
+function transform(transaction: any): TransformedTransaction {
+  const fromName = `${transaction.from.firstName || ""} ${transaction.from.lastName || ""}`;
+  const toName = `${transaction.to.firstName || ""} ${transaction.to.lastName || ""}`;
+
+  const updated = {
+    from: {
+      ...transaction.from,
+      name: fromName,
+      sub: "",
+      avatar: transaction.from.avatarUrl
+        ? `/image/${transaction.from.avatarUrl}`
+        : undefined,
+      link:
+        transaction.from.type === "MEMBER"
+          ? `/dashboard/member/${transaction.from.username}`
+          : undefined,
+    },
+    to: {
+      ...transaction.to,
+      name: toName,
+      sub: "",
+      avatar: transaction.to.avatarUrl
+        ? `/image/${transaction.to.avatarUrl}`
+        : undefined,
+      link:
+        transaction.to.type === "MEMBER"
+          ? `/dashboard/member/${transaction.to.username}`
+          : undefined,
+    },
+  };
+
+  if (["LOAN_TAKEN"].includes(transaction.type)) {
+    updated.to.sub = "Loan Account";
+  }
+
+  if (["LOAN_REPAY", "LOAN_INTEREST"].includes(transaction.type)) {
+    updated.from.sub = "Loan Account";
+    updated.to.sub = "Club Account";
+  }
+
+  if (
+    ["WITHDRAW", "LOAN_TAKEN", "VENDOR_INVEST", "FUNDS_TRANSFER"].includes(
+      transaction.type
+    )
+  ) {
+    updated.from.sub = "Club Account";
+    updated.from.avatar = clubData.avatar;
+  }
+
+  if (
+    [
+      "PERIODIC_DEPOSIT",
+      "VENDOR_RETURNS",
+      "OFFSET_DEPOSIT",
+      "LOAN_REPAY",
+      "LOAN_INTEREST",
+      "FUNDS_TRANSFER",
+    ].includes(transaction.type)
+  ) {
+    updated.to.sub = clubData.sub;
+    updated.to.avatar = clubData.avatar;
+  }
+
+  const createdByName = transaction.createdBy
+    ? `${transaction.createdBy.firstName} ${transaction.createdBy.lastName || ""}`.trim()
+    : null;
+  const updatedByName = transaction.updatedBy
+    ? `${transaction.updatedBy.firstName} ${transaction.updatedBy.lastName || ""}`.trim()
+    : null;
+
+  return {
+    ...transaction,
+    ...updated,
+    transactionType: transaction.type,
+    createdByName,
+    updatedByName,
+    createdById: transaction.createdById,
+    updatedById: transaction.updatedById,
+    createdAt: newZoneDate(transaction.createdAt),
+    updatedAt: newZoneDate(transaction.updatedAt),
+  };
+}
+
+export async function GET(_req: Request, context: { params: { id: string } }) {
+  try {
+    const { id } = context.params;
+    const transaction = await findTransaction(id);
+
+    if (!transaction) {
+      return NextResponse.json(
+        { transaction: null, error: "Not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      transaction: transform(transaction),
+    });
+  } catch (error: any) {
+    console.error("Error fetching transaction by id:", error);
+    return NextResponse.json(
+      { transaction: null, error: "Failed to fetch transaction" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function DELETE(
   request: Request,

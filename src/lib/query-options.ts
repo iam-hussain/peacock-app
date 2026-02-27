@@ -5,7 +5,10 @@ import { GetMemberByUsernameResponse } from "@/app/api/account/member/[username]
 import { GetMemberResponse } from "@/app/api/account/member/route";
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { GetVendorResponse } from "@/app/api/account/vendor/route";
-import { GetTransactionResponse } from "@/app/api/transaction/route";
+import {
+  GetTransactionResponse,
+  TransformedTransaction,
+} from "@/app/api/transaction/route";
 import fetcher from "@/lib/core/fetcher";
 
 type GetStatisticsResponse = {
@@ -144,6 +147,16 @@ export const fetchTransactions = (options: any) => {
     ...frequentDataConfig, // Transactions change frequently
   });
 };
+
+export const fetchTransactionById = (id: string) =>
+  queryOptions({
+    queryKey: ["transaction", id],
+    queryFn: () =>
+      fetcher.get(`/api/transaction/${id}`) as unknown as {
+        transaction: TransformedTransaction | null;
+      },
+    ...noRefetchConfigs,
+  });
 
 export const fetchDashboardSummary = (month?: string) =>
   queryOptions({

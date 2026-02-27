@@ -40,6 +40,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -73,12 +74,32 @@ export default function TransactionsPage() {
   const [selectedTransactionForDelete, setSelectedTransactionForDelete] =
     useState<TransformedTransaction | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const urlFilterApplied = useRef(false);
   const isInitialMount = useRef(true);
 
   // Ensure we're on client before using searchParams
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery =
+      typeof window !== "undefined"
+        ? window.matchMedia("(max-width: 1023px)")
+        : null;
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches);
+    };
+
+    if (mediaQuery) {
+      setIsMobile(mediaQuery.matches);
+      mediaQuery.addEventListener("change", handleChange);
+    }
+
+    return () => mediaQuery?.removeEventListener("change", handleChange);
   }, []);
 
   // Update URL with current filter values
@@ -429,11 +450,19 @@ export default function TransactionsPage() {
 
   const handleAddTransaction = () => {
     setSelectedTransaction(null);
+    if (isMobile) {
+      router.push("/dashboard/transaction/add");
+      return;
+    }
     setDialogOpen(true);
   };
 
   const handleEditTransaction = (transaction: TransformedTransaction) => {
     setSelectedTransaction(transaction);
+    if (isMobile) {
+      router.push(`/dashboard/transaction/${transaction.id}/edit`);
+      return;
+    }
     setDialogOpen(true);
   };
 
@@ -444,7 +473,7 @@ export default function TransactionsPage() {
 
   const handleViewTransaction = (transaction: TransformedTransaction) => {
     setSelectedTransaction(transaction);
-    setDialogOpen(true);
+    setDetailsDialogOpen(true);
   };
 
   const handleResetFilters = () => {
@@ -962,27 +991,21 @@ export default function TransactionsPage() {
         />
       </div>
 
-      <div className="lg:hidden">
-        <PageHeader
-          title="Transaction History"
-          subtitle={
-            canWrite
-              ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
-              : "Read-only access. Contact admin to request write access."
-          }
-          secondaryActions={[
-            {
-              label: "Export CSV",
-              icon: <Download className="h-4 w-4" />,
-              onClick: handleExportCsv,
-            },
-            {
-              label: "Screenshot",
-              icon: <Camera className="h-4 w-4" />,
-              onClick: handleScreenshot,
-            },
-          ]}
-        />
+      <div className="lg:hidden flex items-center justify-between rounded-xl border border-border bg-card/80 px-3 py-3">
+        <div className="space-y-0.5">
+          <p className="text-sm font-semibold">Transactions</p>
+          <p className="text-xs text-muted-foreground">Recent activity</p>
+        </div>
+        {canWrite && (
+          <Button
+            size="sm"
+            className="gap-2 rounded-full px-3"
+            onClick={handleAddTransaction}
+          >
+            <Receipt className="h-4 w-4" />
+            <span>Add</span>
+          </Button>
+        )}
       </div>
 
       <div className="hidden lg:block">
@@ -1032,17 +1055,17 @@ export default function TransactionsPage() {
           <SearchBarMobile
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search transactions..."
+            placeholder="Search transactions"
           />
         </div>
         <Button
           variant="outline"
-          size="default"
+          size="icon"
           onClick={() => setFilterDrawerOpen(true)}
-          className="gap-2 shrink-0"
+          className="shrink-0 rounded-full"
         >
           <SlidersHorizontal className="h-4 w-4" />
-          <span>Filter</span>
+          <span className="sr-only">Filters</span>
         </Button>
       </div>
 
@@ -1090,7 +1113,7 @@ export default function TransactionsPage() {
         </div>
       </ScreenshotArea>
 
-      <div className="lg:hidden space-y-4 pb-20">
+      <div className="lg:hidden space-y-3 pb-16">
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
@@ -1105,6 +1128,7 @@ export default function TransactionsPage() {
                 transaction={transaction}
                 onEdit={() => handleEditTransaction(transaction)}
                 onDelete={() => handleDeleteTransaction(transaction)}
+                onView={() => handleViewTransaction(transaction)}
               />
             ))}
           </div>
@@ -1135,6 +1159,93 @@ export default function TransactionsPage() {
           scrollToTop={true}
         />
       )}
+
+      {/* Mobile details modal */}
+      <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+        <DialogContent className="max-w-md w-[90vw] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">
+              Transaction details
+            </DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Quick view of this entry.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedTransaction && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Amount</p>
+                <p className="text-xl font-semibold tabular-nums">
+                  {moneyFormat(selectedTransaction.amount)}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">From</p>
+                  <p className="font-medium text-foreground">
+                    {selectedTransaction.from?.name || "—"}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">To</p>
+                  <p className="font-medium text-foreground">
+                    {selectedTransaction.to?.name || "—"}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Type</p>
+                  <p className="font-medium text-foreground">
+                    {transactionTypeMap[selectedTransaction.transactionType] ||
+                      selectedTransaction.transactionType}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Date</p>
+                  <p className="font-medium text-foreground">
+                    {dateFormat(newZoneDate(selectedTransaction.occurredAt))}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1 text-sm">
+                <p className="text-xs text-muted-foreground">Note</p>
+                <p className="text-foreground">
+                  {selectedTransaction.description ||
+                    (selectedTransaction as any).note ||
+                    "—"}
+                </p>
+              </div>
+
+              {canWrite && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    className="flex-1"
+                    onClick={() => {
+                      setDetailsDialogOpen(false);
+                      handleEditTransaction(selectedTransaction);
+                    }}
+                  >
+                    Edit transaction
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      setDetailsDialogOpen(false);
+                      handleDeleteTransaction(selectedTransaction);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <TransactionFilterDrawer
         open={filterDrawerOpen}

@@ -166,42 +166,78 @@ export function TransactionForm({
       <form
         id="transaction-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className={isMobile ? "w-full space-y-6" : "w-full max-w-2xl space-y-6"}
+        className={
+          isMobile ? "w-full space-y-4 pb-20" : "w-full max-w-2xl space-y-6"
+        }
       >
-        <FormField
-          control={form.control}
-          name="transactionType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium">
-                Transaction Type *
-              </FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="h-11 rounded-lg">
-                    <SelectValue placeholder="Select transaction type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(transactionTypeHumanMap).map(
-                      ([key, name]) => (
-                        <SelectItem key={key} value={key}>
-                          {name}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
+        {isMobile ? (
+          <FormField
+            control={form.control}
+            name="transactionType"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium">
+                  Transaction Type *
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue placeholder="Select transaction type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(transactionTypeHumanMap).map(
+                        ([key, name]) => (
+                          <SelectItem key={key} value={key}>
+                            {name}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        ) : (
+          <FormField
+            control={form.control}
+            name="transactionType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Transaction Type *
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="h-11 rounded-lg">
+                      <SelectValue placeholder="Select transaction type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(transactionTypeHumanMap).map(
+                        ([key, name]) => (
+                          <SelectItem key={key} value={key}>
+                            {name}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        )}
 
         {isMobile ? (
-          <>
+          <div className="space-y-3">
             <FormField
               control={form.control}
               name="fromId"
@@ -215,7 +251,7 @@ export function TransactionForm({
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger className="h-11 rounded-lg">
+                      <SelectTrigger className="h-11 rounded-xl">
                         <SelectValue
                           placeholder={`Select ${(formToLabels[0] ?? "item").toLowerCase()}`}
                         />
@@ -247,7 +283,7 @@ export function TransactionForm({
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger className="h-11 rounded-lg">
+                      <SelectTrigger className="h-11 rounded-xl">
                         <SelectValue
                           placeholder={`Select ${(formToLabels[1] ?? "item").toLowerCase()}`}
                         />
@@ -265,7 +301,7 @@ export function TransactionForm({
                 </FormItem>
               )}
             />
-          </>
+          </div>
         ) : (
           <Box preset={"grid-split"}>
             <FormField
@@ -335,7 +371,7 @@ export function TransactionForm({
         )}
 
         {isMobile ? (
-          <>
+          <div className="space-y-3">
             <FormField
               control={form.control}
               name="amount"
@@ -347,8 +383,9 @@ export function TransactionForm({
                   <FormControl>
                     <Input
                       type="number"
+                      inputMode="decimal"
                       placeholder="Enter amount"
-                      className="h-11 rounded-lg"
+                      className="h-11 rounded-xl"
                       {...field}
                       onChange={(event) => {
                         const value = event.target.value;
@@ -356,9 +393,6 @@ export function TransactionForm({
                       }}
                     />
                   </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    Enter total amount for this transaction.
-                  </p>
                   <FormMessage className="text-xs" />
                 </FormItem>
               )}
@@ -378,14 +412,11 @@ export function TransactionForm({
                       placeholder="Transaction date"
                     />
                   </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    Defaults to today if not changed.
-                  </p>
                   <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
-          </>
+          </div>
         ) : (
           <Box preset={"grid-split"}>
             <FormField
@@ -440,25 +471,47 @@ export function TransactionForm({
           </Box>
         )}
 
-        <FormField
-          control={form.control}
-          name="note"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium">
-                Note (Optional)
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Optional note"
-                  className="min-h-[100px] rounded-lg resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
+        {isMobile ? (
+          <FormField
+            control={form.control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Note (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Add a short note"
+                    className="min-h-[100px] rounded-xl resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        ) : (
+          <FormField
+            control={form.control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Note (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Optional note"
+                    className="min-h-[100px] rounded-lg resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        )}
 
         {!isMobile && (
           <GenericModalFooter
@@ -468,19 +521,19 @@ export function TransactionForm({
           />
         )}
         {isMobile && (
-          <div className="flex gap-3 w-full pt-4 border-t">
+          <div className="sticky bottom-0 left-0 right-0 -mx-4 flex gap-3 border-t border-border bg-background/95 px-4 py-4 pb-safe shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80">
             <Button
               type="button"
               variant="ghost"
               onClick={onCancel}
-              className="flex-1 h-11 rounded-lg"
+              className="flex-1 h-11 rounded-xl"
               disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 h-11 rounded-lg"
+              className="flex-1 h-11 rounded-xl"
               disabled={isSubmitting}
             >
               {isSubmitting

@@ -70,7 +70,7 @@ export function TransactionFormDialog({
   // Mobile: Drawer
   const mobileContent = (
     <div className="flex flex-col h-full">
-      <DrawerHeader className="text-left border-b pb-4">
+      <DrawerHeader className="text-left sticky top-0 z-20 border-b border-border bg-background/95 px-6 pb-4 pt-5 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="flex items-center justify-between">
           <div>
             <DrawerTitle className="text-xl font-semibold">{title}</DrawerTitle>
@@ -79,7 +79,11 @@ export function TransactionFormDialog({
             </DrawerDescription>
           </div>
           <DrawerClose asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full hover:bg-muted"
+            >
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
             </Button>
@@ -98,7 +102,7 @@ export function TransactionFormDialog({
           />
         </div>
       </div>
-      <DrawerFooter className="border-t pt-4 pb-safe px-4">
+      <DrawerFooter className="border-t border-border bg-background/95 px-4 pt-4 pb-safe backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="text-xs text-muted-foreground text-center">
           Tap outside or swipe down to close
         </div>
@@ -129,7 +133,7 @@ export function TransactionFormDialog({
     <>
       {!isDesktop && (
         <Drawer open={open} onOpenChange={onOpenChange}>
-          <DrawerContent className="max-h-[96vh]">
+          <DrawerContent className="max-h-[96vh] rounded-t-3xl border border-border bg-background/95 shadow-2xl">
             {mobileContent}
           </DrawerContent>
         </Drawer>

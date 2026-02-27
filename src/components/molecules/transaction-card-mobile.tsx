@@ -23,6 +23,7 @@ interface TransactionCardMobileProps {
   transaction: TransformedTransaction;
   onEdit?: (transaction: TransformedTransaction) => void;
   onDelete?: (transaction: TransformedTransaction) => void;
+  onView?: (transaction: TransformedTransaction) => void;
 }
 
 const INFLOW_TYPES = [
@@ -40,6 +41,7 @@ export function TransactionCardMobile({
   transaction,
   onEdit,
   onDelete,
+  onView,
 }: TransactionCardMobileProps) {
   const transactionType =
     transaction.transactionType || (transaction as any).type;
@@ -129,6 +131,9 @@ export function TransactionCardMobile({
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={() => onView?.(transaction)}>
+                  View details
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-destructive focus:text-destructive"
