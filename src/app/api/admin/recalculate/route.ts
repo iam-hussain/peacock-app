@@ -6,9 +6,14 @@ import { NextResponse } from "next/server";
 
 import { requireAdmin } from "@/lib/core/auth";
 import { invalidateDashboardCaches } from "@/lib/core/cache-invalidation";
+import { RATE_LIMITS, rateLimitResponse } from "@/lib/core/rate-limit";
 import { recalculatePassbooks } from "@/logic/reset-handler";
 
-export async function POST() {
+export async function POST(request: Request) {
+  // Rate limit heavy operations
+  const rateLimited = rateLimitResponse(request, "recalculate", RATE_LIMITS.heavy);
+  if (rateLimited) return rateLimited;
+
   try {
     // Admin and super admin can recalculate passbooks
     await requireAdmin();
@@ -32,6 +37,9 @@ export async function POST() {
         { status: 403 }
       );
     }
-    return NextResponse.json({ success: false, error: error }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error instanceof Error ? error.message : "Recalculation failed" },
+      { status: 500 }
+    );
   }
 }

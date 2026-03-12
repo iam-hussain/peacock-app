@@ -5,9 +5,13 @@ import { motion } from "framer-motion";
 import { ChevronDown, LogOut, Menu, Search, User, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
+import {
+  openSideBar,
+  setIsLoggedIn,
+  useAppState,
+} from "../providers/app-state-provider";
 import { GlobalSearch } from "../molecules/global-search";
 import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -22,8 +26,6 @@ import {
 
 import fetcher from "@/lib/core/fetcher";
 import { cn } from "@/lib/ui/utils";
-import { RootState } from "@/store";
-import { openSideBar, setIsLoggedIn } from "@/store/pageSlice";
 
 const getPageTitle = (pathname: string): string => {
   if (pathname === "/dashboard") return "Dashboard";
@@ -39,14 +41,11 @@ const getPageTitle = (pathname: string): string => {
 export function ModernTopBar() {
   const pathname = usePathname();
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
   const queryClient = useQueryClient();
   const [searchOpen, setSearchOpen] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const sideBarCollapsed = useSelector(
-    (state: RootState) => state.page.sideBarCollapsed
-  );
+  const { sideBarOpen, sideBarCollapsed } = state;
 
   // Close mobile search on outside click
   useEffect(() => {

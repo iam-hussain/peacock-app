@@ -127,37 +127,50 @@ export async function POST(request: Request) {
     const { fromId, toId, amount, transactionType, occurredAt, description } =
       validationResult.data;
 
-    const created = await prisma.transaction.create({
-      data: {
-        fromId,
-        toId,
-        amount,
-        type: transactionType as TransactionType,
-        occurredAt: occurredAt ? new Date(occurredAt) : new Date(),
-        description: description || null,
-        method: "ACCOUNT",
-        currency: "INR",
-      },
-    });
-
-    // Process transaction and update passbooks
-    // If this fails, the transaction exists in DB but passbook is out of sync
-    // This is logged as an error and should trigger a recalculation
+    // Create transaction and update passbooks atomically:
+    // If passbook update fails, roll back the transaction to keep data consistent
+    let created;
     try {
+      created = await prisma.transaction.create({
+        data: {
+          fromId,
+          toId,
+          amount,
+          type: transactionType as TransactionType,
+          occurredAt: occurredAt ? new Date(occurredAt) : new Date(),
+          description: description || null,
+          method: "ACCOUNT",
+          currency: "INR",
+        },
+      });
+
       await transactionEntryHandler(created);
     } catch (handlerError) {
-      const errorMessage =
-        handlerError instanceof Error
-          ? handlerError.message
-          : String(handlerError);
-      console.error(
-        `⚠️ Transaction ${created.id} created but passbook update failed. ` +
-          `Transaction exists in database but passbooks may be out of sync. ` +
-          `Run recalculation to fix. Error: ${errorMessage}`
-      );
-      // Still return success for the transaction creation, but log the error
-      // The transaction exists, but passbooks need to be recalculated
-      // In production, you might want to queue a background job to retry or recalculate
+      // If the transaction was created but passbook update failed, roll it back
+      if (created) {
+        try {
+          await prisma.transaction.delete({ where: { id: created.id } });
+        } catch (rollbackError) {
+          // If rollback also fails, log critical error — manual recalculation needed
+          console.error(
+            `CRITICAL: Transaction ${created.id} created but passbook update failed, ` +
+              `and rollback also failed. Run recalculation to fix.`,
+            rollbackError
+          );
+        }
+        const errorMessage =
+          handlerError instanceof Error
+            ? handlerError.message
+            : String(handlerError);
+        console.error(
+          `Transaction rolled back — passbook update failed: ${errorMessage}`
+        );
+        return NextResponse.json(
+          { error: "Transaction failed: could not update account balances. Please try again." },
+          { status: 500 }
+        );
+      }
+      throw handlerError;
     }
 
     // Clear all caches after transaction creation

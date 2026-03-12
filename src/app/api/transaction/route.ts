@@ -199,9 +199,11 @@ export async function POST(request: Request) {
 
 function getQueryParams(url: string) {
   const { searchParams } = new URL(url);
+  const rawPage = parseInt(searchParams.get("page") || "1");
+  const rawLimit = parseInt(searchParams.get("limit") || "10");
   return {
-    page: parseInt(searchParams.get("page") || "1"),
-    limit: parseInt(searchParams.get("limit") || "10"),
+    page: Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage,
+    limit: Number.isNaN(rawLimit) || rawLimit < 1 ? 10 : Math.min(rawLimit, 100),
     accountId: searchParams.get("accountId"),
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),

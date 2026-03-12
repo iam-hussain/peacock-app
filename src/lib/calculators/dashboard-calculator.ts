@@ -5,7 +5,7 @@ import { clubMonthsFromStart } from "@/lib/config/club";
 import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
-  PassbookToUpdate,
+  LedgerUpdateMap,
   VendorFinancialSnapshot,
 } from "@/lib/validators/type";
 
@@ -15,7 +15,7 @@ import {
  */
 export async function calculateMonthlySnapshotFromPassbooks(
   monthStartDate: Date,
-  allPassbooks: PassbookToUpdate,
+  allPassbooks: LedgerUpdateMap,
   activeMembers: number,
   expectedTotalLoanInterestAmount: number,
   totalActiveMemberAdjustments: number

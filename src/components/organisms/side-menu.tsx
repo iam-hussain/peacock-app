@@ -1,21 +1,19 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-
+import {
+  toggleSideBarCollapse,
+  useAppState,
+} from "../providers/app-state-provider";
 import { Button } from "../ui/button";
 
 import MenuItems from "./menu-items";
 
 import { cn } from "@/lib/ui/utils";
-import { RootState } from "@/store";
-import { toggleSideBarCollapse } from "@/store/pageSlice";
 
 function SideMenu() {
-  const dispatch = useDispatch();
-  const sideBarCollapsed = useSelector(
-    (state: RootState) => state.page.sideBarCollapsed
-  );
+  const { state, dispatch } = useAppState();
+  const { sideBarCollapsed } = state;
 
   return (
     <div

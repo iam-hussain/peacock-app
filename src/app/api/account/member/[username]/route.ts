@@ -84,10 +84,17 @@ export async function POST(
   const { username } = params;
 
   try {
-    const account = await prisma.account.findUniqueOrThrow({
+    const account = await prisma.account.findUnique({
       where: { username, type: "MEMBER" },
       include: { passbook: true },
     });
+
+    if (!account) {
+      return NextResponse.json(
+        { message: "Member not found" },
+        { status: 404 }
+      );
+    }
 
     const stats = await getMemberClubStats();
     const {

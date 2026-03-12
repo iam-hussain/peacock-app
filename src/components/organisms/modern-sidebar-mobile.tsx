@@ -18,9 +18,13 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
+import {
+  openSideBar,
+  setIsLoggedIn,
+  useAppState,
+} from "../providers/app-state-provider";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
@@ -30,8 +34,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { clubAge } from "@/lib/core/date";
 import fetcher from "@/lib/core/fetcher";
 import { cn } from "@/lib/ui/utils";
-import { RootState } from "@/store";
-import { openSideBar, setIsLoggedIn } from "@/store/pageSlice";
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -57,12 +59,11 @@ const secondaryNavItems: NavItem[] = [
 ];
 
 export function ModernSidebarMobile() {
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
+  const { sideBarOpen, isLoggedIn } = state;
   const club = clubAge();
   const { user } = useAuth();
 

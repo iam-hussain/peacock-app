@@ -99,15 +99,11 @@ export default function DashboardPage() {
     if (newSource === "summary") {
       queryClient.invalidateQueries({ queryKey: ["dashboard", "summary"] });
       refetchSummary();
-      console.log("[Dashboard] Switched to Summary view");
     } else {
       queryClient.invalidateQueries({
         queryKey: ["dashboard", "club-passbook"],
       });
       refetchClubPassbook();
-      console.log(
-        "[Dashboard] Switched to Club Passbook view - should show ₹69,012"
-      );
     }
   };
 
@@ -127,13 +123,6 @@ export default function DashboardPage() {
           : undefined,
     [dataSource, summaryData, clubPassbookData]
   );
-
-  // Debug: Log which data source is active and what interest balance is shown
-  if (data?.loans?.outstanding?.interestBalance !== undefined) {
-    console.log(
-      `[Dashboard] Data source: ${dataSource}, Interest Balance: ₹${data.loans.outstanding.interestBalance.toLocaleString("en-IN")}`
-    );
-  }
 
   // Memoize loading state
   const isLoading = useMemo(

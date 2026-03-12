@@ -72,12 +72,23 @@ function getEnv(): EnvSchema {
 export const env = getEnv();
 
 /**
- * Get JWT secret with fallback
+ * Get JWT secret — requires JWT_SECRET or AUTH_SECRET to be set
  */
 export function getJwtSecret(): string {
-  return (
-    env.JWT_SECRET || env.AUTH_SECRET || "default-secret-change-in-production"
-  );
+  const secret = env.JWT_SECRET || env.AUTH_SECRET;
+  if (!secret) {
+    if (env.NODE_ENV === "production") {
+      throw new Error(
+        "JWT_SECRET or AUTH_SECRET must be set in production. Please check your .env file."
+      );
+    }
+    // In development only, use a deterministic but non-trivial fallback
+    console.warn(
+      "⚠️ JWT_SECRET not set — using development-only fallback. DO NOT use in production."
+    );
+    return "dev-only-insecure-jwt-secret-do-not-use-in-production";
+  }
+  return secret;
 }
 
 /**

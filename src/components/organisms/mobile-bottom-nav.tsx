@@ -3,13 +3,12 @@
 import { FolderSync, MoreHorizontal, Receipt, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
-import { useDispatch } from "react-redux";
 
+import { openSideBar, useAppState } from "../providers/app-state-provider";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 
 import { cn } from "@/lib/ui/utils";
-import { openSideBar } from "@/store/pageSlice";
 
 interface BottomNavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -27,7 +26,7 @@ const bottomNavItems: BottomNavItem[] = [
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const dispatch = useDispatch();
+  const { dispatch } = useAppState();
 
   const isActive = (href: string) => {
     if (href === "#") return false;

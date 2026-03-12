@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-export type AuthError = "UNAUTHORIZED" | "FORBIDDEN_WRITE" | "FORBIDDEN_ADMIN";
+export type AuthError =
+  | "UNAUTHORIZED"
+  | "FORBIDDEN_WRITE"
+  | "FORBIDDEN_ADMIN"
+  | "FORBIDDEN_SUPER_ADMIN";
 
 /**
  * Handles authentication and authorization errors
@@ -30,11 +34,37 @@ export function handleAuthError(error: Error): NextResponse {
     );
   }
 
+  if (message === "FORBIDDEN_SUPER_ADMIN") {
+    return NextResponse.json(
+      { error: "Super admin access required." },
+      { status: 403 }
+    );
+  }
+
   // Generic error
   return NextResponse.json(
     { error: error.message || "An unexpected error occurred" },
     { status: 500 }
   );
+}
+
+/**
+ * Check if an error is an auth error and handle it.
+ * Returns a NextResponse if it's an auth error, or null otherwise.
+ */
+export function maybeHandleAuthError(error: unknown): NextResponse | null {
+  if (error instanceof Error) {
+    const authErrors: string[] = [
+      "UNAUTHORIZED",
+      "FORBIDDEN_WRITE",
+      "FORBIDDEN_ADMIN",
+      "FORBIDDEN_SUPER_ADMIN",
+    ];
+    if (authErrors.includes(error.message)) {
+      return handleAuthError(error);
+    }
+  }
+  return null;
 }
 
 /**

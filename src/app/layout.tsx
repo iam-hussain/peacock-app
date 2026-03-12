@@ -6,8 +6,8 @@ import type { Metadata } from "next";
 
 import "../styles/globals.css";
 
+import AppStateProvider from "@/components/providers/app-state-provider";
 import QueryProvider from "@/components/providers/query-provider";
-import StoreProvider from "@/components/providers/store-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -38,12 +38,12 @@ export default function RootLayout({
       <body className="bg-paper">
         <Analytics />
         <QueryProvider>
-          <StoreProvider>
+          <AppStateProvider>
             <ThemeProvider>
               {children}
               <Toaster position="bottom-right" />
             </ThemeProvider>
-          </StoreProvider>
+          </AppStateProvider>
         </QueryProvider>
       </body>
     </html>

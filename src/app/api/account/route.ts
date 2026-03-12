@@ -199,28 +199,25 @@ export async function POST(request: Request) {
         // If avatar was removed or changed, delete the old file
         if (!newAvatar || oldAvatar !== newAvatar) {
           try {
-            // Extract filename from avatar URL
-            const oldFilename = oldAvatar
-              .replace("/image/", "")
-              .replace(/^\//, "");
-            if (
-              oldFilename &&
-              oldFilename !==
-                newAvatar.replace("/image/", "").replace(/^\//, "")
-            ) {
+            const oldFilename = path.basename(oldAvatar);
+            const newFilename = newAvatar ? path.basename(newAvatar) : "";
+            if (oldFilename && oldFilename !== newFilename) {
               const publicPath = path.join(process.cwd(), "public", "image");
-              const oldFilePath = path.join(publicPath, oldFilename);
-              try {
-                await unlink(oldFilePath);
-              } catch (unlinkError: any) {
-                // File might not exist, ignore ENOENT error
-                if (unlinkError.code !== "ENOENT") {
-                  console.warn("Failed to delete old avatar:", unlinkError);
+              const oldFilePath = path.resolve(publicPath, oldFilename);
+              // Prevent path traversal — ensure resolved path is within publicPath
+              if (!oldFilePath.startsWith(publicPath + path.sep)) {
+                console.warn("Path traversal attempt blocked:", oldAvatar);
+              } else {
+                try {
+                  await unlink(oldFilePath);
+                } catch (unlinkError: any) {
+                  if (unlinkError.code !== "ENOENT") {
+                    console.warn("Failed to delete old avatar:", unlinkError);
+                  }
                 }
               }
             }
           } catch (deleteError) {
-            // Log but don't fail the request if old avatar deletion fails
             console.warn("Error deleting old avatar:", deleteError);
           }
         }
@@ -278,11 +275,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ account: commonData }, { status: 200 });
   } catch (error: any) {
     console.error("Error creating/updating member:", error);
+    if (error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     if (
-      error.message === "Unauthorized" ||
-      error.message.includes("Forbidden")
+      error.message === "FORBIDDEN_ADMIN" ||
+      error.message === "FORBIDDEN_WRITE"
     ) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
     return NextResponse.json(
       { error: "Failed to process request" },

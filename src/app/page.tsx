@@ -21,9 +21,12 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
+import {
+  setIsLoggedIn,
+  useAppState,
+} from "@/components/providers/app-state-provider";
 import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,11 +40,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import fetcher from "@/lib/core/fetcher";
 import { fetchAuthStatus } from "@/lib/query-options";
 import { cn } from "@/lib/ui/utils";
-import { setIsLoggedIn } from "@/store/pageSlice";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
-  const dispatch = useDispatch();
+  const { dispatch } = useAppState();
   const queryClient = useQueryClient();
   const { data: authData, isLoading: isAuthLoading } =
     useQuery(fetchAuthStatus());

@@ -64,7 +64,7 @@ const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
   });
 };
 
-type PassbookToUpdate = Map<
+type LedgerUpdateMap = Map<
   string,
   Parameters<typeof prisma.passbook.update>[0]
 >;
@@ -76,7 +76,7 @@ type TransactionPassbooks = {
 };
 
 export const updatePassbookByTransaction = (
-  passbookToUpdate: PassbookToUpdate,
+  passbookToUpdate: LedgerUpdateMap,
   transaction: Transaction,
   isRevert: boolean = false
 ) => {
@@ -212,13 +212,7 @@ export async function transactionEntryHandler(
     // No need to store or recalculate loanHistory in passbook
     await bulkPassbookUpdate(passbookToUpdate);
 
-    // Log successful processing for LOAN_INTEREST transactions
-    if (created.type === "LOAN_INTEREST") {
-      console.log(
-        `✅ Processed LOAN_INTEREST: ₹${created.amount.toLocaleString("en-IN")} ` +
-          `(ID: ${created.id}, fromId: ${created.fromId}, toId: ${created.toId})`
-      );
-    }
+    // LOAN_INTEREST processed successfully
   } catch (error) {
     console.error(
       `❌ Failed to process transaction ${created.id} (type: ${created.type}):`,

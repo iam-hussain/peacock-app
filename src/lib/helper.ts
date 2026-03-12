@@ -57,13 +57,13 @@ export const chitCalculator = (
   };
 };
 
-type PassbookToUpdate = Map<
+type LedgerUpdateMap = Map<
   string,
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
 export const bulkPassbookUpdate = async (
-  items: PassbookToUpdate,
+  items: LedgerUpdateMap,
   maxRetries = 3,
   batchSize = 5
 ) => {
@@ -176,8 +176,8 @@ export function initializePassbookToUpdate(
     payload: JsonValue;
   }[],
   isClean: boolean = true
-): PassbookToUpdate {
-  let passbookToUpdate: PassbookToUpdate = new Map();
+): LedgerUpdateMap {
+  let passbookToUpdate: LedgerUpdateMap = new Map();
 
   for (let passbook of passbooks) {
     if (passbook.account?.id && passbook.kind !== "CLUB") {
@@ -233,7 +233,9 @@ export function fetchAllLoanPassbook() {
   });
 }
 
-export const ONE_MONTH_RATE = 0.01;
+import { DEFAULT_INTEREST_RATE } from "@/lib/config/constants";
+
+export const ONE_MONTH_RATE = DEFAULT_INTEREST_RATE;
 
 export function calculateInterestByAmount(
   amount: number,

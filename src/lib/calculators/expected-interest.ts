@@ -6,24 +6,14 @@ import { calculateLoanDetails } from "@/lib/calculators/loan-calculator";
 import { clubConfig } from "@/lib/config/config";
 import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { PassbookToUpdate } from "@/lib/validators/type";
-
-/**
- * Loan history entry structure from passbook
- */
-type LoanHistoryEntry = {
-  amount: number;
-  startDate: Date | string | number;
-  endDate?: Date | string | number;
-  active?: boolean;
-};
+import { LedgerUpdateMap, LoanHistoryEntry } from "@/lib/validators/type";
 
 /**
  * Calculates expected total loan interest amount from member passbooks
  * This sums up the interest for all active and completed loans across all members
  */
 export function calculateExpectedTotalLoanInterestAmount(
-  allPassbooks: PassbookToUpdate
+  allPassbooks: LedgerUpdateMap
 ): number {
   try {
     // Get all member passbooks

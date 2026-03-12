@@ -11,9 +11,9 @@ import { IconType } from "react-icons/lib";
 import { PiSignOutBold } from "react-icons/pi";
 import { RiFolderTransferFill } from "react-icons/ri";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
+import { setIsLoggedIn, useAppState } from "../providers/app-state-provider";
 import ActionMenu from "../molecules/action-menu";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
@@ -24,8 +24,6 @@ import Typography from "../ui/typography";
 
 import { clubAge } from "@/lib/core/date";
 import fetcher from "@/lib/core/fetcher";
-import { RootState } from "@/store";
-import { setIsLoggedIn } from "@/store/pageSlice";
 
 type Menu = { Icon: IconType; label: string; active?: boolean; link?: string };
 
@@ -46,15 +44,15 @@ function MenuItems({
   hasCloseButton = false,
   collapsed = false,
 }: {
-  onItemClick?: () => {};
+  onItemClick?: () => void;
   hasCloseButton?: boolean;
   collapsed?: boolean;
 }) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
   const queryClient = useQueryClient();
 
-  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
+  const { isLoggedIn } = state;
 
   const handleOnItemClick = () => {
     if (onItemClick) {
