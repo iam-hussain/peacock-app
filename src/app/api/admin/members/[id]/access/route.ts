@@ -193,8 +193,14 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     if (error.message === "FORBIDDEN_ADMIN") {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 }
+      );
     }
-    return NextResponse.json({ error: "Failed to update access" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update access" },
+      { status: 500 }
+    );
   }
 }

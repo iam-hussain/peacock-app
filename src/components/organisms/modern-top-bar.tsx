@@ -7,14 +7,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { GlobalSearch } from "../molecules/global-search";
+import SoundToggle from "../molecules/sound-toggle";
+import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
 import {
   openSideBar,
   setIsLoggedIn,
   useAppState,
 } from "../providers/app-state-provider";
-import { GlobalSearch } from "../molecules/global-search";
-import SoundToggle from "../molecules/sound-toggle";
-import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import {
@@ -25,8 +25,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-import fetcher from "@/lib/core/fetcher";
 import { useAuth } from "@/hooks/use-auth";
+import fetcher from "@/lib/core/fetcher";
 import { cn } from "@/lib/ui/utils";
 
 const getPageTitle = (pathname: string): string => {
@@ -140,7 +140,9 @@ export function ModernTopBar() {
 
           {/* Page Title & Breadcrumb */}
           <div className="hidden md:flex items-center gap-2 min-w-0">
-            <span className="text-sm text-muted-foreground font-brand tracking-wide">Peacock Club</span>
+            <span className="text-sm text-muted-foreground font-brand tracking-wide">
+              Peacock Club
+            </span>
             <span className="text-primary/40">/</span>
             <h1 className="text-sm font-semibold text-foreground truncate">
               {pageTitle}
@@ -149,7 +151,9 @@ export function ModernTopBar() {
 
           {/* Mobile App Name */}
           <div className="md:hidden">
-            <h1 className="text-sm font-brand font-bold text-foreground tracking-wide">Peacock Club</h1>
+            <h1 className="text-sm font-brand font-bold text-foreground tracking-wide">
+              Peacock Club
+            </h1>
           </div>
         </div>
 
@@ -192,7 +196,10 @@ export function ModernTopBar() {
                 <ChevronDown className="h-4 w-4 hidden sm:block text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 glass-surface bg-background/95">
+            <DropdownMenuContent
+              align="end"
+              className="w-48 glass-surface bg-background/95"
+            >
               {!isGuest && (
                 <>
                   <DropdownMenuItem

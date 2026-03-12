@@ -28,7 +28,6 @@ import {
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
 
 import { useAuth } from "@/hooks/use-auth";
 import { clubAge } from "@/lib/core/date";
@@ -80,7 +79,9 @@ export function ModernSidebarMobile() {
         };
       }>,
     enabled:
-      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member") && !isGuest,
+      isLoggedIn &&
+      (user?.kind === "member" || user?.kind === "admin-member") &&
+      !isGuest,
   });
 
   // Get display name

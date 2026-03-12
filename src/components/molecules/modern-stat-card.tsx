@@ -38,7 +38,8 @@ export function ModernStatCard({
     <Card
       className={cn(
         "h-full flex flex-col rounded-lg border border-border/30 bg-card/80 backdrop-blur-sm shadow-none transition-all duration-500 hover:border-primary/10 hover:bg-card",
-        isHighlighted && "border-l-[3px] border-l-primary border-primary/20 shimmer-surface",
+        isHighlighted &&
+          "border-l-[3px] border-l-primary border-primary/20 shimmer-surface",
         className
       )}
     >

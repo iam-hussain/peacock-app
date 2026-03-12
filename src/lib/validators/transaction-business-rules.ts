@@ -1,5 +1,8 @@
 import prisma from "@/db";
-import { ClubFinancialSnapshot, MemberFinancialSnapshot } from "@/lib/validators/type";
+import {
+  ClubFinancialSnapshot,
+  MemberFinancialSnapshot,
+} from "@/lib/validators/type";
 
 type ValidationInput = {
   transactionType: string;

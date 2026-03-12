@@ -1,7 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+
 import { openSideBar, useAppState } from "../providers/app-state-provider";
+
 import MenuItems from "./menu-items";
 
 import { animateDecorator } from "@/lib/ui/animate";

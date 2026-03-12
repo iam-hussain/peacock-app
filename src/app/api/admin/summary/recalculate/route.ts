@@ -18,7 +18,11 @@ import { recalculateSummary } from "@/logic/reset-handler";
  */
 export async function POST(request: NextRequest) {
   // Rate limit heavy operations
-  const rateLimited = rateLimitResponse(request, "summary-recalculate", RATE_LIMITS.heavy);
+  const rateLimited = rateLimitResponse(
+    request,
+    "summary-recalculate",
+    RATE_LIMITS.heavy
+  );
   if (rateLimited) return rateLimited;
 
   try {

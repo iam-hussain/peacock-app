@@ -1,9 +1,7 @@
 import prisma from "@/db";
-import {
-  calculateLoanDetails,
-} from "@/lib/calculators/loan-calculator";
-import { clubConfig } from "@/lib/config/config";
+import { calculateLoanDetails } from "@/lib/calculators/loan-calculator";
 import { getMemberTotalDeposit } from "@/lib/config/club";
+import { clubConfig } from "@/lib/config/config";
 import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
 import {
@@ -74,8 +72,7 @@ export async function getMemberClubStats() {
   // Group loan transactions by member ID in memory (instead of N+1 queries)
   const txByMember = new Map<string, typeof allLoanTransactions>();
   for (const tx of allLoanTransactions) {
-    const memberId =
-      tx.type === "LOAN_TAKEN" ? tx.toId : tx.fromId;
+    const memberId = tx.type === "LOAN_TAKEN" ? tx.toId : tx.fromId;
     if (!txByMember.has(memberId)) {
       txByMember.set(memberId, []);
     }

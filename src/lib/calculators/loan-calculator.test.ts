@@ -4,9 +4,7 @@ import { describe, expect, it } from "vitest";
 import { calculateLoanDetails } from "@/lib/calculators/loan-calculator";
 
 // Helper to create a mock transaction
-function mockTransaction(
-  overrides: Partial<Transaction>
-): Transaction {
+function mockTransaction(overrides: Partial<Transaction>): Transaction {
   return {
     id: "test-" + Math.random().toString(36).slice(2),
     fromId: "club",
@@ -45,7 +43,8 @@ describe("calculateLoanDetails", () => {
       }),
     ];
 
-    const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
+    const { loanHistory, totalLoanBalance } =
+      calculateLoanDetails(transactions);
     expect(totalLoanBalance).toBe(50000);
     expect(loanHistory).toHaveLength(1);
     expect(loanHistory[0]!.active).toBe(true);
@@ -68,7 +67,8 @@ describe("calculateLoanDetails", () => {
       }),
     ];
 
-    const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
+    const { loanHistory, totalLoanBalance } =
+      calculateLoanDetails(transactions);
     expect(totalLoanBalance).toBe(0);
     expect(loanHistory).toHaveLength(1);
     expect(loanHistory[0]!.active).toBe(false);
@@ -90,7 +90,8 @@ describe("calculateLoanDetails", () => {
       }),
     ];
 
-    const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
+    const { loanHistory, totalLoanBalance } =
+      calculateLoanDetails(transactions);
     expect(totalLoanBalance).toBe(40000);
     // First segment closed (100000), second active (40000)
     expect(loanHistory).toHaveLength(2);
@@ -116,7 +117,8 @@ describe("calculateLoanDetails", () => {
       }),
     ];
 
-    const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
+    const { loanHistory, totalLoanBalance } =
+      calculateLoanDetails(transactions);
     expect(totalLoanBalance).toBe(80000);
     expect(loanHistory).toHaveLength(2);
     expect(loanHistory[0]!.amount).toBe(50000);

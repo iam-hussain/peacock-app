@@ -136,7 +136,10 @@ export async function PATCH(request: Request) {
 
     if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
       return NextResponse.json(
-        { error: "Password must contain at least one uppercase letter and one number" },
+        {
+          error:
+            "Password must contain at least one uppercase letter and one number",
+        },
         { status: 400 }
       );
     }

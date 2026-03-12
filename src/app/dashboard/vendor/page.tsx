@@ -271,209 +271,212 @@ export default function VendorsPage() {
 
   return (
     <PageTransition>
-    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-20 lg:pb-6">
-      {/* Desktop Header */}
-      <div className="hidden lg:block">
-        <PageHeader
-          title="Vendors Overview"
-          subtitle="View vendor investments, cycles, returns, and performance."
-          secondaryActions={[
-            {
-              label: "Export CSV",
-              icon: <Download className="h-4 w-4" />,
-              onClick: handleExportCsv,
-            },
-            {
-              label: "Screenshot",
-              icon: <Camera className="h-4 w-4" />,
-              onClick: handleScreenshot,
-            },
-          ]}
-        />
-      </div>
-
-      {/* Mobile Header */}
-      <div className="lg:hidden">
-        <PageHeader
-          title="Vendors Overview"
-          subtitle="View vendor investments, cycles, returns, and performance."
-          secondaryActions={[
-            {
-              label: "Export CSV",
-              icon: <Download className="h-4 w-4" />,
-              onClick: handleExportCsv,
-            },
-            {
-              label: "Screenshot",
-              icon: <Camera className="h-4 w-4" />,
-              onClick: handleScreenshot,
-            },
-          ]}
-        />
-      </div>
-
-      {/* Desktop Filter Bar */}
-      <div className="hidden lg:block">
-        <FilterBar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search vendors..."
-          filters={{
-            status: {
-              value: statusFilter,
-              onChange: setStatusFilter,
-              options: [
-                { label: "All Status", value: "all" },
-                { label: "Active", value: "active" },
-                { label: "Closed", value: "closed" },
-              ],
-            },
-          }}
-          onReset={handleResetFilters}
-        />
-      </div>
-
-      {/* Desktop Table View - Also used for mobile screenshots */}
-      <div ref={tableRef} className="hidden lg:block">
-        <DataTable
-          columns={columns}
-          data={filteredVendors}
-          frozenColumnKey="vendor"
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Screenshot Area - Hidden, only for export */}
-      <ScreenshotArea
-        title="Vendors"
-        capturedAt={capturedAt}
-        identifier={identifier}
-      >
-        <div style={{ width: "100%", minWidth: 1200 }}>
-          <DesktopTableOnly
-            columns={columns.filter((col) => col.id !== "actions")}
-            data={filteredVendors}
-            frozenColumnKey="vendor"
+      <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-20 lg:pb-6">
+        {/* Desktop Header */}
+        <div className="hidden lg:block">
+          <PageHeader
+            title="Vendors Overview"
+            subtitle="View vendor investments, cycles, returns, and performance."
+            secondaryActions={[
+              {
+                label: "Export CSV",
+                icon: <Download className="h-4 w-4" />,
+                onClick: handleExportCsv,
+              },
+              {
+                label: "Screenshot",
+                icon: <Camera className="h-4 w-4" />,
+                onClick: handleScreenshot,
+              },
+            ]}
           />
         </div>
-      </ScreenshotArea>
 
-      {/* Mobile Card View */}
-      <div className="lg:hidden space-y-4">
-        {/* Search Bar */}
-        <SearchBarMobile
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search vendors..."
-        />
+        {/* Mobile Header */}
+        <div className="lg:hidden">
+          <PageHeader
+            title="Vendors Overview"
+            subtitle="View vendor investments, cycles, returns, and performance."
+            secondaryActions={[
+              {
+                label: "Export CSV",
+                icon: <Download className="h-4 w-4" />,
+                onClick: handleExportCsv,
+              },
+              {
+                label: "Screenshot",
+                icon: <Camera className="h-4 w-4" />,
+                onClick: handleScreenshot,
+              },
+            ]}
+          />
+        </div>
 
-        {/* Filter Chips */}
-        <FilterChips
-          chips={[
-            { label: "All", value: "all" },
-            { label: "Active", value: "active" },
-            { label: "Closed", value: "closed" },
-          ]}
-          selectedValue={statusFilter}
-          onChange={setStatusFilter}
-        />
+        {/* Desktop Filter Bar */}
+        <div className="hidden lg:block">
+          <FilterBar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search vendors..."
+            filters={{
+              status: {
+                value: statusFilter,
+                onChange: setStatusFilter,
+                options: [
+                  { label: "All Status", value: "all" },
+                  { label: "Active", value: "active" },
+                  { label: "Closed", value: "closed" },
+                ],
+              },
+            }}
+            onReset={handleResetFilters}
+          />
+        </div>
 
-        {/* Vendor List */}
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-32 animate-pulse rounded-xl bg-muted" />
-            ))}
+        {/* Desktop Table View - Also used for mobile screenshots */}
+        <div ref={tableRef} className="hidden lg:block">
+          <DataTable
+            columns={columns}
+            data={filteredVendors}
+            frozenColumnKey="vendor"
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Screenshot Area - Hidden, only for export */}
+        <ScreenshotArea
+          title="Vendors"
+          capturedAt={capturedAt}
+          identifier={identifier}
+        >
+          <div style={{ width: "100%", minWidth: 1200 }}>
+            <DesktopTableOnly
+              columns={columns.filter((col) => col.id !== "actions")}
+              data={filteredVendors}
+              frozenColumnKey="vendor"
+            />
           </div>
-        ) : filteredVendors.length > 0 ? (
-          <div className="space-y-4">
-            {filteredVendors.map((vendor) => (
-              <div
-                key={vendor.id}
-                className="rounded-xl border border-border/50 bg-card p-4 shadow-sm"
-              >
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-12 w-12 rounded-lg shrink-0">
-                    <AvatarImage src={vendor.avatar} alt={vendor.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
-                      {vendor.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col gap-1">
-                      <Badge
-                        variant="secondary"
-                        className="w-fit bg-primary/10 text-primary text-xs font-medium"
+        </ScreenshotArea>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {/* Search Bar */}
+          <SearchBarMobile
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search vendors..."
+          />
+
+          {/* Filter Chips */}
+          <FilterChips
+            chips={[
+              { label: "All", value: "all" },
+              { label: "Active", value: "active" },
+              { label: "Closed", value: "closed" },
+            ]}
+            selectedValue={statusFilter}
+            onChange={setStatusFilter}
+          />
+
+          {/* Vendor List */}
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-32 animate-pulse rounded-xl bg-muted"
+                />
+              ))}
+            </div>
+          ) : filteredVendors.length > 0 ? (
+            <div className="space-y-4">
+              {filteredVendors.map((vendor) => (
+                <div
+                  key={vendor.id}
+                  className="rounded-xl border border-border/50 bg-card p-4 shadow-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12 rounded-lg shrink-0">
+                      <AvatarImage src={vendor.avatar} alt={vendor.name} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold rounded-lg">
+                        {vendor.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col gap-1">
+                        <Badge
+                          variant="secondary"
+                          className="w-fit bg-primary/10 text-primary text-xs font-medium"
+                        >
+                          {vendor.id}
+                        </Badge>
+                        <p className="text-base font-semibold text-foreground">
+                          {vendor.name}
+                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <div
+                            className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                              vendor.active ? "bg-green-500" : "bg-gray-400"
+                            }`}
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            {vendor.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-border">
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Investment
+                      </div>
+                      <div className="text-sm font-medium text-foreground">
+                        {moneyFormat(vendor.totalInvestment || 0)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Returns
+                      </div>
+                      <div className="text-sm font-medium text-muted-foreground">
+                        {vendor.totalReturns === 0
+                          ? "-"
+                          : moneyFormat(vendor.totalReturns)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Profit
+                      </div>
+                      <div
+                        className={`text-sm font-medium ${
+                          vendor.totalProfitAmount > 0
+                            ? "text-green-600 dark:text-green-500"
+                            : "text-muted-foreground/50"
+                        }`}
                       >
-                        {vendor.id}
-                      </Badge>
-                      <p className="text-base font-semibold text-foreground">
-                        {vendor.name}
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <div
-                          className={`h-1.5 w-1.5 rounded-full shrink-0 ${
-                            vendor.active ? "bg-green-500" : "bg-gray-400"
-                          }`}
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {vendor.status}
-                        </span>
+                        {vendor.totalProfitAmount === 0
+                          ? "-"
+                          : moneyFormat(vendor.totalProfitAmount)}
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-3 gap-4 pt-4 border-t border-border">
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">
-                      Investment
-                    </div>
-                    <div className="text-sm font-medium text-foreground">
-                      {moneyFormat(vendor.totalInvestment || 0)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">
-                      Returns
-                    </div>
-                    <div className="text-sm font-medium text-muted-foreground">
-                      {vendor.totalReturns === 0
-                        ? "-"
-                        : moneyFormat(vendor.totalReturns)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">
-                      Profit
-                    </div>
-                    <div
-                      className={`text-sm font-medium ${
-                        vendor.totalProfitAmount > 0
-                          ? "text-green-600 dark:text-green-500"
-                          : "text-muted-foreground/50"
-                      }`}
-                    >
-                      {vendor.totalProfitAmount === 0
-                        ? "-"
-                        : moneyFormat(vendor.totalProfitAmount)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border/50 bg-card p-8 text-center text-muted-foreground">
-            No vendors found
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border/50 bg-card p-8 text-center text-muted-foreground">
+              No vendors found
+            </div>
+          )}
+        </div>
       </div>
-    </div>
     </PageTransition>
   );
 }

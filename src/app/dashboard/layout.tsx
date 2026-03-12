@@ -69,7 +69,9 @@ export default function DashboardLayout({
           )}
           id="dashboard-content"
         >
-          <div className="w-full flex h-full p-2 sm:p-4 md:p-6 pb-20 lg:pb-6">{children}</div>
+          <div className="w-full flex h-full p-2 sm:p-4 md:p-6 pb-20 lg:pb-6">
+            {children}
+          </div>
         </div>
       </main>
       <ModernSidebarMobile />

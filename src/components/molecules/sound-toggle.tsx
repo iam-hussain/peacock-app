@@ -4,11 +4,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  isSoundEnabled,
-  playConfirmSound,
-  toggleSound,
-} from "@/lib/ui/sounds";
+import { isSoundEnabled, playConfirmSound, toggleSound } from "@/lib/ui/sounds";
 
 export default function SoundToggle() {
   const [enabled, setEnabled] = useState(false);

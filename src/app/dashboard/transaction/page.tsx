@@ -960,375 +960,385 @@ export default function TransactionsPage() {
 
   return (
     <PageTransition>
-    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-20 lg:pb-6">
-      <div className="hidden lg:block">
-        <PageHeader
-          title="Transaction History"
-          subtitle={
-            canWrite
-              ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
-              : "Read-only access. Contact admin to request write access."
-          }
-          primaryAction={
-            canWrite
-              ? {
-                  label: "Add Transaction",
-                  icon: <Receipt className="h-4 w-4" />,
-                  onClick: handleAddTransaction,
+      <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-20 lg:pb-6">
+        <div className="hidden lg:block">
+          <PageHeader
+            title="Transaction History"
+            subtitle={
+              canWrite
+                ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
+                : "Read-only access. Contact admin to request write access."
+            }
+            primaryAction={
+              canWrite
+                ? {
+                    label: "Add Transaction",
+                    icon: <Receipt className="h-4 w-4" />,
+                    onClick: handleAddTransaction,
+                  }
+                : undefined
+            }
+            secondaryActions={[
+              {
+                label: "Export CSV",
+                icon: <Download className="h-4 w-4" />,
+                onClick: handleExportCsv,
+              },
+              {
+                label: "Screenshot",
+                icon: <Camera className="h-4 w-4" />,
+                onClick: handleScreenshot,
+              },
+            ]}
+          />
+        </div>
+
+        <div className="lg:hidden flex items-center justify-between rounded-xl border border-border bg-card/80 px-3 py-3">
+          <div className="space-y-0.5">
+            <p className="text-sm font-semibold">Transactions</p>
+            <p className="text-xs text-muted-foreground">Recent activity</p>
+          </div>
+          {canWrite && (
+            <Button
+              size="sm"
+              className="gap-2 rounded-full px-3"
+              onClick={handleAddTransaction}
+            >
+              <Receipt className="h-4 w-4" />
+              <span>Add</span>
+            </Button>
+          )}
+        </div>
+
+        <div className="hidden lg:block">
+          <FilterBar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search transactions..."
+            filters={{
+              account: {
+                value: accountFilter,
+                onChange: setAccountFilter,
+                options: accountOptions,
+              },
+              type: {
+                value: typeFilter,
+                onChange: setTypeFilter,
+                options: allTransactionTypeOptions,
+              },
+            }}
+            dateRange={{
+              startDate,
+              endDate,
+              onStartDateChange: (date) => {
+                setStartDate(date);
+                if (date && endDate && date > endDate) {
+                  setEndDate(undefined);
                 }
-              : undefined
-          }
-          secondaryActions={[
-            {
-              label: "Export CSV",
-              icon: <Download className="h-4 w-4" />,
-              onClick: handleExportCsv,
-            },
-            {
-              label: "Screenshot",
-              icon: <Camera className="h-4 w-4" />,
-              onClick: handleScreenshot,
-            },
-          ]}
-        />
-      </div>
-
-      <div className="lg:hidden flex items-center justify-between rounded-xl border border-border bg-card/80 px-3 py-3">
-        <div className="space-y-0.5">
-          <p className="text-sm font-semibold">Transactions</p>
-          <p className="text-xs text-muted-foreground">Recent activity</p>
+              },
+              onEndDateChange: (date) => {
+                setEndDate(date);
+                if (date && startDate && date < startDate) {
+                  setStartDate(undefined);
+                }
+              },
+            }}
+            pageSize={{
+              value: pageSize,
+              onChange: setPageSize,
+              options: [0, 25, 50, 75, 100],
+            }}
+            onReset={handleResetFilters}
+          />
         </div>
-        {canWrite && (
+
+        <div className="lg:hidden flex items-center gap-2">
+          <div className="flex-1">
+            <SearchBarMobile
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search transactions"
+            />
+          </div>
           <Button
-            size="sm"
-            className="gap-2 rounded-full px-3"
-            onClick={handleAddTransaction}
+            variant="outline"
+            size="icon"
+            onClick={() => setFilterDrawerOpen(true)}
+            className="shrink-0 rounded-full"
           >
-            <Receipt className="h-4 w-4" />
-            <span>Add</span>
+            <SlidersHorizontal className="h-4 w-4" />
+            <span className="sr-only">Filters</span>
           </Button>
-        )}
-      </div>
-
-      <div className="hidden lg:block">
-        <FilterBar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search transactions..."
-          filters={{
-            account: {
-              value: accountFilter,
-              onChange: setAccountFilter,
-              options: accountOptions,
-            },
-            type: {
-              value: typeFilter,
-              onChange: setTypeFilter,
-              options: allTransactionTypeOptions,
-            },
-          }}
-          dateRange={{
-            startDate,
-            endDate,
-            onStartDateChange: (date) => {
-              setStartDate(date);
-              if (date && endDate && date > endDate) {
-                setEndDate(undefined);
-              }
-            },
-            onEndDateChange: (date) => {
-              setEndDate(date);
-              if (date && startDate && date < startDate) {
-                setStartDate(undefined);
-              }
-            },
-          }}
-          pageSize={{
-            value: pageSize,
-            onChange: setPageSize,
-            options: [0, 25, 50, 75, 100],
-          }}
-          onReset={handleResetFilters}
-        />
-      </div>
-
-      <div className="lg:hidden flex items-center gap-2">
-        <div className="flex-1">
-          <SearchBarMobile
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search transactions"
-          />
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setFilterDrawerOpen(true)}
-          className="shrink-0 rounded-full"
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-          <span className="sr-only">Filters</span>
-        </Button>
-      </div>
 
-      {isError && (
-        <Card className="border-destructive bg-destructive/10">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-destructive">
-                We couldn&apos;t load transactions. Try again.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.location.reload()}
-              >
-                Retry
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Desktop Table View - Also used for mobile screenshots */}
-      <div ref={tableRef} className="hidden lg:block">
-        <DataTable
-          columns={columns}
-          data={transactions}
-          frozenColumnKey="from"
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Screenshot Area - Hidden, only for export */}
-      <ScreenshotArea
-        title="Transactions"
-        capturedAt={capturedAt}
-        identifier={identifier}
-      >
-        <div style={{ width: "100%", minWidth: 1400 }}>
-          <DesktopTableOnly
-            columns={columns.filter((col) => col.id !== "actions")}
-            data={transactions}
-            frozenColumnKey="from"
-          />
-        </div>
-      </ScreenshotArea>
-
-      <div className="lg:hidden space-y-3 pb-16">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-32 animate-pulse rounded-xl bg-muted" />
-            ))}
-          </div>
-        ) : transactions.length > 0 ? (
-          <div className="space-y-4">
-            {transactions.map((transaction) => (
-              <TransactionCardMobile
-                key={transaction.id}
-                transaction={transaction}
-                onEdit={() => handleEditTransaction(transaction)}
-                onDelete={() => handleDeleteTransaction(transaction)}
-                onView={() => handleViewTransaction(transaction)}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card className="border-border/50 bg-card">
-            <CardContent className="p-8 text-center">
-              <p className="mb-4 text-sm font-medium text-muted-foreground">
-                No transactions match these filters yet.
-              </p>
-              <Button variant="outline" size="sm" onClick={handleResetFilters}>
-                Clear filters
-              </Button>
+        {isError && (
+          <Card className="border-destructive bg-destructive/10">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-destructive">
+                  We couldn&apos;t load transactions. Try again.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                >
+                  Retry
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
-      </div>
 
-      {totalPages > 0 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          totalItems={totalTransactions}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          isLoading={isLoading}
-          showPageSize={true}
-          scrollToTop={true}
-        />
-      )}
+        {/* Desktop Table View - Also used for mobile screenshots */}
+        <div ref={tableRef} className="hidden lg:block">
+          <DataTable
+            columns={columns}
+            data={transactions}
+            frozenColumnKey="from"
+            isLoading={isLoading}
+          />
+        </div>
 
-      {/* Mobile details modal */}
-      <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-        <DialogContent className="max-w-md w-[90vw] rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">
-              Transaction details
-            </DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Quick view of this entry.
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedTransaction && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Amount</p>
-                <p className="text-xl font-semibold tabular-nums">
-                  {moneyFormat(selectedTransaction.amount)}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">From</p>
-                  <p className="font-medium text-foreground">
-                    {selectedTransaction.from?.name || "—"}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">To</p>
-                  <p className="font-medium text-foreground">
-                    {selectedTransaction.to?.name || "—"}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Type</p>
-                  <p className="font-medium text-foreground">
-                    {transactionTypeMap[selectedTransaction.transactionType] ||
-                      selectedTransaction.transactionType}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground">Date</p>
-                  <p className="font-medium text-foreground">
-                    {dateFormat(newZoneDate(selectedTransaction.occurredAt))}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-1 text-sm">
-                <p className="text-xs text-muted-foreground">Note</p>
-                <p className="text-foreground">
-                  {selectedTransaction.description ||
-                    (selectedTransaction as any).note ||
-                    "—"}
-                </p>
-              </div>
-
-              {selectedTransaction.referenceId && (
-                <div className="space-y-1 text-sm">
-                  <p className="text-xs text-muted-foreground">Reference ID</p>
-                  <p className="font-medium text-foreground">
-                    {selectedTransaction.referenceId}
-                  </p>
-                </div>
-              )}
-
-              {canWrite && (
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    className="flex-1"
-                    onClick={() => {
-                      setDetailsDialogOpen(false);
-                      handleEditTransaction(selectedTransaction);
-                    }}
-                  >
-                    Edit transaction
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onClick={() => {
-                      setDetailsDialogOpen(false);
-                      handleDeleteTransaction(selectedTransaction);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <TransactionFilterDrawer
-        open={filterDrawerOpen}
-        onOpenChange={setFilterDrawerOpen}
-        accountFilter={accountFilter}
-        onAccountFilterChange={setAccountFilter}
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
-        startDate={startDate}
-        onStartDateChange={(date) => {
-          setStartDate(date);
-          if (date && endDate && date > endDate) {
-            setEndDate(undefined);
-          }
-        }}
-        endDate={endDate}
-        onEndDateChange={(date) => {
-          setEndDate(date);
-          if (date && startDate && date < startDate) {
-            setStartDate(undefined);
-          }
-        }}
-        pageSize={pageSize}
-        onPageSizeChange={setPageSize}
-        accountOptions={accountOptions}
-        typeOptions={allTransactionTypeOptions}
-        onApply={handleApplyFilters}
-        onReset={handleResetFilters}
-      />
-
-      {canWrite && <FloatingActionButton onClick={handleAddTransaction} />}
-
-      <TransactionFormDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        selected={selectedTransaction}
-        accounts={accounts}
-        onSuccess={() => {
-          window.location.reload();
-        }}
-      />
-
-      <Dialog
-        open={deleteDialogOpen}
-        onOpenChange={(open) => {
-          setDeleteDialogOpen(open);
-          if (!open) setSelectedTransactionForDelete(null);
-        }}
-      >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete Transaction</DialogTitle>
-          </DialogHeader>
-          {selectedTransactionForDelete && (
-            <TransactionDeleteForm
-              transaction={selectedTransactionForDelete}
-              onSuccess={async () => {
-                setDeleteDialogOpen(false);
-                setSelectedTransactionForDelete(null);
-                await queryClient.invalidateQueries({
-                  queryKey: ["all", "transaction"],
-                });
-              }}
-              onCancel={() => {
-                setDeleteDialogOpen(false);
-                setSelectedTransactionForDelete(null);
-              }}
+        {/* Screenshot Area - Hidden, only for export */}
+        <ScreenshotArea
+          title="Transactions"
+          capturedAt={capturedAt}
+          identifier={identifier}
+        >
+          <div style={{ width: "100%", minWidth: 1400 }}>
+            <DesktopTableOnly
+              columns={columns.filter((col) => col.id !== "actions")}
+              data={transactions}
+              frozenColumnKey="from"
             />
+          </div>
+        </ScreenshotArea>
+
+        <div className="lg:hidden space-y-3 pb-16">
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-32 animate-pulse rounded-xl bg-muted"
+                />
+              ))}
+            </div>
+          ) : transactions.length > 0 ? (
+            <div className="space-y-4">
+              {transactions.map((transaction) => (
+                <TransactionCardMobile
+                  key={transaction.id}
+                  transaction={transaction}
+                  onEdit={() => handleEditTransaction(transaction)}
+                  onDelete={() => handleDeleteTransaction(transaction)}
+                  onView={() => handleViewTransaction(transaction)}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="border-border/50 bg-card">
+              <CardContent className="p-8 text-center">
+                <p className="mb-4 text-sm font-medium text-muted-foreground">
+                  No transactions match these filters yet.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetFilters}
+                >
+                  Clear filters
+                </Button>
+              </CardContent>
+            </Card>
           )}
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        {totalPages > 0 && (
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalTransactions}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            isLoading={isLoading}
+            showPageSize={true}
+            scrollToTop={true}
+          />
+        )}
+
+        {/* Mobile details modal */}
+        <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+          <DialogContent className="max-w-md w-[90vw] rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold">
+                Transaction details
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Quick view of this entry.
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedTransaction && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">Amount</p>
+                  <p className="text-xl font-semibold tabular-nums">
+                    {moneyFormat(selectedTransaction.amount)}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">From</p>
+                    <p className="font-medium text-foreground">
+                      {selectedTransaction.from?.name || "—"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">To</p>
+                    <p className="font-medium text-foreground">
+                      {selectedTransaction.to?.name || "—"}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Type</p>
+                    <p className="font-medium text-foreground">
+                      {transactionTypeMap[
+                        selectedTransaction.transactionType
+                      ] || selectedTransaction.transactionType}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Date</p>
+                    <p className="font-medium text-foreground">
+                      {dateFormat(newZoneDate(selectedTransaction.occurredAt))}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-sm">
+                  <p className="text-xs text-muted-foreground">Note</p>
+                  <p className="text-foreground">
+                    {selectedTransaction.description ||
+                      (selectedTransaction as any).note ||
+                      "—"}
+                  </p>
+                </div>
+
+                {selectedTransaction.referenceId && (
+                  <div className="space-y-1 text-sm">
+                    <p className="text-xs text-muted-foreground">
+                      Reference ID
+                    </p>
+                    <p className="font-medium text-foreground">
+                      {selectedTransaction.referenceId}
+                    </p>
+                  </div>
+                )}
+
+                {canWrite && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      className="flex-1"
+                      onClick={() => {
+                        setDetailsDialogOpen(false);
+                        handleEditTransaction(selectedTransaction);
+                      }}
+                    >
+                      Edit transaction
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="flex-1"
+                      onClick={() => {
+                        setDetailsDialogOpen(false);
+                        handleDeleteTransaction(selectedTransaction);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <TransactionFilterDrawer
+          open={filterDrawerOpen}
+          onOpenChange={setFilterDrawerOpen}
+          accountFilter={accountFilter}
+          onAccountFilterChange={setAccountFilter}
+          typeFilter={typeFilter}
+          onTypeFilterChange={setTypeFilter}
+          startDate={startDate}
+          onStartDateChange={(date) => {
+            setStartDate(date);
+            if (date && endDate && date > endDate) {
+              setEndDate(undefined);
+            }
+          }}
+          endDate={endDate}
+          onEndDateChange={(date) => {
+            setEndDate(date);
+            if (date && startDate && date < startDate) {
+              setStartDate(undefined);
+            }
+          }}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          accountOptions={accountOptions}
+          typeOptions={allTransactionTypeOptions}
+          onApply={handleApplyFilters}
+          onReset={handleResetFilters}
+        />
+
+        {canWrite && <FloatingActionButton onClick={handleAddTransaction} />}
+
+        <TransactionFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          selected={selectedTransaction}
+          accounts={accounts}
+          onSuccess={() => {
+            window.location.reload();
+          }}
+        />
+
+        <Dialog
+          open={deleteDialogOpen}
+          onOpenChange={(open) => {
+            setDeleteDialogOpen(open);
+            if (!open) setSelectedTransactionForDelete(null);
+          }}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Transaction</DialogTitle>
+            </DialogHeader>
+            {selectedTransactionForDelete && (
+              <TransactionDeleteForm
+                transaction={selectedTransactionForDelete}
+                onSuccess={async () => {
+                  setDeleteDialogOpen(false);
+                  setSelectedTransactionForDelete(null);
+                  await queryClient.invalidateQueries({
+                    queryKey: ["all", "transaction"],
+                  });
+                }}
+                onCancel={() => {
+                  setDeleteDialogOpen(false);
+                  setSelectedTransactionForDelete(null);
+                }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </PageTransition>
   );
 }

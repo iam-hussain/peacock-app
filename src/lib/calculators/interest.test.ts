@@ -51,7 +51,11 @@ describe("calculateInterestByAmount", () => {
   });
 
   it("handles large amounts correctly", () => {
-    const result = calculateInterestByAmount(200000, "2024-01-01", "2024-06-01");
+    const result = calculateInterestByAmount(
+      200000,
+      "2024-01-01",
+      "2024-06-01"
+    );
     // 200000 * 0.01 * 5 months = 10000
     expect(result.interestAmount).toBe(10000);
   });

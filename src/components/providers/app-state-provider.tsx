@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useReducer,
-} from "react";
+import { createContext, useContext, useMemo, useReducer } from "react";
 
 // State shape (matches the old Redux pageSlice)
 export type AppState = {

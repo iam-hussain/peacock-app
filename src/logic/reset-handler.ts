@@ -330,8 +330,7 @@ export async function recalculateSingleMemberPassbook(
     interestCollectedTotal:
       (clubData.interestCollectedTotal || 0) -
       (memberData.interestPaidTotal || 0),
-    availableCashBalance:
-      (clubData.availableCashBalance || 0) - memberNetCash,
+    availableCashBalance: (clubData.availableCashBalance || 0) - memberNetCash,
     netClubValue:
       (clubData.netClubValue || 0) -
       ((memberData.periodicDepositsTotal || 0) +
@@ -340,8 +339,9 @@ export async function recalculateSingleMemberPassbook(
   };
 
   // 5. Reset the member's passbook to default (zero) values
-  const defaultMemberData =
-    getDefaultPassbookData("MEMBER") as MemberFinancialSnapshot;
+  const defaultMemberData = getDefaultPassbookData(
+    "MEMBER"
+  ) as MemberFinancialSnapshot;
 
   // 6. Initialize the passbook update map with zeroed member and adjusted club
   type LedgerUpdateMap = Map<

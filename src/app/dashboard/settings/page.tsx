@@ -22,10 +22,10 @@ import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
-import PageTransition from "@/components/molecules/page-transition";
 import { MemberAdjustmentsDialog } from "@/components/molecules/member-adjustments-dialog";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
 import { MemberPermissionCard } from "@/components/molecules/member-permission-card";
+import PageTransition from "@/components/molecules/page-transition";
 import { SmartAccessToggle } from "@/components/molecules/smart-access-toggle";
 import { VendorFormDialog } from "@/components/molecules/vendor-form-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -602,546 +602,546 @@ export default function SettingsPage() {
 
   return (
     <PageTransition>
-    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0 pb-20 lg:pb-6">
-      {/* Breadcrumb */}
-      <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
-        <Link
-          href="/dashboard"
-          className="hover:text-foreground transition-colors"
-        >
-          Dashboard
-        </Link>
-        <span>/</span>
-        <span className="text-foreground">Settings</span>
-      </div>
+      <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0 pb-20 lg:pb-6">
+        {/* Breadcrumb */}
+        <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
+          <Link
+            href="/dashboard"
+            className="hover:text-foreground transition-colors"
+          >
+            Dashboard
+          </Link>
+          <span>/</span>
+          <span className="text-foreground">Settings</span>
+        </div>
 
-      {/* Page Header */}
-      <PageHeader
-        title="Settings"
-        subtitle="Manage system maintenance, members, and user access"
-      />
+        {/* Page Header */}
+        <PageHeader
+          title="Settings"
+          subtitle="Manage system maintenance, members, and user access"
+        />
 
-      {/* System Tools Section */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader>
-          <CardTitle>System Maintenance</CardTitle>
-          <CardDescription>
-            Run safe maintenance actions on financial data
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Recalculate Passbook - Admin and Super Admin */}
-          {isAdmin && (
+        {/* System Tools Section */}
+        <Card className="border-border/50 shadow-sm">
+          <CardHeader>
+            <CardTitle>System Maintenance</CardTitle>
+            <CardDescription>
+              Run safe maintenance actions on financial data
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Recalculate Passbook - Admin and Super Admin */}
+            {isAdmin && (
+              <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <Calculator className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Recalculate Passbook
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Recompute all passbook data by processing all transactions
+                      in chronological order. This updates member, vendor, and
+                      club passbooks.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setRecalculatePassbookDialogOpen(true)}
+                  disabled={
+                    passbookRecalcMutation.isPending ||
+                    analyticsRecalcMutation.isPending ||
+                    backupMutation.isPending ||
+                    clearCacheMutation.isPending
+                  }
+                >
+                  {passbookRecalcMutation.isPending
+                    ? "Running..."
+                    : "Recalculate"}
+                </Button>
+              </div>
+            )}
+
+            {/* Recalculate Analytics - Admin and Super Admin */}
+            {isAdmin && (
+              <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="rounded-lg p-2.5 bg-green-500/10 text-green-600 dark:text-green-400">
+                    <Calculator className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Recalculate Analytics
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Recompute all monthly summary snapshots from transaction
+                      history. This ensures all analytics metrics are accurate
+                      and auditable.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setRecalculateAnalyticsDialogOpen(true)}
+                  disabled={
+                    analyticsRecalcMutation.isPending ||
+                    passbookRecalcMutation.isPending ||
+                    backupMutation.isPending ||
+                    clearCacheMutation.isPending
+                  }
+                >
+                  {analyticsRecalcMutation.isPending
+                    ? "Running..."
+                    : "Recalculate"}
+                </Button>
+              </div>
+            )}
+
+            {/* Backup Data */}
             <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
               <div className="flex items-start gap-4 flex-1">
-                <div className="rounded-lg p-2.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                  <Calculator className="h-5 w-5" />
+                <div className="rounded-lg p-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <Database className="h-5 w-5" />
                 </div>
                 <div className="flex-1 space-y-1">
                   <h3 className="text-sm font-semibold text-foreground">
-                    Recalculate Passbook
+                    Backup Data
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Recompute all passbook data by processing all transactions
-                    in chronological order. This updates member, vendor, and
-                    club passbooks.
+                    Create a full backup of club data before running large
+                    changes.
                   </p>
                 </div>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setRecalculatePassbookDialogOpen(true)}
-                disabled={
-                  passbookRecalcMutation.isPending ||
-                  analyticsRecalcMutation.isPending ||
-                  backupMutation.isPending ||
-                  clearCacheMutation.isPending
-                }
-              >
-                {passbookRecalcMutation.isPending
-                  ? "Running..."
-                  : "Recalculate"}
-              </Button>
-            </div>
-          )}
-
-          {/* Recalculate Analytics - Admin and Super Admin */}
-          {isAdmin && (
-            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-              <div className="flex items-start gap-4 flex-1">
-                <div className="rounded-lg p-2.5 bg-green-500/10 text-green-600 dark:text-green-400">
-                  <Calculator className="h-5 w-5" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    Recalculate Analytics
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Recompute all monthly summary snapshots from transaction
-                    history. This ensures all analytics metrics are accurate and
-                    auditable.
-                  </p>
-                </div>
+              <div className="flex items-center gap-2">
+                {backupDownloadLink && (
+                  <a
+                    href={backupDownloadLink}
+                    download={`peacock_backup_${fileDateTime()}.json`}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+                )}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => backupMutation.mutate()}
+                  disabled={
+                    analyticsRecalcMutation.isPending ||
+                    passbookRecalcMutation.isPending ||
+                    backupMutation.isPending ||
+                    clearCacheMutation.isPending
+                  }
+                >
+                  {backupMutation.isPending ? "Backing up..." : "Create Backup"}
+                </Button>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setRecalculateAnalyticsDialogOpen(true)}
-                disabled={
-                  analyticsRecalcMutation.isPending ||
-                  passbookRecalcMutation.isPending ||
-                  backupMutation.isPending ||
-                  clearCacheMutation.isPending
-                }
-              >
-                {analyticsRecalcMutation.isPending
-                  ? "Running..."
-                  : "Recalculate"}
-              </Button>
             </div>
-          )}
 
-          {/* Backup Data */}
-          <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-            <div className="flex items-start gap-4 flex-1">
-              <div className="rounded-lg p-2.5 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <Database className="h-5 w-5" />
+            {/* Clear Cache - Admin Only */}
+            {isAdmin && (
+              <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="rounded-lg p-2.5 bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                    <RefreshCw className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <h3 className="text-sm font-semibold text-foreground">
+                      Clear All Caches
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Clear all server and client-side caches to ensure fresh
+                      data. This includes React Query cache, sessionStorage, and
+                      server caches.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setClearCacheDialogOpen(true)}
+                  disabled={
+                    analyticsRecalcMutation.isPending ||
+                    passbookRecalcMutation.isPending ||
+                    backupMutation.isPending ||
+                    clearCacheMutation.isPending
+                  }
+                >
+                  {clearCacheMutation.isPending ? "Clearing..." : "Clear Cache"}
+                </Button>
               </div>
-              <div className="flex-1 space-y-1">
-                <h3 className="text-sm font-semibold text-foreground">
-                  Backup Data
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Create a full backup of club data before running large
-                  changes.
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Member Management Section */}
+        <Card className="border-border/50 shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Member & Access Management</CardTitle>
+                <CardDescription>
+                  Admin-only controls to manage members, access, and login.
+                </CardDescription>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Write access is restricted to creating and updating
+                  transactions only. It does not provide permissions to modify
+                  users, vendors, members, or system configurations.
                 </p>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {backupDownloadLink && (
-                <a
-                  href={backupDownloadLink}
-                  download={`peacock_backup_${fileDateTime()}.json`}
-                  className="text-sm text-primary hover:underline"
-                >
-                  <Download className="h-4 w-4" />
-                </a>
+              {canManageAccounts && (
+                <Button onClick={handleAddMember} size="sm" className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Add Member
+                </Button>
               )}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => backupMutation.mutate()}
-                disabled={
-                  analyticsRecalcMutation.isPending ||
-                  passbookRecalcMutation.isPending ||
-                  backupMutation.isPending ||
-                  clearCacheMutation.isPending
-                }
-              >
-                {backupMutation.isPending ? "Backing up..." : "Create Backup"}
-              </Button>
             </div>
-          </div>
+          </CardHeader>
+          <CardContent>
+            {/* Desktop Table View */}
+            <div className="hidden lg:block">
+              <DataTable
+                columns={memberColumns}
+                data={members}
+                frozenColumnKey="member"
+                isLoading={membersLoading}
+              />
+            </div>
 
-          {/* Clear Cache - Admin Only */}
-          {isAdmin && (
-            <div className="flex items-start justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-              <div className="flex items-start gap-4 flex-1">
-                <div className="rounded-lg p-2.5 bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                  <RefreshCw className="h-5 w-5" />
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-3">
+              {membersLoading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-lg border border-border bg-card p-4 space-y-4"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                          <div className="h-3 w-24 bg-muted animate-pulse rounded" />
+                        </div>
+                      </div>
+                      <div className="h-px bg-border" />
+                      <div className="space-y-3">
+                        <div className="h-3 w-20 bg-muted animate-pulse rounded" />
+                        <div className="space-y-2">
+                          <div className="h-8 w-full bg-muted animate-pulse rounded" />
+                          <div className="h-8 w-full bg-muted animate-pulse rounded" />
+                          <div className="h-8 w-full bg-muted animate-pulse rounded" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex-1 space-y-1">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    Clear All Caches
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    Clear all server and client-side caches to ensure fresh
-                    data. This includes React Query cache, sessionStorage, and
-                    server caches.
-                  </p>
+              ) : members.length > 0 ? (
+                members.map((member) => {
+                  const memberState = memberAccessState[member.account.id];
+                  return (
+                    <MemberPermissionCard
+                      key={member.account.id}
+                      member={member}
+                      memberAccessState={memberState}
+                      isAdmin={isAdmin}
+                      onStateChange={(newState) => {
+                        setMemberAccessState((prev) => ({
+                          ...prev,
+                          [member.account.id]: newState,
+                        }));
+                      }}
+                      onEdit={
+                        canManageAccounts
+                          ? () => handleEditMember(member)
+                          : undefined
+                      }
+                      onAdjustOffset={
+                        canManageAccounts
+                          ? () => handleAdjustments(member)
+                          : undefined
+                      }
+                      onResetPassword={
+                        isAdmin ? () => handleResetPassword(member) : undefined
+                      }
+                    />
+                  );
+                })
+              ) : (
+                <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
+                  No members found.
                 </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Vendor Management Section */}
+        <Card className="border-border/50 shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Vendor Management</CardTitle>
+                <CardDescription>
+                  Admin-only controls to add, edit, or manage vendors
+                </CardDescription>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setClearCacheDialogOpen(true)}
-                disabled={
-                  analyticsRecalcMutation.isPending ||
-                  passbookRecalcMutation.isPending ||
-                  backupMutation.isPending ||
-                  clearCacheMutation.isPending
-                }
-              >
-                {clearCacheMutation.isPending ? "Clearing..." : "Clear Cache"}
-              </Button>
+              {isAdmin && (
+                <Button onClick={handleAddVendor} size="sm" className="gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  Add Vendor
+                </Button>
+              )}
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Member Management Section */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Member & Access Management</CardTitle>
-              <CardDescription>
-                Admin-only controls to manage members, access, and login.
-              </CardDescription>
-              <p className="text-xs text-muted-foreground mt-1">
-                Write access is restricted to creating and updating transactions
-                only. It does not provide permissions to modify users, vendors,
-                members, or system configurations.
-              </p>
-            </div>
-            {canManageAccounts && (
-              <Button onClick={handleAddMember} size="sm" className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                Add Member
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {/* Desktop Table View */}
-          <div className="hidden lg:block">
+          </CardHeader>
+          <CardContent>
             <DataTable
-              columns={memberColumns}
-              data={members}
-              frozenColumnKey="member"
-              isLoading={membersLoading}
+              columns={vendorColumns}
+              data={vendors}
+              frozenColumnKey="name"
+              isLoading={vendorsLoading}
             />
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Mobile Card View */}
-          <div className="lg:hidden space-y-3">
-            {membersLoading ? (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg border border-border bg-card p-4 space-y-4"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                        <div className="h-3 w-24 bg-muted animate-pulse rounded" />
-                      </div>
-                    </div>
-                    <div className="h-px bg-border" />
-                    <div className="space-y-3">
-                      <div className="h-3 w-20 bg-muted animate-pulse rounded" />
-                      <div className="space-y-2">
-                        <div className="h-8 w-full bg-muted animate-pulse rounded" />
-                        <div className="h-8 w-full bg-muted animate-pulse rounded" />
-                        <div className="h-8 w-full bg-muted animate-pulse rounded" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : members.length > 0 ? (
-              members.map((member) => {
-                const memberState = memberAccessState[member.account.id];
-                return (
-                  <MemberPermissionCard
-                    key={member.account.id}
-                    member={member}
-                    memberAccessState={memberState}
-                    isAdmin={isAdmin}
-                    onStateChange={(newState) => {
-                      setMemberAccessState((prev) => ({
-                        ...prev,
-                        [member.account.id]: newState,
-                      }));
-                    }}
-                    onEdit={
-                      canManageAccounts
-                        ? () => handleEditMember(member)
-                        : undefined
-                    }
-                    onAdjustOffset={
-                      canManageAccounts
-                        ? () => handleAdjustments(member)
-                        : undefined
-                    }
-                    onResetPassword={
-                      isAdmin ? () => handleResetPassword(member) : undefined
-                    }
-                  />
-                );
-              })
-            ) : (
-              <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-                No members found.
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Vendor Management Section */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Vendor Management</CardTitle>
-              <CardDescription>
-                Admin-only controls to add, edit, or manage vendors
-              </CardDescription>
-            </div>
-            {isAdmin && (
-              <Button onClick={handleAddVendor} size="sm" className="gap-2">
-                <Briefcase className="h-4 w-4" />
-                Add Vendor
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={vendorColumns}
-            data={vendors}
-            frozenColumnKey="name"
-            isLoading={vendorsLoading}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Recalculate Passbook Confirmation Dialog */}
-      <Dialog
-        open={recalculatePassbookDialogOpen}
-        onOpenChange={setRecalculatePassbookDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Recalculate Passbook?</DialogTitle>
-            <DialogDescription>
-              This will recompute all passbook data by processing all
-              transactions in chronological order. This updates member, vendor,
-              and club passbooks. It won&apos;t delete data but may update
-              balances.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setRecalculatePassbookDialogOpen(false)}
-              disabled={passbookRecalcMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => passbookRecalcMutation.mutate()}
-              disabled={passbookRecalcMutation.isPending}
-            >
-              {passbookRecalcMutation.isPending ? "Running..." : "Confirm"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Recalculate Analytics Confirmation Dialog */}
-      <Dialog
-        open={recalculateAnalyticsDialogOpen}
-        onOpenChange={(open) => {
-          // Only allow closing if not currently running
-          if (!analyticsRecalcMutation.isPending) {
-            setRecalculateAnalyticsDialogOpen(open);
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Recalculate Analytics?</DialogTitle>
-            <DialogDescription>
-              This will recalculate all monthly summary snapshots from the first
-              transaction to the current month. This process may take a few
-              minutes depending on the amount of historical data.
-              <br />
-              <br />
-              <strong>Warning:</strong> This will overwrite existing monthly
-              snapshots. Make sure you have a backup before proceeding.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (!analyticsRecalcMutation.isPending) {
-                  setRecalculateAnalyticsDialogOpen(false);
-                }
-              }}
-              disabled={analyticsRecalcMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => analyticsRecalcMutation.mutate()}
-              disabled={analyticsRecalcMutation.isPending}
-            >
-              {analyticsRecalcMutation.isPending
-                ? "Recalculating..."
-                : "Confirm"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Clear Cache Confirmation Dialog */}
-      <Dialog
-        open={clearCacheDialogOpen}
-        onOpenChange={setClearCacheDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Clear All Caches?</DialogTitle>
-            <DialogDescription>
-              This will clear all caches including:
-              <br />
-              • Server-side caches (Next.js route cache, NodeCache)
-              <br />
-              • Client-side caches (React Query cache, sessionStorage ETags)
-              <br />
-              <br />
-              After clearing, all data will be fetched fresh from the database.
-              This may temporarily slow down the next few requests.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setClearCacheDialogOpen(false)}
-              disabled={clearCacheMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => clearCacheMutation.mutate()}
-              disabled={clearCacheMutation.isPending}
-            >
-              {clearCacheMutation.isPending ? "Clearing..." : "Clear Cache"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Member Form Dialog */}
-      <MemberFormDialog
-        open={memberDialogOpen}
-        onOpenChange={setMemberDialogOpen}
-        selected={selectedMember}
-        onSuccess={() => {
-          window.location.reload();
-        }}
-      />
-
-      {/* Vendor Form Dialog */}
-      <VendorFormDialog
-        open={vendorDialogOpen}
-        onOpenChange={setVendorDialogOpen}
-        selected={selectedVendor}
-        onSuccess={() => {
-          window.location.reload();
-        }}
-      />
-
-      {/* Member Adjustments Dialog */}
-      {selectedMemberForAdjustments && (
-        <MemberAdjustmentsDialog
-          open={adjustmentsDialogOpen}
-          onOpenChange={setAdjustmentsDialogOpen}
-          memberId={selectedMemberForAdjustments.account.id}
-          memberName={`${selectedMemberForAdjustments.account.firstName} ${selectedMemberForAdjustments.account.lastName || ""}`.trim()}
-          passbookId={selectedMemberForAdjustments.account.passbookId || ""}
-          currentLateJoin={
-            selectedMemberForAdjustments.account.joiningOffset || 0
-          }
-          currentDelayedPayment={
-            selectedMemberForAdjustments.account.delayOffset || 0
-          }
-          onSuccess={() => {
-            window.location.reload();
-          }}
-        />
-      )}
-
-      {/* Reset Password Dialog */}
-      <Dialog
-        open={resetPasswordDialogOpen}
-        onOpenChange={(open) => {
-          setResetPasswordDialogOpen(open);
-          if (!open) {
-            setNewPassword(null);
-            setSelectedMemberForPasswordReset(null);
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {newPassword
-                ? "Password Reset Successfully"
-                : `Reset Password for ${selectedMemberForPasswordReset?.name || "Member"}?`}
-            </DialogTitle>
-            <DialogDescription>
-              {newPassword
-                ? "The new password has been generated. Share it securely with the member. This password will not be shown again."
-                : "This will generate a new password and invalidate the old one. Share it securely with the member."}
-            </DialogDescription>
-          </DialogHeader>
-          {newPassword ? (
-            <div className="space-y-4 py-4">
-              <div className="flex items-center gap-2">
-                <code className="flex-1 rounded-lg border border-border bg-muted px-4 py-3 text-sm font-mono">
-                  {newPassword}
-                </code>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => {
-                    navigator.clipboard.writeText(newPassword);
-                    toast.success("Password copied to clipboard");
-                  }}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <DialogFooter>
-                <Button
-                  onClick={() => {
-                    setResetPasswordDialogOpen(false);
-                    setNewPassword(null);
-                    setSelectedMemberForPasswordReset(null);
-                  }}
-                >
-                  Close
-                </Button>
-              </DialogFooter>
-            </div>
-          ) : (
+        {/* Recalculate Passbook Confirmation Dialog */}
+        <Dialog
+          open={recalculatePassbookDialogOpen}
+          onOpenChange={setRecalculatePassbookDialogOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Recalculate Passbook?</DialogTitle>
+              <DialogDescription>
+                This will recompute all passbook data by processing all
+                transactions in chronological order. This updates member,
+                vendor, and club passbooks. It won&apos;t delete data but may
+                update balances.
+              </DialogDescription>
+            </DialogHeader>
             <DialogFooter className="gap-2">
               <Button
                 variant="outline"
-                onClick={() => setResetPasswordDialogOpen(false)}
+                onClick={() => setRecalculatePassbookDialogOpen(false)}
+                disabled={passbookRecalcMutation.isPending}
               >
                 Cancel
               </Button>
               <Button
-                onClick={handleConfirmResetPassword}
-                disabled={resetPasswordMutation.isPending}
+                onClick={() => passbookRecalcMutation.mutate()}
+                disabled={passbookRecalcMutation.isPending}
               >
-                {resetPasswordMutation.isPending
-                  ? "Resetting..."
-                  : "Reset Password"}
+                {passbookRecalcMutation.isPending ? "Running..." : "Confirm"}
               </Button>
             </DialogFooter>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Recalculate Analytics Confirmation Dialog */}
+        <Dialog
+          open={recalculateAnalyticsDialogOpen}
+          onOpenChange={(open) => {
+            // Only allow closing if not currently running
+            if (!analyticsRecalcMutation.isPending) {
+              setRecalculateAnalyticsDialogOpen(open);
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Recalculate Analytics?</DialogTitle>
+              <DialogDescription>
+                This will recalculate all monthly summary snapshots from the
+                first transaction to the current month. This process may take a
+                few minutes depending on the amount of historical data.
+                <br />
+                <br />
+                <strong>Warning:</strong> This will overwrite existing monthly
+                snapshots. Make sure you have a backup before proceeding.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (!analyticsRecalcMutation.isPending) {
+                    setRecalculateAnalyticsDialogOpen(false);
+                  }
+                }}
+                disabled={analyticsRecalcMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => analyticsRecalcMutation.mutate()}
+                disabled={analyticsRecalcMutation.isPending}
+              >
+                {analyticsRecalcMutation.isPending
+                  ? "Recalculating..."
+                  : "Confirm"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Clear Cache Confirmation Dialog */}
+        <Dialog
+          open={clearCacheDialogOpen}
+          onOpenChange={setClearCacheDialogOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Clear All Caches?</DialogTitle>
+              <DialogDescription>
+                This will clear all caches including:
+                <br />
+                • Server-side caches (Next.js route cache, NodeCache)
+                <br />
+                • Client-side caches (React Query cache, sessionStorage ETags)
+                <br />
+                <br />
+                After clearing, all data will be fetched fresh from the
+                database. This may temporarily slow down the next few requests.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setClearCacheDialogOpen(false)}
+                disabled={clearCacheMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => clearCacheMutation.mutate()}
+                disabled={clearCacheMutation.isPending}
+              >
+                {clearCacheMutation.isPending ? "Clearing..." : "Clear Cache"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Member Form Dialog */}
+        <MemberFormDialog
+          open={memberDialogOpen}
+          onOpenChange={setMemberDialogOpen}
+          selected={selectedMember}
+          onSuccess={() => {
+            window.location.reload();
+          }}
+        />
+
+        {/* Vendor Form Dialog */}
+        <VendorFormDialog
+          open={vendorDialogOpen}
+          onOpenChange={setVendorDialogOpen}
+          selected={selectedVendor}
+          onSuccess={() => {
+            window.location.reload();
+          }}
+        />
+
+        {/* Member Adjustments Dialog */}
+        {selectedMemberForAdjustments && (
+          <MemberAdjustmentsDialog
+            open={adjustmentsDialogOpen}
+            onOpenChange={setAdjustmentsDialogOpen}
+            memberId={selectedMemberForAdjustments.account.id}
+            memberName={`${selectedMemberForAdjustments.account.firstName} ${selectedMemberForAdjustments.account.lastName || ""}`.trim()}
+            passbookId={selectedMemberForAdjustments.account.passbookId || ""}
+            currentLateJoin={
+              selectedMemberForAdjustments.account.joiningOffset || 0
+            }
+            currentDelayedPayment={
+              selectedMemberForAdjustments.account.delayOffset || 0
+            }
+            onSuccess={() => {
+              window.location.reload();
+            }}
+          />
+        )}
+
+        {/* Reset Password Dialog */}
+        <Dialog
+          open={resetPasswordDialogOpen}
+          onOpenChange={(open) => {
+            setResetPasswordDialogOpen(open);
+            if (!open) {
+              setNewPassword(null);
+              setSelectedMemberForPasswordReset(null);
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {newPassword
+                  ? "Password Reset Successfully"
+                  : `Reset Password for ${selectedMemberForPasswordReset?.name || "Member"}?`}
+              </DialogTitle>
+              <DialogDescription>
+                {newPassword
+                  ? "The new password has been generated. Share it securely with the member. This password will not be shown again."
+                  : "This will generate a new password and invalidate the old one. Share it securely with the member."}
+              </DialogDescription>
+            </DialogHeader>
+            {newPassword ? (
+              <div className="space-y-4 py-4">
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 rounded-lg border border-border bg-muted px-4 py-3 text-sm font-mono">
+                    {newPassword}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(newPassword);
+                      toast.success("Password copied to clipboard");
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                <DialogFooter>
+                  <Button
+                    onClick={() => {
+                      setResetPasswordDialogOpen(false);
+                      setNewPassword(null);
+                      setSelectedMemberForPasswordReset(null);
+                    }}
+                  >
+                    Close
+                  </Button>
+                </DialogFooter>
+              </div>
+            ) : (
+              <DialogFooter className="gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setResetPasswordDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleConfirmResetPassword}
+                  disabled={resetPasswordMutation.isPending}
+                >
+                  {resetPasswordMutation.isPending
+                    ? "Resetting..."
+                    : "Reset Password"}
+                </Button>
+              </DialogFooter>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </PageTransition>
   );
 }

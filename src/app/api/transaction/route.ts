@@ -203,7 +203,8 @@ function getQueryParams(url: string) {
   const rawLimit = parseInt(searchParams.get("limit") || "10");
   return {
     page: Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage,
-    limit: Number.isNaN(rawLimit) || rawLimit < 1 ? 10 : Math.min(rawLimit, 100),
+    limit:
+      Number.isNaN(rawLimit) || rawLimit < 1 ? 10 : Math.min(rawLimit, 100),
     accountId: searchParams.get("accountId"),
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),
@@ -317,7 +318,9 @@ async function fetchTransactions(
   } catch (err: any) {
     // Handle orphaned references (deleted accounts still referenced by transactions)
     if (err.message?.includes("Inconsistent query result")) {
-      console.warn("Orphaned transaction references detected, fetching without includes");
+      console.warn(
+        "Orphaned transaction references detected, fetching without includes"
+      );
       const raw = await prisma.transaction.findMany({
         where: filters,
         skip: (page - 1) * limit,
@@ -325,7 +328,9 @@ async function fetchTransactions(
         orderBy: { [sortField]: sortOrder },
       });
       // Manually resolve accounts
-      const accountIds = Array.from(new Set(raw.flatMap((t) => [t.fromId, t.toId].filter(Boolean))));
+      const accountIds = Array.from(
+        new Set(raw.flatMap((t) => [t.fromId, t.toId].filter(Boolean)))
+      );
       const accounts = await prisma.account.findMany({
         where: { id: { in: accountIds } },
         ...accountSelect,
@@ -364,9 +369,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       ...from,
       name: fromName,
       sub: "",
-      avatar: from.avatarUrl
-        ? `/image/${from.avatarUrl}`
-        : undefined,
+      avatar: from.avatarUrl ? `/image/${from.avatarUrl}` : undefined,
       link:
         from.type === "MEMBER" && from.id !== "unknown"
           ? `/dashboard/member/${from.username}`
@@ -376,9 +379,7 @@ function transactionTableTransform(transaction: TransactionToTransform) {
       ...to,
       name: toName,
       sub: "",
-      avatar: to.avatarUrl
-        ? `/image/${to.avatarUrl}`
-        : undefined,
+      avatar: to.avatarUrl ? `/image/${to.avatarUrl}` : undefined,
       link:
         to.type === "MEMBER" && to.id !== "unknown"
           ? `/dashboard/member/${to.username}`

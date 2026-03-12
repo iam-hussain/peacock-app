@@ -51,11 +51,17 @@ export async function POST(request: Request) {
       },
     });
   } catch (error: any) {
-    if (error?.message === "FORBIDDEN_ADMIN" || error?.message === "UNAUTHORIZED") {
+    if (
+      error?.message === "FORBIDDEN_ADMIN" ||
+      error?.message === "UNAUTHORIZED"
+    ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Backup failed" },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Backup failed",
+      },
       { status: 500 }
     );
   }

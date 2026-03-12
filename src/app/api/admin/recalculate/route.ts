@@ -14,7 +14,11 @@ import {
 
 export async function POST(request: Request) {
   // Rate limit heavy operations
-  const rateLimited = rateLimitResponse(request, "recalculate", RATE_LIMITS.heavy);
+  const rateLimited = rateLimitResponse(
+    request,
+    "recalculate",
+    RATE_LIMITS.heavy
+  );
   if (rateLimited) return rateLimited;
 
   try {
@@ -58,7 +62,10 @@ export async function POST(request: Request) {
       );
     }
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : "Recalculation failed" },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Recalculation failed",
+      },
       { status: 500 }
     );
   }

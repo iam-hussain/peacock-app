@@ -13,8 +13,8 @@ import {
   isBefore,
 } from "date-fns";
 
-import { DEFAULT_INTEREST_RATE } from "@/lib/config/constants";
 import { clubConfig } from "@/lib/config/config";
+import { DEFAULT_INTEREST_RATE } from "@/lib/config/constants";
 import { calculateTimePassed, newZoneDate } from "@/lib/core/date";
 
 const getPeriodString = (months: number, days: number) => {
@@ -65,8 +65,7 @@ export const newLoanCalculator = (
 
   if (end && nextDueDate && differenceInDays(nextDueDate, endDate) >= 20) {
     const monthsInterest = actualPassed.monthsPassed * amount * interestRate;
-    const daysInterest =
-      (actualPassed.daysPassed / 30) * amount * interestRate;
+    const daysInterest = (actualPassed.daysPassed / 30) * amount * interestRate;
     totalAmount = monthsInterest + daysInterest;
   }
 

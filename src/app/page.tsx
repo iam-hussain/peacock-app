@@ -23,10 +23,7 @@ import { useEffect, useState } from "react";
 
 import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchAuthStatus } from "@/lib/query-options";
 
@@ -75,20 +72,17 @@ export default function Home() {
     {
       icon: <Wallet className="h-6 w-6" />,
       title: "Deposit Monthly",
-      description:
-        "Contribute your monthly savings to the club fund.",
+      description: "Contribute your monthly savings to the club fund.",
     },
     {
       icon: <HandCoins className="h-6 w-6" />,
       title: "Borrow Based on Rules",
-      description:
-        "Access loans following transparent club policies.",
+      description: "Access loans following transparent club policies.",
     },
     {
       icon: <LineChart className="h-6 w-6" />,
       title: "Track Everything",
-      description:
-        "Monitor your position and club performance in real-time.",
+      description: "Monitor your position and club performance in real-time.",
     },
   ];
 
@@ -150,7 +144,11 @@ export default function Home() {
                 {/* Breathing Peacock Mark */}
                 <motion.div
                   animate={{ scale: [1, 1.03, 1] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                   className="mb-8"
                 >
                   <Image
@@ -283,7 +281,11 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5, ease: luxuryEase }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.5,
+                  ease: luxuryEase,
+                }}
               >
                 <Card className="border-border/20 bg-card/50 backdrop-blur-sm shadow-none hover:border-primary/10 transition-all duration-500 h-full">
                   <CardContent className="p-6">
@@ -322,7 +324,11 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.15, duration: 0.5, ease: luxuryEase }}
+                transition={{
+                  delay: index * 0.15,
+                  duration: 0.5,
+                  ease: luxuryEase,
+                }}
                 className="flex-1 flex flex-col items-center text-center"
               >
                 <div className="relative mb-4">
@@ -351,7 +357,11 @@ export default function Home() {
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5, ease: luxuryEase }}
+                transition={{
+                  delay: index * 0.1,
+                  duration: 0.5,
+                  ease: luxuryEase,
+                }}
                 className="flex gap-4"
               >
                 <div className="flex-shrink-0">

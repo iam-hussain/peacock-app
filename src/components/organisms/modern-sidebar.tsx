@@ -80,7 +80,9 @@ export function ModernSidebar() {
         };
       }>,
     enabled:
-      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member") && !isGuest,
+      isLoggedIn &&
+      (user?.kind === "member" || user?.kind === "admin-member") &&
+      !isGuest,
   });
 
   // Get display name

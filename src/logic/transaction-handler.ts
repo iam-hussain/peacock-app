@@ -50,10 +50,7 @@ function getPassbookUpdateQuery(
   });
 }
 
-const getTractionPassbook = async (
-  { fromId, toId }: Transaction,
-  db?: any
-) => {
+const getTractionPassbook = async ({ fromId, toId }: Transaction, db?: any) => {
   const client = db || prisma;
   return client.passbook.findMany({
     where: {

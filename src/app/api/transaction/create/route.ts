@@ -129,8 +129,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const { fromId, toId, amount, transactionType, occurredAt, description, referenceId } =
-      validationResult.data;
+    const {
+      fromId,
+      toId,
+      amount,
+      transactionType,
+      occurredAt,
+      description,
+      referenceId,
+    } = validationResult.data;
 
     // Validate business rules (e.g., sufficient balance, outstanding loan limits)
     const validationError = await validateTransactionBusinessRules({

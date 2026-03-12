@@ -2,9 +2,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { NextResponse } from "next/server";
-
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { env, getAdminPassword } from "@/lib/config/env";
@@ -177,7 +176,8 @@ export async function POST(request: Request) {
 
       // Support both bcrypt-hashed and plaintext admin passwords
       // If the stored password looks like a bcrypt hash, compare with bcrypt
-      const isBcryptHash = adminPassword.startsWith("$2a$") || adminPassword.startsWith("$2b$");
+      const isBcryptHash =
+        adminPassword.startsWith("$2a$") || adminPassword.startsWith("$2b$");
       const isValidAdmin = isBcryptHash
         ? await bcrypt.compare(password, adminPassword)
         : password === adminPassword;

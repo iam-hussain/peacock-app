@@ -6,8 +6,8 @@ import { HiMenuAlt2 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { useWindowScroll } from "react-use";
 
-import { openSideBar, useAppState } from "../providers/app-state-provider";
 import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
+import { openSideBar, useAppState } from "../providers/app-state-provider";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";

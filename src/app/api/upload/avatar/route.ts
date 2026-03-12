@@ -115,19 +115,32 @@ export async function POST(request: Request) {
 
     // Validate magic bytes (server-side file type verification)
     const magicBytes = buffer.subarray(0, 8);
-    const isJpeg = magicBytes[0] === 0xff && magicBytes[1] === 0xd8 && magicBytes[2] === 0xff;
+    const isJpeg =
+      magicBytes[0] === 0xff &&
+      magicBytes[1] === 0xd8 &&
+      magicBytes[2] === 0xff;
     const isPng =
-      magicBytes[0] === 0x89 && magicBytes[1] === 0x50 &&
-      magicBytes[2] === 0x4e && magicBytes[3] === 0x47;
-    const isGif = magicBytes[0] === 0x47 && magicBytes[1] === 0x49 && magicBytes[2] === 0x46;
+      magicBytes[0] === 0x89 &&
+      magicBytes[1] === 0x50 &&
+      magicBytes[2] === 0x4e &&
+      magicBytes[3] === 0x47;
+    const isGif =
+      magicBytes[0] === 0x47 &&
+      magicBytes[1] === 0x49 &&
+      magicBytes[2] === 0x46;
     const isWebp =
-      magicBytes[0] === 0x52 && magicBytes[1] === 0x49 &&
-      magicBytes[2] === 0x46 && magicBytes[3] === 0x46 &&
-      magicBytes[8] === 0x57 && magicBytes[9] === 0x45;
+      magicBytes[0] === 0x52 &&
+      magicBytes[1] === 0x49 &&
+      magicBytes[2] === 0x46 &&
+      magicBytes[3] === 0x46 &&
+      magicBytes[8] === 0x57 &&
+      magicBytes[9] === 0x45;
 
     if (!isJpeg && !isPng && !isGif && !isWebp) {
       return NextResponse.json(
-        { error: "Invalid image file. Supported formats: JPEG, PNG, GIF, WebP" },
+        {
+          error: "Invalid image file. Supported formats: JPEG, PNG, GIF, WebP",
+        },
         { status: 400 }
       );
     }

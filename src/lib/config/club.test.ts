@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getMemberTotalDeposit, clubMonthsFromStart } from "@/lib/config/club";
+import { clubMonthsFromStart, getMemberTotalDeposit } from "@/lib/config/club";
 
 describe("getMemberTotalDeposit", () => {
   it("returns 0 for a date before club started", () => {
