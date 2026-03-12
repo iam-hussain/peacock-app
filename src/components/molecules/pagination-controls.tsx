@@ -228,96 +228,80 @@ export function PaginationControls({
       </div>
 
       {/* Mobile Layout */}
-      <div className="flex flex-col gap-3 md:hidden">
-        {/* Pagination Buttons - Centered */}
-        <div className="flex items-center justify-center gap-2">
-          {/* First Page */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(1)}
-            disabled={!canGoPrevious}
-            className="h-9 w-9 p-0"
-            aria-label="First page"
-          >
-            <ChevronsLeft className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-col gap-2 md:hidden">
+        <div className="flex items-center justify-between">
+          {/* Left: item count */}
+          <span className="text-[11px] text-muted-foreground tabular-nums">
+            {startItem}–{endItem} of {totalItems.toLocaleString()}
+          </span>
 
-          {/* Previous Page */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={!canGoPrevious}
-            className="h-9 w-9 p-0"
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          {/* Current Page Info */}
-          <div className="px-3 text-sm font-medium text-foreground">
-            {currentPage} of {totalPages}
+          {/* Center: nav buttons */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(1)}
+              disabled={!canGoPrevious}
+              className="h-8 w-8 p-0"
+              aria-label="First page"
+            >
+              <ChevronsLeft className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={!canGoPrevious}
+              className="h-8 w-8 p-0"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </Button>
+            <span className="px-2 text-xs font-medium text-foreground tabular-nums">
+              {currentPage}/{totalPages}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={!canGoNext}
+              className="h-8 w-8 p-0"
+              aria-label="Next page"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onPageChange(totalPages)}
+              disabled={!canGoNext}
+              className="h-8 w-8 p-0"
+              aria-label="Last page"
+            >
+              <ChevronsRight className="h-3.5 w-3.5" />
+            </Button>
           </div>
 
-          {/* Next Page */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={!canGoNext}
-            className="h-9 w-9 p-0"
-            aria-label="Next page"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-
-          {/* Last Page */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(totalPages)}
-            disabled={!canGoNext}
-            className="h-9 w-9 p-0"
-            aria-label="Last page"
-          >
-            <ChevronsRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Item Count & Page Size - Below */}
-        <div className="flex flex-col items-center gap-2">
-          <div className="text-xs text-muted-foreground">
-            Showing {startItem}–{endItem} of {totalItems.toLocaleString()}{" "}
-            transactions
-          </div>
+          {/* Right: page size */}
           {showPageSize && (
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="page-size-select-mobile"
-                className="text-xs text-muted-foreground"
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => onPageSizeChange(parseInt(value))}
+              disabled={isLoading}
+            >
+              <SelectTrigger
+                id="page-size-select-mobile"
+                className="h-7 w-[60px] text-[11px] px-2"
               >
-                Per page:
-              </label>
-              <Select
-                value={pageSize.toString()}
-                onValueChange={(value) => onPageSizeChange(parseInt(value))}
-                disabled={isLoading}
-              >
-                <SelectTrigger
-                  id="page-size-select-mobile"
-                  className="h-9 w-[100px] text-xs"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="25">25</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
           )}
         </div>
       </div>

@@ -6,7 +6,16 @@ import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { transformSummaryToDashboardData } from "@/lib/transformers/dashboard-summary";
+import { calculateExpectedTotalLoanInterestAmountFromDb } from "@/lib/calculators/expected-interest";
+import { clubMonthsFromStart } from "@/lib/config/club";
+import {
+  transformClubPassbookToSummary,
+  transformSummaryToDashboardData,
+} from "@/lib/transformers/dashboard-summary";
+import {
+  ClubFinancialSnapshot,
+  VendorFinancialSnapshot,
+} from "@/lib/validators/type";
 
 /**
  * @swagger
@@ -139,26 +148,88 @@ export async function GET(request: NextRequest) {
         );
       }
     } else {
-      // Return latest summary if no month provided
-      summary = await prisma.summary.findFirst({
-        orderBy: { monthStartDate: "desc" },
-      });
+      // No month param — compute live data from club passbook (same as club-passbook route)
+      // This ensures Summary and Club Passbook views always show identical current data
+      const [clubPassbook, activeMembers, vendorPassbooks, allMemberPassbooks] =
+        await Promise.all([
+          prisma.passbook.findFirst({
+            where: { kind: "CLUB" },
+            select: { payload: true, updatedAt: true },
+          }),
+          prisma.account.count({
+            where: { type: "MEMBER", status: "ACTIVE" },
+          }),
+          prisma.passbook.findMany({
+            where: { kind: "VENDOR" },
+            select: { payload: true },
+          }),
+          prisma.passbook.findMany({
+            where: { kind: "MEMBER" },
+            select: { joiningOffset: true, delayOffset: true },
+          }),
+        ]);
 
-      if (!summary) {
+      if (!clubPassbook) {
         return NextResponse.json(
           {
             success: false,
             error:
-              "No dashboard summary found. Please run recalculation first.",
+              "No dashboard data found. Please run recalculation first.",
           },
           { status: 404 }
         );
       }
+
+      const clubData = clubPassbook.payload as ClubFinancialSnapshot;
+      const clubAgeMonths = clubMonthsFromStart();
+
+      const { expectedTotalLoanInterestAmount } =
+        await calculateExpectedTotalLoanInterestAmountFromDb();
+
+      const totalExpectedAdjustments = allMemberPassbooks.reduce(
+        (sum, pb) => sum + (pb.joiningOffset || 0) + (pb.delayOffset || 0),
+        0
+      );
+      const totalReceivedAdjustments = clubData.memberOffsetDepositsTotal || 0;
+      const pendingAdjustments = Math.max(
+        0,
+        totalExpectedAdjustments - totalReceivedAdjustments
+      );
+
+      const dashboardData = transformClubPassbookToSummary({
+        clubData,
+        activeMembers,
+        clubAgeMonths,
+        expectedTotalLoanInterestAmount,
+        vendorPassbooks: vendorPassbooks.map((vp) => ({
+          payload: vp.payload as VendorFinancialSnapshot,
+        })),
+        monthStartDate: null,
+        monthEndDate: null,
+        recalculatedAt: clubPassbook.updatedAt,
+        recalculatedByAdminId: null,
+        isLocked: false,
+        pendingAdjustments,
+      });
+
+      const response = { success: true, data: dashboardData };
+
+      const etag = `"${clubPassbook.updatedAt.getTime()}"`;
+      const ifNoneMatch = request.headers.get("if-none-match");
+      if (ifNoneMatch === etag) {
+        return new NextResponse(null, { status: 304 });
+      }
+
+      return NextResponse.json(response, {
+        headers: {
+          "Cache-Control": "private, no-cache, must-revalidate",
+          ETag: etag,
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
     }
 
-    // Calculate pending adjustments dynamically (not stored in Summary table)
-    // Total expected = sum of all members' (joiningOffset + delayOffset)
-    // Total received = summary.memberAdjustments
+    // Historical month query — use stored Summary snapshot
     const allMemberPassbooks = await prisma.passbook.findMany({
       where: { kind: "MEMBER" },
       select: { joiningOffset: true, delayOffset: true },
@@ -174,10 +245,7 @@ export async function GET(request: NextRequest) {
       totalExpectedAdjustments - totalReceivedAdjustments
     );
 
-    // Transform summary to dashboard data structure using common transformer
     const dashboardData = transformSummaryToDashboardData(summary);
-
-    // Add pending adjustments to the transformed data
     dashboardData.memberOutflow.pendingAdjustments = pendingAdjustments;
 
     const response = {
@@ -185,18 +253,15 @@ export async function GET(request: NextRequest) {
       data: dashboardData,
     };
 
-    // Generate ETag from summary's recalculatedAt timestamp for cache validation
     const etag = `"${summary.recalculatedAt.getTime()}"`;
-
-    // Check if client has cached version
     const ifNoneMatch = request.headers.get("if-none-match");
     if (ifNoneMatch === etag) {
-      return new NextResponse(null, { status: 304 }); // Not Modified
+      return new NextResponse(null, { status: 304 });
     }
 
     return NextResponse.json(response, {
       headers: {
-        "Cache-Control": "private, no-cache, must-revalidate", // Don't cache at CDN, but allow browser cache with validation
+        "Cache-Control": "private, no-cache, must-revalidate",
         ETag: etag,
         "X-Content-Type-Options": "nosniff",
       },

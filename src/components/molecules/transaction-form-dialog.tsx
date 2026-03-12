@@ -69,12 +69,12 @@ export function TransactionFormDialog({
 
   // Mobile: Drawer
   const mobileContent = (
-    <div className="flex flex-col h-full">
-      <DrawerHeader className="text-left sticky top-0 z-20 border-b border-border bg-background/95 px-6 pb-4 pt-5 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <>
+      <DrawerHeader className="text-left shrink-0 border-b border-border bg-background px-4 pb-3 pt-2">
         <div className="flex items-center justify-between">
           <div>
-            <DrawerTitle className="text-xl font-semibold">{title}</DrawerTitle>
-            <DrawerDescription className="mt-1.5 text-sm text-muted-foreground">
+            <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
+            <DrawerDescription className="mt-0.5 text-xs text-muted-foreground">
               {description}
             </DrawerDescription>
           </div>
@@ -91,23 +91,19 @@ export function TransactionFormDialog({
         </div>
       </DrawerHeader>
 
-      <div className="flex-1 overflow-y-auto px-4 py-6 -mx-4">
-        <div className="px-4">
-          <TransactionForm
-            accounts={accounts}
-            selected={selected as any}
-            onSuccess={handleSuccess}
-            onCancel={handleSuccess}
-            isMobile={true}
-          />
-        </div>
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
+        data-vaul-no-drag
+      >
+        <TransactionForm
+          accounts={accounts}
+          selected={selected as any}
+          onSuccess={handleSuccess}
+          onCancel={handleSuccess}
+          isMobile={true}
+        />
       </div>
-      <DrawerFooter className="border-t border-border bg-background/95 px-4 pt-4 pb-safe backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="text-xs text-muted-foreground text-center">
-          Tap outside or swipe down to close
-        </div>
-      </DrawerFooter>
-    </div>
+    </>
   );
 
   // Desktop: Dialog
@@ -133,7 +129,7 @@ export function TransactionFormDialog({
     <>
       {!isDesktop && (
         <Drawer open={open} onOpenChange={onOpenChange}>
-          <DrawerContent className="max-h-[96vh] rounded-t-3xl border border-border bg-background/95 shadow-2xl">
+          <DrawerContent className="h-[92vh] max-h-[92vh] rounded-t-2xl border border-border bg-background shadow-2xl overflow-hidden flex flex-col">
             {mobileContent}
           </DrawerContent>
         </Drawer>

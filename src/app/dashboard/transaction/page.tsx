@@ -993,20 +993,51 @@ export default function TransactionsPage() {
           />
         </div>
 
-        <div className="lg:hidden flex items-center justify-between rounded-xl border border-border bg-card/80 px-3 py-3">
-          <div className="space-y-0.5">
-            <p className="text-sm font-semibold">Transactions</p>
-            <p className="text-xs text-muted-foreground">Recent activity</p>
+        <div className="lg:hidden space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">
+                Transactions
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                {totalTransactions > 0
+                  ? `${totalTransactions.toLocaleString()} total`
+                  : "Recent activity"}
+              </p>
+            </div>
+            {canWrite && (
+              <Button
+                size="sm"
+                className="gap-1.5 rounded-full px-3 h-8"
+                onClick={handleAddTransaction}
+              >
+                <Receipt className="h-3.5 w-3.5" />
+                <span className="text-xs">Add</span>
+              </Button>
+            )}
           </div>
-          {canWrite && (
-            <Button
-              size="sm"
-              className="gap-2 rounded-full px-3"
-              onClick={handleAddTransaction}
-            >
-              <Receipt className="h-4 w-4" />
-              <span>Add</span>
-            </Button>
+          {/* Inflow/Outflow mini stats */}
+          {!isLoading && transactions.length > 0 && (
+            <div className="flex gap-2">
+              <div className="flex-1 flex items-center gap-2 rounded-lg border border-border/40 bg-card px-3 py-1.5">
+                <ArrowDown className="h-3.5 w-3.5 text-green-600 dark:text-green-500" />
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Inflow</p>
+                  <p className="text-xs font-semibold text-green-600 dark:text-green-500 tabular-nums">
+                    {moneyFormat(_summary.inflow)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex-1 flex items-center gap-2 rounded-lg border border-border/40 bg-card px-3 py-1.5">
+                <ArrowUp className="h-3.5 w-3.5 text-destructive" />
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Outflow</p>
+                  <p className="text-xs font-semibold text-destructive tabular-nums">
+                    {moneyFormat(_summary.outflow)}
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
@@ -1064,9 +1095,22 @@ export default function TransactionsPage() {
             variant="outline"
             size="icon"
             onClick={() => setFilterDrawerOpen(true)}
-            className="shrink-0 rounded-full"
+            className="shrink-0 rounded-full h-12 w-12 relative"
           >
             <SlidersHorizontal className="h-4 w-4" />
+            {/* Active filter count badge */}
+            {(() => {
+              const count =
+                (accountFilter !== "all" ? 1 : 0) +
+                (typeFilter !== "all" ? 1 : 0) +
+                (startDate ? 1 : 0) +
+                (endDate ? 1 : 0);
+              return count > 0 ? (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                  {count}
+                </span>
+              ) : null;
+            })()}
             <span className="sr-only">Filters</span>
           </Button>
         </div>
@@ -1115,18 +1159,28 @@ export default function TransactionsPage() {
           </div>
         </ScreenshotArea>
 
-        <div className="lg:hidden space-y-3 pb-16">
+        <div className="lg:hidden space-y-1.5">
           {isLoading ? (
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => (
+            <div className="space-y-1.5">
+              {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className="h-32 animate-pulse rounded-xl bg-muted"
-                />
+                  className="flex items-center gap-3 rounded-xl border border-border/40 bg-card px-3 py-2.5"
+                >
+                  <div className="h-9 w-9 rounded-full bg-muted animate-pulse shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+                  </div>
+                  <div className="space-y-1.5 text-right">
+                    <div className="h-3.5 w-16 rounded bg-muted animate-pulse ml-auto" />
+                    <div className="h-2.5 w-12 rounded bg-muted animate-pulse ml-auto" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : transactions.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-1.5">
               {transactions.map((transaction) => (
                 <TransactionCardMobile
                   key={transaction.id}
@@ -1138,20 +1192,20 @@ export default function TransactionsPage() {
               ))}
             </div>
           ) : (
-            <Card className="border-border/50 bg-card">
-              <CardContent className="p-8 text-center">
-                <p className="mb-4 text-sm font-medium text-muted-foreground">
-                  No transactions match these filters yet.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleResetFilters}
-                >
-                  Clear filters
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="rounded-xl border border-border/40 bg-card px-4 py-10 text-center">
+              <Receipt className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm font-medium text-muted-foreground mb-3">
+                No transactions found
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleResetFilters}
+                className="rounded-full"
+              >
+                Clear filters
+              </Button>
+            </div>
           )}
         </div>
 
@@ -1171,100 +1225,95 @@ export default function TransactionsPage() {
 
         {/* Mobile details modal */}
         <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
-          <DialogContent className="max-w-md w-[90vw] rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">
-                Transaction details
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                Quick view of this entry.
-              </DialogDescription>
-            </DialogHeader>
-
-            {selectedTransaction && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">Amount</p>
-                  <p className="text-xl font-semibold tabular-nums">
-                    {moneyFormat(selectedTransaction.amount)}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">From</p>
-                    <p className="font-medium text-foreground">
-                      {selectedTransaction.from?.name || "—"}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">To</p>
-                    <p className="font-medium text-foreground">
-                      {selectedTransaction.to?.name || "—"}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Type</p>
-                    <p className="font-medium text-foreground">
-                      {transactionTypeMap[
-                        selectedTransaction.transactionType
-                      ] || selectedTransaction.transactionType}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Date</p>
-                    <p className="font-medium text-foreground">
-                      {dateFormat(newZoneDate(selectedTransaction.occurredAt))}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-1 text-sm">
-                  <p className="text-xs text-muted-foreground">Note</p>
-                  <p className="text-foreground">
-                    {selectedTransaction.description ||
-                      (selectedTransaction as any).note ||
-                      "—"}
-                  </p>
-                </div>
-
-                {selectedTransaction.referenceId && (
-                  <div className="space-y-1 text-sm">
+          <DialogContent className="max-w-md w-[calc(100%-2rem)] rounded-2xl p-0 gap-0 overflow-hidden">
+            {selectedTransaction && (() => {
+              const dir = getTransactionDirection(selectedTransaction);
+              return (
+                <>
+                  {/* Amount hero */}
+                  <div className="px-5 pt-5 pb-4 text-center border-b border-border/40">
+                    <div className={`flex items-center justify-center gap-1.5 ${dir.color} mb-1`}>
+                      {dir.icon && <dir.icon className="h-4 w-4" />}
+                      <span className="text-2xl font-bold tabular-nums">
+                        {moneyFormat(selectedTransaction.amount)}
+                      </span>
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      Reference ID
-                    </p>
-                    <p className="font-medium text-foreground">
-                      {selectedTransaction.referenceId}
+                      {transactionTypeMap[selectedTransaction.transactionType] ||
+                        selectedTransaction.transactionType}
                     </p>
                   </div>
-                )}
 
-                {canWrite && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="secondary"
-                      className="flex-1"
-                      onClick={() => {
-                        setDetailsDialogOpen(false);
-                        handleEditTransaction(selectedTransaction);
-                      }}
-                    >
-                      Edit transaction
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      className="flex-1"
-                      onClick={() => {
-                        setDetailsDialogOpen(false);
-                        handleDeleteTransaction(selectedTransaction);
-                      }}
-                    >
-                      Delete
-                    </Button>
+                  {/* Details grid */}
+                  <div className="px-5 py-4 space-y-3">
+                    <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                      <span className="text-xs text-muted-foreground">From</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {selectedTransaction.from?.name || "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                      <span className="text-xs text-muted-foreground">To</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {selectedTransaction.to?.name || "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                      <span className="text-xs text-muted-foreground">Date</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {dateFormat(newZoneDate(selectedTransaction.occurredAt))}
+                      </span>
+                    </div>
+                    {(selectedTransaction.description ||
+                      (selectedTransaction as any).note) && (
+                      <div className="flex items-start justify-between py-1.5 border-b border-border/30">
+                        <span className="text-xs text-muted-foreground shrink-0">Note</span>
+                        <span className="text-sm text-foreground text-right ml-4">
+                          {selectedTransaction.description ||
+                            (selectedTransaction as any).note}
+                        </span>
+                      </div>
+                    )}
+                    {selectedTransaction.referenceId && (
+                      <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                        <span className="text-xs text-muted-foreground">Ref ID</span>
+                        <span className="text-sm font-mono text-foreground">
+                          {selectedTransaction.referenceId}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+
+                  {/* Actions */}
+                  {canWrite && (
+                    <div className="px-5 pb-5 flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 rounded-lg"
+                        onClick={() => {
+                          setDetailsDialogOpen(false);
+                          handleEditTransaction(selectedTransaction);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="flex-1 rounded-lg"
+                        onClick={() => {
+                          setDetailsDialogOpen(false);
+                          handleDeleteTransaction(selectedTransaction);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </DialogContent>
         </Dialog>
 

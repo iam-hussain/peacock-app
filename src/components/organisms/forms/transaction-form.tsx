@@ -171,7 +171,7 @@ export function TransactionForm({
         id="transaction-form"
         onSubmit={form.handleSubmit(onSubmit)}
         className={
-          isMobile ? "w-full space-y-4 pb-20" : "w-full max-w-2xl space-y-6"
+          isMobile ? "w-full space-y-4" : "w-full max-w-2xl space-y-6"
         }
       >
         {isMobile ? (
@@ -572,7 +572,7 @@ export function TransactionForm({
           />
         )}
         {isMobile && (
-          <div className="sticky bottom-0 left-0 right-0 -mx-4 flex gap-3 border-t border-border bg-background/95 px-4 py-4 pb-safe shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <div className="flex gap-3 pt-4 pb-2">
             <Button
               type="button"
               variant="ghost"

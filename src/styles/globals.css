@@ -28,82 +28,82 @@
 
 @layer base {
   :root {
-    --background: 160 20% 6%;
-    --foreground: 150 10% 92%;
+    --background: 220 16% 7%;
+    --foreground: 210 10% 92%;
 
-    --card: 160 18% 9%;
-    --card-foreground: 150 10% 92%;
-    --popover: 160 18% 9%;
-    --popover-foreground: 150 10% 92%;
+    --card: 220 14% 10%;
+    --card-foreground: 210 10% 92%;
+    --popover: 220 14% 10%;
+    --popover-foreground: 210 10% 92%;
 
-    --primary: 152 58% 42%;
-    --primary-foreground: 160 20% 6%;
+    --primary: 215 14% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 180 50% 18%;
-    --secondary-foreground: 150 10% 92%;
+    --secondary: 220 12% 18%;
+    --secondary-foreground: 210 10% 92%;
 
-    --muted: 160 12% 14%;
-    --muted-foreground: 160 8% 50%;
+    --muted: 220 12% 14%;
+    --muted-foreground: 215 8% 50%;
 
-    --accent: 200 35% 20%;
-    --accent-foreground: 150 10% 92%;
+    --accent: 220 10% 20%;
+    --accent-foreground: 210 10% 92%;
 
     --destructive: 0 62% 50%;
-    --destructive-foreground: 150 10% 92%;
+    --destructive-foreground: 210 10% 92%;
 
-    --border: 160 12% 14%;
-    --input: 160 12% 14%;
-    --ring: 152 58% 42%;
+    --border: 220 12% 15%;
+    --input: 220 12% 15%;
+    --ring: 215 14% 50%;
     --radius: 0.5rem;
 
-    --paper: 160 18% 7%;
-    --paper-foreground: 150 10% 92%;
+    --paper: 220 14% 8%;
+    --paper-foreground: 210 10% 92%;
 
-    --inactive: 160 8% 28%;
-    --inactive-foreground: 160 8% 50%;
+    --inactive: 220 8% 28%;
+    --inactive-foreground: 215 8% 50%;
 
-    --info: 195 70% 45%;
-    --info-foreground: 150 10% 92%;
+    --info: 210 60% 50%;
+    --info-foreground: 210 10% 92%;
 
     --bw: 0 0% 100%;
     --bw-foreground: 0 0% 0%;
   }
 
   .light {
-    --background: 140 20% 97%;
-    --foreground: 160 25% 10%;
+    --background: 220 14% 97%;
+    --foreground: 220 20% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 160 25% 10%;
+    --card-foreground: 220 20% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 160 25% 10%;
+    --popover-foreground: 220 20% 12%;
 
-    --primary: 152 58% 35%;
+    --primary: 215 14% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 180 40% 30%;
+    --secondary: 220 10% 35%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 140 15% 92%;
-    --muted-foreground: 160 10% 40%;
+    --muted: 220 12% 93%;
+    --muted-foreground: 220 8% 42%;
 
-    --accent: 200 20% 92%;
-    --accent-foreground: 200 35% 25%;
+    --accent: 220 10% 93%;
+    --accent-foreground: 220 14% 28%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 140 15% 88%;
-    --input: 140 15% 88%;
-    --ring: 152 58% 35%;
+    --border: 220 12% 88%;
+    --input: 220 12% 88%;
+    --ring: 215 14% 40%;
 
-    --paper: 140 15% 94%;
-    --paper-foreground: 160 25% 10%;
+    --paper: 220 12% 95%;
+    --paper-foreground: 220 20% 12%;
 
-    --inactive: 140 10% 75%;
-    --inactive-foreground: 160 10% 40%;
+    --inactive: 220 8% 75%;
+    --inactive-foreground: 220 8% 42%;
 
-    --info: 195 70% 45%;
+    --info: 210 60% 50%;
     --info-foreground: 0 0% 100%;
 
     --bw: 0 0% 0%;
@@ -134,9 +134,9 @@
   background: conic-gradient(
     from var(--shimmer-angle, 0deg) at 50% 50%,
     transparent 0%,
-    hsl(152 58% 42% / 0.03) 15%,
-    hsl(180 50% 25% / 0.05) 30%,
-    hsl(200 35% 30% / 0.03) 45%,
+    hsl(215 14% 45% / 0.03) 15%,
+    hsl(220 12% 30% / 0.05) 30%,
+    hsl(220 10% 35% / 0.03) 45%,
     transparent 60%
   );
   pointer-events: none;
@@ -144,17 +144,17 @@
   z-index: 0;
 }
 
-/* Green accent line */
+/* Slate accent line */
 .gold-line {
   height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(152 58% 42% / 0.5), transparent);
+  background: linear-gradient(90deg, transparent, hsl(215 14% 45% / 0.4), transparent);
 }
 
 /* Glass surface effect */
 .glass-surface {
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 1px solid hsl(152 58% 42% / 0.08);
+  border: 1px solid hsl(215 14% 45% / 0.08);
 }
 
 /* Luxury easing */
@@ -162,9 +162,9 @@
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Green text gradient */
+/* Slate text gradient */
 .text-gold-gradient {
-  background: linear-gradient(135deg, hsl(152 58% 42%), hsl(152 70% 58%), hsl(152 58% 42%));
+  background: linear-gradient(135deg, hsl(215 14% 45%), hsl(215 20% 60%), hsl(215 14% 45%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
