@@ -8,12 +8,19 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
+import { requireAdmin } from "@/lib/core/auth";
 import { clearCache } from "@/lib/core/cache";
 import { fileDateTime } from "@/lib/core/date";
+import { RATE_LIMITS, rateLimitResponse } from "@/lib/core/rate-limit";
 
-export async function POST() {
+export async function POST(request: Request) {
+  // Rate limit heavy operations
+  const rateLimited = rateLimitResponse(request, "backup", RATE_LIMITS.heavy);
+  if (rateLimited) return rateLimited;
+
   revalidateTag("api");
   try {
+    await requireAdmin();
     clearCache();
     // Fetch all data from Prisma models
     const account = await prisma.account.findMany();
@@ -43,7 +50,19 @@ export async function POST() {
         "Content-Disposition": `attachment; filename="${fileName}"`,
       },
     });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: error }, { status: 500 });
+  } catch (error: any) {
+    if (
+      error?.message === "FORBIDDEN_ADMIN" ||
+      error?.message === "UNAUTHORIZED"
+    ) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Backup failed",
+      },
+      { status: 500 }
+    );
   }
 }

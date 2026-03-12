@@ -155,8 +155,6 @@ export async function PATCH(
       accessUpdatedById: currentUser.id === "admin" ? null : currentUser.id,
     };
 
-    console.log("Updating account with:", updateData);
-
     const updated = await prisma.account.update({
       where: { id },
       data: updateData,
@@ -191,20 +189,18 @@ export async function PATCH(
     );
   } catch (error: any) {
     console.error("Error updating access:", error);
-    console.error("Error details:", {
-      message: error.message,
-      code: error.code,
-      meta: error.meta,
-      stack: error.stack,
-    });
-    if (
-      error.message === "UNAUTHORIZED" ||
-      error.message === "FORBIDDEN_ADMIN"
-    ) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
+    if (error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    // Return more detailed error message
-    const errorMessage = error.message || "Failed to update access";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    if (error.message === "FORBIDDEN_ADMIN") {
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 }
+      );
+    }
+    return NextResponse.json(
+      { error: "Failed to update access" },
+      { status: 500 }
+    );
   }
 }

@@ -2,11 +2,13 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { env, getAdminPassword } from "@/lib/config/env";
 import { createSessionCookie, verifyPassword } from "@/lib/core/auth";
+import { RATE_LIMITS, rateLimitResponse } from "@/lib/core/rate-limit";
 import { loginSchema } from "@/lib/validators/api-schemas";
 
 /**
@@ -112,6 +114,10 @@ import { loginSchema } from "@/lib/validators/api-schemas";
  *                   type: string
  */
 export async function POST(request: Request) {
+  // Rate limit login attempts
+  const rateLimited = rateLimitResponse(request, "login", RATE_LIMITS.login);
+  if (rateLimited) return rateLimited;
+
   try {
     const body = await request.json();
 
@@ -132,6 +138,30 @@ export async function POST(request: Request) {
 
     const { username, password } = validationResult.data;
 
+    // Guest login — read-only access, no password required
+    if (username === "guest" && password === "guest") {
+      await createSessionCookie({
+        sub: "guest",
+        role: "MEMBER",
+        accessLevel: "READ",
+        canLogin: true,
+      });
+
+      return NextResponse.json(
+        {
+          message: "Login successful",
+          user: {
+            kind: "member" as const,
+            accountId: "guest",
+            role: "MEMBER",
+            accessLevel: "READ",
+            canLogin: true,
+          },
+        },
+        { status: 200 }
+      );
+    }
+
     const adminUsername = env.ADMIN_USERNAME;
     const adminPassword = getAdminPassword();
 
@@ -144,7 +174,15 @@ export async function POST(request: Request) {
         );
       }
 
-      if (password !== adminPassword) {
+      // Support both bcrypt-hashed and plaintext admin passwords
+      // If the stored password looks like a bcrypt hash, compare with bcrypt
+      const isBcryptHash =
+        adminPassword.startsWith("$2a$") || adminPassword.startsWith("$2b$");
+      const isValidAdmin = isBcryptHash
+        ? await bcrypt.compare(password, adminPassword)
+        : password === adminPassword;
+
+      if (!isValidAdmin) {
         return NextResponse.json(
           { error: "Invalid username or password" },
           { status: 401 }

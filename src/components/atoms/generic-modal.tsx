@@ -72,11 +72,11 @@ export const GenericModalFooter = ({
   );
 
   return (
-    <DialogFooter className="gap-2 flex sm:flex-row flex-row justify-between pt-4">
+    <DialogFooter className="gap-2 flex flex-col-reverse sm:flex-row justify-between pt-4">
       <Button
         variant="outline"
         onClick={throttledOnCancel}
-        className="min-w-[140px]"
+        className="w-full sm:w-auto sm:min-w-[140px]"
         disabled={isSubmitting}
       >
         Cancel
@@ -84,7 +84,7 @@ export const GenericModalFooter = ({
       <Button
         type={isDelete ? "button" : "submit"}
         variant={isDelete ? "destructive" : "default"}
-        className="min-w-[140px]"
+        className="w-full sm:w-auto sm:min-w-[140px]"
         onClick={throttledOnConfirm}
         disabled={isSubmitting}
       >

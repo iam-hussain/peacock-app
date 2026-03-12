@@ -87,6 +87,11 @@ export function LoginFormCard() {
     return await mutation.mutateAsync(data);
   }
 
+  async function onGuestLogin() {
+    setError(null);
+    return await mutation.mutateAsync({ username: "guest", password: "guest" });
+  }
+
   return (
     <Card className="w-full max-w-[400px] border-border/50 bg-card shadow-sm">
       <CardHeader className="space-y-1 pb-4">
@@ -181,6 +186,28 @@ export function LoginFormCard() {
             >
               {mutation.isPending ? "Logging in..." : "Login"}
             </Button>
+
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-card px-2 text-muted-foreground">or</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 rounded-lg"
+              disabled={mutation.isPending}
+              onClick={onGuestLogin}
+            >
+              Continue as Guest
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              View-only access — no account required
+            </p>
           </form>
         </Form>
       </CardContent>

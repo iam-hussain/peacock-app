@@ -182,24 +182,12 @@ export async function DELETE(
       );
     }
 
-    // Revert passbook changes before deleting the transaction
-    // If this fails, the transaction will be deleted but passbooks will be out of sync
-    try {
-      if (transaction) {
-        await transactionEntryHandler(transaction, true);
-      }
-    } catch (handlerError: any) {
-      console.error(
-        `⚠️ Transaction ${id} deletion: passbook revert failed. ` +
-          `Transaction will be deleted but passbooks may be out of sync. ` +
-          `Run recalculation to fix. Error: ${handlerError.message}`
-      );
-      // Continue with deletion even if passbook revert failed
-      // The transaction will be deleted, but passbooks need recalculation
-    }
-
-    // Delete the transaction
-    await prisma.transaction.delete({ where: { id } });
+    // Revert passbook changes and delete the transaction atomically.
+    // If any step fails, the entire operation is rolled back automatically by Prisma.
+    await prisma.$transaction(async (tx) => {
+      await transactionEntryHandler(transaction, true, tx);
+      await tx.transaction.delete({ where: { id } });
+    });
 
     // Clear all caches after transaction deletion
     await invalidateTransactionCaches();

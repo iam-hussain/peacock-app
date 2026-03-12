@@ -3,16 +3,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
+import MemberWatermark from "@/components/molecules/member-watermark";
 import { MobileBottomNav } from "@/components/organisms/mobile-bottom-nav";
 import { ModernSidebar } from "@/components/organisms/modern-sidebar";
 import { ModernSidebarMobile } from "@/components/organisms/modern-sidebar-mobile";
 import { ModernTopBar } from "@/components/organisms/modern-top-bar";
+import {
+  setIsLoggedIn,
+  useAppState,
+} from "@/components/providers/app-state-provider";
 import { fetchAuthStatus } from "@/lib/query-options";
 import { cn } from "@/lib/ui/utils";
-import { RootState } from "@/store";
-import { setIsLoggedIn } from "@/store/pageSlice";
 
 export default function DashboardLayout({
   children,
@@ -20,11 +22,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
   const { data, isLoading, isError } = useQuery(fetchAuthStatus());
-  const sideBarCollapsed = useSelector(
-    (state: RootState) => state.page.sideBarCollapsed
-  );
+  const { sideBarCollapsed } = state;
 
   useEffect(() => {
     if (data) {
@@ -59,6 +59,7 @@ export default function DashboardLayout({
   return (
     <div className="main-wrapper">
       <main className={"page-main bg-paper"}>
+        <MemberWatermark />
         <ModernTopBar />
         <ModernSidebar />
         <div
@@ -68,7 +69,9 @@ export default function DashboardLayout({
           )}
           id="dashboard-content"
         >
-          <div className="w-full flex h-full p-6 pb-20 lg:pb-6">{children}</div>
+          <div className="w-full flex h-full p-2 sm:p-4 md:p-6 pb-20 lg:pb-6">
+            {children}
+          </div>
         </div>
       </main>
       <ModernSidebarMobile />

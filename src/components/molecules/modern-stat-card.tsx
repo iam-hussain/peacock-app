@@ -37,8 +37,9 @@ export function ModernStatCard({
   return (
     <Card
       className={cn(
-        "h-full flex flex-col rounded-lg border border-border/50 bg-card shadow-sm transition-all hover:shadow-md",
-        isHighlighted && "ring-2 ring-primary/20 shadow-md border-primary/30",
+        "h-full flex flex-col rounded-lg border border-border/30 bg-card/80 backdrop-blur-sm shadow-none transition-all duration-500 hover:border-primary/10 hover:bg-card",
+        isHighlighted &&
+          "border-l-[3px] border-l-primary border-primary/20 shimmer-surface",
         className
       )}
     >
@@ -48,7 +49,7 @@ export function ModernStatCard({
         <div className="flex flex-1 items-center justify-between gap-4">
           {/* Left: Label */}
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">
               {title}
             </p>
           </div>
@@ -57,8 +58,8 @@ export function ModernStatCard({
             {typeof value === "string" || typeof value === "number" ? (
               <p
                 className={cn(
-                  "font-bold tracking-tight text-foreground",
-                  isHighlighted ? "text-2xl" : "text-xl"
+                  "font-semibold font-bold tracking-tight text-foreground",
+                  isHighlighted ? "text-lg sm:text-2xl" : "text-base sm:text-xl"
                 )}
               >
                 {value}
@@ -66,8 +67,8 @@ export function ModernStatCard({
             ) : (
               <div
                 className={cn(
-                  "font-bold tracking-tight text-foreground",
-                  isHighlighted ? "text-2xl" : "text-xl"
+                  "font-semibold font-bold tracking-tight text-foreground",
+                  isHighlighted ? "text-lg sm:text-2xl" : "text-base sm:text-xl"
                 )}
               >
                 {value}

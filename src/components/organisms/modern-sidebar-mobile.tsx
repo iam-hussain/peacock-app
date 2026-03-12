@@ -18,20 +18,21 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
+import {
+  openSideBar,
+  setIsLoggedIn,
+  useAppState,
+} from "../providers/app-state-provider";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 import { ScrollArea } from "../ui/scroll-area";
-import { Separator } from "../ui/separator";
 
 import { useAuth } from "@/hooks/use-auth";
 import { clubAge } from "@/lib/core/date";
 import fetcher from "@/lib/core/fetcher";
 import { cn } from "@/lib/ui/utils";
-import { RootState } from "@/store";
-import { openSideBar, setIsLoggedIn } from "@/store/pageSlice";
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -57,14 +58,14 @@ const secondaryNavItems: NavItem[] = [
 ];
 
 export function ModernSidebarMobile() {
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const isLoggedIn = useSelector((state: RootState) => state.page.isLoggedIn);
+  const { sideBarOpen, isLoggedIn } = state;
   const club = clubAge();
   const { user } = useAuth();
+  const isGuest = user?.kind === "member" && user?.id === "guest";
 
   // Fetch profile data for members and admin-members
   const { data: profileData } = useQuery({
@@ -78,7 +79,9 @@ export function ModernSidebarMobile() {
         };
       }>,
     enabled:
-      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member"),
+      isLoggedIn &&
+      (user?.kind === "member" || user?.kind === "admin-member") &&
+      !isGuest,
   });
 
   // Get display name
@@ -138,7 +141,7 @@ export function ModernSidebarMobile() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
             onClick={handleClose}
           />
 
@@ -148,10 +151,10 @@ export function ModernSidebarMobile() {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 z-50 h-screen w-[280px] lg:hidden flex flex-col bg-background shadow-xl"
+            className="fixed left-0 top-0 z-50 h-screen w-[280px] lg:hidden flex flex-col bg-background/95 glass-surface shadow-none"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border/50">
+            <div className="flex items-center justify-between p-4">
               <Link
                 href="/"
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
@@ -166,7 +169,7 @@ export function ModernSidebarMobile() {
                   />
                 </div>
                 <div>
-                  <h1 className="text-sm font-bold text-foreground">
+                  <h1 className="text-sm font-brand font-bold text-foreground tracking-[0.15em] uppercase">
                     Peacock Club
                   </h1>
                   <p className="text-[10px] text-muted-foreground">
@@ -217,7 +220,7 @@ export function ModernSidebarMobile() {
                 })}
               </nav>
 
-              <Separator className="my-4" />
+              <div className="gold-line my-4" />
 
               <nav className="space-y-1">
                 {secondaryNavItems.map((item) => {
@@ -252,48 +255,53 @@ export function ModernSidebarMobile() {
             </ScrollArea>
 
             {/* Footer Actions */}
-            <div className="p-4 border-t border-border/50 space-y-1">
+            <div className="gold-line mx-3" />
+            <div className="p-4 space-y-1">
               {isLoggedIn ? (
                 <>
                   {/* User Name Display */}
                   {displayName && (
-                    <div className="px-3 py-2 mb-2 rounded-lg bg-muted/50">
+                    <div className="px-3 py-2 mb-2 rounded-lg bg-primary/5">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="text-sm font-medium text-foreground truncate">
+                        <User className="h-4 w-4 text-primary/60 shrink-0" />
+                        <span className="text-sm font-brand font-medium text-foreground truncate">
                           {displayName}
                         </span>
                       </div>
                     </div>
                   )}
-                  <CustomLink
-                    href="/dashboard/profile"
-                    variant="ghost"
-                    size="default"
-                    className={cn(
-                      "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
-                      isActive("/dashboard/profile") &&
-                        "bg-primary/10 text-primary font-medium"
-                    )}
-                    onClick={handleClose}
-                  >
-                    <User className="h-5 w-5 shrink-0" />
-                    <span className="text-sm font-medium">Profile</span>
-                  </CustomLink>
-                  <CustomLink
-                    href="/dashboard/settings"
-                    variant="ghost"
-                    size="default"
-                    className={cn(
-                      "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
-                      isActive("/dashboard/settings") &&
-                        "bg-primary/10 text-primary font-medium"
-                    )}
-                    onClick={handleClose}
-                  >
-                    <Settings className="h-5 w-5 shrink-0" />
-                    <span className="text-sm font-medium">Settings</span>
-                  </CustomLink>
+                  {!isGuest && (
+                    <>
+                      <CustomLink
+                        href="/dashboard/profile"
+                        variant="ghost"
+                        size="default"
+                        className={cn(
+                          "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
+                          isActive("/dashboard/profile") &&
+                            "bg-primary/10 text-primary font-medium"
+                        )}
+                        onClick={handleClose}
+                      >
+                        <User className="h-5 w-5 shrink-0" />
+                        <span className="text-sm font-medium">Profile</span>
+                      </CustomLink>
+                      <CustomLink
+                        href="/dashboard/settings"
+                        variant="ghost"
+                        size="default"
+                        className={cn(
+                          "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
+                          isActive("/dashboard/settings") &&
+                            "bg-primary/10 text-primary font-medium"
+                        )}
+                        onClick={handleClose}
+                      >
+                        <Settings className="h-5 w-5 shrink-0" />
+                        <span className="text-sm font-medium">Settings</span>
+                      </CustomLink>
+                    </>
+                  )}
                   <Button
                     variant="ghost"
                     size="default"

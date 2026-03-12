@@ -36,6 +36,7 @@ export const transactionFormSchema = z.object({
   method: z.string().optional().default("ACCOUNT"),
   transactionAt: z.date(),
   note: z.string().optional(),
+  referenceId: z.string().optional(),
 });
 
 export type TransactionFormSchema = z.infer<typeof transactionFormSchema>;

@@ -26,8 +26,8 @@ type AuditAccountDetails = {
 };
 
 type TransactionToTransform = Transaction & {
-  from: AccountDetails;
-  to: AccountDetails;
+  from: AccountDetails | null;
+  to: AccountDetails | null;
   createdBy: AuditAccountDetails | null;
   updatedBy: AuditAccountDetails | null;
 };
@@ -199,9 +199,12 @@ export async function POST(request: Request) {
 
 function getQueryParams(url: string) {
   const { searchParams } = new URL(url);
+  const rawPage = parseInt(searchParams.get("page") || "1");
+  const rawLimit = parseInt(searchParams.get("limit") || "10");
   return {
-    page: parseInt(searchParams.get("page") || "1"),
-    limit: parseInt(searchParams.get("limit") || "10"),
+    page: Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage,
+    limit:
+      Number.isNaN(rawLimit) || rawLimit < 1 ? 10 : Math.min(rawLimit, 100),
     accountId: searchParams.get("accountId"),
     transactionType: searchParams.get("transactionType"),
     startDate: searchParams.get("startDate"),
@@ -280,86 +283,106 @@ function createFilters({
   return filters;
 }
 
-function fetchTransactions(
+async function fetchTransactions(
   filters: any,
   page: number,
   limit: number,
   sortField: string,
   sortOrder: string
 ) {
-  return prisma.transaction.findMany({
-    where: filters,
-    skip: (page - 1) * limit,
-    take: limit,
-    orderBy: { [sortField]: sortOrder },
-    include: {
-      from: {
-        select: {
-          id: true,
-          username: true,
-          firstName: true,
-          lastName: true,
-          avatarUrl: true,
-          status: true,
-          type: true,
-        },
-      },
-      to: {
-        select: {
-          id: true,
-          username: true,
-          firstName: true,
-          lastName: true,
-          avatarUrl: true,
-          status: true,
-          type: true,
-        },
-      },
-      createdBy: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
-      updatedBy: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-        },
-      },
+  const accountSelect = {
+    select: {
+      id: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+      avatarUrl: true,
+      status: true,
+      type: true,
     },
-  });
+  };
+
+  try {
+    return await prisma.transaction.findMany({
+      where: filters,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { [sortField]: sortOrder },
+      include: {
+        from: accountSelect,
+        to: accountSelect,
+        createdBy: { select: { id: true, firstName: true, lastName: true } },
+        updatedBy: { select: { id: true, firstName: true, lastName: true } },
+      },
+    });
+  } catch (err: any) {
+    // Handle orphaned references (deleted accounts still referenced by transactions)
+    if (err.message?.includes("Inconsistent query result")) {
+      console.warn(
+        "Orphaned transaction references detected, fetching without includes"
+      );
+      const raw = await prisma.transaction.findMany({
+        where: filters,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { [sortField]: sortOrder },
+      });
+      // Manually resolve accounts
+      const accountIds = Array.from(
+        new Set(raw.flatMap((t) => [t.fromId, t.toId].filter(Boolean)))
+      );
+      const accounts = await prisma.account.findMany({
+        where: { id: { in: accountIds } },
+        ...accountSelect,
+      });
+      const accountMap = new Map(accounts.map((a) => [a.id, a]));
+      return raw.map((t) => ({
+        ...t,
+        from: accountMap.get(t.fromId) || null,
+        to: accountMap.get(t.toId) || null,
+        createdBy: null,
+        updatedBy: null,
+      }));
+    }
+    throw err;
+  }
 }
 
+const UNKNOWN_ACCOUNT: AccountDetails = {
+  id: "unknown",
+  username: "unknown",
+  firstName: "Deleted",
+  lastName: "Account",
+  avatarUrl: null,
+  status: "CLOSED",
+  type: "MEMBER",
+};
+
 function transactionTableTransform(transaction: TransactionToTransform) {
-  const fromName = `${transaction.from.firstName || ""} ${transaction.from.lastName || ""}`;
-  const toName = `${transaction.to.firstName || ""} ${transaction.to.lastName || ""}`;
+  const from = transaction.from || UNKNOWN_ACCOUNT;
+  const to = transaction.to || UNKNOWN_ACCOUNT;
+  const fromName = `${from.firstName || ""} ${from.lastName || ""}`;
+  const toName = `${to.firstName || ""} ${to.lastName || ""}`;
 
   const updated = {
     from: {
-      ...transaction.from,
+      ...from,
       name: fromName,
       sub: "",
-      avatar: transaction.from.avatarUrl
-        ? `/image/${transaction.from.avatarUrl}`
-        : undefined,
+      avatar: from.avatarUrl ? `/image/${from.avatarUrl}` : undefined,
       link:
-        transaction.from.type === "MEMBER"
-          ? `/dashboard/member/${transaction.from.username}`
+        from.type === "MEMBER" && from.id !== "unknown"
+          ? `/dashboard/member/${from.username}`
           : undefined,
     },
     to: {
-      ...transaction.to,
+      ...to,
       name: toName,
       sub: "",
-      avatar: transaction.to.avatarUrl
-        ? `/image/${transaction.to.avatarUrl}`
-        : undefined,
+      avatar: to.avatarUrl ? `/image/${to.avatarUrl}` : undefined,
       link:
-        transaction.to.type === "MEMBER"
-          ? `/dashboard/member/${transaction.to.username}`
+        to.type === "MEMBER" && to.id !== "unknown"
+          ? `/dashboard/member/${to.username}`
           : undefined,
     },
   };

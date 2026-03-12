@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file type
+    // Validate file type (MIME header check)
     if (!file.type.startsWith("image/")) {
       return NextResponse.json(
         { error: "File must be an image" },
@@ -112,6 +112,38 @@ export async function POST(request: Request) {
     // Convert file to buffer
     const bytesArray = await file.arrayBuffer();
     const buffer = Buffer.from(bytesArray);
+
+    // Validate magic bytes (server-side file type verification)
+    const magicBytes = buffer.subarray(0, 8);
+    const isJpeg =
+      magicBytes[0] === 0xff &&
+      magicBytes[1] === 0xd8 &&
+      magicBytes[2] === 0xff;
+    const isPng =
+      magicBytes[0] === 0x89 &&
+      magicBytes[1] === 0x50 &&
+      magicBytes[2] === 0x4e &&
+      magicBytes[3] === 0x47;
+    const isGif =
+      magicBytes[0] === 0x47 &&
+      magicBytes[1] === 0x49 &&
+      magicBytes[2] === 0x46;
+    const isWebp =
+      magicBytes[0] === 0x52 &&
+      magicBytes[1] === 0x49 &&
+      magicBytes[2] === 0x46 &&
+      magicBytes[3] === 0x46 &&
+      magicBytes[8] === 0x57 &&
+      magicBytes[9] === 0x45;
+
+    if (!isJpeg && !isPng && !isGif && !isWebp) {
+      return NextResponse.json(
+        {
+          error: "Invalid image file. Supported formats: JPEG, PNG, GIF, WebP",
+        },
+        { status: 400 }
+      );
+    }
 
     // Resize and crop image to 200x200px square using sharp
     const processedImage = await sharp(buffer)
@@ -147,17 +179,20 @@ export async function POST(request: Request) {
     if (oldImageUrl) {
       try {
         // Extract filename from URL (e.g., /image/avatar_13.jpeg -> avatar_13.jpeg)
-        const oldFilename = oldImageUrl
-          .replace("/image/", "")
-          .replace(/^\//, "");
+        const oldFilename = path.basename(oldImageUrl);
         if (oldFilename && oldFilename !== filename) {
-          const oldFilePath = path.join(publicPath, oldFilename);
-          try {
-            await unlink(oldFilePath);
-          } catch (unlinkError: any) {
-            // File might not exist, ignore error
-            if (unlinkError.code !== "ENOENT") {
-              console.warn("Failed to delete old image:", unlinkError);
+          const oldFilePath = path.resolve(publicPath, oldFilename);
+          // Prevent path traversal — ensure resolved path is within publicPath
+          if (!oldFilePath.startsWith(publicPath + path.sep)) {
+            console.warn("Path traversal attempt blocked:", oldImageUrl);
+          } else {
+            try {
+              await unlink(oldFilePath);
+            } catch (unlinkError: any) {
+              // File might not exist, ignore error
+              if (unlinkError.code !== "ENOENT") {
+                console.warn("Failed to delete old image:", unlinkError);
+              }
             }
           }
         }

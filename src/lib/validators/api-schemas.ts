@@ -19,6 +19,7 @@ export const createTransactionSchema = z.object({
     .optional()
     .transform((val) => (val ? new Date(val) : undefined)),
   description: z.string().optional(),
+  referenceId: z.string().optional(),
   method: z.string().default("ACCOUNT"),
   currency: z.string().default("INR"),
 });
@@ -41,6 +42,8 @@ export const createAccountSchema = z.object({
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
     .optional(),
   phone: z.string().optional(),
   email: z.string().email("Invalid email format").optional().or(z.literal("")),

@@ -31,7 +31,7 @@ ChartJS.register(
 const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
   loading: () => (
-    <div className="h-[500px] flex items-center justify-center text-muted-foreground">
+    <div className="h-[300px] sm:h-[400px] md:h-[500px] flex items-center justify-center text-muted-foreground">
       Loading chart...
     </div>
   ),
@@ -39,6 +39,7 @@ const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
 
 import { DataTable } from "@/components/atoms/data-table";
 import { CommonTableCell } from "@/components/atoms/table-component";
+import PageTransition from "@/components/molecules/page-transition";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -632,108 +633,110 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Analytics</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Cash flow graphs and financial metrics over time
-        </p>
-        {summaries.length > 0 && (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Note: Data is based on monthly snapshots. If values don&apos;t match
-            the dashboard, please run recalculation from Settings.
+    <PageTransition>
+      <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">Analytics</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Cash flow graphs and financial metrics over time
           </p>
-        )}
-      </div>
-
-      {/* Controls */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Time Range Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground">
-                Time Range:
-              </span>
-              <div className="flex gap-2">
-                {TIME_RANGES.map((range) => (
-                  <Button
-                    key={range.label}
-                    variant={
-                      selectedRange === range.label ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => setSelectedRange(range.label)}
-                  >
-                    {range.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Metric Toggles */}
-            <div className="flex flex-col gap-3">
-              <span className="text-sm font-medium text-foreground">
-                Metrics:
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {METRICS.map((metric) => (
-                  <Button
-                    key={metric.key}
-                    variant={
-                      visibleMetrics.has(metric.key) ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => toggleMetric(metric.key)}
-                    className="text-xs"
-                  >
-                    {metric.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Main Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Financial Metrics Over Time</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-[500px] w-full" />
-          ) : chartData ? (
-            <div className="h-[500px]">
-              <Line data={chartData} options={chartOptions} />
-            </div>
-          ) : (
-            <div className="h-[500px] flex items-center justify-center text-muted-foreground">
-              No data available for the selected range
-            </div>
+          {summaries.length > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Note: Data is based on monthly snapshots. If values don&apos;t
+              match the dashboard, please run recalculation from Settings.
+            </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Data Table Summary */}
-      {!isLoading && summaries.length > 0 && (
+        {/* Controls */}
         <Card>
-          <CardHeader>
-            <CardTitle>Monthly Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DataTable
-              columns={columns}
-              data={flatSummaries.reverse()}
-              frozenColumnKey="month"
-              isLoading={isLoading}
-              pageSize={10}
-            />
+          <CardContent className="p-4">
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Time Range Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-foreground">
+                  Time Range:
+                </span>
+                <div className="flex gap-2">
+                  {TIME_RANGES.map((range) => (
+                    <Button
+                      key={range.label}
+                      variant={
+                        selectedRange === range.label ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => setSelectedRange(range.label)}
+                    >
+                      {range.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Metric Toggles */}
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-foreground">
+                  Metrics:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {METRICS.map((metric) => (
+                    <Button
+                      key={metric.key}
+                      variant={
+                        visibleMetrics.has(metric.key) ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => toggleMetric(metric.key)}
+                      className="text-xs"
+                    >
+                      {metric.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
-      )}
-    </div>
+
+        {/* Main Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Financial Metrics Over Time</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-[300px] sm:h-[400px] md:h-[500px] w-full" />
+            ) : chartData ? (
+              <div className="h-[300px] sm:h-[400px] md:h-[500px]">
+                <Line data={chartData} options={chartOptions} />
+              </div>
+            ) : (
+              <div className="h-[300px] sm:h-[400px] md:h-[500px] flex items-center justify-center text-muted-foreground">
+                No data available for the selected range
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Data Table Summary */}
+        {!isLoading && summaries.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                columns={columns}
+                data={flatSummaries.reverse()}
+                frozenColumnKey="month"
+                isLoading={isLoading}
+                pageSize={10}
+              />
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </PageTransition>
   );
 }

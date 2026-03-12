@@ -1,14 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
+import { openSideBar, useAppState } from "../providers/app-state-provider";
 
 import MenuItems from "./menu-items";
 
 import { animateDecorator } from "@/lib/ui/animate";
 import { cn } from "@/lib/ui/utils";
-import { RootState } from "@/store";
-import { openSideBar } from "@/store/pageSlice";
 
 const variants = {
   initial: { x: -400, transition: { duration: 0.3, ease: "linear" } },
@@ -19,8 +18,8 @@ const variants = {
 };
 
 function SideMenuMobile({ className }: { className?: string }) {
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
+  const { sideBarOpen } = state;
 
   useEffect(() => {
     document.body.style.overflow = sideBarOpen ? "hidden" : "unset";

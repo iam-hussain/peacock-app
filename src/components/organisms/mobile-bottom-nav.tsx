@@ -3,13 +3,12 @@
 import { FolderSync, MoreHorizontal, Receipt, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import React from "react";
-import { useDispatch } from "react-redux";
 
+import { openSideBar, useAppState } from "../providers/app-state-provider";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 
 import { cn } from "@/lib/ui/utils";
-import { openSideBar } from "@/store/pageSlice";
 
 interface BottomNavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -27,7 +26,7 @@ const bottomNavItems: BottomNavItem[] = [
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const dispatch = useDispatch();
+  const { dispatch } = useAppState();
 
   const isActive = (href: string) => {
     if (href === "#") return false;
@@ -42,13 +41,15 @@ export function MobileBottomNav() {
     <nav
       className={cn(
         "fixed bottom-0 left-0 right-0 z-40 lg:hidden",
-        "bg-background border-t border-border",
-        "shadow-[0_-2px_8px_rgba(0,0,0,0.06)]"
+        "bg-background/80 glass-surface border-t-0",
+        "shadow-none"
       )}
       style={{
         paddingBottom: `max(0.5rem, env(safe-area-inset-bottom))`,
       }}
     >
+      {/* Gold top line */}
+      <div className="gold-line" />
       <div className="flex items-center justify-between h-16 px-2 max-w-md mx-auto">
         {bottomNavItems.map((item) => {
           const active = isActive(item.href);

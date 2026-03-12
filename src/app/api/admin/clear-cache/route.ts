@@ -37,13 +37,16 @@ export async function POST() {
     });
   } catch (error: any) {
     console.error("Error clearing cache:", error);
-    if (
-      error.message === "FORBIDDEN_ADMIN" ||
-      error.message === "UNAUTHORIZED"
-    ) {
+    if (error.message === "UNAUTHORIZED") {
       return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: "Unauthorized" },
         { status: 401 }
+      );
+    }
+    if (error.message === "FORBIDDEN_ADMIN") {
+      return NextResponse.json(
+        { success: false, error: "Forbidden: Admin access required" },
+        { status: 403 }
       );
     }
     return NextResponse.json(

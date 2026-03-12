@@ -4,18 +4,14 @@ import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
 import { useWindowScroll } from "react-use";
 
 import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
+import { openSideBar, useAppState } from "../providers/app-state-provider";
 import Box from "../ui/box";
 import { Button } from "../ui/button";
 import { CustomLink } from "../ui/link";
 import Typography from "../ui/typography";
-
-import { RootState } from "@/store";
-import { openSideBar } from "@/store/pageSlice";
-``;
 
 const animator = {
   hide: {
@@ -34,12 +30,9 @@ const animator = {
 
 function TopMenu({ className }: { className?: string }) {
   const { y } = useWindowScroll();
-  const dispatch = useDispatch();
+  const { state, dispatch } = useAppState();
   const [scrollDirection, setScrollDirection] = useState("IDEAL");
-  const sideBarOpen = useSelector((state: RootState) => state.page.sideBarOpen);
-  const sideBarCollapsed = useSelector(
-    (state: RootState) => state.page.sideBarCollapsed
-  );
+  const { sideBarOpen, sideBarCollapsed } = state;
 
   const callback = useCallback(
     (event: any) => {

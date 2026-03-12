@@ -71,6 +71,7 @@ export function TransactionForm({
           method: selected.method || "ACCOUNT",
           amount: selected.amount || 0,
           note: selected.description || selected.note || "",
+          referenceId: selected.referenceId || "",
           transactionAt: selected.occurredAt
             ? newZoneDate(selected.occurredAt)
             : newZoneDate(),
@@ -82,6 +83,7 @@ export function TransactionForm({
           method: "ACCOUNT",
           amount: 0,
           note: "",
+          referenceId: "",
           transactionAt: newZoneDate(),
         },
   });
@@ -129,6 +131,7 @@ export function TransactionForm({
             ? newZoneDate(transaction.occurredAt)
             : newZoneDate(),
           note: transaction?.description || "",
+          referenceId: transaction?.referenceId || "",
         });
       }
       if (selected?.id) {
@@ -156,6 +159,7 @@ export function TransactionForm({
       ...values,
       occurredAt: values.transactionAt,
       description: values.note,
+      referenceId: values.referenceId || undefined,
     });
   };
 
@@ -166,9 +170,7 @@ export function TransactionForm({
       <form
         id="transaction-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className={
-          isMobile ? "w-full space-y-4 pb-20" : "w-full max-w-2xl space-y-6"
-        }
+        className={isMobile ? "w-full space-y-4" : "w-full max-w-2xl space-y-6"}
       >
         {isMobile ? (
           <FormField
@@ -513,6 +515,53 @@ export function TransactionForm({
           />
         )}
 
+        {isMobile ? (
+          <FormField
+            control={form.control}
+            name="referenceId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Reference ID (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="e.g., loan ID, UPI ref, cheque #"
+                    className="h-11 rounded-xl"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        ) : (
+          <FormField
+            control={form.control}
+            name="referenceId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Reference ID (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="e.g., loan ID, UPI ref, cheque #"
+                    className="h-11 rounded-lg"
+                    {...field}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Link to a loan, UPI reference, cheque number, etc.
+                </p>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        )}
+
         {!isMobile && (
           <GenericModalFooter
             actionLabel={selected ? "Update Transaction" : "Add Transaction"}
@@ -521,7 +570,7 @@ export function TransactionForm({
           />
         )}
         {isMobile && (
-          <div className="sticky bottom-0 left-0 right-0 -mx-4 flex gap-3 border-t border-border bg-background/95 px-4 py-4 pb-safe shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <div className="flex gap-3 pt-4 pb-2">
             <Button
               type="button"
               variant="ghost"

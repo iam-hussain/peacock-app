@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/core/auth";
 import { invalidateDashboardCaches } from "@/lib/core/cache-invalidation";
 import { handleAuthError } from "@/lib/core/error-handler";
+import { RATE_LIMITS, rateLimitResponse } from "@/lib/core/rate-limit";
 import { recalculateSchema } from "@/lib/validators/api-schemas";
 import { recalculateSummary } from "@/logic/reset-handler";
 
@@ -16,6 +17,14 @@ import { recalculateSummary } from "@/logic/reset-handler";
  * Admin-only endpoint
  */
 export async function POST(request: NextRequest) {
+  // Rate limit heavy operations
+  const rateLimited = rateLimitResponse(
+    request,
+    "summary-recalculate",
+    RATE_LIMITS.heavy
+  );
+  if (rateLimited) return rateLimited;
+
   try {
     await requireAdmin();
 

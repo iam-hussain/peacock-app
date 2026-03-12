@@ -127,9 +127,19 @@ export async function PATCH(request: Request) {
       );
     }
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: "New password must be at least 6 characters" },
+        { error: "New password must be at least 8 characters" },
+        { status: 400 }
+      );
+    }
+
+    if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      return NextResponse.json(
+        {
+          error:
+            "Password must contain at least one uppercase letter and one number",
+        },
         { status: 400 }
       );
     }

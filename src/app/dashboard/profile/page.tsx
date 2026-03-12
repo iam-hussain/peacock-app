@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import PageTransition from "@/components/molecules/page-transition";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -166,89 +167,138 @@ export default function ProfilePage() {
   };
 
   return (
-    <TooltipProvider>
-      <div className="w-full max-w-4xl mx-auto space-y-6 pb-24">
-        {/* Breadcrumb */}
-        <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
-          <Link
-            href="/dashboard"
-            className="hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </Link>
-          <span>/</span>
-          <span className="text-foreground">Profile</span>
-        </div>
+    <PageTransition>
+      <TooltipProvider>
+        <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0 pb-20 lg:pb-6">
+          {/* Breadcrumb */}
+          <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
+            <Link
+              href="/dashboard"
+              className="hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+            <span>/</span>
+            <span className="text-foreground">Profile</span>
+          </div>
 
-        {/* Header Section */}
-        <div className="text-center space-y-4 py-8">
-          <div className="flex justify-center">
-            <div className="rounded-full bg-primary/10 p-4">
-              <User className="h-12 w-12 text-primary" />
+          {/* Header Section */}
+          <div className="text-center space-y-3 sm:space-y-4 py-4 sm:py-8">
+            <div className="flex justify-center">
+              <div className="rounded-full bg-primary/10 p-3 sm:p-4">
+                <User className="h-8 w-8 sm:h-12 sm:w-12 text-primary" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+                My Profile
+              </h1>
+              <p className="mt-1 sm:mt-2 text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+                Update your personal information and manage your account
+              </p>
             </div>
           </div>
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-              My Profile
-            </h1>
-            <p className="mt-2 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Update your personal information and manage your account
-            </p>
-          </div>
-        </div>
 
-        {/* Profile Information Card */}
-        <Card className="border-border/50 shadow-sm">
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your personal details and contact information
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...profileForm}>
-              <form
-                onSubmit={profileForm.handleSubmit(onProfileSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={profileForm.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="username"
-                          className={cn(
-                            "font-mono",
-                            isSuperAdmin &&
-                              "bg-muted cursor-not-allowed text-muted-foreground"
-                          )}
-                          disabled={isSuperAdmin}
-                          readOnly={isSuperAdmin}
-                          tabIndex={isSuperAdmin ? -1 : 0}
-                          {...field}
-                        />
-                      </FormControl>
-                      <p className="text-xs text-muted-foreground">
-                        Used for login. Lowercase letters, numbers, hyphens, and
-                        underscores only.
-                      </p>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Profile Information Card */}
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader>
+              <CardTitle>Profile Information</CardTitle>
+              <CardDescription>
+                Update your personal details and contact information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...profileForm}>
+                <form
+                  onSubmit={profileForm.handleSubmit(onProfileSubmit)}
+                  className="space-y-4"
+                >
                   <FormField
                     control={profileForm.control}
-                    name="firstName"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name *</FormLabel>
+                        <FormLabel>Username *</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="John"
+                            placeholder="username"
+                            className={cn(
+                              "font-mono",
+                              isSuperAdmin &&
+                                "bg-muted cursor-not-allowed text-muted-foreground"
+                            )}
+                            disabled={isSuperAdmin}
+                            readOnly={isSuperAdmin}
+                            tabIndex={isSuperAdmin ? -1 : 0}
+                            {...field}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground">
+                          Used for login. Lowercase letters, numbers, hyphens,
+                          and underscores only.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <FormField
+                      control={profileForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name *</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="John"
+                              className={cn(
+                                isSuperAdmin &&
+                                  "bg-muted cursor-not-allowed text-muted-foreground"
+                              )}
+                              disabled={isSuperAdmin}
+                              readOnly={isSuperAdmin}
+                              tabIndex={isSuperAdmin ? -1 : 0}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name (Optional)</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Doe"
+                              className={cn(
+                                isSuperAdmin &&
+                                  "bg-muted cursor-not-allowed text-muted-foreground"
+                              )}
+                              disabled={isSuperAdmin}
+                              readOnly={isSuperAdmin}
+                              tabIndex={isSuperAdmin ? -1 : 0}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                    control={profileForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email (Optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="john.doe@example.com"
                             className={cn(
                               isSuperAdmin &&
                                 "bg-muted cursor-not-allowed text-muted-foreground"
@@ -263,213 +313,177 @@ export default function ProfilePage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={profileForm.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name (Optional)</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Doe"
-                            className={cn(
-                              isSuperAdmin &&
-                                "bg-muted cursor-not-allowed text-muted-foreground"
-                            )}
-                            disabled={isSuperAdmin}
-                            readOnly={isSuperAdmin}
-                            tabIndex={isSuperAdmin ? -1 : 0}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="flex justify-end">
+                    {isSuperAdmin ? (
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted border border-border">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          Super Admin profile (managed via environment)
+                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">
+                              This account is configured via environment
+                              variables and cannot be edited from the dashboard.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    ) : (
+                      <Button
+                        type="submit"
+                        disabled={profileMutation.isPending}
+                        className="gap-2"
+                      >
+                        {profileMutation.isPending
+                          ? "Saving..."
+                          : "Save Changes"}
+                      </Button>
                     )}
-                  />
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+
+          {/* Password Management Card */}
+          <Card className="border-border/50 shadow-sm">
+            <CardHeader>
+              <CardTitle>Password</CardTitle>
+              <CardDescription>
+                {isSuperAdmin
+                  ? "Super Admin password is managed securely outside this dashboard."
+                  : "Change your password to keep your account secure"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isSuperAdmin ? (
+                <div className="p-4 rounded-lg bg-muted/30">
+                  <p className="text-sm text-muted-foreground">
+                    Super Admin password is managed securely outside this
+                    dashboard.
+                  </p>
                 </div>
-                <FormField
-                  control={profileForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email (Optional)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="john.doe@example.com"
-                          className={cn(
-                            isSuperAdmin &&
-                              "bg-muted cursor-not-allowed text-muted-foreground"
-                          )}
-                          disabled={isSuperAdmin}
-                          readOnly={isSuperAdmin}
-                          tabIndex={isSuperAdmin ? -1 : 0}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-end">
-                  {isSuperAdmin ? (
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted border border-border">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        Super Admin profile (managed via environment)
-                      </span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="max-w-xs">
-                            This account is configured via environment variables
-                            and cannot be edited from the dashboard.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  ) : (
+              ) : (
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Password Management
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Update your password regularly to maintain account
+                      security
+                    </p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setPasswordDialogOpen(true)}
+                  >
+                    Change Password
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Change Password Dialog */}
+          <Dialog
+            open={passwordDialogOpen}
+            onOpenChange={setPasswordDialogOpen}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Change Password</DialogTitle>
+                <DialogDescription>
+                  Enter your current password and choose a new one
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...passwordForm}>
+                <form
+                  onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={passwordForm.control}
+                    name="currentPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter current password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={passwordForm.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Enter new password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={passwordForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm New Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="Confirm new password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter className="gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={() => {
+                        setPasswordDialogOpen(false);
+                        passwordForm.reset();
+                      }}
+                    >
+                      Cancel
+                    </Button>
                     <Button
                       type="submit"
-                      disabled={profileMutation.isPending}
-                      className="gap-2"
+                      className="w-full sm:w-auto"
+                      disabled={passwordMutation.isPending}
                     >
-                      {profileMutation.isPending ? "Saving..." : "Save Changes"}
+                      {passwordMutation.isPending
+                        ? "Changing..."
+                        : "Change Password"}
                     </Button>
-                  )}
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
-        {/* Password Management Card */}
-        <Card className="border-border/50 shadow-sm">
-          <CardHeader>
-            <CardTitle>Password</CardTitle>
-            <CardDescription>
-              {isSuperAdmin
-                ? "Super Admin password is managed securely outside this dashboard."
-                : "Change your password to keep your account secure"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isSuperAdmin ? (
-              <div className="p-4 rounded-lg bg-muted/30">
-                <p className="text-sm text-muted-foreground">
-                  Super Admin password is managed securely outside this
-                  dashboard.
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    Password Management
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Update your password regularly to maintain account security
-                  </p>
-                </div>
-                <Button
-                  variant="secondary"
-                  onClick={() => setPasswordDialogOpen(true)}
-                >
-                  Change Password
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Change Password Dialog */}
-        <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Change Password</DialogTitle>
-              <DialogDescription>
-                Enter your current password and choose a new one
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...passwordForm}>
-              <form
-                onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={passwordForm.control}
-                  name="currentPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter current password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={passwordForm.control}
-                  name="newPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter new password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={passwordForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Confirm new password"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setPasswordDialogOpen(false);
-                      passwordForm.reset();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={passwordMutation.isPending}>
-                    {passwordMutation.isPending
-                      ? "Changing..."
-                      : "Change Password"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </TooltipProvider>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </TooltipProvider>
+    </PageTransition>
   );
 }

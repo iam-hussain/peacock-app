@@ -20,6 +20,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         menu: "no-touch:hover:bg-accent no-touch:hover:text-accent-foreground justify-start gap-4 text-foreground/80 w-full",
+        luxury:
+          "bg-transparent border border-primary/50 text-primary hover:bg-primary/10 hover:border-primary tracking-wider uppercase text-sm transition-all duration-500",
       },
       size: {
         default: "h-9 px-4 py-2",

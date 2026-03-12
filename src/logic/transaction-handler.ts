@@ -50,8 +50,9 @@ function getPassbookUpdateQuery(
   });
 }
 
-const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
-  return prisma.passbook.findMany({
+const getTractionPassbook = async ({ fromId, toId }: Transaction, db?: any) => {
+  const client = db || prisma;
+  return client.passbook.findMany({
     where: {
       OR: [{ account: { id: { in: [fromId, toId] } } }, { kind: "CLUB" }],
     },
@@ -64,7 +65,7 @@ const getTractionPassbook = async ({ fromId, toId }: Transaction) => {
   });
 };
 
-type PassbookToUpdate = Map<
+type LedgerUpdateMap = Map<
   string,
   Parameters<typeof prisma.passbook.update>[0]
 >;
@@ -76,7 +77,7 @@ type TransactionPassbooks = {
 };
 
 export const updatePassbookByTransaction = (
-  passbookToUpdate: PassbookToUpdate,
+  passbookToUpdate: LedgerUpdateMap,
   transaction: Transaction,
   isRevert: boolean = false
 ) => {
@@ -172,14 +173,15 @@ export const updatePassbookByTransaction = (
 
 export async function transactionEntryHandler(
   created: Transaction,
-  isDelete: boolean = false
+  isDelete: boolean = false,
+  db?: any
 ) {
   try {
-    const passbooks = await getTractionPassbook(created);
+    const passbooks = await getTractionPassbook(created, db);
 
     // Validate CLUB passbook exists for LOAN_INTEREST transactions
     if (created.type === "LOAN_INTEREST") {
-      const clubPassbook = passbooks.find((p) => p.kind === "CLUB");
+      const clubPassbook = passbooks.find((p: any) => p.kind === "CLUB");
       if (!clubPassbook) {
         const error = new Error(
           `CLUB passbook not found for LOAN_INTEREST transaction ${created.id}. ` +
@@ -210,15 +212,9 @@ export async function transactionEntryHandler(
 
     // Loan history is now calculated on-the-fly from transactions
     // No need to store or recalculate loanHistory in passbook
-    await bulkPassbookUpdate(passbookToUpdate);
+    await bulkPassbookUpdate(passbookToUpdate, db);
 
-    // Log successful processing for LOAN_INTEREST transactions
-    if (created.type === "LOAN_INTEREST") {
-      console.log(
-        `✅ Processed LOAN_INTEREST: ₹${created.amount.toLocaleString("en-IN")} ` +
-          `(ID: ${created.id}, fromId: ${created.fromId}, toId: ${created.toId})`
-      );
-    }
+    // LOAN_INTEREST processed successfully
   } catch (error) {
     console.error(
       `❌ Failed to process transaction ${created.id} (type: ${created.type}):`,

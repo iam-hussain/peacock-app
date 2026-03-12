@@ -9,6 +9,7 @@ import prisma from "@/db";
 import { requireWriteAccess } from "@/lib/core/auth";
 import { invalidateTransactionCaches } from "@/lib/core/cache-invalidation";
 import { createTransactionSchema } from "@/lib/validators/api-schemas";
+import { validateTransactionBusinessRules } from "@/lib/validators/transaction-business-rules";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 /**
@@ -59,6 +60,10 @@ import { transactionEntryHandler } from "@/logic/transaction-handler";
  *                 type: string
  *                 description: Optional transaction description
  *                 example: "Monthly deposit"
+ *               referenceId:
+ *                 type: string
+ *                 description: Optional external reference (loan ID, UPI ref, cheque number, etc.)
+ *                 example: "507f1f77bcf86cd799439099"
  *     responses:
  *       201:
  *         description: Transaction created successfully
@@ -124,41 +129,47 @@ export async function POST(request: Request) {
       );
     }
 
-    const { fromId, toId, amount, transactionType, occurredAt, description } =
-      validationResult.data;
+    const {
+      fromId,
+      toId,
+      amount,
+      transactionType,
+      occurredAt,
+      description,
+      referenceId,
+    } = validationResult.data;
 
-    const created = await prisma.transaction.create({
-      data: {
-        fromId,
-        toId,
-        amount,
-        type: transactionType as TransactionType,
-        occurredAt: occurredAt ? new Date(occurredAt) : new Date(),
-        description: description || null,
-        method: "ACCOUNT",
-        currency: "INR",
-      },
+    // Validate business rules (e.g., sufficient balance, outstanding loan limits)
+    const validationError = await validateTransactionBusinessRules({
+      transactionType,
+      amount,
+      fromId,
+      toId,
     });
-
-    // Process transaction and update passbooks
-    // If this fails, the transaction exists in DB but passbook is out of sync
-    // This is logged as an error and should trigger a recalculation
-    try {
-      await transactionEntryHandler(created);
-    } catch (handlerError) {
-      const errorMessage =
-        handlerError instanceof Error
-          ? handlerError.message
-          : String(handlerError);
-      console.error(
-        `⚠️ Transaction ${created.id} created but passbook update failed. ` +
-          `Transaction exists in database but passbooks may be out of sync. ` +
-          `Run recalculation to fix. Error: ${errorMessage}`
-      );
-      // Still return success for the transaction creation, but log the error
-      // The transaction exists, but passbooks need to be recalculated
-      // In production, you might want to queue a background job to retry or recalculate
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
     }
+
+    // Create transaction and update passbooks atomically within a single DB transaction.
+    // If any step fails, the entire operation is rolled back automatically by Prisma.
+    const created = await prisma.$transaction(async (tx) => {
+      const transaction = await tx.transaction.create({
+        data: {
+          fromId,
+          toId,
+          amount,
+          type: transactionType as TransactionType,
+          occurredAt: occurredAt ? new Date(occurredAt) : new Date(),
+          description: description || null,
+          referenceId: referenceId || null,
+          method: "ACCOUNT",
+          currency: "INR",
+        },
+      });
+
+      await transactionEntryHandler(transaction, false, tx);
+      return transaction;
+    });
 
     // Clear all caches after transaction creation
     await invalidateTransactionCaches();

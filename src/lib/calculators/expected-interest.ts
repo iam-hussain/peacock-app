@@ -6,24 +6,14 @@ import { calculateLoanDetails } from "@/lib/calculators/loan-calculator";
 import { clubConfig } from "@/lib/config/config";
 import { newZoneDate } from "@/lib/core/date";
 import { calculateInterestByAmount } from "@/lib/helper";
-import { PassbookToUpdate } from "@/lib/validators/type";
-
-/**
- * Loan history entry structure from passbook
- */
-type LoanHistoryEntry = {
-  amount: number;
-  startDate: Date | string | number;
-  endDate?: Date | string | number;
-  active?: boolean;
-};
+import { LedgerUpdateMap, LoanHistoryEntry } from "@/lib/validators/type";
 
 /**
  * Calculates expected total loan interest amount from member passbooks
  * This sums up the interest for all active and completed loans across all members
  */
 export function calculateExpectedTotalLoanInterestAmount(
-  allPassbooks: PassbookToUpdate
+  allPassbooks: LedgerUpdateMap
 ): number {
   try {
     // Get all member passbooks
@@ -55,16 +45,16 @@ export function calculateExpectedTotalLoanInterestAmount(
       .flat()
       .map((loan: LoanHistoryEntry) => {
         // Calculate interest for each loan
-        const { interestAmount } = calculateInterestByAmount(
+        const { rawInterestAmount } = calculateInterestByAmount(
           loan.amount || 0,
           loan.startDate || new Date(),
           loan?.endDate
         );
-        return interestAmount;
+        return rawInterestAmount;
       })
       .reduce((a, b) => a + b, 0);
 
-    return expectedTotalLoanInterestAmount;
+    return Math.round(expectedTotalLoanInterestAmount);
   } catch (error) {
     console.error(
       "Error calculating expected total loan interest amount:",
@@ -139,20 +129,20 @@ export function calculateExpectedTotalLoanInterestAmountFromTransactions(
           }
 
           // Calculate interest from actual start to end date
-          const { interestAmount } = calculateInterestByAmount(
+          const { rawInterestAmount } = calculateInterestByAmount(
             loan.amount ?? 0,
             actualStartDate,
             loanEndDate
           );
-          return interestAmount;
+          return rawInterestAmount;
         });
       }
     );
 
     // Sum up all interest amounts from all members
-    const expectedTotalLoanInterestAmount = memberLoanHistories
-      .flat()
-      .reduce((a, b) => a + b, 0);
+    const expectedTotalLoanInterestAmount = Math.round(
+      memberLoanHistories.flat().reduce((a, b) => a + b, 0)
+    );
 
     return { expectedTotalLoanInterestAmount };
   } catch (error) {

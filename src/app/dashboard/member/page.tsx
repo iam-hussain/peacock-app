@@ -18,6 +18,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
+import PageTransition from "@/components/molecules/page-transition";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/core/date";
@@ -291,147 +292,149 @@ export default function MembersPage() {
   });
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
-      {/* Desktop Header */}
-      <div className="hidden lg:block">
-        <PageHeader
-          title="Members Overview"
-          subtitle="View member details, funds managed, balances, and performance."
-          secondaryActions={[
-            {
-              label: "Export CSV",
-              icon: <Download className="h-4 w-4" />,
-              onClick: handleExportCsv,
-            },
-            {
-              label: "Screenshot",
-              icon: <Camera className="h-4 w-4" />,
-              onClick: handleScreenshot,
-            },
-          ]}
-        />
-      </div>
-
-      {/* Mobile Header */}
-      <div className="lg:hidden">
-        <PageHeader
-          title="Members Overview"
-          subtitle="View member details, funds managed, balances, and performance."
-          secondaryActions={[
-            {
-              label: "Export CSV",
-              icon: <Download className="h-4 w-4" />,
-              onClick: handleExportCsv,
-            },
-            {
-              label: "Screenshot",
-              icon: <Camera className="h-4 w-4" />,
-              onClick: handleScreenshot,
-            },
-          ]}
-        />
-      </div>
-
-      {/* Desktop Filter Bar */}
-      <div className="hidden lg:block">
-        <FilterBar
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search members..."
-          filters={{
-            status: {
-              value: statusFilter,
-              onChange: setStatusFilter,
-              options: [
-                { label: "All Status", value: "all" },
-                { label: "Active", value: "active" },
-                { label: "Inactive", value: "inactive" },
-              ],
-            },
-            balance: {
-              value: balanceFilter,
-              onChange: setBalanceFilter,
-              options: [
-                { label: "All Balances", value: "all" },
-                { label: "High Balance", value: "high" },
-                { label: "Low Balance", value: "low" },
-                { label: "Zero Balance", value: "zero" },
-              ],
-            },
-          }}
-          onReset={handleResetFilters}
-        />
-      </div>
-
-      {/* Desktop Table View - Also used for mobile screenshots */}
-      <div ref={tableRef} className="hidden lg:block">
-        <DataTable
-          columns={columns}
-          data={filteredMembers}
-          frozenColumnKey="member"
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Screenshot Area - Hidden, only for export */}
-      <ScreenshotArea
-        title="Members"
-        capturedAt={capturedAt}
-        identifier={identifier}
-      >
-        <div style={{ width: "100%", minWidth: 1200 }}>
-          <DesktopTableOnly
-            columns={columns.filter((col) => col.id !== "actions")}
-            data={filteredMembers}
-            frozenColumnKey="member"
+    <PageTransition>
+      <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-20 lg:pb-6">
+        {/* Desktop Header */}
+        <div className="hidden lg:block">
+          <PageHeader
+            title="Members Overview"
+            subtitle="View member details, funds managed, balances, and performance."
+            secondaryActions={[
+              {
+                label: "Export CSV",
+                icon: <Download className="h-4 w-4" />,
+                onClick: handleExportCsv,
+              },
+              {
+                label: "Screenshot",
+                icon: <Camera className="h-4 w-4" />,
+                onClick: handleScreenshot,
+              },
+            ]}
           />
         </div>
-      </ScreenshotArea>
 
-      {/* Mobile Card View */}
-      <div className="lg:hidden space-y-4">
-        {/* Search Bar */}
-        <SearchBarMobile
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search members..."
-        />
+        {/* Mobile Header */}
+        <div className="lg:hidden">
+          <PageHeader
+            title="Members Overview"
+            subtitle="View member details, funds managed, balances, and performance."
+            secondaryActions={[
+              {
+                label: "Export CSV",
+                icon: <Download className="h-4 w-4" />,
+                onClick: handleExportCsv,
+              },
+              {
+                label: "Screenshot",
+                icon: <Camera className="h-4 w-4" />,
+                onClick: handleScreenshot,
+              },
+            ]}
+          />
+        </div>
 
-        {/* Filter Chips */}
-        <FilterChips
-          chips={[
-            { label: "All", value: "all" },
-            { label: "Active", value: "active" },
-            { label: "Inactive", value: "inactive" },
-          ]}
-          selectedValue={statusFilter}
-          onChange={setStatusFilter}
-        />
+        {/* Desktop Filter Bar */}
+        <div className="hidden lg:block">
+          <FilterBar
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Search members..."
+            filters={{
+              status: {
+                value: statusFilter,
+                onChange: setStatusFilter,
+                options: [
+                  { label: "All Status", value: "all" },
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                ],
+              },
+              balance: {
+                value: balanceFilter,
+                onChange: setBalanceFilter,
+                options: [
+                  { label: "All Balances", value: "all" },
+                  { label: "High Balance", value: "high" },
+                  { label: "Low Balance", value: "low" },
+                  { label: "Zero Balance", value: "zero" },
+                ],
+              },
+            }}
+            onReset={handleResetFilters}
+          />
+        </div>
 
-        {/* Member List */}
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(6)].map((_, i) => (
-              <MemberCardSkeleton key={i} />
-            ))}
+        {/* Desktop Table View - Also used for mobile screenshots */}
+        <div ref={tableRef} className="hidden lg:block">
+          <DataTable
+            columns={columns}
+            data={filteredMembers}
+            frozenColumnKey="member"
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Screenshot Area - Hidden, only for export */}
+        <ScreenshotArea
+          title="Members"
+          capturedAt={capturedAt}
+          identifier={identifier}
+        >
+          <div style={{ width: "100%", minWidth: 1200 }}>
+            <DesktopTableOnly
+              columns={columns.filter((col) => col.id !== "actions")}
+              data={filteredMembers}
+              frozenColumnKey="member"
+            />
           </div>
-        ) : filteredMembers.length > 0 ? (
-          <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-            {filteredMembers.map((member) => (
-              <MemberCardMobile
-                key={member.id}
-                member={member}
-                onViewDetails={() => handleViewDetails(member)}
-                onViewTransactions={() => handleViewTransactions(member)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border/50 bg-card p-8 text-center text-muted-foreground">
-            No members found
-          </div>
-        )}
+        </ScreenshotArea>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {/* Search Bar */}
+          <SearchBarMobile
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search members..."
+          />
+
+          {/* Filter Chips */}
+          <FilterChips
+            chips={[
+              { label: "All", value: "all" },
+              { label: "Active", value: "active" },
+              { label: "Inactive", value: "inactive" },
+            ]}
+            selectedValue={statusFilter}
+            onChange={setStatusFilter}
+          />
+
+          {/* Member List */}
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(6)].map((_, i) => (
+                <MemberCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredMembers.length > 0 ? (
+            <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+              {filteredMembers.map((member) => (
+                <MemberCardMobile
+                  key={member.id}
+                  member={member}
+                  onViewDetails={() => handleViewDetails(member)}
+                  onViewTransactions={() => handleViewTransactions(member)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border/50 bg-card p-8 text-center text-muted-foreground">
+              No members found
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

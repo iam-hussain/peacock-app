@@ -73,6 +73,22 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
+const LuxuryCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-xl border border-border/30 bg-card/80 backdrop-blur-sm shadow-none transition-all duration-500",
+      "hover:border-primary/10 hover:bg-card",
+      className
+    )}
+    {...props}
+  />
+));
+LuxuryCard.displayName = "LuxuryCard";
+
 export {
   Card,
   CardContent,
@@ -80,4 +96,5 @@ export {
   CardFooter,
   CardHeader,
   CardTitle,
+  LuxuryCard,
 };

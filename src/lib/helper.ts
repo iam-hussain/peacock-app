@@ -57,17 +57,27 @@ export const chitCalculator = (
   };
 };
 
-type PassbookToUpdate = Map<
+type LedgerUpdateMap = Map<
   string,
   Parameters<typeof prisma.passbook.update>[0]
 >;
 
 export const bulkPassbookUpdate = async (
-  items: PassbookToUpdate,
-  maxRetries = 3,
-  batchSize = 5
+  items: LedgerUpdateMap,
+  db?: any,
+  maxRetries = BATCH_RETRY_ATTEMPTS,
+  batchSize = BATCH_UPDATE_SIZE
 ) => {
   const values = Array.from(items.values());
+
+  // When a transaction client is provided, execute updates sequentially
+  // (nested interactive transactions are NOT supported in Prisma)
+  if (db) {
+    for (const value of values) {
+      await db.passbook.update(value);
+    }
+    return;
+  }
 
   if (values.length === 1) {
     const firstValue = values[0];
@@ -176,8 +186,8 @@ export function initializePassbookToUpdate(
     payload: JsonValue;
   }[],
   isClean: boolean = true
-): PassbookToUpdate {
-  let passbookToUpdate: PassbookToUpdate = new Map();
+): LedgerUpdateMap {
+  let passbookToUpdate: LedgerUpdateMap = new Map();
 
   for (let passbook of passbooks) {
     if (passbook.account?.id && passbook.kind !== "CLUB") {
@@ -233,7 +243,13 @@ export function fetchAllLoanPassbook() {
   });
 }
 
-export const ONE_MONTH_RATE = 0.01;
+import {
+  BATCH_RETRY_ATTEMPTS,
+  BATCH_UPDATE_SIZE,
+  DEFAULT_INTEREST_RATE,
+} from "@/lib/config/constants";
+
+export const ONE_MONTH_RATE = DEFAULT_INTEREST_RATE;
 
 export function calculateInterestByAmount(
   amount: number,
@@ -247,21 +263,19 @@ export function calculateInterestByAmount(
     new Date(recentStartDate.getFullYear(), recentStartDate.getMonth() + 1, 0)
   ).getDate();
 
-  const interestForMonths = Number(
-    (amount * ONE_MONTH_RATE * monthsPassed).toFixed(2)
-  );
-  const interestPerDay = Number(
-    ((amount * ONE_MONTH_RATE) / daysInMonth).toFixed(2)
-  );
-  const interestForDays = Number((interestPerDay * daysPassed).toFixed(2));
+  const interestForMonths = amount * ONE_MONTH_RATE * monthsPassed;
+  const interestPerDay = (amount * ONE_MONTH_RATE) / daysInMonth;
+  const interestForDays = interestPerDay * daysPassed;
 
-  const interestAmount = Math.round(interestForMonths + interestForDays);
+  const rawInterestAmount = interestForMonths + interestForDays;
+  const interestAmount = Math.round(rawInterestAmount);
 
   return {
     startDate,
     endDate,
     monthsPassed,
     daysPassed,
+    rawInterestAmount,
     interestAmount,
     monthsPassedString: getMonthsPassedString(monthsPassed, daysPassed),
     daysInMonth,
