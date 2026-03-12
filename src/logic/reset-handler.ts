@@ -18,8 +18,13 @@ import { clearCache } from "@/lib/core/cache";
 import {
   bulkPassbookUpdate,
   fetchAllPassbook,
+  getDefaultPassbookData,
   initializePassbookToUpdate,
 } from "@/lib/helper";
+import {
+  ClubFinancialSnapshot,
+  MemberFinancialSnapshot,
+} from "@/lib/validators/type";
 
 type SummaryCreateManyArgs = NonNullable<
   Parameters<typeof prisma.summary.createMany>[0]
@@ -236,4 +241,193 @@ export async function resetAllTransactionMiddlewareHandler(
     updatePassbooks: shouldUpdatePassbooks,
     updateSummary: shouldUpdateDashboard,
   });
+}
+
+/**
+ * Recalculate a single member's passbook and adjust the CLUB passbook accordingly.
+ *
+ * Instead of rebuilding ALL passbooks from ALL transactions, this function:
+ * 1. Subtracts the member's current contribution from the CLUB passbook
+ * 2. Resets the member's passbook to zero
+ * 3. Replays only the member's transactions to rebuild their passbook and re-add to CLUB
+ *
+ * For V1, vendor passbooks are not adjusted — only the member + club passbooks are recalculated.
+ */
+export async function recalculateSingleMemberPassbook(
+  memberId: string
+): Promise<void> {
+  clearCache();
+
+  // 1. Fetch the member's passbook and the CLUB passbook
+  const passbooks = await prisma.passbook.findMany({
+    where: {
+      OR: [{ account: { id: memberId } }, { kind: "CLUB" }],
+    },
+    select: {
+      id: true,
+      kind: true,
+      payload: true,
+      account: { select: { id: true } },
+    },
+  });
+
+  const memberPassbook = passbooks.find(
+    (p) => p.account?.id === memberId && p.kind === "MEMBER"
+  );
+  const clubPassbook = passbooks.find((p) => p.kind === "CLUB");
+
+  if (!memberPassbook) {
+    throw new Error(`Passbook not found for member: ${memberId}`);
+  }
+  if (!clubPassbook) {
+    throw new Error("CLUB passbook not found");
+  }
+
+  // 2. Fetch ALL transactions where this member is involved (fromId or toId)
+  const memberTransactions = await prisma.transaction.findMany({
+    where: {
+      OR: [{ fromId: memberId }, { toId: memberId }],
+    },
+    orderBy: { occurredAt: "asc" },
+  });
+
+  // 3. Read current member passbook values
+  const memberData = (memberPassbook.payload || {}) as MemberFinancialSnapshot;
+  const clubData = (clubPassbook.payload || {}) as ClubFinancialSnapshot;
+
+  // 4. Subtract the member's current contribution from the CLUB passbook ("undo" their impact)
+  //    Calculate net cash effect of this member on the club
+  const memberNetCash =
+    (memberData.periodicDepositsTotal || 0) +
+    (memberData.offsetDepositsTotal || 0) +
+    (memberData.loansPrincipalRepaid || 0) +
+    (memberData.interestPaidTotal || 0) -
+    (memberData.withdrawalsTotal || 0) -
+    (memberData.loansPrincipalTaken || 0);
+
+  const adjustedClubData: ClubFinancialSnapshot = {
+    ...clubData,
+    memberPeriodicDepositsTotal:
+      (clubData.memberPeriodicDepositsTotal || 0) -
+      (memberData.periodicDepositsTotal || 0),
+    memberOffsetDepositsTotal:
+      (clubData.memberOffsetDepositsTotal || 0) -
+      (memberData.offsetDepositsTotal || 0),
+    memberWithdrawalsTotal:
+      (clubData.memberWithdrawalsTotal || 0) -
+      (memberData.withdrawalsTotal || 0),
+    memberProfitWithdrawalsTotal:
+      (clubData.memberProfitWithdrawalsTotal || 0) -
+      (memberData.profitWithdrawalsTotal || 0),
+    loansPrincipalDisbursed:
+      (clubData.loansPrincipalDisbursed || 0) -
+      (memberData.loansPrincipalTaken || 0),
+    loansPrincipalRepaid:
+      (clubData.loansPrincipalRepaid || 0) -
+      (memberData.loansPrincipalRepaid || 0),
+    loansOutstanding:
+      (clubData.loansOutstanding || 0) - (memberData.loansOutstanding || 0),
+    interestCollectedTotal:
+      (clubData.interestCollectedTotal || 0) -
+      (memberData.interestPaidTotal || 0),
+    availableCashBalance:
+      (clubData.availableCashBalance || 0) - memberNetCash,
+    netClubValue:
+      (clubData.netClubValue || 0) -
+      ((memberData.periodicDepositsTotal || 0) +
+        (memberData.offsetDepositsTotal || 0) -
+        (memberData.withdrawalsTotal || 0)),
+  };
+
+  // 5. Reset the member's passbook to default (zero) values
+  const defaultMemberData =
+    getDefaultPassbookData("MEMBER") as MemberFinancialSnapshot;
+
+  // 6. Initialize the passbook update map with zeroed member and adjusted club
+  type LedgerUpdateMap = Map<
+    string,
+    Parameters<typeof prisma.passbook.update>[0]
+  >;
+
+  let passbookToUpdate: LedgerUpdateMap = new Map();
+
+  passbookToUpdate.set(memberId, {
+    where: { id: memberPassbook.id },
+    data: {
+      kind: "MEMBER",
+      payload: defaultMemberData,
+      loanHistory: [],
+    },
+  });
+
+  passbookToUpdate.set("CLUB", {
+    where: { id: clubPassbook.id },
+    data: {
+      kind: "CLUB",
+      payload: adjustedClubData,
+      loanHistory: [],
+    },
+  });
+
+  // 7. If there are no transactions, just write the zeroed/adjusted passbooks
+  if (memberTransactions.length === 0) {
+    await bulkPassbookUpdate(passbookToUpdate);
+    clearCache();
+    return;
+  }
+
+  // 8. For transactions involving other accounts (e.g., FUNDS_TRANSFER from/to another member,
+  //    or VENDOR_INVEST/VENDOR_RETURNS with a vendor), we need those passbooks in the map too
+  //    so that updatePassbookByTransaction can update both sides.
+  //    Collect all unique counterpart account IDs from the member's transactions.
+  const counterpartAccountIds = new Set<string>();
+  for (const tx of memberTransactions) {
+    if (tx.fromId !== memberId) {
+      counterpartAccountIds.add(tx.fromId);
+    }
+    if (tx.toId !== memberId) {
+      counterpartAccountIds.add(tx.toId);
+    }
+  }
+
+  // Fetch counterpart passbooks (these are NOT reset — loaded with current values)
+  if (counterpartAccountIds.size > 0) {
+    const counterpartPassbooks = await prisma.passbook.findMany({
+      where: {
+        account: { id: { in: Array.from(counterpartAccountIds) } },
+      },
+      select: {
+        id: true,
+        kind: true,
+        payload: true,
+        account: { select: { id: true } },
+      },
+    });
+
+    for (const pb of counterpartPassbooks) {
+      if (pb.account?.id && !passbookToUpdate.has(pb.account.id)) {
+        // Initialize with current values (isClean = false) — we don't reset counterpart passbooks
+        passbookToUpdate.set(pb.account.id, {
+          where: { id: pb.id },
+          data: {
+            kind: pb.kind,
+            payload: pb.payload as any,
+          },
+        });
+      }
+    }
+  }
+
+  // 9. Replay all member transactions in occurredAt order
+  for (const transaction of memberTransactions) {
+    passbookToUpdate = updatePassbookByTransaction(
+      passbookToUpdate,
+      transaction
+    );
+  }
+
+  // 10. Write updated passbooks
+  await bulkPassbookUpdate(passbookToUpdate);
+
+  clearCache();
 }

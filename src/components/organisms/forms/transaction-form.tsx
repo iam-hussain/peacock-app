@@ -71,6 +71,7 @@ export function TransactionForm({
           method: selected.method || "ACCOUNT",
           amount: selected.amount || 0,
           note: selected.description || selected.note || "",
+          referenceId: selected.referenceId || "",
           transactionAt: selected.occurredAt
             ? newZoneDate(selected.occurredAt)
             : newZoneDate(),
@@ -82,6 +83,7 @@ export function TransactionForm({
           method: "ACCOUNT",
           amount: 0,
           note: "",
+          referenceId: "",
           transactionAt: newZoneDate(),
         },
   });
@@ -129,6 +131,7 @@ export function TransactionForm({
             ? newZoneDate(transaction.occurredAt)
             : newZoneDate(),
           note: transaction?.description || "",
+          referenceId: transaction?.referenceId || "",
         });
       }
       if (selected?.id) {
@@ -156,6 +159,7 @@ export function TransactionForm({
       ...values,
       occurredAt: values.transactionAt,
       description: values.note,
+      referenceId: values.referenceId || undefined,
     });
   };
 
@@ -507,6 +511,53 @@ export function TransactionForm({
                     {...field}
                   />
                 </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {isMobile ? (
+          <FormField
+            control={form.control}
+            name="referenceId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Reference ID (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="e.g., loan ID, UPI ref, cheque #"
+                    className="h-11 rounded-xl"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        ) : (
+          <FormField
+            control={form.control}
+            name="referenceId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">
+                  Reference ID (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="e.g., loan ID, UPI ref, cheque #"
+                    className="h-11 rounded-lg"
+                    {...field}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Link to a loan, UPI reference, cheque number, etc.
+                </p>
                 <FormMessage className="text-xs" />
               </FormItem>
             )}

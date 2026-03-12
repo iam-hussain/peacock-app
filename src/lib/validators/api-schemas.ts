@@ -19,6 +19,7 @@ export const createTransactionSchema = z.object({
     .optional()
     .transform((val) => (val ? new Date(val) : undefined)),
   description: z.string().optional(),
+  referenceId: z.string().optional(),
   method: z.string().default("ACCOUNT"),
   currency: z.string().default("INR"),
 });

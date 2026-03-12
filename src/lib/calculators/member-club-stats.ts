@@ -104,14 +104,16 @@ export async function getMemberClubStats() {
         ? newZoneDate(loan.endDate)
         : newZoneDate();
 
-      const { interestAmount } = calculateInterestByAmount(
+      const { rawInterestAmount } = calculateInterestByAmount(
         loan.amount ?? 0,
         actualStartDate,
         loanEndDate
       );
-      totalInterestAmount += interestAmount;
+      totalInterestAmount += rawInterestAmount;
     }
   }
+
+  totalInterestAmount = Math.round(totalInterestAmount);
 
   const totalInterestBalance =
     totalInterestAmount - clubData.interestCollectedTotal;

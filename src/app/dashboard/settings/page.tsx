@@ -22,6 +22,7 @@ import { ClickableAvatar } from "@/components/atoms/clickable-avatar";
 import { DataTable } from "@/components/atoms/data-table";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
+import PageTransition from "@/components/molecules/page-transition";
 import { MemberAdjustmentsDialog } from "@/components/molecules/member-adjustments-dialog";
 import { MemberFormDialog } from "@/components/molecules/member-form-dialog";
 import { MemberPermissionCard } from "@/components/molecules/member-permission-card";
@@ -600,6 +601,7 @@ export default function SettingsPage() {
   );
 
   return (
+    <PageTransition>
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-24">
       {/* Breadcrumb */}
       <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
@@ -1140,5 +1142,6 @@ export default function SettingsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </PageTransition>
   );
 }

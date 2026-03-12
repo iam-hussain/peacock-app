@@ -156,7 +156,7 @@ export async function getMemberLoanHistory(memberId: string) {
         actualStartDate,
         loanEndDate
       );
-      acc.totalInterestAmount += interestCalc.interestAmount;
+      acc.totalInterestAmount += interestCalc.rawInterestAmount;
       // Remove startDate and endDate from loan before spreading
       const { startDate: _startDate, endDate: _endDate } = loan;
       acc.loanHistory.push({
@@ -179,7 +179,7 @@ export async function getMemberLoanHistory(memberId: string) {
   return {
     loanHistory: loanHistoryResult.loanHistory,
     totalLoanBalance,
-    totalInterestAmount: loanHistoryResult.totalInterestAmount,
+    totalInterestAmount: Math.round(loanHistoryResult.totalInterestAmount),
     recentPassedString: loanHistoryResult.recentPassedString,
   };
 }

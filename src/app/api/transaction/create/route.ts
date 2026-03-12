@@ -9,6 +9,7 @@ import prisma from "@/db";
 import { requireWriteAccess } from "@/lib/core/auth";
 import { invalidateTransactionCaches } from "@/lib/core/cache-invalidation";
 import { createTransactionSchema } from "@/lib/validators/api-schemas";
+import { validateTransactionBusinessRules } from "@/lib/validators/transaction-business-rules";
 import { transactionEntryHandler } from "@/logic/transaction-handler";
 
 /**
@@ -59,6 +60,10 @@ import { transactionEntryHandler } from "@/logic/transaction-handler";
  *                 type: string
  *                 description: Optional transaction description
  *                 example: "Monthly deposit"
+ *               referenceId:
+ *                 type: string
+ *                 description: Optional external reference (loan ID, UPI ref, cheque number, etc.)
+ *                 example: "507f1f77bcf86cd799439099"
  *     responses:
  *       201:
  *         description: Transaction created successfully
@@ -124,14 +129,24 @@ export async function POST(request: Request) {
       );
     }
 
-    const { fromId, toId, amount, transactionType, occurredAt, description } =
+    const { fromId, toId, amount, transactionType, occurredAt, description, referenceId } =
       validationResult.data;
 
-    // Create transaction and update passbooks atomically:
-    // If passbook update fails, roll back the transaction to keep data consistent
-    let created;
-    try {
-      created = await prisma.transaction.create({
+    // Validate business rules (e.g., sufficient balance, outstanding loan limits)
+    const validationError = await validateTransactionBusinessRules({
+      transactionType,
+      amount,
+      fromId,
+      toId,
+    });
+    if (validationError) {
+      return NextResponse.json({ error: validationError }, { status: 400 });
+    }
+
+    // Create transaction and update passbooks atomically within a single DB transaction.
+    // If any step fails, the entire operation is rolled back automatically by Prisma.
+    const created = await prisma.$transaction(async (tx) => {
+      const transaction = await tx.transaction.create({
         data: {
           fromId,
           toId,
@@ -139,39 +154,15 @@ export async function POST(request: Request) {
           type: transactionType as TransactionType,
           occurredAt: occurredAt ? new Date(occurredAt) : new Date(),
           description: description || null,
+          referenceId: referenceId || null,
           method: "ACCOUNT",
           currency: "INR",
         },
       });
 
-      await transactionEntryHandler(created);
-    } catch (handlerError) {
-      // If the transaction was created but passbook update failed, roll it back
-      if (created) {
-        try {
-          await prisma.transaction.delete({ where: { id: created.id } });
-        } catch (rollbackError) {
-          // If rollback also fails, log critical error — manual recalculation needed
-          console.error(
-            `CRITICAL: Transaction ${created.id} created but passbook update failed, ` +
-              `and rollback also failed. Run recalculation to fix.`,
-            rollbackError
-          );
-        }
-        const errorMessage =
-          handlerError instanceof Error
-            ? handlerError.message
-            : String(handlerError);
-        console.error(
-          `Transaction rolled back — passbook update failed: ${errorMessage}`
-        );
-        return NextResponse.json(
-          { error: "Transaction failed: could not update account balances. Please try again." },
-          { status: 500 }
-        );
-      }
-      throw handlerError;
-    }
+      await transactionEntryHandler(transaction, false, tx);
+      return transaction;
+    });
 
     // Clear all caches after transaction creation
     await invalidateTransactionCaches();

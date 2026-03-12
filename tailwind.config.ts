@@ -44,7 +44,6 @@ const config = {
         },
         paper: {
           DEFAULT: "hsl(var(--paper))",
-          dark: "hsl(var(--paper-dark))",
           foreground: "hsl(var(--paper-foreground))",
         },
         inactive: {
@@ -90,10 +89,30 @@ const config = {
             height: "0",
           },
         },
+        shimmer: {
+          "0%, 100%": { "--shimmer-angle": "0deg" },
+          "50%": { "--shimmer-angle": "360deg" },
+        },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(24px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "0.8" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        shimmer: "shimmer 8s ease-in-out infinite",
+        "fade-in": "fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+        "slide-up": "slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
       },
       fontFamily: {
         sans: ["Roboto-Regular", "sans-serif"],

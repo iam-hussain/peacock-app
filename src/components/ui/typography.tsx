@@ -25,6 +25,8 @@ const typographyStyles = cva("w-auto text-foreground", {
       listItem: "my-6 ml-6 list-disc",
       table: "my-6 w-full overflow-y-auto",
       tableCell: "border px-4 py-2 text-left",
+      luxury: "font-brand text-2xl tracking-wider text-foreground",
+      brandLuxury: "font-brand text-3xl tracking-wider text-gold-gradient",
     },
     align: {
       default: "",

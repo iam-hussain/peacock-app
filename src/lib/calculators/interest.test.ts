@@ -55,4 +55,24 @@ describe("calculateInterestByAmount", () => {
     // 200000 * 0.01 * 5 months = 10000
     expect(result.interestAmount).toBe(10000);
   });
+
+  it("returns rawInterestAmount as an unrounded float", () => {
+    const result = calculateInterestByAmount(10000, "2024-01-01", "2024-01-16");
+    // 15 days of January (31 days): 10000 * 0.01 / 31 * 15 = 48.387096...
+    expect(result.rawInterestAmount).toBeDefined();
+    expect(typeof result.rawInterestAmount).toBe("number");
+    // rawInterestAmount should be the unrounded value
+    expect(result.rawInterestAmount).not.toEqual(
+      Math.round(result.rawInterestAmount)
+    );
+    // interestAmount should be the rounded version of rawInterestAmount
+    expect(result.interestAmount).toBe(Math.round(result.rawInterestAmount));
+  });
+
+  it("rawInterestAmount equals interestAmount for exact month boundaries", () => {
+    const result = calculateInterestByAmount(10000, "2024-01-01", "2024-02-01");
+    // Exact months: 10000 * 0.01 * 1 = 100.0 (no fractional part)
+    expect(result.rawInterestAmount).toBe(100);
+    expect(result.interestAmount).toBe(100);
+  });
 });

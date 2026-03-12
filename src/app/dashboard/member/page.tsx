@@ -18,6 +18,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { MemberCardMobile } from "@/components/molecules/member-card-mobile";
+import PageTransition from "@/components/molecules/page-transition";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { useTableExport } from "@/hooks/use-table-export";
 import { dateFormat, newZoneDate } from "@/lib/core/date";
@@ -291,6 +292,7 @@ export default function MembersPage() {
   });
 
   return (
+    <PageTransition>
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
       {/* Desktop Header */}
       <div className="hidden lg:block">
@@ -433,5 +435,6 @@ export default function MembersPage() {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 }

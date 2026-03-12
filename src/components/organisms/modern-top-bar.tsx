@@ -13,6 +13,7 @@ import {
   useAppState,
 } from "../providers/app-state-provider";
 import { GlobalSearch } from "../molecules/global-search";
+import SoundToggle from "../molecules/sound-toggle";
 import { ThemeModeToggle } from "../molecules/theme-mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -35,6 +36,9 @@ const getPageTitle = (pathname: string): string => {
   if (pathname.startsWith("/dashboard/transaction")) return "Transactions";
   if (pathname.startsWith("/dashboard/terms-and-conditions"))
     return "Terms & Conditions";
+  if (pathname.startsWith("/dashboard/analytics")) return "Analytics";
+  if (pathname.startsWith("/dashboard/profile")) return "Profile";
+  if (pathname.startsWith("/dashboard/settings")) return "Settings";
   return "Dashboard";
 };
 
@@ -106,11 +110,10 @@ export function ModernTopBar() {
     <motion.header
       initial={{ y: -64 }}
       animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      transition={{ type: "spring", stiffness: 80, damping: 18, duration: 0.8 }}
       className={cn(
         "fixed top-0 left-0 right-0 z-30 h-14",
-        "bg-background/80 backdrop-blur-md border-b border-border/50",
-        "shadow-sm",
+        "bg-background/60 glass-surface",
         "transition-all duration-300",
         sideBarCollapsed ? "lg:pl-[80px]" : "lg:pl-[260px]"
       )}
@@ -122,7 +125,7 @@ export function ModernTopBar() {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden h-9 w-9"
+            className="lg:hidden h-9 w-9 border border-primary/20 text-primary hover:bg-primary/5"
             onClick={() => dispatch(openSideBar())}
           >
             {sideBarOpen ? (
@@ -134,8 +137,8 @@ export function ModernTopBar() {
 
           {/* Page Title & Breadcrumb */}
           <div className="hidden md:flex items-center gap-2 min-w-0">
-            <span className="text-sm text-muted-foreground">Peacock Club</span>
-            <span className="text-muted-foreground">/</span>
+            <span className="text-sm text-muted-foreground font-brand tracking-wide">Peacock Club</span>
+            <span className="text-primary/40">/</span>
             <h1 className="text-sm font-semibold text-foreground truncate">
               {pageTitle}
             </h1>
@@ -143,7 +146,7 @@ export function ModernTopBar() {
 
           {/* Mobile App Name */}
           <div className="md:hidden">
-            <h1 className="text-sm font-bold text-foreground">Peacock Club</h1>
+            <h1 className="text-sm font-brand font-bold text-foreground tracking-wide">Peacock Club</h1>
           </div>
         </div>
 
@@ -156,7 +159,7 @@ export function ModernTopBar() {
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden h-9 w-9"
+          className="lg:hidden h-9 w-9 text-primary/70 hover:text-primary"
           onClick={() => setSearchOpen(!searchOpen)}
           data-search-button
         >
@@ -165,6 +168,8 @@ export function ModernTopBar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
+          {/* Sound Toggle */}
+          <SoundToggle />
           {/* Theme Toggle */}
           <ThemeModeToggle />
 
@@ -173,35 +178,35 @@ export function ModernTopBar() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="h-9 gap-2 px-2 hover:bg-accent"
+                className="h-9 gap-2 px-2 hover:bg-primary/5 border border-transparent hover:border-primary/10 transition-all duration-300"
               >
-                <Avatar className="h-7 w-7">
+                <Avatar className="h-7 w-7 ring-1 ring-primary/20">
                   <AvatarImage src="" alt="User" />
                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
                     <User className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <ChevronDown className="h-4 w-4 hidden sm:block" />
+                <ChevronDown className="h-4 w-4 hidden sm:block text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 glass-surface bg-background/95">
               <DropdownMenuItem
                 onClick={() => router.push("/dashboard/profile")}
-                className="cursor-pointer"
+                className="cursor-pointer focus:bg-primary/5 focus:text-primary"
               >
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => router.push("/dashboard/settings")}
-                className="cursor-pointer"
+                className="cursor-pointer focus:bg-primary/5 focus:text-primary"
               >
                 <User className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="bg-primary/10" />
               <DropdownMenuItem
-                className="text-destructive focus:text-destructive cursor-pointer"
+                className="text-muted-foreground focus:text-destructive cursor-pointer transition-colors duration-300"
                 onClick={handleLogout}
               >
                 <LogOut className="mr-2 h-4 w-4" />
@@ -212,6 +217,9 @@ export function ModernTopBar() {
         </div>
       </div>
 
+      {/* Gold line at bottom */}
+      <div className="gold-line" />
+
       {/* Mobile Search Bar */}
       {searchOpen && (
         <motion.div
@@ -219,7 +227,7 @@ export function ModernTopBar() {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="lg:hidden border-t border-border/50 px-4 py-3 bg-background"
+          className="lg:hidden px-4 py-3 bg-background/95 glass-surface"
         >
           <GlobalSearch
             onResultClick={() => setSearchOpen(false)}

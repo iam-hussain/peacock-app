@@ -39,6 +39,7 @@ const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
 
 import { DataTable } from "@/components/atoms/data-table";
 import { CommonTableCell } from "@/components/atoms/table-component";
+import PageTransition from "@/components/molecules/page-transition";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -632,6 +633,7 @@ export default function AnalyticsPage() {
   };
 
   return (
+    <PageTransition>
     <div className="w-full max-w-7xl mx-auto space-y-6">
       {/* Page Header */}
       <div>
@@ -735,5 +737,6 @@ export default function AnalyticsPage() {
         </Card>
       )}
     </div>
+    </PageTransition>
   );
 }

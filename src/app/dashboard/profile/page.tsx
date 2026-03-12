@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import PageTransition from "@/components/molecules/page-transition";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -166,6 +167,7 @@ export default function ProfilePage() {
   };
 
   return (
+    <PageTransition>
     <TooltipProvider>
       <div className="w-full max-w-4xl mx-auto space-y-6 pb-24">
         {/* Breadcrumb */}
@@ -471,5 +473,6 @@ export default function ProfilePage() {
         </Dialog>
       </div>
     </TooltipProvider>
+    </PageTransition>
   );
 }

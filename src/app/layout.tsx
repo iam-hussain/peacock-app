@@ -25,7 +25,6 @@ export default function RootLayout({
     <html lang="en" className="bg-paper">
       <head>
         {/* Resource Hints for Performance */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         {/* Preload critical assets */}
         <link
@@ -35,7 +34,7 @@ export default function RootLayout({
           type="image/svg+xml"
         />
       </head>
-      <body className="bg-paper">
+      <body className="bg-paper noise-overlay">
         <Analytics />
         <QueryProvider>
           <AppStateProvider>

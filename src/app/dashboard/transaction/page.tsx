@@ -29,6 +29,7 @@ import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
 import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
 import { FloatingActionButton } from "@/components/molecules/floating-action-button";
+import PageTransition from "@/components/molecules/page-transition";
 import { PaginationControls } from "@/components/molecules/pagination-controls";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
@@ -958,6 +959,7 @@ export default function TransactionsPage() {
   }, [columns, fetchAllTransactionsForExport, escapeCsvValue]);
 
   return (
+    <PageTransition>
     <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-24 lg:pb-6">
       <div className="hidden lg:block">
         <PageHeader
@@ -1218,6 +1220,15 @@ export default function TransactionsPage() {
                 </p>
               </div>
 
+              {selectedTransaction.referenceId && (
+                <div className="space-y-1 text-sm">
+                  <p className="text-xs text-muted-foreground">Reference ID</p>
+                  <p className="font-medium text-foreground">
+                    {selectedTransaction.referenceId}
+                  </p>
+                </div>
+              )}
+
               {canWrite && (
                 <div className="flex gap-2">
                   <Button
@@ -1318,5 +1329,6 @@ export default function TransactionsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </PageTransition>
   );
 }

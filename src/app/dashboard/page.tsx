@@ -55,6 +55,7 @@ const MembersPreview = dynamic(
 );
 
 import { ModernStatCard } from "@/components/molecules/modern-stat-card";
+import PageTransition from "@/components/molecules/page-transition";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -187,6 +188,7 @@ export default function DashboardPage() {
   };
 
   return (
+    <PageTransition>
     <div className="w-full max-w-7xl mx-auto space-y-3">
       {/* Page Header */}
       <div>
@@ -863,5 +865,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }
