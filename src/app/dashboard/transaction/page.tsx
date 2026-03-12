@@ -41,7 +41,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -1226,94 +1225,110 @@ export default function TransactionsPage() {
         {/* Mobile details modal */}
         <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
           <DialogContent className="max-w-md w-[calc(100%-2rem)] rounded-2xl p-0 gap-0 overflow-hidden">
-            {selectedTransaction && (() => {
-              const dir = getTransactionDirection(selectedTransaction);
-              return (
-                <>
-                  {/* Amount hero */}
-                  <div className="px-5 pt-5 pb-4 text-center border-b border-border/40">
-                    <div className={`flex items-center justify-center gap-1.5 ${dir.color} mb-1`}>
-                      {dir.icon && <dir.icon className="h-4 w-4" />}
-                      <span className="text-2xl font-bold tabular-nums">
-                        {moneyFormat(selectedTransaction.amount)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {transactionTypeMap[selectedTransaction.transactionType] ||
-                        selectedTransaction.transactionType}
-                    </p>
-                  </div>
-
-                  {/* Details grid */}
-                  <div className="px-5 py-4 space-y-3">
-                    <div className="flex items-center justify-between py-1.5 border-b border-border/30">
-                      <span className="text-xs text-muted-foreground">From</span>
-                      <span className="text-sm font-medium text-foreground">
-                        {selectedTransaction.from?.name || "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between py-1.5 border-b border-border/30">
-                      <span className="text-xs text-muted-foreground">To</span>
-                      <span className="text-sm font-medium text-foreground">
-                        {selectedTransaction.to?.name || "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between py-1.5 border-b border-border/30">
-                      <span className="text-xs text-muted-foreground">Date</span>
-                      <span className="text-sm font-medium text-foreground">
-                        {dateFormat(newZoneDate(selectedTransaction.occurredAt))}
-                      </span>
-                    </div>
-                    {(selectedTransaction.description ||
-                      (selectedTransaction as any).note) && (
-                      <div className="flex items-start justify-between py-1.5 border-b border-border/30">
-                        <span className="text-xs text-muted-foreground shrink-0">Note</span>
-                        <span className="text-sm text-foreground text-right ml-4">
-                          {selectedTransaction.description ||
-                            (selectedTransaction as any).note}
+            {selectedTransaction &&
+              (() => {
+                const dir = getTransactionDirection(selectedTransaction);
+                return (
+                  <>
+                    {/* Amount hero */}
+                    <div className="px-5 pt-5 pb-4 text-center border-b border-border/40">
+                      <div
+                        className={`flex items-center justify-center gap-1.5 ${dir.color} mb-1`}
+                      >
+                        {dir.icon && <dir.icon className="h-4 w-4" />}
+                        <span className="text-2xl font-bold tabular-nums">
+                          {moneyFormat(selectedTransaction.amount)}
                         </span>
                       </div>
-                    )}
-                    {selectedTransaction.referenceId && (
+                      <p className="text-xs text-muted-foreground">
+                        {transactionTypeMap[
+                          selectedTransaction.transactionType
+                        ] || selectedTransaction.transactionType}
+                      </p>
+                    </div>
+
+                    {/* Details grid */}
+                    <div className="px-5 py-4 space-y-3">
                       <div className="flex items-center justify-between py-1.5 border-b border-border/30">
-                        <span className="text-xs text-muted-foreground">Ref ID</span>
-                        <span className="text-sm font-mono text-foreground">
-                          {selectedTransaction.referenceId}
+                        <span className="text-xs text-muted-foreground">
+                          From
+                        </span>
+                        <span className="text-sm font-medium text-foreground">
+                          {selectedTransaction.from?.name || "—"}
                         </span>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  {canWrite && (
-                    <div className="px-5 pb-5 flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 rounded-lg"
-                        onClick={() => {
-                          setDetailsDialogOpen(false);
-                          handleEditTransaction(selectedTransaction);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="flex-1 rounded-lg"
-                        onClick={() => {
-                          setDetailsDialogOpen(false);
-                          handleDeleteTransaction(selectedTransaction);
-                        }}
-                      >
-                        Delete
-                      </Button>
+                      <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                        <span className="text-xs text-muted-foreground">
+                          To
+                        </span>
+                        <span className="text-sm font-medium text-foreground">
+                          {selectedTransaction.to?.name || "—"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                        <span className="text-xs text-muted-foreground">
+                          Date
+                        </span>
+                        <span className="text-sm font-medium text-foreground">
+                          {dateFormat(
+                            newZoneDate(selectedTransaction.occurredAt)
+                          )}
+                        </span>
+                      </div>
+                      {(selectedTransaction.description ||
+                        (selectedTransaction as any).note) && (
+                        <div className="flex items-start justify-between py-1.5 border-b border-border/30">
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            Note
+                          </span>
+                          <span className="text-sm text-foreground text-right ml-4">
+                            {selectedTransaction.description ||
+                              (selectedTransaction as any).note}
+                          </span>
+                        </div>
+                      )}
+                      {selectedTransaction.referenceId && (
+                        <div className="flex items-center justify-between py-1.5 border-b border-border/30">
+                          <span className="text-xs text-muted-foreground">
+                            Ref ID
+                          </span>
+                          <span className="text-sm font-mono text-foreground">
+                            {selectedTransaction.referenceId}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </>
-              );
-            })()}
+
+                    {/* Actions */}
+                    {canWrite && (
+                      <div className="px-5 pb-5 flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 rounded-lg"
+                          onClick={() => {
+                            setDetailsDialogOpen(false);
+                            handleEditTransaction(selectedTransaction);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="flex-1 rounded-lg"
+                          onClick={() => {
+                            setDetailsDialogOpen(false);
+                            handleDeleteTransaction(selectedTransaction);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
           </DialogContent>
         </Dialog>
 

@@ -170,9 +170,7 @@ export function TransactionForm({
       <form
         id="transaction-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className={
-          isMobile ? "w-full space-y-4" : "w-full max-w-2xl space-y-6"
-        }
+        className={isMobile ? "w-full space-y-4" : "w-full max-w-2xl space-y-6"}
       >
         {isMobile ? (
           <FormField

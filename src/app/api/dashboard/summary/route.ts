@@ -173,8 +173,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
-            error:
-              "No dashboard data found. Please run recalculation first.",
+            error: "No dashboard data found. Please run recalculation first.",
           },
           { status: 404 }
         );
