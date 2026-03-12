@@ -66,6 +66,7 @@ export function ModernSidebar() {
   const { sideBarCollapsed, isLoggedIn } = state;
   const club = clubAge();
   const { user } = useAuth();
+  const isGuest = user?.kind === "member" && user?.id === "guest";
 
   // Fetch profile data for members and admin-members
   const { data: profileData } = useQuery({
@@ -79,7 +80,7 @@ export function ModernSidebar() {
         };
       }>,
     enabled:
-      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member"),
+      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member") && !isGuest,
   });
 
   // Get display name
@@ -291,42 +292,46 @@ export function ModernSidebar() {
                 </div>
               </div>
             )}
-            <CustomLink
-              href="/dashboard/profile"
-              variant="ghost"
-              size="default"
-              className={cn(
-                "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
-                sideBarCollapsed && "justify-center px-2",
-                isActive("/dashboard/profile") &&
-                  "text-primary bg-primary/5 border-l-2 border-primary font-medium"
-              )}
-              title={sideBarCollapsed ? "Profile" : undefined}
-            >
-              <User className="h-5 w-5 shrink-0" />
-              {!sideBarCollapsed && (
-                <span className="text-sm font-medium">Profile</span>
-              )}
-            </CustomLink>
-            <CustomLink
-              href="/dashboard/settings"
-              variant="ghost"
-              size="default"
-              className={cn(
-                "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
-                sideBarCollapsed && "justify-center px-2",
-                isActive("/dashboard/settings") &&
-                  "text-primary bg-primary/5 border-l-2 border-primary font-medium"
-              )}
-              title={sideBarCollapsed ? "Settings" : undefined}
-            >
-              <Settings className="h-5 w-5 shrink-0" />
-              {!sideBarCollapsed && (
-                <span className="text-sm font-medium">Settings</span>
-              )}
-            </CustomLink>
+            {!isGuest && (
+              <>
+                <CustomLink
+                  href="/dashboard/profile"
+                  variant="ghost"
+                  size="default"
+                  className={cn(
+                    "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
+                    sideBarCollapsed && "justify-center px-2",
+                    isActive("/dashboard/profile") &&
+                      "text-primary bg-primary/5 border-l-2 border-primary font-medium"
+                  )}
+                  title={sideBarCollapsed ? "Profile" : undefined}
+                >
+                  <User className="h-5 w-5 shrink-0" />
+                  {!sideBarCollapsed && (
+                    <span className="text-sm font-medium">Profile</span>
+                  )}
+                </CustomLink>
+                <CustomLink
+                  href="/dashboard/settings"
+                  variant="ghost"
+                  size="default"
+                  className={cn(
+                    "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
+                    sideBarCollapsed && "justify-center px-2",
+                    isActive("/dashboard/settings") &&
+                      "text-primary bg-primary/5 border-l-2 border-primary font-medium"
+                  )}
+                  title={sideBarCollapsed ? "Settings" : undefined}
+                >
+                  <Settings className="h-5 w-5 shrink-0" />
+                  {!sideBarCollapsed && (
+                    <span className="text-sm font-medium">Settings</span>
+                  )}
+                </CustomLink>
+              </>
+            )}
             <Button
               variant="ghost"
               size="default"

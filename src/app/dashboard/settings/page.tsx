@@ -602,7 +602,7 @@ export default function SettingsPage() {
 
   return (
     <PageTransition>
-    <div className="w-full max-w-7xl mx-auto space-y-6 pb-24">
+    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0 pb-20 lg:pb-6">
       {/* Breadcrumb */}
       <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
         <Link

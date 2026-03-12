@@ -66,6 +66,7 @@ export function ModernSidebarMobile() {
   const { sideBarOpen, isLoggedIn } = state;
   const club = clubAge();
   const { user } = useAuth();
+  const isGuest = user?.kind === "member" && user?.id === "guest";
 
   // Fetch profile data for members and admin-members
   const { data: profileData } = useQuery({
@@ -79,7 +80,7 @@ export function ModernSidebarMobile() {
         };
       }>,
     enabled:
-      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member"),
+      isLoggedIn && (user?.kind === "member" || user?.kind === "admin-member") && !isGuest,
   });
 
   // Get display name
@@ -268,34 +269,38 @@ export function ModernSidebarMobile() {
                       </div>
                     </div>
                   )}
-                  <CustomLink
-                    href="/dashboard/profile"
-                    variant="ghost"
-                    size="default"
-                    className={cn(
-                      "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
-                      isActive("/dashboard/profile") &&
-                        "bg-primary/10 text-primary font-medium"
-                    )}
-                    onClick={handleClose}
-                  >
-                    <User className="h-5 w-5 shrink-0" />
-                    <span className="text-sm font-medium">Profile</span>
-                  </CustomLink>
-                  <CustomLink
-                    href="/dashboard/settings"
-                    variant="ghost"
-                    size="default"
-                    className={cn(
-                      "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
-                      isActive("/dashboard/settings") &&
-                        "bg-primary/10 text-primary font-medium"
-                    )}
-                    onClick={handleClose}
-                  >
-                    <Settings className="h-5 w-5 shrink-0" />
-                    <span className="text-sm font-medium">Settings</span>
-                  </CustomLink>
+                  {!isGuest && (
+                    <>
+                      <CustomLink
+                        href="/dashboard/profile"
+                        variant="ghost"
+                        size="default"
+                        className={cn(
+                          "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
+                          isActive("/dashboard/profile") &&
+                            "bg-primary/10 text-primary font-medium"
+                        )}
+                        onClick={handleClose}
+                      >
+                        <User className="h-5 w-5 shrink-0" />
+                        <span className="text-sm font-medium">Profile</span>
+                      </CustomLink>
+                      <CustomLink
+                        href="/dashboard/settings"
+                        variant="ghost"
+                        size="default"
+                        className={cn(
+                          "w-full justify-start gap-3 px-3 py-3 rounded-lg hover:bg-accent hover:text-accent-foreground",
+                          isActive("/dashboard/settings") &&
+                            "bg-primary/10 text-primary font-medium"
+                        )}
+                        onClick={handleClose}
+                      >
+                        <Settings className="h-5 w-5 shrink-0" />
+                        <span className="text-sm font-medium">Settings</span>
+                      </CustomLink>
+                    </>
+                  )}
                   <Button
                     variant="ghost"
                     size="default"

@@ -2,98 +2,51 @@
 
 export const dynamic = "force-dynamic";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3,
   Eye,
   HandCoins,
-  LayoutDashboard,
   LineChart,
-  LogOut,
   Moon,
-  Settings,
   Shield,
   Sun,
-  User,
   Users,
   Wallet,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
-import {
-  setIsLoggedIn,
-  useAppState,
-} from "@/components/providers/app-state-provider";
 import { LoginFormCard } from "@/components/molecules/login-form-card";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import fetcher from "@/lib/core/fetcher";
 import { fetchAuthStatus } from "@/lib/query-options";
-import { cn } from "@/lib/ui/utils";
 
 const luxuryEase = [0.16, 1, 0.3, 1] as const;
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
-  const { dispatch } = useAppState();
-  const queryClient = useQueryClient();
+  const router = useRouter();
   const [showLogin, setShowLogin] = useState(false);
   const { data: authData, isLoading: isAuthLoading } =
     useQuery(fetchAuthStatus());
 
   const isLoggedIn = authData?.isLoggedIn ?? false;
-  const isMember = authData?.user?.kind === "member";
-  const isAdminMember = authData?.user?.kind === "admin-member";
-  const isSuperAdmin = authData?.user?.kind === "admin";
 
-  const { data: profileData } = useQuery({
-    queryKey: ["profile"],
-    queryFn: () =>
-      fetcher.get("/api/profile") as Promise<{
-        account: {
-          firstName: string | null;
-          lastName: string | null;
-          username: string;
-        };
-      }>,
-    enabled: (isMember || isAdminMember) && isLoggedIn,
-  });
-
-  const logoutMutation = useMutation({
-    mutationFn: () => fetcher.post("/api/auth/logout"),
-    onSuccess: async () => {
-      dispatch(setIsLoggedIn(false));
-      queryClient.setQueryData(["authentication"], {
-        isLoggedIn: false,
-        user: null,
-      });
-      queryClient.removeQueries({ queryKey: ["profile"] });
-      await queryClient.invalidateQueries({ queryKey: ["authentication"] });
-      await queryClient.refetchQueries({ queryKey: ["authentication"] });
-      toast.success("Logged out successfully!");
-    },
-    onError: (error: any) => {
-      toast.error(
-        error.message || "An unexpected error occurred. Please try again."
-      );
-    },
-  });
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
+  // Auto-redirect to dashboard when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/dashboard");
+    }
+  }, [isLoggedIn, router]);
 
   const features = [
     {
@@ -288,7 +241,7 @@ export default function Home() {
                   <LoginFormCard />
                 </div>
               </motion.div>
-            ) : isAuthLoading ? (
+            ) : isAuthLoading || isLoggedIn ? (
               <motion.div
                 key="loading"
                 initial={{ opacity: 0 }}
@@ -309,103 +262,7 @@ export default function Home() {
                   </Card>
                 </div>
               </motion.div>
-            ) : (
-              <motion.div
-                key="authenticated"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: luxuryEase }}
-                className="flex flex-col items-center"
-              >
-                <div className="w-full max-w-[420px]">
-                  <Card className="border-border/30 bg-card/80 backdrop-blur-sm">
-                    <CardHeader className="space-y-1 pb-4 text-center">
-                      <div className="flex justify-center mb-2">
-                        <Image
-                          src="/peacock.svg"
-                          alt="Peacock Club"
-                          width={48}
-                          height={48}
-                        />
-                      </div>
-                      <CardTitle className="text-xl font-brand tracking-wide">
-                        Welcome back
-                      </CardTitle>
-                      <CardDescription className="text-sm text-muted-foreground">
-                        {isSuperAdmin
-                          ? "Super Admin"
-                          : profileData?.account
-                            ? `${profileData.account.firstName || ""} ${profileData.account.lastName || ""}`.trim() ||
-                              profileData.account.username
-                            : "Access your club dashboard"}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <Button
-                        size="lg"
-                        asChild
-                        className="w-full h-11 rounded-lg"
-                      >
-                        <Link href="/dashboard">
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
-                          Enter the Club
-                        </Link>
-                      </Button>
-                      <div className="grid grid-cols-2 gap-3">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          asChild
-                          className="h-11 rounded-lg"
-                        >
-                          <Link href="/dashboard/profile">
-                            <User className="mr-2 h-4 w-4" />
-                            Profile
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          asChild
-                          className="h-11 rounded-lg"
-                        >
-                          <Link href="/dashboard/settings">
-                            <Settings className="mr-2 h-4 w-4" />
-                            Settings
-                          </Link>
-                        </Button>
-                      </div>
-                      <div className="gold-line my-3" />
-                      <div className="space-y-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                          className="w-full text-muted-foreground hover:text-foreground"
-                        >
-                          <Link href="/dashboard/transaction">
-                            <Wallet className="mr-2 h-4 w-4" />
-                            View Transactions
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleLogout}
-                          disabled={logoutMutation.isPending}
-                          className="w-full text-muted-foreground hover:text-destructive"
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          {logoutMutation.isPending
-                            ? "Logging out..."
-                            : "Logout"}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </motion.div>
-            )}
+            ) : null}
           </AnimatePresence>
         </div>
       </section>

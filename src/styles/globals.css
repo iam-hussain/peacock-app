@@ -28,82 +28,82 @@
 
 @layer base {
   :root {
-    --background: 230 25% 7%;
-    --foreground: 45 10% 90%;
+    --background: 160 20% 6%;
+    --foreground: 150 10% 92%;
 
-    --card: 230 20% 10%;
-    --card-foreground: 45 10% 90%;
-    --popover: 230 20% 10%;
-    --popover-foreground: 45 10% 90%;
+    --card: 160 18% 9%;
+    --card-foreground: 150 10% 92%;
+    --popover: 160 18% 9%;
+    --popover-foreground: 150 10% 92%;
 
-    --primary: 43 65% 54%;
-    --primary-foreground: 230 25% 7%;
+    --primary: 152 58% 42%;
+    --primary-foreground: 160 20% 6%;
 
-    --secondary: 175 55% 15%;
-    --secondary-foreground: 45 10% 90%;
+    --secondary: 180 50% 18%;
+    --secondary-foreground: 150 10% 92%;
 
-    --muted: 230 15% 15%;
-    --muted-foreground: 230 10% 55%;
+    --muted: 160 12% 14%;
+    --muted-foreground: 160 8% 50%;
 
-    --accent: 270 30% 18%;
-    --accent-foreground: 45 10% 90%;
+    --accent: 200 35% 20%;
+    --accent-foreground: 150 10% 92%;
 
     --destructive: 0 62% 50%;
-    --destructive-foreground: 45 10% 90%;
+    --destructive-foreground: 150 10% 92%;
 
-    --border: 230 15% 15%;
-    --input: 230 15% 15%;
-    --ring: 43 65% 54%;
+    --border: 160 12% 14%;
+    --input: 160 12% 14%;
+    --ring: 152 58% 42%;
     --radius: 0.5rem;
 
-    --paper: 230 20% 9%;
-    --paper-foreground: 45 10% 90%;
+    --paper: 160 18% 7%;
+    --paper-foreground: 150 10% 92%;
 
-    --inactive: 230 10% 30%;
-    --inactive-foreground: 230 10% 55%;
+    --inactive: 160 8% 28%;
+    --inactive-foreground: 160 8% 50%;
 
-    --info: 200 70% 45%;
-    --info-foreground: 45 10% 90%;
+    --info: 195 70% 45%;
+    --info-foreground: 150 10% 92%;
 
     --bw: 0 0% 100%;
     --bw-foreground: 0 0% 0%;
   }
 
   .light {
-    --background: 40 20% 97%;
-    --foreground: 230 25% 12%;
+    --background: 140 20% 97%;
+    --foreground: 160 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 230 25% 12%;
+    --card-foreground: 160 25% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 230 25% 12%;
+    --popover-foreground: 160 25% 10%;
 
-    --primary: 43 65% 40%;
+    --primary: 152 58% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 175 40% 30%;
+    --secondary: 180 40% 30%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 40 15% 92%;
-    --muted-foreground: 230 10% 40%;
+    --muted: 140 15% 92%;
+    --muted-foreground: 160 10% 40%;
 
-    --accent: 270 20% 92%;
-    --accent-foreground: 270 30% 25%;
+    --accent: 200 20% 92%;
+    --accent-foreground: 200 35% 25%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 15% 88%;
-    --input: 40 15% 88%;
-    --ring: 43 65% 40%;
+    --border: 140 15% 88%;
+    --input: 140 15% 88%;
+    --ring: 152 58% 35%;
 
-    --paper: 40 15% 94%;
-    --paper-foreground: 230 25% 12%;
+    --paper: 140 15% 94%;
+    --paper-foreground: 160 25% 10%;
 
-    --inactive: 40 10% 75%;
-    --inactive-foreground: 230 10% 40%;
+    --inactive: 140 10% 75%;
+    --inactive-foreground: 160 10% 40%;
 
-    --info: 200 70% 45%;
+    --info: 195 70% 45%;
     --info-foreground: 0 0% 100%;
 
     --bw: 0 0% 0%;
@@ -134,9 +134,9 @@
   background: conic-gradient(
     from var(--shimmer-angle, 0deg) at 50% 50%,
     transparent 0%,
-    hsl(43 65% 54% / 0.03) 15%,
-    hsl(175 55% 25% / 0.05) 30%,
-    hsl(270 30% 30% / 0.03) 45%,
+    hsl(152 58% 42% / 0.03) 15%,
+    hsl(180 50% 25% / 0.05) 30%,
+    hsl(200 35% 30% / 0.03) 45%,
     transparent 60%
   );
   pointer-events: none;
@@ -144,17 +144,17 @@
   z-index: 0;
 }
 
-/* Gold accent line */
+/* Green accent line */
 .gold-line {
   height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(43 65% 54% / 0.5), transparent);
+  background: linear-gradient(90deg, transparent, hsl(152 58% 42% / 0.5), transparent);
 }
 
 /* Glass surface effect */
 .glass-surface {
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 1px solid hsl(43 65% 54% / 0.08);
+  border: 1px solid hsl(152 58% 42% / 0.08);
 }
 
 /* Luxury easing */
@@ -162,9 +162,9 @@
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Gold text gradient */
+/* Green text gradient */
 .text-gold-gradient {
-  background: linear-gradient(135deg, hsl(43 65% 54%), hsl(43 80% 70%), hsl(43 65% 54%));
+  background: linear-gradient(135deg, hsl(152 58% 42%), hsl(152 70% 58%), hsl(152 58% 42%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

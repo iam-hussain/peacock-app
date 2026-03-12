@@ -139,6 +139,30 @@ export async function POST(request: Request) {
 
     const { username, password } = validationResult.data;
 
+    // Guest login — read-only access, no password required
+    if (username === "guest" && password === "guest") {
+      await createSessionCookie({
+        sub: "guest",
+        role: "MEMBER",
+        accessLevel: "READ",
+        canLogin: true,
+      });
+
+      return NextResponse.json(
+        {
+          message: "Login successful",
+          user: {
+            kind: "member" as const,
+            accountId: "guest",
+            role: "MEMBER",
+            accessLevel: "READ",
+            canLogin: true,
+          },
+        },
+        { status: 200 }
+      );
+    }
+
     const adminUsername = env.ADMIN_USERNAME;
     const adminPassword = getAdminPassword();
 

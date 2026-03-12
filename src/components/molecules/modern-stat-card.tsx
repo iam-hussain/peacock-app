@@ -48,7 +48,7 @@ export function ModernStatCard({
         <div className="flex flex-1 items-center justify-between gap-4">
           {/* Left: Label */}
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">
               {title}
             </p>
           </div>
@@ -58,7 +58,7 @@ export function ModernStatCard({
               <p
                 className={cn(
                   "font-semibold font-bold tracking-tight text-foreground",
-                  isHighlighted ? "text-2xl" : "text-xl"
+                  isHighlighted ? "text-lg sm:text-2xl" : "text-base sm:text-xl"
                 )}
               >
                 {value}
@@ -67,7 +67,7 @@ export function ModernStatCard({
               <div
                 className={cn(
                   "font-semibold font-bold tracking-tight text-foreground",
-                  isHighlighted ? "text-2xl" : "text-xl"
+                  isHighlighted ? "text-lg sm:text-2xl" : "text-base sm:text-xl"
                 )}
               >
                 {value}

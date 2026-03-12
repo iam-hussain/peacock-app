@@ -16,6 +16,7 @@ const pageTransition = {
 export default function PageTransition({ children }: { children: ReactNode }) {
   return (
     <motion.div
+      className="w-full"
       variants={pageVariants}
       initial="initial"
       animate="animate"

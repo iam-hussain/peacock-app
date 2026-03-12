@@ -31,7 +31,7 @@ ChartJS.register(
 const Line = dynamic(() => import("react-chartjs-2").then((mod) => mod.Line), {
   ssr: false,
   loading: () => (
-    <div className="h-[500px] flex items-center justify-center text-muted-foreground">
+    <div className="h-[300px] sm:h-[400px] md:h-[500px] flex items-center justify-center text-muted-foreground">
       Loading chart...
     </div>
   ),
@@ -634,7 +634,7 @@ export default function AnalyticsPage() {
 
   return (
     <PageTransition>
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Analytics</h1>
@@ -706,13 +706,13 @@ export default function AnalyticsPage() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className="h-[500px] w-full" />
+            <Skeleton className="h-[300px] sm:h-[400px] md:h-[500px] w-full" />
           ) : chartData ? (
-            <div className="h-[500px]">
+            <div className="h-[300px] sm:h-[400px] md:h-[500px]">
               <Line data={chartData} options={chartOptions} />
             </div>
           ) : (
-            <div className="h-[500px] flex items-center justify-center text-muted-foreground">
+            <div className="h-[300px] sm:h-[400px] md:h-[500px] flex items-center justify-center text-muted-foreground">
               No data available for the selected range
             </div>
           )}

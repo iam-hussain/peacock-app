@@ -26,6 +26,7 @@ import {
 } from "../ui/dropdown-menu";
 
 import fetcher from "@/lib/core/fetcher";
+import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/ui/utils";
 
 const getPageTitle = (pathname: string): string => {
@@ -50,6 +51,8 @@ export function ModernTopBar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
   const { sideBarOpen, sideBarCollapsed } = state;
+  const { user } = useAuth();
+  const isGuest = user?.kind === "member" && user?.id === "guest";
 
   // Close mobile search on outside click
   useEffect(() => {
@@ -190,21 +193,25 @@ export function ModernTopBar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 glass-surface bg-background/95">
-              <DropdownMenuItem
-                onClick={() => router.push("/dashboard/profile")}
-                className="cursor-pointer focus:bg-primary/5 focus:text-primary"
-              >
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push("/dashboard/settings")}
-                className="cursor-pointer focus:bg-primary/5 focus:text-primary"
-              >
-                <User className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-primary/10" />
+              {!isGuest && (
+                <>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/profile")}
+                    className="cursor-pointer focus:bg-primary/5 focus:text-primary"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/settings")}
+                    className="cursor-pointer focus:bg-primary/5 focus:text-primary"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-primary/10" />
+                </>
+              )}
               <DropdownMenuItem
                 className="text-muted-foreground focus:text-destructive cursor-pointer transition-colors duration-300"
                 onClick={handleLogout}

@@ -169,7 +169,7 @@ export default function ProfilePage() {
   return (
     <PageTransition>
     <TooltipProvider>
-      <div className="w-full max-w-4xl mx-auto space-y-6 pb-24">
+      <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0 pb-20 lg:pb-6">
         {/* Breadcrumb */}
         <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
           <Link
@@ -183,17 +183,17 @@ export default function ProfilePage() {
         </div>
 
         {/* Header Section */}
-        <div className="text-center space-y-4 py-8">
+        <div className="text-center space-y-3 sm:space-y-4 py-4 sm:py-8">
           <div className="flex justify-center">
-            <div className="rounded-full bg-primary/10 p-4">
-              <User className="h-12 w-12 text-primary" />
+            <div className="rounded-full bg-primary/10 p-3 sm:p-4">
+              <User className="h-8 w-8 sm:h-12 sm:w-12 text-primary" />
             </div>
           </div>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               My Profile
             </h1>
-            <p className="mt-2 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Update your personal information and manage your account
             </p>
           </div>
@@ -450,10 +450,11 @@ export default function ProfilePage() {
                     </FormItem>
                   )}
                 />
-                <DialogFooter>
+                <DialogFooter className="gap-2">
                   <Button
                     type="button"
                     variant="outline"
+                    className="w-full sm:w-auto"
                     onClick={() => {
                       setPasswordDialogOpen(false);
                       passwordForm.reset();
@@ -461,7 +462,11 @@ export default function ProfilePage() {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={passwordMutation.isPending}>
+                  <Button
+                    type="submit"
+                    className="w-full sm:w-auto"
+                    disabled={passwordMutation.isPending}
+                  >
                     {passwordMutation.isPending
                       ? "Changing..."
                       : "Change Password"}

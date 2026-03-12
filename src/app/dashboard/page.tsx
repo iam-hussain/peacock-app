@@ -189,7 +189,7 @@ export default function DashboardPage() {
 
   return (
     <PageTransition>
-    <div className="w-full max-w-7xl mx-auto space-y-3">
+    <div className="w-full max-w-7xl mx-auto space-y-3 px-2 sm:px-0">
       {/* Page Header */}
       <div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
