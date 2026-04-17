@@ -47,8 +47,9 @@ export async function calculateMonthlySnapshotFromPassbooks(
     const clubAgeMonths = clubMonthsFromStart(monthEndDate);
 
     // Sum per-active-member values from their MEMBER passbooks in the map.
-    //   activeMemberDeposited = Σ (periodicDepositsTotal + offsetDepositsTotal − profitWithdrawalsTotal)
-    //   totalMemberPending    = Σ (memberTotalDeposit + joiningOffset + delayOffset − accountBalance)
+    //   totalMemberPending = Σ (memberTotalDeposit + joiningOffset + delayOffset
+    //                         − (periodicDepositsTotal + offsetDepositsTotal))
+    //                       = expected contributions − actual contributions
     const memberTotalDeposit = getMemberTotalDeposit(monthEndDate);
     const activeMemberTotals = Array.from(allPassbooks.entries()).reduce(
       (acc, [key, entry]) => {
@@ -57,32 +58,25 @@ export async function calculateMonthlySnapshotFromPassbooks(
         if (!offsets) return acc; // not an active member
         const payload = (entry.data.payload ||
           {}) as MemberFinancialSnapshot & {
-          accountBalance?: number;
           periodicDepositAmount?: number;
           offsetDepositAmount?: number;
-          profitWithdrawalAmount?: number;
         };
-        const accountBalance =
-          payload.accountBalance ?? payload.memberBalance ?? 0;
         const periodicDeposits =
           payload.periodicDepositsTotal ?? payload.periodicDepositAmount ?? 0;
         const offsetDeposits =
           payload.offsetDepositsTotal ?? payload.offsetDepositAmount ?? 0;
-        const profitWithdrawals =
-          payload.profitWithdrawalsTotal ?? payload.profitWithdrawalAmount ?? 0;
         const totalOffset =
           (offsets.joiningOffset || 0) + (offsets.delayOffset || 0);
+        const actualContributions = periodicDeposits + offsetDeposits;
         return {
           pending:
-            acc.pending + memberTotalDeposit + totalOffset - accountBalance,
-          deposited:
-            acc.deposited +
-            periodicDeposits +
-            offsetDeposits -
-            profitWithdrawals,
+            acc.pending +
+            memberTotalDeposit +
+            totalOffset -
+            actualContributions,
         };
       },
-      { pending: 0, deposited: 0 }
+      { pending: 0 }
     );
 
     // Extract vendor passbooks from allPassbooks
@@ -109,7 +103,6 @@ export async function calculateMonthlySnapshotFromPassbooks(
       recalculatedAt: new Date(),
       pendingAdjustments,
       totalMemberPending: activeMemberTotals.pending,
-      activeMemberDeposited: activeMemberTotals.deposited,
     });
 
     // Return transformed snapshot (mapping summary structure to Prisma Summary format)

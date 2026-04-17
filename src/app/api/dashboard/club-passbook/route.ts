@@ -78,7 +78,6 @@ export async function GET(request: NextRequest) {
       isLocked: false,
       pendingAdjustments,
       totalMemberPending: clubData.activeMemberPendingTotal ?? 0,
-      activeMemberDeposited: clubData.activeMemberDepositedTotal ?? 0,
     });
 
     // Structure response according to financial domain semantics (matching summary structure)

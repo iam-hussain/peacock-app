@@ -55,13 +55,10 @@ export async function recomputeClubDashboardAggregates(
   const totals = activeMemberPassbooks.reduce(
     (acc, pb) => {
       const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
-        accountBalance?: number;
         periodicDepositAmount?: number;
         offsetDepositAmount?: number;
         profitWithdrawalAmount?: number;
       };
-      const accountBalance =
-        payload.accountBalance ?? payload.memberBalance ?? 0;
       const periodicDeposits =
         payload.periodicDepositsTotal ?? payload.periodicDepositAmount ?? 0;
       const offsetDeposits =
@@ -72,12 +69,19 @@ export async function recomputeClubDashboardAggregates(
       const delay = Number(pb.delayOffset) || 0;
       const totalOffset = joining + delay;
 
+      // Pending = expected contributions − actual contributions received.
+      // Uses (periodic + offset) deposits, NOT accountBalance — so prior
+      // withdrawals don't make the member appear to "owe" their principal
+      // back (Bug 4). An exiting member with deposits = withdrawals will
+      // correctly show 0 remaining expected contribution (no residual debt
+      // from their withdrawal).
+      const actualContributions = periodicDeposits + offsetDeposits;
       return {
         pending:
           acc.pending +
           memberTotalDepositExpected +
           totalOffset -
-          accountBalance,
+          actualContributions,
         deposited:
           acc.deposited + periodicDeposits + offsetDeposits - profitWithdrawals,
         expectedAdjustments: acc.expectedAdjustments + totalOffset,

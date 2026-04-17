@@ -115,9 +115,15 @@ export function membersTableTransform(
     periodicDepositsTotal - withdrawalsTotal;
   const totalOffsetBalanceAmount = totalOffsetAmount - offsetDepositsTotal;
 
-  // Total balance is what the member should have minus what is in their account
+  // Total balance = expected contributions − actual contributions received.
+  //   Uses (periodic + offset) deposits, NOT accountBalance — so prior
+  //   withdrawals don't falsely resurface as "owed" principal. Keeps the
+  //   Member table's Balance column aligned with the dashboard's
+  //   `totalMemberPending` tile.
   let totalBalanceAmount =
-    memberTotalDeposit + totalOffsetAmount - memberBalance;
+    memberTotalDeposit +
+    totalOffsetAmount -
+    (periodicDepositsTotal + offsetDepositsTotal);
   // If total balance is more than memberTotalDeposit, use only the period balance
   let totalPeriodBalanceAmount =
     totalBalanceAmount > memberTotalDeposit

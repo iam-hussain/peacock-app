@@ -87,7 +87,6 @@ export type TransformClubPassbookOptions = {
   isLocked?: boolean;
   pendingAdjustments?: number; // Total expected adjustments - total received adjustments
   totalMemberPending?: number; // Sum of active members' totalBalanceAmount (mirrors Member table)
-  activeMemberDeposited?: number; // Σ (periodicDepositsTotal + offsetDepositsTotal − profitWithdrawalsTotal) over active members
 };
 
 /**
@@ -150,21 +149,15 @@ export function transformClubPassbookToSummary(
   // Calculate available cash
   const availableCash = clubData.availableCashBalance || 0;
 
-  // Current Value = Member Deposited + Vendor Profit + Loan Profit
-  //   Member Deposited = active members' periodic + offset deposits − profit withdrawals.
-  //   Read from the CLUB passbook's derived aggregate when available, then
-  //   fall back to explicit option, then to club-wide aggregates (historical).
-  const activeMemberDeposited =
-    options?.activeMemberDeposited ??
-    clubData.activeMemberDepositedTotal ??
-    (clubData.memberPeriodicDepositsTotal || 0) +
-      (clubData.memberOffsetDepositsTotal || 0) -
-      (clubData.memberProfitWithdrawalsTotal || 0);
-
+  // Current Value = what the club physically holds right now.
+  //   availableCash + loansOutstanding + totalVendorInvestment
+  // This is the canonical asset-side identity — every term is a direct
+  // CLUB-passbook accumulator maintained by the settings DSL, so the value
+  // can't drift. The old equity-side formula (active-member deposits +
+  // vendor profit + interest collected) silently over-counted principal
+  // withdrawals and profit paid to exited members.
   const currentValue =
-    activeMemberDeposited +
-    vendorProfit +
-    (clubData.interestCollectedTotal || 0);
+    availableCash + (clubData.loansOutstanding || 0) + totalVendorInvestment;
 
   // Net Value = Current Value + Remaining Interest Pending + Member Deposited Pending
   //   totalMemberPending already folds in Adjustments Pending.

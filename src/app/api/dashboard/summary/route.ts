@@ -205,7 +205,6 @@ export async function GET(request: NextRequest) {
         isLocked: false,
         pendingAdjustments,
         totalMemberPending: clubData.activeMemberPendingTotal ?? 0,
-        activeMemberDeposited: clubData.activeMemberDepositedTotal ?? 0,
       });
 
       const response = { success: true, data: dashboardData };
