@@ -681,7 +681,7 @@ export default function DashboardPage() {
                         )}
                       </p>
                     )}
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className="mt-2 hidden text-xs text-muted-foreground md:block">
                       Current Value + Pending Loan Interest + Pending Member
                       Deposits
                     </p>
