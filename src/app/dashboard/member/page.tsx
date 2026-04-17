@@ -27,7 +27,7 @@ export default function MembersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
   const [balanceFilter, setBalanceFilter] = useState("all");
-  const [stickyEnabled, setStickyEnabled] = useState(true);
+  const [stickyEnabled, setStickyEnabled] = useState(false);
 
   // Filter members
   const filteredMembers = useMemo(() => {

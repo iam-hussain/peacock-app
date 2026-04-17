@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { endOfMonth, startOfMonth } from "date-fns";
 
-import { clubMonthsFromStart } from "@/lib/config/club";
+import { clubMonthsFromStart, getMemberTotalDeposit } from "@/lib/config/club";
 import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
   LedgerUpdateMap,
+  MemberFinancialSnapshot,
   VendorFinancialSnapshot,
 } from "@/lib/validators/type";
 
@@ -18,7 +19,11 @@ export async function calculateMonthlySnapshotFromPassbooks(
   allPassbooks: LedgerUpdateMap,
   activeMembers: number,
   expectedTotalLoanInterestAmount: number,
-  totalActiveMemberAdjustments: number
+  totalActiveMemberAdjustments: number,
+  activeMemberOffsets: Map<
+    string,
+    { joiningOffset: number; delayOffset: number }
+  > = new Map()
 ): Promise<Prisma.SummaryCreateInput | null> {
   try {
     const clubPassbook = allPassbooks.get("CLUB");
@@ -40,6 +45,45 @@ export async function calculateMonthlySnapshotFromPassbooks(
 
     // Calculate club age
     const clubAgeMonths = clubMonthsFromStart(monthEndDate);
+
+    // Sum per-active-member values from their MEMBER passbooks in the map.
+    //   activeMemberDeposited = Σ (periodicDepositsTotal + offsetDepositsTotal − profitWithdrawalsTotal)
+    //   totalMemberPending    = Σ (memberTotalDeposit + joiningOffset + delayOffset − accountBalance)
+    const memberTotalDeposit = getMemberTotalDeposit(monthEndDate);
+    const activeMemberTotals = Array.from(allPassbooks.entries()).reduce(
+      (acc, [key, entry]) => {
+        if (key === "CLUB" || entry?.data?.kind !== "MEMBER") return acc;
+        const offsets = activeMemberOffsets.get(key);
+        if (!offsets) return acc; // not an active member
+        const payload = (entry.data.payload ||
+          {}) as MemberFinancialSnapshot & {
+          accountBalance?: number;
+          periodicDepositAmount?: number;
+          offsetDepositAmount?: number;
+          profitWithdrawalAmount?: number;
+        };
+        const accountBalance =
+          payload.accountBalance ?? payload.memberBalance ?? 0;
+        const periodicDeposits =
+          payload.periodicDepositsTotal ?? payload.periodicDepositAmount ?? 0;
+        const offsetDeposits =
+          payload.offsetDepositsTotal ?? payload.offsetDepositAmount ?? 0;
+        const profitWithdrawals =
+          payload.profitWithdrawalsTotal ?? payload.profitWithdrawalAmount ?? 0;
+        const totalOffset =
+          (offsets.joiningOffset || 0) + (offsets.delayOffset || 0);
+        return {
+          pending:
+            acc.pending + memberTotalDeposit + totalOffset - accountBalance,
+          deposited:
+            acc.deposited +
+            periodicDeposits +
+            offsetDeposits -
+            profitWithdrawals,
+        };
+      },
+      { pending: 0, deposited: 0 }
+    );
 
     // Extract vendor passbooks from allPassbooks
     const vendorPassbooks = Array.from(allPassbooks.entries())
@@ -64,6 +108,8 @@ export async function calculateMonthlySnapshotFromPassbooks(
       monthEndDate,
       recalculatedAt: new Date(),
       pendingAdjustments,
+      totalMemberPending: activeMemberTotals.pending,
+      activeMemberDeposited: activeMemberTotals.deposited,
     });
 
     // Return transformed snapshot (mapping summary structure to Prisma Summary format)

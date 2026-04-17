@@ -11,6 +11,7 @@ import {
 import { updatePassbookByTransaction } from "./transaction-handler";
 
 import prisma from "@/db";
+import { recomputeClubDashboardAggregates } from "@/lib/calculators/club-aggregates";
 import { calculateMonthlySnapshotFromPassbooks } from "@/lib/calculators/dashboard-calculator";
 import { calculateExpectedTotalLoanInterestAmountFromTransactions } from "@/lib/calculators/expected-interest";
 import { clubConfig } from "@/lib/config/config";
@@ -131,6 +132,21 @@ async function processTransactionsForPassbooks(options: {
     0
   );
 
+  // Map accountId → {joiningOffset, delayOffset} for active members so the
+  // monthly snapshot can compute per-active-member deposit + pending sums.
+  const activeMemberOffsets = new Map<
+    string,
+    { joiningOffset: number; delayOffset: number }
+  >();
+  for (const passbook of activeMemberPassbooks) {
+    if (passbook.account?.id) {
+      activeMemberOffsets.set(passbook.account.id, {
+        joiningOffset: Number(passbook.joiningOffset) || 0,
+        delayOffset: Number(passbook.delayOffset) || 0,
+      });
+    }
+  }
+
   // Initialize passbook update map
   let passbookToUpdate = initializePassbookToUpdate(passbooks, true);
 
@@ -185,7 +201,8 @@ async function processTransactionsForPassbooks(options: {
         passbookToUpdate,
         activeMemberCount,
         expectedTotalLoanInterestAmount,
-        totalActiveMemberAdjustments
+        totalActiveMemberAdjustments,
+        activeMemberOffsets
       );
       if (snapshot) {
         monthlySnapshots.push(snapshot);
@@ -202,6 +219,17 @@ async function processTransactionsForPassbooks(options: {
 
   if (options.updatePassbooks) {
     await bulkPassbookUpdate(passbookToUpdate);
+    // Refresh the derived CLUB-passbook aggregates (active-only totals,
+    // expected interest) after the bulk update so the dashboard reads them
+    // directly instead of re-aggregating at request time.
+    try {
+      await recomputeClubDashboardAggregates();
+    } catch (aggregateError) {
+      console.error(
+        "⚠️  Failed to recompute club dashboard aggregates after reset",
+        aggregateError
+      );
+    }
   }
 
   clearCache();

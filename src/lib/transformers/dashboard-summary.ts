@@ -142,18 +142,21 @@ export function transformClubPassbookToSummary(
     (clubData.loansOutstanding || 0) + totalVendorInvestment;
 
   // Calculate pending amounts
+  // totalMemberPending already folds in Adjustments Pending, so don't add
+  // pendingAdjustments separately (would double-count).
   const pendingAdjustments = options?.pendingAdjustments || 0;
-  const pendingAmounts = memberBalance + interestBalance + pendingAdjustments;
+  const pendingAmounts = (options?.totalMemberPending ?? 0) + interestBalance;
 
   // Calculate available cash
   const availableCash = clubData.availableCashBalance || 0;
 
   // Current Value = Member Deposited + Vendor Profit + Loan Profit
   //   Member Deposited = active members' periodic + offset deposits − profit withdrawals.
-  //   Fallback to club-wide aggregates when per-active-member sum isn't supplied
-  //   (e.g. historical snapshots that pre-date this field).
+  //   Read from the CLUB passbook's derived aggregate when available, then
+  //   fall back to explicit option, then to club-wide aggregates (historical).
   const activeMemberDeposited =
     options?.activeMemberDeposited ??
+    clubData.activeMemberDepositedTotal ??
     (clubData.memberPeriodicDepositsTotal || 0) +
       (clubData.memberOffsetDepositsTotal || 0) -
       (clubData.memberProfitWithdrawalsTotal || 0);
@@ -165,7 +168,8 @@ export function transformClubPassbookToSummary(
 
   // Net Value = Current Value + Remaining Interest Pending + Member Deposited Pending
   //   totalMemberPending already folds in Adjustments Pending.
-  const totalMemberPending = options?.totalMemberPending ?? 0;
+  const totalMemberPending =
+    options?.totalMemberPending ?? clubData.activeMemberPendingTotal ?? 0;
   const totalPortfolioValue =
     currentValue + interestBalance + totalMemberPending;
 

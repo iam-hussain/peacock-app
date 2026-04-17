@@ -27,7 +27,7 @@ export default function VendorsPage() {
   const { data, isLoading } = useQuery(fetchVendors());
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
-  const [stickyEnabled, setStickyEnabled] = useState(true);
+  const [stickyEnabled, setStickyEnabled] = useState(false);
 
   // Filter vendors
   const filteredVendors = useMemo(() => {

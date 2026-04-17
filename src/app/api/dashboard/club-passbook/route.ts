@@ -5,12 +5,11 @@ export const fetchCache = "force-no-store";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { calculateExpectedTotalLoanInterestAmountFromDb } from "@/lib/calculators/expected-interest";
-import { clubMonthsFromStart, getMemberTotalDeposit } from "@/lib/config/club";
+import { recomputeClubDashboardAggregates } from "@/lib/calculators/club-aggregates";
+import { clubMonthsFromStart } from "@/lib/config/club";
 import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
-  MemberFinancialSnapshot,
   VendorFinancialSnapshot,
 } from "@/lib/validators/type";
 
@@ -38,93 +37,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const clubData = clubPassbook.payload as ClubFinancialSnapshot;
+    let clubData = clubPassbook.payload as ClubFinancialSnapshot;
 
-    // Fetch active members count - optimized query
-    const activeMembers = await prisma.account.count({
-      where: {
-        type: "MEMBER",
-        status: "ACTIVE",
-      },
-    });
+    // If the CLUB passbook was written before the derived-aggregates change,
+    // it won't carry them yet. Recompute on demand so the dashboard renders
+    // correctly even on first load after upgrade.
+    if (clubData.aggregatesComputedAt === undefined) {
+      const fresh = await recomputeClubDashboardAggregates();
+      if (fresh) {
+        clubData = { ...clubData, ...fresh };
+      }
+    }
 
-    // Calculate club age in months
+    // Derived aggregates live on the CLUB passbook payload (refreshed after
+    // every transaction via `recomputeClubDashboardAggregates`).
+    const activeMembers = clubData.activeMembersCount ?? 0;
     const clubAgeMonths = clubMonthsFromStart();
+    const expectedTotalLoanInterestAmount =
+      clubData.expectedTotalLoanInterest ?? 0;
+    const pendingAdjustments = clubData.pendingAdjustmentsTotal ?? 0;
 
-    // Calculate expected total loan interest amount dynamically from transactions
-    const { expectedTotalLoanInterestAmount } =
-      await calculateExpectedTotalLoanInterestAmountFromDb();
-
-    // Fetch vendor passbooks to calculate total vendor profit
+    // Fetch vendor passbooks to calculate total vendor profit (still per-vendor)
     const vendorPassbooks = await prisma.passbook.findMany({
       where: { kind: "VENDOR" },
       select: { payload: true },
     });
 
-    // Calculate pending adjustments: Total expected (sum of all members' offsets) - Total received
-    const [allMemberPassbooks, activeMemberPassbooks] = await Promise.all([
-      prisma.passbook.findMany({
-        where: { kind: "MEMBER" },
-        select: { joiningOffset: true, delayOffset: true },
-      }),
-      prisma.passbook.findMany({
-        where: {
-          kind: "MEMBER",
-          account: { type: "MEMBER", status: "ACTIVE" },
-        },
-        select: {
-          joiningOffset: true,
-          delayOffset: true,
-          payload: true,
-        },
-      }),
-    ]);
-
-    const totalExpectedAdjustments = allMemberPassbooks.reduce(
-      (sum, pb) => sum + (pb.joiningOffset || 0) + (pb.delayOffset || 0),
-      0
-    );
-    const totalReceivedAdjustments = clubData.memberOffsetDepositsTotal || 0;
-    const pendingAdjustments = Math.max(
-      0,
-      totalExpectedAdjustments - totalReceivedAdjustments
-    );
-
-    // Mirror the Member table's Balance column and compute Member Deposited:
-    //   totalBalanceAmount = memberTotalDeposit + totalOffsetAmount - accountBalance
-    //   activeMemberDeposited = periodicDepositsTotal + offsetDepositsTotal − profitWithdrawalsTotal
-    const memberTotalDeposit = getMemberTotalDeposit();
-    const activeMemberTotals = activeMemberPassbooks.reduce(
-      (acc, pb) => {
-        const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
-          accountBalance?: number;
-          periodicDepositAmount?: number;
-          offsetDepositAmount?: number;
-          profitWithdrawalAmount?: number;
-        };
-        const accountBalance =
-          payload.accountBalance ?? payload.memberBalance ?? 0;
-        const periodicDeposits =
-          payload.periodicDepositsTotal ?? payload.periodicDepositAmount ?? 0;
-        const offsetDeposits =
-          payload.offsetDepositsTotal ?? payload.offsetDepositAmount ?? 0;
-        const profitWithdrawals =
-          payload.profitWithdrawalsTotal ?? payload.profitWithdrawalAmount ?? 0;
-        const totalOffset = (pb.joiningOffset || 0) + (pb.delayOffset || 0);
-        return {
-          pending:
-            acc.pending + memberTotalDeposit + totalOffset - accountBalance,
-          deposited:
-            acc.deposited +
-            periodicDeposits +
-            offsetDeposits -
-            profitWithdrawals,
-        };
-      },
-      { pending: 0, deposited: 0 }
-    );
-
-    // Transform club passbook to summary structure using common transformer
     const summaryData = transformClubPassbookToSummary({
       clubData,
       activeMembers,
@@ -133,14 +71,14 @@ export async function GET(request: NextRequest) {
       vendorPassbooks: vendorPassbooks.map((vp) => ({
         payload: vp.payload as VendorFinancialSnapshot,
       })),
-      monthStartDate: null, // Not applicable for passbook
-      monthEndDate: null, // Not applicable for passbook
+      monthStartDate: null,
+      monthEndDate: null,
       recalculatedAt: clubPassbook.updatedAt,
-      recalculatedByAdminId: null, // Not tracked in passbook
-      isLocked: false, // Not applicable for passbook
+      recalculatedByAdminId: null,
+      isLocked: false,
       pendingAdjustments,
-      totalMemberPending: activeMemberTotals.pending,
-      activeMemberDeposited: activeMemberTotals.deposited,
+      totalMemberPending: clubData.activeMemberPendingTotal ?? 0,
+      activeMemberDeposited: clubData.activeMemberDepositedTotal ?? 0,
     });
 
     // Structure response according to financial domain semantics (matching summary structure)

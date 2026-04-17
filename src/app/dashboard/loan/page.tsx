@@ -33,7 +33,7 @@ export default function LoansPage() {
   const { data, isLoading } = useQuery(fetchLoans());
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
-  const [stickyEnabled, setStickyEnabled] = useState(true);
+  const [stickyEnabled, setStickyEnabled] = useState(false);
 
   // Determine loan status
   const getLoanStatus = (loan: TransformedLoan) => {

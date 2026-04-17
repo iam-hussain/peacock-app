@@ -72,7 +72,7 @@ export default function TransactionsPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
-  const [stickyEnabled, setStickyEnabled] = useState(true);
+  const [stickyEnabled, setStickyEnabled] = useState(false);
   const urlFilterApplied = useRef(false);
   const isInitialMount = useRef(true);
 

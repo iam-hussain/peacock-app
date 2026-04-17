@@ -58,7 +58,7 @@ export function DataTable<TData, TValue>({
   isLoading,
   className,
   pageSize = 50,
-  sticky = true,
+  sticky = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const stickyEnabled = sticky;

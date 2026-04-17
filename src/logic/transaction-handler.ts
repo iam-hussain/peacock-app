@@ -7,6 +7,7 @@ import {
 } from "./settings";
 
 import prisma from "@/db";
+import { recomputeClubDashboardAggregates } from "@/lib/calculators/club-aggregates";
 import {
   bulkPassbookUpdate,
   initializePassbookToUpdate,
@@ -213,6 +214,19 @@ export async function transactionEntryHandler(
     // Loan history is now calculated on-the-fly from transactions
     // No need to store or recalculate loanHistory in passbook
     await bulkPassbookUpdate(passbookToUpdate, db);
+
+    // Recompute derived dashboard aggregates on CLUB passbook (active-only
+    // aggregates that sit outside the settings DSL). Non-fatal on failure —
+    // the transaction itself succeeded; next write or reset will refresh.
+    try {
+      await recomputeClubDashboardAggregates(db || prisma);
+    } catch (aggregateError) {
+      console.error(
+        "⚠️  Failed to recompute club dashboard aggregates after transaction",
+        created.id,
+        aggregateError
+      );
+    }
 
     // LOAN_INTEREST processed successfully
   } catch (error) {

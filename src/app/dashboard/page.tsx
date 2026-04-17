@@ -644,7 +644,9 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Member Pending"
-                  value={formatCurrency(data?.memberFunds?.memberBalance || 0)}
+                  value={formatCurrency(
+                    data?.memberFunds?.totalMemberPending || 0
+                  )}
                   icon={<Wallet className="h-5 w-5" />}
                   iconBgColor="#FFF3E0"
                 />

@@ -150,6 +150,15 @@ export const getDefaultPassbookData = (
       loansPrincipalRepaid: 0,
       loansOutstanding: 0,
       interestCollectedTotal: 0,
+      // Derived aggregates (recomputed, see recomputeClubDashboardAggregates)
+      activeMembersCount: 0,
+      memberTotalDepositExpected: 0,
+      activeMemberDepositedTotal: 0,
+      activeMemberPendingTotal: 0,
+      activeMemberExpectedAdjustments: 0,
+      pendingAdjustmentsTotal: 0,
+      expectedTotalLoanInterest: 0,
+      pendingLoanInterest: 0,
     };
   }
   return {
