@@ -1,8 +1,10 @@
 "use client";
 
+import { Info } from "lucide-react";
 import { ReactElement } from "react";
 
 import { Card, CardContent } from "../ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 import { cn } from "@/lib/ui/utils";
 
@@ -15,6 +17,8 @@ interface ModernStatCardProps {
     value: string;
     isPositive: boolean;
   };
+  /** Explanation of the value — shown in a click-triggered popover (works on desktop + mobile). */
+  tooltip?: React.ReactNode;
   className?: string;
   isHighlighted?: boolean;
 }
@@ -25,6 +29,7 @@ export function ModernStatCard({
   icon,
   iconBgColor = "bg-primary/10",
   trend,
+  tooltip,
   className,
   isHighlighted = false,
 }: ModernStatCardProps) {
@@ -49,9 +54,37 @@ export function ModernStatCard({
         <div className="flex flex-1 items-center justify-between gap-4">
           {/* Left: Label */}
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">
-              {title}
-            </p>
+            <div className="flex items-center gap-1">
+              <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">
+                {title}
+              </p>
+              {tooltip && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={`What is ${title}?`}
+                      className="shrink-0 rounded-full p-0.5 text-muted-foreground/60 hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    side="top"
+                    align="start"
+                    className="w-64 text-xs leading-relaxed"
+                  >
+                    <p className="font-semibold text-foreground normal-case tracking-normal mb-1">
+                      {title}
+                    </p>
+                    <div className="text-muted-foreground normal-case tracking-normal">
+                      {tooltip}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
           </div>
           {/* Center: Value */}
           <div className="flex-1 text-center">

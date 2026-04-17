@@ -14,6 +14,7 @@ import {
   FileText,
   HandCoins,
   Hourglass,
+  Info,
   Layers,
   SlidersHorizontal,
   TrendingUp,
@@ -59,6 +60,11 @@ import PageTransition from "@/components/molecules/page-transition";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchDashboardClubPassbook,
@@ -66,6 +72,73 @@ import {
   fetchMembers,
 } from "@/lib/query-options";
 import { exportScreenshot } from "@/lib/ui/export-screenshot";
+
+/**
+ * Tooltip copy for every dashboard tile. Each entry explains the
+ * underlying formula in plain words so members can understand exactly
+ * what a number represents — shown via click-triggered popover that
+ * works on desktop hover/click and mobile tap.
+ */
+const TILE_TOOLTIPS: Record<string, React.ReactNode> = {
+  activeMembers: "Count of members currently marked active in the club.",
+  clubAge:
+    "Number of months since the club started (config-defined start date).",
+  memberDeposits:
+    "Sum of periodic deposits actually paid by active members (from every PERIODIC_DEPOSIT transaction).",
+  totalDeposits:
+    "Expected total = active members × per-member expected deposit (from stage configuration).",
+  memberAdjustments:
+    "Sum of every offset deposit received (joining + delay adjustments members have paid in).",
+  memberPending: (
+    <>
+      For each active member:{" "}
+      <em>expected deposits + offsets − actual contributions</em>. Summed across
+      active members. Positive = members still owe this amount.
+    </>
+  ),
+  adjustmentsPending:
+    "Total expected joining + delay offsets for active members, minus offsets already received.",
+  totalLoanGiven:
+    "Lifetime principal disbursed across all LOAN_TAKEN transactions.",
+  totalInterestCollected:
+    "Lifetime interest actually received across all LOAN_INTEREST transactions.",
+  currentLoanTaken:
+    "Principal currently outstanding (LOAN_TAKEN − LOAN_REPAY across all members).",
+  interestPending:
+    "Time-based expected interest on outstanding loans, minus interest already collected. Clamped at 0.",
+  vendorInvestment:
+    "Money currently parked with vendors = vendor investments − (vendor returns − booked profit).",
+  vendorProfit: (
+    <>
+      Sum across vendors: for <strong>inactive</strong> vendors count the full
+      P&amp;L (returns − invested, losses included); for <strong>active</strong>{" "}
+      vendors count only positive gains (floored at 0).
+    </>
+  ),
+  currentProfit:
+    "Vendor Profit + Total Interest Collected. Total earnings booked by the club.",
+  profitWithdrawals:
+    "Sum of the profit portion of every WITHDRAW transaction (excess over a member's principal).",
+  totalInvested: "Current Loan Taken + Vendor Investment.",
+  totalPending: "Member Pending + Interest Pending.",
+  availableCash:
+    "Cash physically held by the club right now. Accumulator: +deposits, +loan repayments, +interest, +vendor returns; −withdrawals, −loans disbursed, −vendor investments.",
+  currentValue: (
+    <>
+      <strong>Available Cash + Current Loan Taken + Vendor Investment.</strong>
+      <br />
+      The club&apos;s real-world worth now: cash on hand plus money out as loans
+      and with vendors (both coming back).
+    </>
+  ),
+  totalPortfolioValue: (
+    <>
+      <strong>Current Value + Interest Pending + Member Pending.</strong>
+      <br />
+      What the pot will be worth once every pending inflow lands.
+    </>
+  ),
+};
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
@@ -243,6 +316,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Active Members"
+                tooltip={TILE_TOOLTIPS.activeMembers}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-12" />
@@ -255,6 +329,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Club Age"
+                tooltip={TILE_TOOLTIPS.clubAge}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-16" />
@@ -276,6 +351,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Member Deposits"
+                tooltip={TILE_TOOLTIPS.memberDeposits}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -288,6 +364,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Member Adjustments"
+                tooltip={TILE_TOOLTIPS.memberAdjustments}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -309,6 +386,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Member Pending"
+                tooltip={TILE_TOOLTIPS.memberPending}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -321,6 +399,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Adjustments Pending"
+                tooltip={TILE_TOOLTIPS.adjustmentsPending}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -342,6 +421,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Total Loan Given"
+                tooltip={TILE_TOOLTIPS.totalLoanGiven}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -354,6 +434,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Total Interest Collected"
+                tooltip={TILE_TOOLTIPS.totalInterestCollected}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -377,6 +458,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Current Loan Taken"
+                tooltip={TILE_TOOLTIPS.currentLoanTaken}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -391,6 +473,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Interest Pending"
+                tooltip={TILE_TOOLTIPS.interestPending}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -414,6 +497,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Vendor Investment"
+                tooltip={TILE_TOOLTIPS.vendorInvestment}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -426,6 +510,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Vendor Profit"
+                tooltip={TILE_TOOLTIPS.vendorProfit}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -447,6 +532,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Current Profit"
+                tooltip={TILE_TOOLTIPS.currentProfit}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -459,6 +545,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Profit Withdrawals"
+                tooltip={TILE_TOOLTIPS.profitWithdrawals}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -480,6 +567,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Total Invested"
+                tooltip={TILE_TOOLTIPS.totalInvested}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -492,6 +580,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Total Pending"
+                tooltip={TILE_TOOLTIPS.totalPending}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -513,6 +602,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               <ModernStatCard
                 title="Available Cash"
+                tooltip={TILE_TOOLTIPS.availableCash}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -525,6 +615,7 @@ export default function DashboardPage() {
               />
               <ModernStatCard
                 title="Current Value"
+                tooltip={TILE_TOOLTIPS.currentValue}
                 value={
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
@@ -550,9 +641,34 @@ export default function DashboardPage() {
                 <div className="flex flex-1 items-center justify-between gap-3">
                   {/* Left: Label */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Total Portfolio Value
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Total Portfolio Value
+                      </p>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label="What is Total Portfolio Value?"
+                            className="shrink-0 rounded-full p-0.5 text-muted-foreground/60 hover:bg-muted hover:text-foreground focus:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          >
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          side="top"
+                          align="start"
+                          className="w-64 text-xs leading-relaxed"
+                        >
+                          <p className="font-semibold text-foreground normal-case tracking-normal mb-1">
+                            Total Portfolio Value
+                          </p>
+                          <div className="text-muted-foreground normal-case tracking-normal">
+                            {TILE_TOOLTIPS.totalPortfolioValue}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </div>
                   {/* Center: Value */}
                   <div className="flex-1 text-center">
@@ -566,7 +682,8 @@ export default function DashboardPage() {
                       </p>
                     )}
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Total portfolio value (cash + investments + receivables)
+                      Current Value + Pending Loan Interest + Pending Member
+                      Deposits
                     </p>
                   </div>
                   {/* Right: Icon */}
@@ -600,12 +717,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Active Members"
+                  tooltip={TILE_TOOLTIPS.activeMembers}
                   value={data?.members?.activeMembers || 0}
                   icon={<Users className="h-5 w-5" />}
                   iconBgColor="#E3F2FD"
                 />
                 <ModernStatCard
                   title="Club Age"
+                  tooltip={TILE_TOOLTIPS.clubAge}
                   value={`${data?.members?.clubAgeMonths || 0} months`}
                   icon={<CalendarDays className="h-5 w-5" />}
                   iconBgColor="#EDE7F6"
@@ -621,12 +740,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Total Deposits"
+                  tooltip={TILE_TOOLTIPS.totalDeposits}
                   value={formatCurrency(data?.memberFunds?.totalDeposits || 0)}
                   icon={<CircleDollarSign className="h-5 w-5" />}
                   iconBgColor="#E8F5E9"
                 />
                 <ModernStatCard
                   title="Member Adjustments"
+                  tooltip={TILE_TOOLTIPS.memberAdjustments}
                   value={formatCurrency(
                     data?.memberOutflow?.memberAdjustments || 0
                   )}
@@ -644,6 +765,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Member Pending"
+                  tooltip={TILE_TOOLTIPS.memberPending}
                   value={formatCurrency(
                     data?.memberFunds?.totalMemberPending || 0
                   )}
@@ -652,6 +774,7 @@ export default function DashboardPage() {
                 />
                 <ModernStatCard
                   title="Adjustments Pending"
+                  tooltip={TILE_TOOLTIPS.adjustmentsPending}
                   value={formatCurrency(
                     data?.memberOutflow?.pendingAdjustments || 0
                   )}
@@ -669,6 +792,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Total Loan Given"
+                  tooltip={TILE_TOOLTIPS.totalLoanGiven}
                   value={formatCurrency(
                     data?.loans?.lifetime?.totalLoanGiven || 0
                   )}
@@ -677,6 +801,7 @@ export default function DashboardPage() {
                 />
                 <ModernStatCard
                   title="Total Interest Collected"
+                  tooltip={TILE_TOOLTIPS.totalInterestCollected}
                   value={formatCurrency(
                     data?.loans?.lifetime?.totalInterestCollected || 0
                   )}
@@ -694,6 +819,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Current Loan Taken"
+                  tooltip={TILE_TOOLTIPS.currentLoanTaken}
                   value={formatCurrency(
                     data?.loans?.outstanding?.currentLoanTaken || 0
                   )}
@@ -702,6 +828,7 @@ export default function DashboardPage() {
                 />
                 <ModernStatCard
                   title="Interest Pending"
+                  tooltip={TILE_TOOLTIPS.interestPending}
                   value={formatCurrency(
                     data?.loans?.outstanding?.interestBalance || 0
                   )}
@@ -719,12 +846,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Vendor Investment"
+                  tooltip={TILE_TOOLTIPS.vendorInvestment}
                   value={formatCurrency(data?.vendor?.vendorInvestment || 0)}
                   icon={<Briefcase className="h-5 w-5" />}
                   iconBgColor="#E3F2FD"
                 />
                 <ModernStatCard
                   title="Vendor Profit"
+                  tooltip={TILE_TOOLTIPS.vendorProfit}
                   value={formatCurrency(data?.vendor?.vendorProfit || 0)}
                   icon={<TrendingUp className="h-5 w-5" />}
                   iconBgColor="#E8F5E9"
@@ -740,12 +869,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Current Profit"
+                  tooltip={TILE_TOOLTIPS.currentProfit}
                   value={formatCurrency(data?.cashFlow?.totalProfit || 0)}
                   icon={<TrendingUp className="h-5 w-5" />}
                   iconBgColor="#16A34A"
                 />
                 <ModernStatCard
                   title="Profit Withdrawals"
+                  tooltip={TILE_TOOLTIPS.profitWithdrawals}
                   value={formatCurrency(
                     data?.memberOutflow?.profitWithdrawals || 0
                   )}
@@ -763,12 +894,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Total Invested"
+                  tooltip={TILE_TOOLTIPS.totalInvested}
                   value={formatCurrency(data?.cashFlow?.totalInvested || 0)}
                   icon={<Layers className="h-5 w-5" />}
                   iconBgColor="#2563EB"
                 />
                 <ModernStatCard
                   title="Total Pending"
+                  tooltip={TILE_TOOLTIPS.totalPending}
                   value={formatCurrency(data?.cashFlow?.pendingAmounts || 0)}
                   icon={<Clock className="h-5 w-5" />}
                   iconBgColor="#9333EA"
@@ -784,12 +917,14 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <ModernStatCard
                   title="Available Cash"
+                  tooltip={TILE_TOOLTIPS.availableCash}
                   value={formatCurrency(data?.valuation?.availableCash || 0)}
                   icon={<Wallet className="h-5 w-5" />}
                   iconBgColor="#F59E0B"
                 />
                 <ModernStatCard
                   title="Current Value"
+                  tooltip={TILE_TOOLTIPS.currentValue}
                   value={formatCurrency(data?.valuation?.currentValue || 0)}
                   icon={<Banknote className="h-5 w-5" />}
                   iconBgColor="#16A34A"
