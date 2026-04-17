@@ -18,9 +18,12 @@ export type DashboardSummaryData = {
   };
   // Member Funds
   memberFunds: {
+    /** Expected total periodic deposits across active members (stage-based). */
     totalDeposits: number;
+    /** Actual periodic deposits received from active members. */
+    memberDepositsPaid: number;
     memberBalance: number;
-    // Sum of per-active-member totalBalanceAmount (matches Member table's Balance column)
+    /** Sum of per-active-member totalBalanceAmount (matches Member table's Balance column). */
     totalMemberPending: number;
   };
   // Member Outflow
@@ -79,7 +82,10 @@ export type TransformClubPassbookOptions = {
   activeMembers: number;
   clubAgeMonths: number;
   expectedTotalLoanInterestAmount?: number;
-  vendorPassbooks?: Array<{ payload: VendorFinancialSnapshot }>;
+  vendorPassbooks?: Array<{
+    payload: VendorFinancialSnapshot;
+    active?: boolean;
+  }>;
   monthStartDate?: Date | null;
   monthEndDate?: Date | null;
   recalculatedAt?: Date;
@@ -122,12 +128,15 @@ export function transformClubPassbookToSummary(
     expectedTotalLoanInterestAmount - (clubData.interestCollectedTotal || 0)
   );
 
-  // Calculate vendor profit by summing profits from each vendor passbook
-  // Profit is calculated as returnsTotal - investmentTotal (not from stored profitTotal)
+  // Vendor Profit:
+  //   - Inactive vendor (cycle closed): book the full P&L = returns − invested.
+  //   - Active vendor (cycle ongoing): count only realized gains, floored at 0.
+  // When `active` isn't supplied we default to floored (safer: assumes ongoing).
   const vendorProfit = vendorPassbooks.reduce((total, vendorPassbook) => {
-    const vendorData = vendorPassbook.payload as VendorFinancialSnapshot;
-    const { investmentTotal = 0, returnsTotal = 0 } = vendorData;
-    const profit = Math.max(returnsTotal - investmentTotal, 0);
+    const { investmentTotal = 0, returnsTotal = 0 } = vendorPassbook.payload;
+    const net = returnsTotal - investmentTotal;
+    const isActive = vendorPassbook.active ?? true;
+    const profit = isActive ? Math.max(net, 0) : net;
     return total + profit;
   }, 0);
 
@@ -175,6 +184,7 @@ export function transformClubPassbookToSummary(
     // Member Funds
     memberFunds: {
       totalDeposits,
+      memberDepositsPaid: clubData.activeMemberPeriodicDepositsTotal ?? 0,
       memberBalance,
       totalMemberPending,
     },
@@ -244,6 +254,7 @@ export function transformSummaryToDashboardData(
     // Member Funds
     memberFunds: {
       totalDeposits: summary.totalDeposits,
+      memberDepositsPaid: 0,
       memberBalance: summary.memberBalance,
       totalMemberPending: 0,
     },

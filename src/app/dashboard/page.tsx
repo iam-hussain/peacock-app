@@ -280,7 +280,7 @@ export default function DashboardPage() {
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
                   ) : (
-                    formatCurrency(data?.memberFunds?.totalDeposits || 0)
+                    formatCurrency(data?.memberFunds?.memberDepositsPaid || 0)
                   )
                 }
                 icon={<CircleDollarSign className="h-5 w-5" />}

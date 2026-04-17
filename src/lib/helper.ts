@@ -154,6 +154,7 @@ export const getDefaultPassbookData = (
       activeMembersCount: 0,
       memberTotalDepositExpected: 0,
       activeMemberDepositedTotal: 0,
+      activeMemberPeriodicDepositsTotal: 0,
       activeMemberPendingTotal: 0,
       activeMemberExpectedAdjustments: 0,
       pendingAdjustmentsTotal: 0,

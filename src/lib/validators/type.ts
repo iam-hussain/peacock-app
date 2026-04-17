@@ -101,6 +101,8 @@ export type ClubFinancialSnapshot = {
   memberTotalDepositExpected?: number;
   /** Σ over active members of (periodic + offset − profitWithdrawals) */
   activeMemberDepositedTotal?: number;
+  /** Σ over active members of periodicDepositsTotal (periodic only) */
+  activeMemberPeriodicDepositsTotal?: number;
   /** Σ over active members of (memberTotalDeposit + joiningOffset + delayOffset − accountBalance) */
   activeMemberPendingTotal?: number;
   /** Σ of expected offsets for active members (joining + delay) */

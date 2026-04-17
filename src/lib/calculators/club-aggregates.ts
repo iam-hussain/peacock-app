@@ -84,10 +84,11 @@ export async function recomputeClubDashboardAggregates(
           actualContributions,
         deposited:
           acc.deposited + periodicDeposits + offsetDeposits - profitWithdrawals,
+        periodicOnly: acc.periodicOnly + periodicDeposits,
         expectedAdjustments: acc.expectedAdjustments + totalOffset,
       };
     },
-    { pending: 0, deposited: 0, expectedAdjustments: 0 }
+    { pending: 0, deposited: 0, periodicOnly: 0, expectedAdjustments: 0 }
   );
 
   const expectedTotalLoanInterest =
@@ -105,6 +106,7 @@ export async function recomputeClubDashboardAggregates(
     activeMembersCount,
     memberTotalDepositExpected,
     activeMemberDepositedTotal: totals.deposited,
+    activeMemberPeriodicDepositsTotal: totals.periodicOnly,
     activeMemberPendingTotal: totals.pending,
     activeMemberExpectedAdjustments: totals.expectedAdjustments,
     pendingAdjustmentsTotal,

@@ -160,7 +160,10 @@ export async function GET(request: NextRequest) {
         }),
         prisma.passbook.findMany({
           where: { kind: "VENDOR" },
-          select: { payload: true },
+          select: {
+            payload: true,
+            account: { select: { active: true } },
+          },
         }),
       ]);
 
@@ -197,6 +200,7 @@ export async function GET(request: NextRequest) {
         expectedTotalLoanInterestAmount,
         vendorPassbooks: vendorPassbooks.map((vp) => ({
           payload: vp.payload as VendorFinancialSnapshot,
+          active: vp.account?.active ?? true,
         })),
         monthStartDate: null,
         monthEndDate: null,

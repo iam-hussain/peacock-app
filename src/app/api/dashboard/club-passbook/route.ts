@@ -60,7 +60,10 @@ export async function GET(request: NextRequest) {
     // Fetch vendor passbooks to calculate total vendor profit (still per-vendor)
     const vendorPassbooks = await prisma.passbook.findMany({
       where: { kind: "VENDOR" },
-      select: { payload: true },
+      select: {
+        payload: true,
+        account: { select: { active: true } },
+      },
     });
 
     const summaryData = transformClubPassbookToSummary({
@@ -70,6 +73,7 @@ export async function GET(request: NextRequest) {
       expectedTotalLoanInterestAmount,
       vendorPassbooks: vendorPassbooks.map((vp) => ({
         payload: vp.payload as VendorFinancialSnapshot,
+        active: vp.account?.active ?? true,
       })),
       monthStartDate: null,
       monthEndDate: null,

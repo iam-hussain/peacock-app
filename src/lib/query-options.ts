@@ -177,6 +177,7 @@ export const fetchDashboardSummary = (month?: string) =>
             };
             memberFunds: {
               totalDeposits: number;
+              memberDepositsPaid: number;
               memberBalance: number;
               totalMemberPending: number;
             };
@@ -256,6 +257,7 @@ export const fetchDashboardClubPassbook = () =>
             };
             memberFunds: {
               totalDeposits: number;
+              memberDepositsPaid: number;
               memberBalance: number;
               totalMemberPending: number;
             };
