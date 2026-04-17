@@ -6,10 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { calculateExpectedTotalLoanInterestAmountFromDb } from "@/lib/calculators/expected-interest";
-import { clubMonthsFromStart } from "@/lib/config/club";
+import { clubMonthsFromStart, getMemberTotalDeposit } from "@/lib/config/club";
 import { transformClubPassbookToSummary } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
+  MemberFinancialSnapshot,
   VendorFinancialSnapshot,
 } from "@/lib/validators/type";
 
@@ -61,10 +62,23 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate pending adjustments: Total expected (sum of all members' offsets) - Total received
-    const allMemberPassbooks = await prisma.passbook.findMany({
-      where: { kind: "MEMBER" },
-      select: { joiningOffset: true, delayOffset: true },
-    });
+    const [allMemberPassbooks, activeMemberPassbooks] = await Promise.all([
+      prisma.passbook.findMany({
+        where: { kind: "MEMBER" },
+        select: { joiningOffset: true, delayOffset: true },
+      }),
+      prisma.passbook.findMany({
+        where: {
+          kind: "MEMBER",
+          account: { type: "MEMBER", status: "ACTIVE" },
+        },
+        select: {
+          joiningOffset: true,
+          delayOffset: true,
+          payload: true,
+        },
+      }),
+    ]);
 
     const totalExpectedAdjustments = allMemberPassbooks.reduce(
       (sum, pb) => sum + (pb.joiningOffset || 0) + (pb.delayOffset || 0),
@@ -75,6 +89,19 @@ export async function GET(request: NextRequest) {
       0,
       totalExpectedAdjustments - totalReceivedAdjustments
     );
+
+    // Mirror the Member table's Balance column:
+    //   totalBalanceAmount = memberTotalDeposit + totalOffsetAmount - accountBalance
+    const memberTotalDeposit = getMemberTotalDeposit();
+    const totalMemberPending = activeMemberPassbooks.reduce((sum, pb) => {
+      const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
+        accountBalance?: number;
+      };
+      const accountBalance =
+        payload.accountBalance ?? payload.memberBalance ?? 0;
+      const totalOffset = (pb.joiningOffset || 0) + (pb.delayOffset || 0);
+      return sum + memberTotalDeposit + totalOffset - accountBalance;
+    }, 0);
 
     // Transform club passbook to summary structure using common transformer
     const summaryData = transformClubPassbookToSummary({
@@ -91,6 +118,7 @@ export async function GET(request: NextRequest) {
       recalculatedByAdminId: null, // Not tracked in passbook
       isLocked: false, // Not applicable for passbook
       pendingAdjustments,
+      totalMemberPending,
     });
 
     // Structure response according to financial domain semantics (matching summary structure)

@@ -313,7 +313,7 @@ export default function DashboardPage() {
                   isLoading ? (
                     <Skeleton className="h-6 w-24" />
                   ) : (
-                    formatCurrency(data?.memberFunds?.memberBalance || 0)
+                    formatCurrency(data?.memberFunds?.totalMemberPending || 0)
                   )
                 }
                 icon={<Wallet className="h-5 w-5" />}

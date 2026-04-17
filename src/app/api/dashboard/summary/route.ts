@@ -7,13 +7,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
 import { calculateExpectedTotalLoanInterestAmountFromDb } from "@/lib/calculators/expected-interest";
-import { clubMonthsFromStart } from "@/lib/config/club";
+import { clubMonthsFromStart, getMemberTotalDeposit } from "@/lib/config/club";
 import {
   transformClubPassbookToSummary,
   transformSummaryToDashboardData,
 } from "@/lib/transformers/dashboard-summary";
 import {
   ClubFinancialSnapshot,
+  MemberFinancialSnapshot,
   VendorFinancialSnapshot,
 } from "@/lib/validators/type";
 
@@ -150,24 +151,40 @@ export async function GET(request: NextRequest) {
     } else {
       // No month param — compute live data from club passbook (same as club-passbook route)
       // This ensures Summary and Club Passbook views always show identical current data
-      const [clubPassbook, activeMembers, vendorPassbooks, allMemberPassbooks] =
-        await Promise.all([
-          prisma.passbook.findFirst({
-            where: { kind: "CLUB" },
-            select: { payload: true, updatedAt: true },
-          }),
-          prisma.account.count({
-            where: { type: "MEMBER", status: "ACTIVE" },
-          }),
-          prisma.passbook.findMany({
-            where: { kind: "VENDOR" },
-            select: { payload: true },
-          }),
-          prisma.passbook.findMany({
-            where: { kind: "MEMBER" },
-            select: { joiningOffset: true, delayOffset: true },
-          }),
-        ]);
+      const [
+        clubPassbook,
+        activeMembers,
+        vendorPassbooks,
+        allMemberPassbooks,
+        activeMemberPassbooks,
+      ] = await Promise.all([
+        prisma.passbook.findFirst({
+          where: { kind: "CLUB" },
+          select: { payload: true, updatedAt: true },
+        }),
+        prisma.account.count({
+          where: { type: "MEMBER", status: "ACTIVE" },
+        }),
+        prisma.passbook.findMany({
+          where: { kind: "VENDOR" },
+          select: { payload: true },
+        }),
+        prisma.passbook.findMany({
+          where: { kind: "MEMBER" },
+          select: { joiningOffset: true, delayOffset: true },
+        }),
+        prisma.passbook.findMany({
+          where: {
+            kind: "MEMBER",
+            account: { type: "MEMBER", status: "ACTIVE" },
+          },
+          select: {
+            joiningOffset: true,
+            delayOffset: true,
+            payload: true,
+          },
+        }),
+      ]);
 
       if (!clubPassbook) {
         return NextResponse.json(
@@ -195,6 +212,19 @@ export async function GET(request: NextRequest) {
         totalExpectedAdjustments - totalReceivedAdjustments
       );
 
+      // Mirror the Member table's Balance column:
+      //   totalBalanceAmount = memberTotalDeposit + totalOffsetAmount - accountBalance
+      const memberTotalDeposit = getMemberTotalDeposit();
+      const totalMemberPending = activeMemberPassbooks.reduce((sum, pb) => {
+        const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
+          accountBalance?: number;
+        };
+        const accountBalance =
+          payload.accountBalance ?? payload.memberBalance ?? 0;
+        const totalOffset = (pb.joiningOffset || 0) + (pb.delayOffset || 0);
+        return sum + memberTotalDeposit + totalOffset - accountBalance;
+      }, 0);
+
       const dashboardData = transformClubPassbookToSummary({
         clubData,
         activeMembers,
@@ -209,6 +239,7 @@ export async function GET(request: NextRequest) {
         recalculatedByAdminId: null,
         isLocked: false,
         pendingAdjustments,
+        totalMemberPending,
       });
 
       const response = { success: true, data: dashboardData };

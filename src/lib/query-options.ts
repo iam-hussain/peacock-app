@@ -178,6 +178,7 @@ export const fetchDashboardSummary = (month?: string) =>
             memberFunds: {
               totalDeposits: number;
               memberBalance: number;
+              totalMemberPending: number;
             };
             memberOutflow: {
               profitWithdrawals: number;
@@ -256,6 +257,7 @@ export const fetchDashboardClubPassbook = () =>
             memberFunds: {
               totalDeposits: number;
               memberBalance: number;
+              totalMemberPending: number;
             };
             memberOutflow: {
               profitWithdrawals: number;

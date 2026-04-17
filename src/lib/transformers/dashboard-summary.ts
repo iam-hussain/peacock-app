@@ -20,6 +20,8 @@ export type DashboardSummaryData = {
   memberFunds: {
     totalDeposits: number;
     memberBalance: number;
+    // Sum of per-active-member totalBalanceAmount (matches Member table's Balance column)
+    totalMemberPending: number;
   };
   // Member Outflow
   memberOutflow: {
@@ -84,6 +86,7 @@ export type TransformClubPassbookOptions = {
   recalculatedByAdminId?: string | null;
   isLocked?: boolean;
   pendingAdjustments?: number; // Total expected adjustments - total received adjustments
+  totalMemberPending?: number; // Sum of active members' totalBalanceAmount (mirrors Member table)
 };
 
 /**
@@ -165,6 +168,7 @@ export function transformClubPassbookToSummary(
     memberFunds: {
       totalDeposits,
       memberBalance,
+      totalMemberPending: options?.totalMemberPending ?? 0,
     },
     // Member Outflow
     memberOutflow: {
@@ -233,6 +237,7 @@ export function transformSummaryToDashboardData(
     memberFunds: {
       totalDeposits: summary.totalDeposits,
       memberBalance: summary.memberBalance,
+      totalMemberPending: 0,
     },
     // Member Outflow
     memberOutflow: {
