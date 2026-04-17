@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 
 import prisma from "@/db";
+import { recomputeClubDashboardAggregates } from "@/lib/calculators/club-aggregates";
 import { invalidateAccountCaches } from "@/lib/core/cache-invalidation";
 import { newZoneDate } from "@/lib/core/date";
 import { generateVendorUsername, getDefaultPassbookData } from "@/lib/helper";
@@ -223,6 +224,19 @@ export async function POST(request: Request) {
         }
       }
 
+      // Active-toggle or member/vendor edit changes active-only aggregates
+      // on the CLUB passbook. Loan interest is unaffected → skip it.
+      try {
+        await recomputeClubDashboardAggregates(prisma, {
+          skipLoanInterest: true,
+        });
+      } catch (aggregateError) {
+        console.error(
+          "⚠️  Failed to recompute club dashboard aggregates after account update",
+          aggregateError
+        );
+      }
+
       // Clear all caches after account update
       await invalidateAccountCaches();
 
@@ -268,6 +282,18 @@ export async function POST(request: Request) {
     await prisma.account.create({
       data: createData,
     });
+
+    // New member/vendor changes active-count & related aggregates on CLUB.
+    try {
+      await recomputeClubDashboardAggregates(prisma, {
+        skipLoanInterest: true,
+      });
+    } catch (aggregateError) {
+      console.error(
+        "⚠️  Failed to recompute club dashboard aggregates after account creation",
+        aggregateError
+      );
+    }
 
     // Clear all caches after account creation
     await invalidateAccountCaches();

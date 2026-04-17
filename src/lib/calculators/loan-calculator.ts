@@ -123,6 +123,108 @@ export function calculateLoanDetails(transactions: Transaction[]) {
  * Gets loan history for a member calculated on-the-fly from transactions
  * This replaces reading from passbook.loanHistory
  */
+type MemberLoanHistoryResult = {
+  loanHistory: any[];
+  totalLoanBalance: number;
+  totalInterestAmount: number;
+  recentPassedString: string;
+};
+
+/**
+ * Computes per-member loan history from a pre-grouped transaction map.
+ * Shared between `getMemberLoanHistory` (single member) and
+ * `getAllMembersLoanHistory` (batched) so both paths produce identical output.
+ */
+function computeLoanHistoryResult(
+  transactions: Transaction[]
+): MemberLoanHistoryResult {
+  const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);
+  const clubStartDate = newZoneDate(clubConfig.startedAt);
+  const currentMonthEnd = endOfMonth(newZoneDate());
+
+  const loanHistoryResult = loanHistory.reduce(
+    (acc, loan) => {
+      const loanStartDate = loan.startDate
+        ? newZoneDate(loan.startDate)
+        : newZoneDate();
+      const actualStartDate =
+        loanStartDate < clubStartDate ? clubStartDate : loanStartDate;
+
+      let loanEndDate = loan?.endDate
+        ? newZoneDate(loan.endDate)
+        : currentMonthEnd;
+
+      if (loan.index === loanHistory.length - 1 && !loan.endDate) {
+        loanEndDate = newZoneDate();
+      }
+
+      const interestCalc = calculateInterestByAmount(
+        loan.amount ?? 0,
+        actualStartDate,
+        loanEndDate
+      );
+      acc.totalInterestAmount += interestCalc.rawInterestAmount;
+      acc.loanHistory.push({
+        ...interestCalc,
+        amount: loan.amount ?? 0,
+        active: !loan.endDate,
+        startDate: newZoneDate(loan.startDate ?? newZoneDate()).getTime(),
+        endDate: loan.endDate ? newZoneDate(loan.endDate).getTime() : undefined,
+        totalInterestAmount: acc.totalInterestAmount,
+      });
+      if (interestCalc.monthsPassedString) {
+        acc.recentPassedString = interestCalc.monthsPassedString;
+      }
+      return acc;
+    },
+    { totalInterestAmount: 0, loanHistory: [] as any[], recentPassedString: "" }
+  );
+
+  return {
+    loanHistory: loanHistoryResult.loanHistory,
+    totalLoanBalance,
+    totalInterestAmount: Math.round(loanHistoryResult.totalInterestAmount),
+    recentPassedString: loanHistoryResult.recentPassedString,
+  };
+}
+
+/**
+ * Fetches loan transactions for ALL members in a single query and returns
+ * a map of memberId → loan history. Use this on the loan table page to
+ * avoid N+1 DB round-trips.
+ */
+export async function getAllMembersLoanHistory(): Promise<
+  Map<string, MemberLoanHistoryResult>
+> {
+  const transactions = await prisma.transaction.findMany({
+    where: { type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] } },
+    orderBy: { occurredAt: "asc" },
+  });
+
+  // Group transactions by the member party that owns the loan
+  //   LOAN_TAKEN: toId = member receiving the loan
+  //   LOAN_REPAY: fromId = member repaying the loan
+  const byMember = new Map<string, Transaction[]>();
+  for (const tx of transactions) {
+    const memberId =
+      tx.type === "LOAN_TAKEN"
+        ? tx.toId
+        : tx.type === "LOAN_REPAY"
+          ? tx.fromId
+          : null;
+    if (!memberId) continue;
+    const list = byMember.get(memberId);
+    if (list) list.push(tx);
+    else byMember.set(memberId, [tx]);
+  }
+
+  const result = new Map<string, MemberLoanHistoryResult>();
+  for (const [memberId, txns] of Array.from(byMember.entries())) {
+    result.set(memberId, computeLoanHistoryResult(txns));
+  }
+  return result;
+}
+
 export async function getMemberLoanHistory(memberId: string) {
   const transactions = await fetchLoanTransactionsForMember(memberId);
   const { loanHistory, totalLoanBalance } = calculateLoanDetails(transactions);

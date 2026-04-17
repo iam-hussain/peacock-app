@@ -5,6 +5,7 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { recomputeClubDashboardAggregates } from "@/lib/calculators/club-aggregates";
 import { invalidateAccountCaches } from "@/lib/core/cache-invalidation";
 
 // POST Request to update the member's offset adjustments
@@ -31,6 +32,19 @@ export async function POST(request: Request) {
         delayOffset,
       },
     });
+
+    // Offsets change the active-member pending/adjustments aggregates but
+    // can't affect loan interest — skip the expensive loan-history recompute.
+    try {
+      await recomputeClubDashboardAggregates(prisma, {
+        skipLoanInterest: true,
+      });
+    } catch (aggregateError) {
+      console.error(
+        "⚠️  Failed to recompute club dashboard aggregates after offset update",
+        aggregateError
+      );
+    }
 
     // Clear all caches after offset update
     await invalidateAccountCaches();

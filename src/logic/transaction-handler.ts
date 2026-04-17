@@ -218,8 +218,13 @@ export async function transactionEntryHandler(
     // Recompute derived dashboard aggregates on CLUB passbook (active-only
     // aggregates that sit outside the settings DSL). Non-fatal on failure —
     // the transaction itself succeeded; next write or reset will refresh.
+    // Skip the expensive loan-history recompute for non-LOAN transaction
+    // types (they can't change expected interest).
+    const skipLoanInterest = !created.type.startsWith("LOAN_");
     try {
-      await recomputeClubDashboardAggregates(db || prisma);
+      await recomputeClubDashboardAggregates(db || prisma, {
+        skipLoanInterest,
+      });
     } catch (aggregateError) {
       console.error(
         "⚠️  Failed to recompute club dashboard aggregates after transaction",

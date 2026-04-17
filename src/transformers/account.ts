@@ -6,7 +6,22 @@ import { MemberFinancialSnapshot } from "@/lib/validators/type";
 
 type ToTransform = Account & { passbook: Passbook | null };
 
-export async function transformLoanForTable(vendorInput: ToTransform) {
+/**
+ * Optional pre-computed loan history. When caller batches history for all
+ * members at once (e.g. the loan table route), pass the matching entry to
+ * avoid an N+1 per-member DB round-trip.
+ */
+type PrecomputedLoanHistory = {
+  loanHistory: any[];
+  totalLoanBalance: number;
+  totalInterestAmount: number;
+  recentPassedString: string;
+};
+
+export async function transformLoanForTable(
+  vendorInput: ToTransform,
+  precomputed?: PrecomputedLoanHistory
+) {
   const { passbook, ...member } = vendorInput;
   // Support both old and new field names for backward compatibility
   const payload =
@@ -27,13 +42,13 @@ export async function transformLoanForTable(vendorInput: ToTransform) {
       0,
   } = payload;
 
-  // Calculate loan history on-the-fly from transactions
+  // Use pre-batched result when available; otherwise fall back to one query.
   const {
     loanHistory: calculatedLoanHistory,
     totalLoanBalance: calculatedTotalLoanBalance,
     totalInterestAmount,
     recentPassedString,
-  } = await getMemberLoanHistory(member.id);
+  } = precomputed ?? (await getMemberLoanHistory(member.id));
 
   const totalInterestBalance = totalInterestAmount - interestPaidTotal;
 

@@ -254,9 +254,9 @@ export function transformSummaryToDashboardData(
     // Member Funds
     memberFunds: {
       totalDeposits: summary.totalDeposits,
-      memberDepositsPaid: 0,
+      memberDepositsPaid: summary.memberDepositsPaid ?? 0,
       memberBalance: summary.memberBalance,
-      totalMemberPending: 0,
+      totalMemberPending: summary.totalMemberPending ?? 0,
     },
     // Member Outflow
     memberOutflow: {

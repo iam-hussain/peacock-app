@@ -145,7 +145,6 @@ export const getDefaultPassbookData = (
       netClubValue: 0,
       vendorInvestmentTotal: 0,
       vendorReturnsTotal: 0,
-      vendorProfitTotal: 0,
       loansPrincipalDisbursed: 0,
       loansPrincipalRepaid: 0,
       loansOutstanding: 0,
@@ -153,7 +152,6 @@ export const getDefaultPassbookData = (
       // Derived aggregates (recomputed, see recomputeClubDashboardAggregates)
       activeMembersCount: 0,
       memberTotalDepositExpected: 0,
-      activeMemberDepositedTotal: 0,
       activeMemberPeriodicDepositsTotal: 0,
       activeMemberPendingTotal: 0,
       activeMemberExpectedAdjustments: 0,

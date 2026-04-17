@@ -214,7 +214,7 @@ export function ModernSidebar() {
                 variant="ghost"
                 size="default"
                 className={cn(
-                  "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                  "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-out",
                   "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
                   active &&
                     "text-primary bg-primary/5 border-l-2 border-primary font-medium hover:text-primary",
@@ -248,7 +248,7 @@ export function ModernSidebar() {
                 variant="ghost"
                 size="default"
                 className={cn(
-                  "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                  "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-out",
                   "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
                   active &&
                     "text-primary bg-primary/5 border-l-2 border-primary font-medium hover:text-primary",
@@ -301,7 +301,7 @@ export function ModernSidebar() {
                   variant="ghost"
                   size="default"
                   className={cn(
-                    "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-out",
                     "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
                     sideBarCollapsed && "justify-center px-2",
                     isActive("/dashboard/profile") &&
@@ -319,7 +319,7 @@ export function ModernSidebar() {
                   variant="ghost"
                   size="default"
                   className={cn(
-                    "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    "w-full justify-start gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ease-out",
                     "text-muted-foreground hover:text-foreground hover:translate-x-0.5",
                     sideBarCollapsed && "justify-center px-2",
                     isActive("/dashboard/settings") &&

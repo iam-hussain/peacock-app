@@ -4,6 +4,7 @@ export const fetchCache = "force-no-store";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
+import { getAllMembersLoanHistory } from "@/lib/calculators/loan-calculator";
 import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
 
 /**
@@ -58,14 +59,31 @@ import { TransformedLoan, transformLoanForTable } from "@/transformers/account";
  */
 export async function POST(request: NextRequest) {
   try {
-    const loans = await prisma.account.findMany({
-      where: { type: "MEMBER" },
-      include: { passbook: true },
-    });
+    const [loans, historyByMember] = await Promise.all([
+      prisma.account.findMany({
+        where: { type: "MEMBER" },
+        include: { passbook: true },
+      }),
+      getAllMembersLoanHistory(),
+    ]);
 
+    // Pass the pre-batched history into the transformer so each row avoids
+    // its own DB round-trip. Members with no loan rows get a zero-result
+    // sentinel so the transformer never falls back to the per-member query.
+    const EMPTY_LOAN_HISTORY = {
+      loanHistory: [],
+      totalLoanBalance: 0,
+      totalInterestAmount: 0,
+      recentPassedString: "",
+    };
     const transformedLoans = await Promise.all(
       loans.map((loan) =>
-        loan.passbook ? transformLoanForTable(loan as any) : null
+        loan.passbook
+          ? transformLoanForTable(
+              loan as any,
+              historyByMember.get(loan.id) ?? EMPTY_LOAN_HISTORY
+            )
+          : null
       )
     );
 

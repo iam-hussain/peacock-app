@@ -6,16 +6,8 @@ import { parse } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/db";
-import { recomputeClubDashboardAggregates } from "@/lib/calculators/club-aggregates";
-import { clubMonthsFromStart } from "@/lib/config/club";
-import {
-  transformClubPassbookToSummary,
-  transformSummaryToDashboardData,
-} from "@/lib/transformers/dashboard-summary";
-import {
-  ClubFinancialSnapshot,
-  VendorFinancialSnapshot,
-} from "@/lib/validators/type";
+import { computeLiveDashboard } from "@/lib/calculators/dashboard-live";
+import { transformSummaryToDashboardData } from "@/lib/transformers/dashboard-summary";
 
 /**
  * @swagger
@@ -148,84 +140,32 @@ export async function GET(request: NextRequest) {
         );
       }
     } else {
-      // No month param — read live data from CLUB passbook. Derived
-      // aggregates (active-only totals, expected interest, pending
-      // adjustments) live on the passbook payload and are refreshed by
-      // `recomputeClubDashboardAggregates` on every transaction write
-      // and at reset.
-      const [clubPassbook, vendorPassbooks] = await Promise.all([
-        prisma.passbook.findFirst({
-          where: { kind: "CLUB" },
-          select: { payload: true, updatedAt: true },
-        }),
-        prisma.passbook.findMany({
-          where: { kind: "VENDOR" },
-          select: {
-            payload: true,
-            account: { select: { active: true } },
-          },
-        }),
-      ]);
+      // No month param — delegate to the shared live-dashboard computation
+      // so this endpoint and /api/dashboard/club-passbook can never diverge.
+      const result = await computeLiveDashboard();
 
-      if (!clubPassbook) {
+      if (!result.success) {
         return NextResponse.json(
-          {
-            success: false,
-            error: "No dashboard data found. Please run recalculation first.",
-          },
+          { success: false, error: result.error },
           { status: 404 }
         );
       }
 
-      let clubData = clubPassbook.payload as ClubFinancialSnapshot;
-
-      // Passbook written before the derived-aggregates change — backfill once.
-      if (clubData.aggregatesComputedAt === undefined) {
-        const fresh = await recomputeClubDashboardAggregates();
-        if (fresh) {
-          clubData = { ...clubData, ...fresh };
-        }
-      }
-
-      const activeMembers = clubData.activeMembersCount ?? 0;
-      const clubAgeMonths = clubMonthsFromStart();
-      const expectedTotalLoanInterestAmount =
-        clubData.expectedTotalLoanInterest ?? 0;
-      const pendingAdjustments = clubData.pendingAdjustmentsTotal ?? 0;
-
-      const dashboardData = transformClubPassbookToSummary({
-        clubData,
-        activeMembers,
-        clubAgeMonths,
-        expectedTotalLoanInterestAmount,
-        vendorPassbooks: vendorPassbooks.map((vp) => ({
-          payload: vp.payload as VendorFinancialSnapshot,
-          active: vp.account?.active ?? true,
-        })),
-        monthStartDate: null,
-        monthEndDate: null,
-        recalculatedAt: clubPassbook.updatedAt,
-        recalculatedByAdminId: null,
-        isLocked: false,
-        pendingAdjustments,
-        totalMemberPending: clubData.activeMemberPendingTotal ?? 0,
-      });
-
-      const response = { success: true, data: dashboardData };
-
-      const etag = `"${clubPassbook.updatedAt.getTime()}"`;
       const ifNoneMatch = request.headers.get("if-none-match");
-      if (ifNoneMatch === etag) {
+      if (ifNoneMatch === result.etag) {
         return new NextResponse(null, { status: 304 });
       }
 
-      return NextResponse.json(response, {
-        headers: {
-          "Cache-Control": "private, no-cache, must-revalidate",
-          ETag: etag,
-          "X-Content-Type-Options": "nosniff",
-        },
-      });
+      return NextResponse.json(
+        { success: true, data: result.data },
+        {
+          headers: {
+            "Cache-Control": "private, no-cache, must-revalidate",
+            ETag: result.etag,
+            "X-Content-Type-Options": "nosniff",
+          },
+        }
+      );
     }
 
     // Historical month query — use stored Summary snapshot

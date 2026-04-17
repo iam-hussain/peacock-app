@@ -219,10 +219,12 @@ model Summary {
   clubAgeMonths Int @default(0)
 
   // Member Funds
-  totalDeposits     Float @default(0)
-  memberBalance     Float @default(0)
-  profitWithdrawals Float @default(0)
-  memberAdjustments Float @default(0)
+  totalDeposits      Float @default(0) // Expected total = activeMembers × memberTotalDeposit
+  memberDepositsPaid Float @default(0) // Actual periodic deposits paid by active members
+  memberBalance      Float @default(0) // Legacy: memberPeriodicDepositsTotal − totalDeposits
+  totalMemberPending Float @default(0) // Σ active (expected − actual contributions), matches dashboard tile
+  profitWithdrawals  Float @default(0)
+  memberAdjustments  Float @default(0)
 
   // Loans - Lifetime
   totalLoanGiven         Float @default(0)

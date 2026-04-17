@@ -18,13 +18,25 @@ type DbClient = PrismaClient | typeof prisma;
  * defined in `src/logic/settings.ts`. This helper re-derives them from
  * current DB state and writes them onto the CLUB passbook payload.
  *
- * Call after every transaction write (via `transactionEntryHandler`) and
- * at the end of a full reset.
+ * Call after every transaction write (via `transactionEntryHandler`),
+ * after member/vendor active toggles, after offset edits, and at the
+ * end of a full reset.
+ *
+ * Options:
+ *   - `skipLoanInterest`: reuse the currently-stored expectedTotalLoanInterest
+ *     instead of recomputing. The expected-interest recompute fetches every
+ *     loan transaction since club start, so skip it on hot paths where the
+ *     transaction cannot possibly affect loans (PERIODIC_DEPOSIT,
+ *     OFFSET_DEPOSIT, WITHDRAW, FUNDS_TRANSFER, VENDOR_*). Only LOAN_TAKEN,
+ *     LOAN_REPAY, LOAN_INTEREST and reset flows should recompute it.
  */
 export async function recomputeClubDashboardAggregates(
-  db: DbClient = prisma
+  db: DbClient = prisma,
+  options: { skipLoanInterest?: boolean } = {}
 ): Promise<Partial<ClubFinancialSnapshot> | null> {
-  const [clubPassbook, activeMemberPassbooks, expectedInterest] =
+  const { skipLoanInterest = false } = options;
+
+  const [clubPassbook, activeMemberPassbooks, freshInterest] =
     await Promise.all([
       db.passbook.findFirst({
         where: { kind: "CLUB" },
@@ -41,7 +53,9 @@ export async function recomputeClubDashboardAggregates(
           payload: true,
         },
       }),
-      calculateExpectedTotalLoanInterestAmountFromDb(),
+      skipLoanInterest
+        ? Promise.resolve(null)
+        : calculateExpectedTotalLoanInterestAmountFromDb(),
     ]);
 
   if (!clubPassbook) {
@@ -57,14 +71,11 @@ export async function recomputeClubDashboardAggregates(
       const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
         periodicDepositAmount?: number;
         offsetDepositAmount?: number;
-        profitWithdrawalAmount?: number;
       };
       const periodicDeposits =
         payload.periodicDepositsTotal ?? payload.periodicDepositAmount ?? 0;
       const offsetDeposits =
         payload.offsetDepositsTotal ?? payload.offsetDepositAmount ?? 0;
-      const profitWithdrawals =
-        payload.profitWithdrawalsTotal ?? payload.profitWithdrawalAmount ?? 0;
       const joining = Number(pb.joiningOffset) || 0;
       const delay = Number(pb.delayOffset) || 0;
       const totalOffset = joining + delay;
@@ -82,17 +93,18 @@ export async function recomputeClubDashboardAggregates(
           memberTotalDepositExpected +
           totalOffset -
           actualContributions,
-        deposited:
-          acc.deposited + periodicDeposits + offsetDeposits - profitWithdrawals,
         periodicOnly: acc.periodicOnly + periodicDeposits,
         expectedAdjustments: acc.expectedAdjustments + totalOffset,
       };
     },
-    { pending: 0, deposited: 0, periodicOnly: 0, expectedAdjustments: 0 }
+    { pending: 0, periodicOnly: 0, expectedAdjustments: 0 }
   );
 
+  // Reuse stored value when skipping the loan-history recompute (hot path).
   const expectedTotalLoanInterest =
-    expectedInterest.expectedTotalLoanInterestAmount;
+    freshInterest?.expectedTotalLoanInterestAmount ??
+    clubData.expectedTotalLoanInterest ??
+    0;
   const pendingLoanInterest = Math.max(
     0,
     expectedTotalLoanInterest - (clubData.interestCollectedTotal || 0)
@@ -105,7 +117,6 @@ export async function recomputeClubDashboardAggregates(
   const aggregates: Partial<ClubFinancialSnapshot> = {
     activeMembersCount,
     memberTotalDepositExpected,
-    activeMemberDepositedTotal: totals.deposited,
     activeMemberPeriodicDepositsTotal: totals.periodicOnly,
     activeMemberPendingTotal: totals.pending,
     activeMemberExpectedAdjustments: totals.expectedAdjustments,

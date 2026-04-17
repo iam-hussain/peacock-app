@@ -454,24 +454,33 @@ export default function TransactionsPage() {
     setDialogOpen(true);
   };
 
-  const handleEditTransaction = (transaction: TransformedTransaction) => {
-    setSelectedTransaction(transaction);
-    if (isMobile) {
-      router.push(`/dashboard/transaction/${transaction.id}/edit`);
-      return;
-    }
-    setDialogOpen(true);
-  };
+  const handleEditTransaction = useCallback(
+    (transaction: TransformedTransaction) => {
+      setSelectedTransaction(transaction);
+      if (isMobile) {
+        router.push(`/dashboard/transaction/${transaction.id}/edit`);
+        return;
+      }
+      setDialogOpen(true);
+    },
+    [isMobile, router]
+  );
 
-  const handleDeleteTransaction = (transaction: TransformedTransaction) => {
-    setSelectedTransactionForDelete(transaction);
-    setDeleteDialogOpen(true);
-  };
+  const handleDeleteTransaction = useCallback(
+    (transaction: TransformedTransaction) => {
+      setSelectedTransactionForDelete(transaction);
+      setDeleteDialogOpen(true);
+    },
+    []
+  );
 
-  const handleViewTransaction = (transaction: TransformedTransaction) => {
-    setSelectedTransaction(transaction);
-    setDetailsDialogOpen(true);
-  };
+  const handleViewTransaction = useCallback(
+    (transaction: TransformedTransaction) => {
+      setSelectedTransaction(transaction);
+      setDetailsDialogOpen(true);
+    },
+    []
+  );
 
   const handleResetFilters = () => {
     setSearchQuery("");
@@ -729,7 +738,12 @@ export default function TransactionsPage() {
         },
       },
     ],
-    [canWrite]
+    [
+      canWrite,
+      handleEditTransaction,
+      handleDeleteTransaction,
+      handleViewTransaction,
+    ]
   );
 
   // Fetch all transactions for CSV export (without pagination)

@@ -195,18 +195,20 @@ export default function AnalyticsPage() {
 
   const summaries = data?.summaries || [];
 
-  // Extract nested data for chart and table
+  // Extract nested data for chart and table. The graphs endpoint
+  // (/api/dashboard/summary/range) transforms each stored Summary row via
+  // `transformSummaryToDashboardData`, so items arrive in the nested shape.
   const flatSummaries: MonthlySummary[] = summaries
     .map((s: any) => ({
       monthStartDate: s.systemMeta?.monthStartDate,
       // Club Snapshot
       activeMembers: s.members?.activeMembers || 0,
       clubAgeMonths: s.members?.clubAgeMonths || 0,
-      // Member Funds
-      totalDeposits: s.memberFunds?.totalDeposits || 0,
+      // Member Funds — use the same "paid" aggregate the dashboard shows
+      totalDeposits: s.memberFunds?.memberDepositsPaid || 0,
       memberAdjustments: s.memberOutflow?.memberAdjustments || 0,
-      // Member Pending
-      memberPending: s.memberFunds?.memberBalance || 0,
+      // Member Pending — matches dashboard's Member Pending tile
+      memberPending: s.memberFunds?.totalMemberPending || 0,
       adjustmentsPending: s.memberOutflow?.pendingAdjustments || 0,
       // Loans – Lifetime
       totalLoanGiven: s.loans?.lifetime?.totalLoanGiven || 0,
@@ -229,7 +231,7 @@ export default function AnalyticsPage() {
       // Portfolio Summary
       totalPortfolioValue: s.portfolio?.totalPortfolioValue || 0,
     }))
-    .filter((s) => s.monthStartDate); // Filter out entries with invalid dates
+    .filter((s) => s.monthStartDate);
 
   // Define table columns
   const columns: ColumnDef<MonthlySummary>[] = useMemo(

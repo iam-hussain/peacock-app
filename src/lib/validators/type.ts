@@ -86,7 +86,6 @@ export type ClubFinancialSnapshot = {
 
   vendorInvestmentTotal: number;
   vendorReturnsTotal: number;
-  vendorProfitTotal: number;
 
   loansPrincipalDisbursed: number;
   loansPrincipalRepaid: number;
@@ -99,8 +98,6 @@ export type ClubFinancialSnapshot = {
   activeMembersCount?: number;
   /** Expected periodic deposit per active member (from clubConfig stages) */
   memberTotalDepositExpected?: number;
-  /** Σ over active members of (periodic + offset − profitWithdrawals) */
-  activeMemberDepositedTotal?: number;
   /** Σ over active members of periodicDepositsTotal (periodic only) */
   activeMemberPeriodicDepositsTotal?: number;
   /** Σ over active members of (memberTotalDeposit + joiningOffset + delayOffset − accountBalance) */
