@@ -90,18 +90,39 @@ export async function GET(request: NextRequest) {
       totalExpectedAdjustments - totalReceivedAdjustments
     );
 
-    // Mirror the Member table's Balance column:
+    // Mirror the Member table's Balance column and compute Member Deposited:
     //   totalBalanceAmount = memberTotalDeposit + totalOffsetAmount - accountBalance
+    //   activeMemberDeposited = periodicDepositsTotal + offsetDepositsTotal − profitWithdrawalsTotal
     const memberTotalDeposit = getMemberTotalDeposit();
-    const totalMemberPending = activeMemberPassbooks.reduce((sum, pb) => {
-      const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
-        accountBalance?: number;
-      };
-      const accountBalance =
-        payload.accountBalance ?? payload.memberBalance ?? 0;
-      const totalOffset = (pb.joiningOffset || 0) + (pb.delayOffset || 0);
-      return sum + memberTotalDeposit + totalOffset - accountBalance;
-    }, 0);
+    const activeMemberTotals = activeMemberPassbooks.reduce(
+      (acc, pb) => {
+        const payload = (pb.payload || {}) as MemberFinancialSnapshot & {
+          accountBalance?: number;
+          periodicDepositAmount?: number;
+          offsetDepositAmount?: number;
+          profitWithdrawalAmount?: number;
+        };
+        const accountBalance =
+          payload.accountBalance ?? payload.memberBalance ?? 0;
+        const periodicDeposits =
+          payload.periodicDepositsTotal ?? payload.periodicDepositAmount ?? 0;
+        const offsetDeposits =
+          payload.offsetDepositsTotal ?? payload.offsetDepositAmount ?? 0;
+        const profitWithdrawals =
+          payload.profitWithdrawalsTotal ?? payload.profitWithdrawalAmount ?? 0;
+        const totalOffset = (pb.joiningOffset || 0) + (pb.delayOffset || 0);
+        return {
+          pending:
+            acc.pending + memberTotalDeposit + totalOffset - accountBalance,
+          deposited:
+            acc.deposited +
+            periodicDeposits +
+            offsetDeposits -
+            profitWithdrawals,
+        };
+      },
+      { pending: 0, deposited: 0 }
+    );
 
     // Transform club passbook to summary structure using common transformer
     const summaryData = transformClubPassbookToSummary({
@@ -118,7 +139,8 @@ export async function GET(request: NextRequest) {
       recalculatedByAdminId: null, // Not tracked in passbook
       isLocked: false, // Not applicable for passbook
       pendingAdjustments,
-      totalMemberPending,
+      totalMemberPending: activeMemberTotals.pending,
+      activeMemberDeposited: activeMemberTotals.deposited,
     });
 
     // Structure response according to financial domain semantics (matching summary structure)

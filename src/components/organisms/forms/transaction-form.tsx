@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { DatePickerForm } from "@/components/atoms/date-picker-form";
 import { GenericModalFooter } from "@/components/atoms/generic-modal";
-import Box from "@/components/ui/box";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -170,33 +169,68 @@ export function TransactionForm({
       <form
         id="transaction-form"
         onSubmit={form.handleSubmit(onSubmit)}
-        className={isMobile ? "w-full space-y-4" : "w-full max-w-2xl space-y-6"}
+        className="w-full space-y-5"
       >
-        {isMobile ? (
+        <FormField
+          control={form.control}
+          name="transactionType"
+          render={({ field }) => (
+            <FormItem className="space-y-1.5">
+              <FormLabel className="text-sm font-medium">
+                Transaction Type *
+              </FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="h-11 rounded-xl">
+                    <SelectValue placeholder="Select transaction type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(transactionTypeHumanMap).map(
+                      ([key, name]) => (
+                        <SelectItem key={key} value={key}>
+                          {name}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="transactionType"
+            name="fromId"
             render={({ field }) => (
-              <FormItem className="space-y-2">
+              <FormItem className="space-y-1.5">
                 <FormLabel className="text-sm font-medium">
-                  Transaction Type *
+                  {formToLabels[0] ?? "From"} *
                 </FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <SelectTrigger className="h-11 rounded-xl">
-                      <SelectValue placeholder="Select transaction type" />
+                      <SelectValue
+                        placeholder={`Select ${(
+                          formToLabels[0] ?? "item"
+                        ).toLowerCase()}`}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(transactionTypeHumanMap).map(
-                        ([key, name]) => (
-                          <SelectItem key={key} value={key}>
-                            {name}
-                          </SelectItem>
-                        )
-                      )}
+                      {(formToValues[0] ?? []).map((member) => (
+                        <SelectItem key={member.id} value={member.id}>
+                          {member.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -204,31 +238,34 @@ export function TransactionForm({
               </FormItem>
             )}
           />
-        ) : (
+
           <FormField
             control={form.control}
-            name="transactionType"
+            name="toId"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="space-y-1.5">
                 <FormLabel className="text-sm font-medium">
-                  Transaction Type *
+                  {formToLabels[1] ?? "To"} *
                 </FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
-                    <SelectTrigger className="h-11 rounded-lg">
-                      <SelectValue placeholder="Select transaction type" />
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue
+                        placeholder={`Select ${(
+                          formToLabels[1] ?? "item"
+                        ).toLowerCase()}`}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(transactionTypeHumanMap).map(
-                        ([key, name]) => (
-                          <SelectItem key={key} value={key}>
-                            {name}
-                          </SelectItem>
-                        )
-                      )}
+                      {(formToValues[1] ?? []).map((vendor) => (
+                        <SelectItem key={vendor.id} value={vendor.id}>
+                          {vendor.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -236,341 +273,100 @@ export function TransactionForm({
               </FormItem>
             )}
           />
-        )}
+        </div>
 
-        {isMobile ? (
-          <div className="space-y-3">
-            <FormField
-              control={form.control}
-              name="fromId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    {formToLabels[0] ?? "From"} *
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger className="h-11 rounded-xl">
-                        <SelectValue
-                          placeholder={`Select ${(formToLabels[0] ?? "item").toLowerCase()}`}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(formToValues[0] ?? []).map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="toId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    {formToLabels[1] ?? "To"} *
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger className="h-11 rounded-xl">
-                        <SelectValue
-                          placeholder={`Select ${(formToLabels[1] ?? "item").toLowerCase()}`}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(formToValues[1] ?? []).map((vendor) => (
-                          <SelectItem key={vendor.id} value={vendor.id}>
-                            {vendor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-          </div>
-        ) : (
-          <Box preset={"grid-split"}>
-            <FormField
-              control={form.control}
-              name="fromId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    {formToLabels[0] ?? "From"} *
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger className="h-11 rounded-lg">
-                        <SelectValue
-                          placeholder={`Select ${(formToLabels[0] ?? "item").toLowerCase()}`}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(formToValues[0] ?? []).map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="toId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    {formToLabels[1] ?? "To"} *
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger className="h-11 rounded-lg">
-                        <SelectValue
-                          placeholder={`Select ${(formToLabels[1] ?? "item").toLowerCase()}`}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(formToValues[1] ?? []).map((vendor) => (
-                          <SelectItem key={vendor.id} value={vendor.id}>
-                            {vendor.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-          </Box>
-        )}
-
-        {isMobile ? (
-          <div className="space-y-3">
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Amount *
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="decimal"
-                      placeholder="Enter amount"
-                      className="h-11 rounded-xl"
-                      {...field}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        field.onChange(value === "" ? "" : Number(value));
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="transactionAt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Transaction Date (Optional)
-                  </FormLabel>
-                  <FormControl>
-                    <DatePickerForm
-                      field={field}
-                      placeholder="Transaction date"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-          </div>
-        ) : (
-          <Box preset={"grid-split"}>
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Amount *
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Enter amount"
-                      className="h-11 rounded-lg"
-                      {...field}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        field.onChange(value === "" ? "" : Number(value));
-                      }}
-                    />
-                  </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    Enter total amount for this transaction.
-                  </p>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="transactionAt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Transaction Date (Optional)
-                  </FormLabel>
-                  <FormControl>
-                    <DatePickerForm
-                      field={field}
-                      placeholder="Transaction date"
-                    />
-                  </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    Defaults to today if not changed.
-                  </p>
-                  <FormMessage className="text-xs" />
-                </FormItem>
-              )}
-            />
-          </Box>
-        )}
-
-        {isMobile ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="note"
+            name="amount"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">
-                  Note (Optional)
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Add a short note"
-                    className="min-h-[100px] rounded-xl resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-        ) : (
-          <FormField
-            control={form.control}
-            name="note"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">
-                  Note (Optional)
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Optional note"
-                    className="min-h-[100px] rounded-lg resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-        )}
-
-        {isMobile ? (
-          <FormField
-            control={form.control}
-            name="referenceId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium">
-                  Reference ID (Optional)
-                </FormLabel>
+              <FormItem className="space-y-1.5">
+                <FormLabel className="text-sm font-medium">Amount *</FormLabel>
                 <FormControl>
                   <Input
-                    type="text"
-                    placeholder="e.g., loan ID, UPI ref, cheque #"
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="Enter amount"
                     className="h-11 rounded-xl"
                     {...field}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      field.onChange(value === "" ? "" : Number(value));
+                    }}
                   />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
-        ) : (
+
           <FormField
             control={form.control}
-            name="referenceId"
+            name="transactionAt"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="space-y-1.5">
                 <FormLabel className="text-sm font-medium">
-                  Reference ID (Optional)
+                  Transaction Date
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="e.g., loan ID, UPI ref, cheque #"
-                    className="h-11 rounded-lg"
-                    {...field}
+                  <DatePickerForm
+                    field={field}
+                    placeholder="Transaction date"
                   />
                 </FormControl>
                 <p className="text-xs text-muted-foreground">
-                  Link to a loan, UPI reference, cheque number, etc.
+                  Defaults to today.
                 </p>
                 <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
-        )}
+        </div>
 
-        {!isMobile && (
-          <GenericModalFooter
-            actionLabel={selected ? "Update Transaction" : "Add Transaction"}
-            onCancel={onCancel}
-            isSubmitting={isSubmitting}
-          />
-        )}
-        {isMobile && (
-          <div className="flex gap-3 pt-4 pb-2">
+        <FormField
+          control={form.control}
+          name="note"
+          render={({ field }) => (
+            <FormItem className="space-y-1.5">
+              <FormLabel className="text-sm font-medium">Note</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Add a short note"
+                  className="min-h-[96px] rounded-xl resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="referenceId"
+          render={({ field }) => (
+            <FormItem className="space-y-1.5">
+              <FormLabel className="text-sm font-medium">
+                Reference ID
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  placeholder="e.g., loan ID, UPI ref, cheque #"
+                  className="h-11 rounded-xl"
+                  {...field}
+                />
+              </FormControl>
+              <p className="text-xs text-muted-foreground">
+                Link to a loan, UPI reference, cheque number, etc.
+              </p>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
+
+        {isMobile ? (
+          <div className="flex gap-3 pt-2">
             <Button
               type="button"
               variant="ghost"
@@ -586,12 +382,18 @@ export function TransactionForm({
               disabled={isSubmitting}
             >
               {isSubmitting
-                ? "Adding..."
+                ? "Saving..."
                 : selected
                   ? "Update Transaction"
                   : "Add Transaction"}
             </Button>
           </div>
+        ) : (
+          <GenericModalFooter
+            actionLabel={selected ? "Update Transaction" : "Add Transaction"}
+            onCancel={onCancel}
+            isSubmitting={isSubmitting}
+          />
         )}
       </form>
     </Form>

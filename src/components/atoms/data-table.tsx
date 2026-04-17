@@ -37,6 +37,7 @@ declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
     align?: "left" | "right" | "center";
     tooltip?: string;
+    columnClassName?: string;
   }
 }
 
@@ -47,6 +48,7 @@ interface DataTableProps<TData, TValue> {
   isLoading?: boolean;
   className?: string;
   pageSize?: number;
+  sticky?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -56,8 +58,10 @@ export function DataTable<TData, TValue>({
   isLoading,
   className,
   pageSize = 50,
+  sticky = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const stickyEnabled = sticky;
 
   const table = useReactTable({
     data,
@@ -85,8 +89,7 @@ export function DataTable<TData, TValue>({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {/* Desktop Table Skeleton */}
-        <div className="hidden lg:block overflow-hidden rounded-lg border border-border bg-card">
+        <div className="overflow-hidden rounded-lg border border-border bg-card">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-card">
@@ -114,47 +117,19 @@ export function DataTable<TData, TValue>({
             </Table>
           </div>
         </div>
-
-        {/* Mobile Card Skeleton */}
-        <div className="lg:hidden space-y-3">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="rounded-lg border border-border bg-card p-4 space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-                <Skeleton className="h-8 w-8 rounded" />
-              </div>
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-                {[...Array(4)].map((_, j) => (
-                  <div key={j} className="space-y-1">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-4 w-20" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     );
   }
 
   return (
     <div className={cn("space-y-4", className)}>
-      {/* Desktop Table View */}
-      <div className="hidden lg:block overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
         <div className="overflow-x-auto">
           <div className="relative">
             <Table>
-              <TableHeader className="sticky top-0 z-10 bg-card">
+              <TableHeader
+                className={cn("bg-card", stickyEnabled && "sticky top-0 z-10")}
+              >
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id} className="border-b">
                     {headerGroup.headers.map((header, index) => {
@@ -167,14 +142,17 @@ export function DataTable<TData, TValue>({
                           key={header.id}
                           className={cn(
                             "h-12 px-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
-                            isFrozen && "sticky left-0 z-20 bg-card border-r",
+                            isFrozen &&
+                              stickyEnabled &&
+                              "sticky left-0 z-20 bg-card border-r",
                             header.column.columnDef.meta?.align === "right" &&
                               "text-right",
                             header.column.columnDef.meta?.align === "center" &&
-                              "text-center"
+                              "text-center",
+                            header.column.columnDef.meta?.columnClassName
                           )}
                           style={
-                            isFrozen
+                            isFrozen && stickyEnabled
                               ? {
                                   boxShadow:
                                     "2px 0 4px -2px rgba(0, 0, 0, 0.1)",
@@ -291,14 +269,17 @@ export function DataTable<TData, TValue>({
                             key={cell.id}
                             className={cn(
                               "px-4 py-3 text-sm",
-                              isFrozen && "sticky left-0 z-10 bg-card border-r",
+                              isFrozen &&
+                                stickyEnabled &&
+                                "sticky left-0 z-10 bg-card border-r",
                               cell.column.columnDef.meta?.align === "right" &&
                                 "text-right",
                               cell.column.columnDef.meta?.align === "center" &&
-                                "text-center"
+                                "text-center",
+                              cell.column.columnDef.meta?.columnClassName
                             )}
                             style={
-                              isFrozen
+                              isFrozen && stickyEnabled
                                 ? {
                                     boxShadow:
                                       "2px 0 4px -2px rgba(0, 0, 0, 0.1)",
@@ -329,79 +310,6 @@ export function DataTable<TData, TValue>({
             </Table>
           </div>
         </div>
-      </div>
-
-      {/* Mobile Card View */}
-      <div className="lg:hidden space-y-3">
-        {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row) => {
-            // Get the frozen column data (Member)
-            const memberCell =
-              row.getVisibleCells()[
-                frozenColumnIndex >= 0 ? frozenColumnIndex : 0
-              ];
-            const memberData = memberCell?.getContext();
-
-            return (
-              <div
-                key={row.id}
-                className="rounded-lg border border-border bg-card p-4 space-y-3"
-              >
-                {/* Member Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {(() => {
-                      const visibleCells = row.getVisibleCells();
-                      const firstCell = visibleCells[0];
-                      const cellDef =
-                        memberCell?.column.columnDef.cell ||
-                        columns[0]?.cell ||
-                        (() => null);
-                      const context = memberData || firstCell?.getContext();
-                      return context && cellDef
-                        ? flexRender(cellDef, context)
-                        : null;
-                    })()}
-                  </div>
-                  {(() => {
-                    const visibleCells = row.getVisibleCells();
-                    const lastCell = visibleCells[visibleCells.length - 1];
-                    const lastColumn = columns[columns.length - 1];
-                    const cellDef = lastColumn?.cell;
-                    const context = lastCell?.getContext();
-                    return cellDef && context
-                      ? flexRender(cellDef, context)
-                      : null;
-                  })()}
-                </div>
-
-                {/* Financial Data Grid */}
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-                  {row
-                    .getVisibleCells()
-                    .slice(1, -1)
-                    .map((cell) => (
-                      <div key={cell.id} className="space-y-1">
-                        <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                          {cell.column.columnDef.header as string}
-                        </div>
-                        <div className="text-sm font-medium text-foreground">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="rounded-lg border border-border bg-card p-8 text-center text-muted-foreground">
-            No results.
-          </div>
-        )}
       </div>
 
       {/* Pagination */}

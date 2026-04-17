@@ -87,6 +87,7 @@ export type TransformClubPassbookOptions = {
   isLocked?: boolean;
   pendingAdjustments?: number; // Total expected adjustments - total received adjustments
   totalMemberPending?: number; // Sum of active members' totalBalanceAmount (mirrors Member table)
+  activeMemberDeposited?: number; // Σ (periodicDepositsTotal + offsetDepositsTotal − profitWithdrawalsTotal) over active members
 };
 
 /**
@@ -147,16 +148,26 @@ export function transformClubPassbookToSummary(
   // Calculate available cash
   const availableCash = clubData.availableCashBalance || 0;
 
-  // Calculate current value
-  const currentValue =
+  // Current Value = Member Deposited + Vendor Profit + Loan Profit
+  //   Member Deposited = active members' periodic + offset deposits − profit withdrawals.
+  //   Fallback to club-wide aggregates when per-active-member sum isn't supplied
+  //   (e.g. historical snapshots that pre-date this field).
+  const activeMemberDeposited =
+    options?.activeMemberDeposited ??
     (clubData.memberPeriodicDepositsTotal || 0) +
-    (clubData.memberOffsetDepositsTotal || 0) +
-    (clubData.interestCollectedTotal || 0) +
-    vendorProfit -
-    (clubData.memberWithdrawalsTotal || 0);
+      (clubData.memberOffsetDepositsTotal || 0) -
+      (clubData.memberProfitWithdrawalsTotal || 0);
 
-  // Calculate total portfolio value
-  const totalPortfolioValue = currentValue + pendingAmounts;
+  const currentValue =
+    activeMemberDeposited +
+    vendorProfit +
+    (clubData.interestCollectedTotal || 0);
+
+  // Net Value = Current Value + Remaining Interest Pending + Member Deposited Pending
+  //   totalMemberPending already folds in Adjustments Pending.
+  const totalMemberPending = options?.totalMemberPending ?? 0;
+  const totalPortfolioValue =
+    currentValue + interestBalance + totalMemberPending;
 
   return {
     // Members
@@ -168,7 +179,7 @@ export function transformClubPassbookToSummary(
     memberFunds: {
       totalDeposits,
       memberBalance,
-      totalMemberPending: options?.totalMemberPending ?? 0,
+      totalMemberPending,
     },
     // Member Outflow
     memberOutflow: {

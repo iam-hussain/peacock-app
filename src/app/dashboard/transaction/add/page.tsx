@@ -8,6 +8,7 @@ import { TransformedAccountSelect } from "@/app/api/account/select/route";
 import { TransactionForm } from "@/components/organisms/forms/transaction-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
 import { fetchAccountSelect } from "@/lib/query-options";
 
@@ -25,33 +26,38 @@ export default function AddTransactionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pb-10 pt-6">
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-muted/20">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-4 md:px-6 md:pt-8">
+        <div className="mb-4 flex items-center gap-2 md:mb-6">
           <Button
             variant="ghost"
-            size="icon"
-            className="rounded-full border border-border"
+            size="sm"
             onClick={handleCancel}
+            className="gap-1.5 -ml-2 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="sr-only">Back to transactions</span>
+            Back
           </Button>
+        </div>
+
+        <div className="mb-6 flex items-start gap-3 md:mb-8 md:gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary md:h-12 md:w-12">
+            <Receipt className="h-5 w-5 md:h-6 md:w-6" />
+          </div>
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <Receipt className="h-5 w-5 text-muted-foreground" />
-              <h1 className="text-lg font-semibold">Add Transaction</h1>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Mobile-first flow to record member deposits, withdrawals, and
-              more.
+            <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
+              Add Transaction
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Record deposits, withdrawals, transfers, loans, and vendor
+              movements.
             </p>
           </div>
         </div>
 
         {!canWrite ? (
           <Card>
-            <CardContent className="space-y-3 p-4">
+            <CardContent className="space-y-3 p-6">
               <p className="text-sm text-muted-foreground">
                 You have read-only access. Contact an admin to request write
                 access.
@@ -67,19 +73,28 @@ export default function AddTransactionPage() {
           </Card>
         ) : isLoading ? (
           <Card>
-            <CardContent className="space-y-3 p-4">
-              <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-              <div className="h-32 animate-pulse rounded-xl bg-muted" />
+            <CardContent className="space-y-4 p-6">
+              <Skeleton className="h-10 w-full" />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-10 w-full" />
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-none bg-transparent shadow-none">
-            <CardContent className="p-0">
+          <Card>
+            <CardContent className="p-4 md:p-6">
               <TransactionForm
                 accounts={accounts as TransformedAccountSelect[]}
                 onSuccess={handleSuccess}
                 onCancel={handleCancel}
-                isMobile={true}
+                isMobile={false}
               />
             </CardContent>
           </Card>

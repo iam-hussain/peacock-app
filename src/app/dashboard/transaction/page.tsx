@@ -11,8 +11,9 @@ import {
   Camera,
   Download,
   MoreHorizontal,
+  Pin,
+  PinOff,
   Receipt,
-  SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -27,13 +28,9 @@ import { DesktopTableOnly } from "@/components/atoms/desktop-table-only";
 import { FilterBar } from "@/components/atoms/filter-bar";
 import { PageHeader } from "@/components/atoms/page-header";
 import { RowActionsMenu } from "@/components/atoms/row-actions-menu";
-import { SearchBarMobile } from "@/components/atoms/search-bar-mobile";
-import { FloatingActionButton } from "@/components/molecules/floating-action-button";
 import PageTransition from "@/components/molecules/page-transition";
 import { PaginationControls } from "@/components/molecules/pagination-controls";
 import { ScreenshotArea } from "@/components/molecules/screenshot-area";
-import { TransactionCardMobile } from "@/components/molecules/transaction-card-mobile";
-import { TransactionFilterDrawer } from "@/components/molecules/transaction-filter-drawer";
 import { TransactionFormDialog } from "@/components/molecules/transaction-form-dialog";
 import { TransactionDeleteForm } from "@/components/organisms/forms/transaction-delete-form";
 import { Button } from "@/components/ui/button";
@@ -68,7 +65,6 @@ export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransformedTransaction | null>(null);
   const [selectedTransactionForDelete, setSelectedTransactionForDelete] =
@@ -76,6 +72,7 @@ export default function TransactionsPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [stickyEnabled, setStickyEnabled] = useState(true);
   const urlFilterApplied = useRef(false);
   const isInitialMount = useRef(true);
 
@@ -485,11 +482,6 @@ export default function TransactionsPage() {
     setPageSize(25);
     setCurrentPage(1);
     router.push(pathname, { scroll: false });
-  };
-
-  const handleApplyFilters = () => {
-    setFilterDrawerOpen(false);
-    setCurrentPage(1);
   };
 
   const handlePageChange = (page: number) => {
@@ -960,159 +952,84 @@ export default function TransactionsPage() {
   return (
     <PageTransition>
       <div className="w-full max-w-7xl mx-auto space-y-4 md:space-y-6 p-4 md:p-6 pb-20 lg:pb-6">
-        <div className="hidden lg:block">
-          <PageHeader
-            title="Transaction History"
-            subtitle={
-              canWrite
-                ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
-                : "Read-only access. Contact admin to request write access."
-            }
-            primaryAction={
-              canWrite
-                ? {
-                    label: "Add Transaction",
-                    icon: <Receipt className="h-4 w-4" />,
-                    onClick: handleAddTransaction,
-                  }
-                : undefined
-            }
-            secondaryActions={[
-              {
-                label: "Export CSV",
-                icon: <Download className="h-4 w-4" />,
-                onClick: handleExportCsv,
-              },
-              {
-                label: "Screenshot",
-                icon: <Camera className="h-4 w-4" />,
-                onClick: handleScreenshot,
-              },
-            ]}
-          />
-        </div>
-
-        <div className="lg:hidden space-y-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold text-foreground">
-                Transactions
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                {totalTransactions > 0
-                  ? `${totalTransactions.toLocaleString()} total`
-                  : "Recent activity"}
-              </p>
-            </div>
-            {canWrite && (
-              <Button
-                size="sm"
-                className="gap-1.5 rounded-full px-3 h-8"
-                onClick={handleAddTransaction}
-              >
-                <Receipt className="h-3.5 w-3.5" />
-                <span className="text-xs">Add</span>
-              </Button>
-            )}
-          </div>
-          {/* Inflow/Outflow mini stats */}
-          {!isLoading && transactions.length > 0 && (
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center gap-2 rounded-lg border border-border/40 bg-card px-3 py-1.5">
-                <ArrowDown className="h-3.5 w-3.5 text-green-600 dark:text-green-500" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Inflow</p>
-                  <p className="text-xs font-semibold text-green-600 dark:text-green-500 tabular-nums">
-                    {moneyFormat(_summary.inflow)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center gap-2 rounded-lg border border-border/40 bg-card px-3 py-1.5">
-                <ArrowUp className="h-3.5 w-3.5 text-destructive" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground">Outflow</p>
-                  <p className="text-xs font-semibold text-destructive tabular-nums">
-                    {moneyFormat(_summary.outflow)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="hidden lg:block">
-          <FilterBar
-            searchValue={searchQuery}
-            onSearchChange={setSearchQuery}
-            searchPlaceholder="Search transactions..."
-            filters={{
-              account: {
-                value: accountFilter,
-                onChange: setAccountFilter,
-                options: accountOptions,
-              },
-              type: {
-                value: typeFilter,
-                onChange: setTypeFilter,
-                options: allTransactionTypeOptions,
-              },
-            }}
-            dateRange={{
-              startDate,
-              endDate,
-              onStartDateChange: (date) => {
-                setStartDate(date);
-                if (date && endDate && date > endDate) {
-                  setEndDate(undefined);
+        <PageHeader
+          title="Transaction History"
+          subtitle={
+            canWrite
+              ? "Review all deposits, withdrawals, transfers, loans, and vendor movements."
+              : "Read-only access. Contact admin to request write access."
+          }
+          primaryAction={
+            canWrite
+              ? {
+                  label: "Add Transaction",
+                  icon: <Receipt className="h-4 w-4" />,
+                  onClick: handleAddTransaction,
                 }
-              },
-              onEndDateChange: (date) => {
-                setEndDate(date);
-                if (date && startDate && date < startDate) {
-                  setStartDate(undefined);
-                }
-              },
-            }}
-            pageSize={{
-              value: pageSize,
-              onChange: setPageSize,
-              options: [0, 25, 50, 75, 100],
-            }}
-            onReset={handleResetFilters}
-          />
-        </div>
+              : undefined
+          }
+          secondaryActions={[
+            {
+              label: stickyEnabled ? "Sticky on" : "Sticky off",
+              icon: stickyEnabled ? (
+                <Pin className="h-4 w-4" />
+              ) : (
+                <PinOff className="h-4 w-4" />
+              ),
+              onClick: () => setStickyEnabled((v) => !v),
+            },
+            {
+              label: "Export CSV",
+              icon: <Download className="h-4 w-4" />,
+              onClick: handleExportCsv,
+            },
+            {
+              label: "Screenshot",
+              icon: <Camera className="h-4 w-4" />,
+              onClick: handleScreenshot,
+            },
+          ]}
+        />
 
-        <div className="lg:hidden flex items-center gap-2">
-          <div className="flex-1">
-            <SearchBarMobile
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search transactions"
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setFilterDrawerOpen(true)}
-            className="shrink-0 rounded-full h-12 w-12 relative"
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            {/* Active filter count badge */}
-            {(() => {
-              const count =
-                (accountFilter !== "all" ? 1 : 0) +
-                (typeFilter !== "all" ? 1 : 0) +
-                (startDate ? 1 : 0) +
-                (endDate ? 1 : 0);
-              return count > 0 ? (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
-                  {count}
-                </span>
-              ) : null;
-            })()}
-            <span className="sr-only">Filters</span>
-          </Button>
-        </div>
+        <FilterBar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder="Search transactions..."
+          filters={{
+            account: {
+              value: accountFilter,
+              onChange: setAccountFilter,
+              options: accountOptions,
+            },
+            type: {
+              value: typeFilter,
+              onChange: setTypeFilter,
+              options: allTransactionTypeOptions,
+            },
+          }}
+          dateRange={{
+            startDate,
+            endDate,
+            onStartDateChange: (date) => {
+              setStartDate(date);
+              if (date && endDate && date > endDate) {
+                setEndDate(undefined);
+              }
+            },
+            onEndDateChange: (date) => {
+              setEndDate(date);
+              if (date && startDate && date < startDate) {
+                setStartDate(undefined);
+              }
+            },
+          }}
+          pageSize={{
+            value: pageSize,
+            onChange: setPageSize,
+            options: [0, 25, 50, 75, 100],
+          }}
+          onReset={handleResetFilters}
+        />
 
         {isError && (
           <Card className="border-destructive bg-destructive/10">
@@ -1133,17 +1050,16 @@ export default function TransactionsPage() {
           </Card>
         )}
 
-        {/* Desktop Table View - Also used for mobile screenshots */}
-        <div ref={tableRef} className="hidden lg:block">
+        <div ref={tableRef}>
           <DataTable
             columns={columns}
             data={transactions}
             frozenColumnKey="from"
             isLoading={isLoading}
+            sticky={stickyEnabled}
           />
         </div>
 
-        {/* Screenshot Area - Hidden, only for export */}
         <ScreenshotArea
           title="Transactions"
           capturedAt={capturedAt}
@@ -1157,56 +1073,6 @@ export default function TransactionsPage() {
             />
           </div>
         </ScreenshotArea>
-
-        <div className="lg:hidden space-y-1.5">
-          {isLoading ? (
-            <div className="space-y-1.5">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 rounded-xl border border-border/40 bg-card px-3 py-2.5"
-                >
-                  <div className="h-9 w-9 rounded-full bg-muted animate-pulse shrink-0" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
-                    <div className="h-3 w-16 rounded bg-muted animate-pulse" />
-                  </div>
-                  <div className="space-y-1.5 text-right">
-                    <div className="h-3.5 w-16 rounded bg-muted animate-pulse ml-auto" />
-                    <div className="h-2.5 w-12 rounded bg-muted animate-pulse ml-auto" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : transactions.length > 0 ? (
-            <div className="space-y-1.5">
-              {transactions.map((transaction) => (
-                <TransactionCardMobile
-                  key={transaction.id}
-                  transaction={transaction}
-                  onEdit={() => handleEditTransaction(transaction)}
-                  onDelete={() => handleDeleteTransaction(transaction)}
-                  onView={() => handleViewTransaction(transaction)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border/40 bg-card px-4 py-10 text-center">
-              <Receipt className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm font-medium text-muted-foreground mb-3">
-                No transactions found
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleResetFilters}
-                className="rounded-full"
-              >
-                Clear filters
-              </Button>
-            </div>
-          )}
-        </div>
 
         {totalPages > 0 && (
           <PaginationControls
@@ -1331,37 +1197,6 @@ export default function TransactionsPage() {
               })()}
           </DialogContent>
         </Dialog>
-
-        <TransactionFilterDrawer
-          open={filterDrawerOpen}
-          onOpenChange={setFilterDrawerOpen}
-          accountFilter={accountFilter}
-          onAccountFilterChange={setAccountFilter}
-          typeFilter={typeFilter}
-          onTypeFilterChange={setTypeFilter}
-          startDate={startDate}
-          onStartDateChange={(date) => {
-            setStartDate(date);
-            if (date && endDate && date > endDate) {
-              setEndDate(undefined);
-            }
-          }}
-          endDate={endDate}
-          onEndDateChange={(date) => {
-            setEndDate(date);
-            if (date && startDate && date < startDate) {
-              setStartDate(undefined);
-            }
-          }}
-          pageSize={pageSize}
-          onPageSizeChange={setPageSize}
-          accountOptions={accountOptions}
-          typeOptions={allTransactionTypeOptions}
-          onApply={handleApplyFilters}
-          onReset={handleResetFilters}
-        />
-
-        {canWrite && <FloatingActionButton onClick={handleAddTransaction} />}
 
         <TransactionFormDialog
           open={dialogOpen}
