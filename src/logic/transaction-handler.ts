@@ -1,6 +1,12 @@
 import { Transaction } from "@prisma/client";
 
 import {
+  calculateLoansHandler,
+  fetchLoanTransaction,
+  resetMemberLoanPassbookData,
+} from "@/lib/calculators/loan-calculator";
+
+import {
   PassbookConfigAction,
   PassbookConfigActionValue,
   transactionPassbookSettings,
@@ -210,11 +216,24 @@ export async function transactionEntryHandler(
       throw error;
     }
 
-    // Loan history is now calculated on-the-fly from transactions
-    // No need to store or recalculate loanHistory in passbook
-    await bulkPassbookUpdate(passbookToUpdate, db);
+    // If the transaction is loan-related, recalculate loan history for the member
+    if (
+      ["LOAN_TAKEN", "LOAN_REPAY", "LOAN_INTEREST"].includes(created.type)
+    ) {
+      const loanMember =
+        created.type === "LOAN_TAKEN" ? created.toId : created.fromId;
+      passbookToUpdate = resetMemberLoanPassbookData(
+        passbookToUpdate,
+        loanMember
+      );
+      const loanTransaction = await fetchLoanTransaction(loanMember);
+      passbookToUpdate = calculateLoansHandler(
+        passbookToUpdate,
+        loanTransaction
+      );
+    }
 
-    // LOAN_INTEREST processed successfully
+    await bulkPassbookUpdate(passbookToUpdate, db);
   } catch (error) {
     console.error(
       `❌ Failed to process transaction ${created.id} (type: ${created.type}):`,

@@ -13,10 +13,14 @@ import { updatePassbookByTransaction } from "./transaction-handler";
 import prisma from "@/db";
 import { calculateMonthlySnapshotFromPassbooks } from "@/lib/calculators/dashboard-calculator";
 import { calculateExpectedTotalLoanInterestAmountFromTransactions } from "@/lib/calculators/expected-interest";
+import {
+  calculateLoansHandler,
+} from "@/lib/calculators/loan-calculator";
 import { clubConfig } from "@/lib/config/config";
 import { clearCache } from "@/lib/core/cache";
 import {
   bulkPassbookUpdate,
+  fetchAllLoanPassbook,
   fetchAllPassbook,
   getDefaultPassbookData,
   initializePassbookToUpdate,
@@ -200,7 +204,9 @@ async function processTransactionsForPassbooks(options: {
     });
   }
 
+  // Recalculate loan history for all members and store in passbooks
   if (options.updatePassbooks) {
+    passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
     await bulkPassbookUpdate(passbookToUpdate);
   }
 
@@ -426,8 +432,32 @@ export async function recalculateSingleMemberPassbook(
     );
   }
 
-  // 10. Write updated passbooks
+  // 10. Recalculate loan history for this member
+  passbookToUpdate = calculateLoansHandler(passbookToUpdate, memberTransactions);
+
+  // 11. Write updated passbooks
   await bulkPassbookUpdate(passbookToUpdate);
 
   clearCache();
+}
+
+/**
+ * Recalculate loan history for all members.
+ * Standalone function matching original resetAllLoanHandler behavior.
+ */
+export async function resetAllLoanHandler() {
+  clearCache();
+
+  const [transactions, passbooks] = await Promise.all([
+    prisma.transaction.findMany({
+      where: { type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] } },
+      orderBy: { occurredAt: "asc" },
+    }),
+    fetchAllLoanPassbook(),
+  ]);
+
+  let passbookToUpdate = initializePassbookToUpdate(passbooks, false);
+  passbookToUpdate = calculateLoansHandler(passbookToUpdate, transactions);
+
+  return bulkPassbookUpdate(passbookToUpdate);
 }

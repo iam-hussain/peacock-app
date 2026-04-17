@@ -4,8 +4,16 @@ import { endOfMonth } from "date-fns";
 import prisma from "@/db";
 import { clubConfig } from "@/lib/config/config";
 import { newZoneDate } from "@/lib/core/date";
-import { calculateInterestByAmount } from "@/lib/helper";
+import {
+  calculateInterestByAmount,
+  setPassbookUpdateQuery,
+} from "@/lib/helper";
 import { LoanHistoryEntry } from "@/lib/validators/type";
+
+type LedgerUpdateMap = Map<
+  string,
+  Parameters<typeof prisma.passbook.update>[0]
+>;
 
 /**
  * Fetches all loan transactions for a specific member
@@ -117,6 +125,82 @@ export function calculateLoanDetails(transactions: Transaction[]) {
     });
   }
   return { loanHistory, totalLoanBalance: accountBalance };
+}
+
+/**
+ * Fetch all loan transactions (LOAN_TAKEN, LOAN_REPAY) for all members or a specific member.
+ * Used by the recalculation handler to rebuild loan history in passbooks.
+ */
+export function fetchLoanTransaction(accountId?: string | null) {
+  return prisma.transaction.findMany({
+    where: {
+      ...(accountId
+        ? { OR: [{ fromId: accountId }, { toId: accountId }] }
+        : {}),
+      type: { in: ["LOAN_TAKEN", "LOAN_REPAY"] },
+    },
+    orderBy: { occurredAt: "asc" },
+  });
+}
+
+/**
+ * Resets loan history on a member's passbook entry before recalculating.
+ */
+export function resetMemberLoanPassbookData(
+  passbookToUpdate: LedgerUpdateMap,
+  memberId: string
+): LedgerUpdateMap {
+  const memberPassbook = passbookToUpdate.get(memberId);
+  if (memberPassbook) {
+    passbookToUpdate.set(
+      memberId,
+      setPassbookUpdateQuery(memberPassbook, {}, { loanHistory: [] })
+    );
+  }
+  return passbookToUpdate;
+}
+
+/**
+ * Groups loan transactions by member, calculates loan history for each,
+ * and writes the loanHistory array into the corresponding passbook entries.
+ * This is the original loan-handler logic adapted to new field names.
+ */
+export function calculateLoansHandler(
+  passbookToUpdate: LedgerUpdateMap,
+  transactions: Transaction[]
+): LedgerUpdateMap {
+  const loanTransactions = transactions.filter((e) =>
+    ["LOAN_TAKEN", "LOAN_REPAY"].includes(e.type)
+  );
+  const memberGroup: { [key: string]: Transaction[] } = {};
+
+  loanTransactions.forEach((each) => {
+    if (each.type === "LOAN_TAKEN") {
+      if (!memberGroup[each.toId]) {
+        memberGroup[each.toId] = [];
+      }
+      memberGroup[each.toId].push(each);
+    } else {
+      if (!memberGroup[each.fromId]) {
+        memberGroup[each.fromId] = [];
+      }
+      memberGroup[each.fromId].push(each);
+    }
+  });
+
+  Object.entries(memberGroup).forEach(([memberId, memTransactions]) => {
+    const { loanHistory } = calculateLoanDetails(memTransactions);
+
+    const memberPassbook = passbookToUpdate.get(memberId);
+    if (memberPassbook) {
+      passbookToUpdate.set(
+        memberId,
+        setPassbookUpdateQuery(memberPassbook, {}, { loanHistory })
+      );
+    }
+  });
+
+  return passbookToUpdate;
 }
 
 /**

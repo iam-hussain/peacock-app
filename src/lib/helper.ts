@@ -263,9 +263,13 @@ export function calculateInterestByAmount(
     new Date(recentStartDate.getFullYear(), recentStartDate.getMonth() + 1, 0)
   ).getDate();
 
-  const interestForMonths = amount * ONE_MONTH_RATE * monthsPassed;
-  const interestPerDay = (amount * ONE_MONTH_RATE) / daysInMonth;
-  const interestForDays = interestPerDay * daysPassed;
+  const interestForMonths = Number(
+    (amount * ONE_MONTH_RATE * monthsPassed).toFixed(2)
+  );
+  const interestPerDay = Number(
+    ((amount * ONE_MONTH_RATE) / daysInMonth).toFixed(2)
+  );
+  const interestForDays = Number((interestPerDay * daysPassed).toFixed(2));
 
   const rawInterestAmount = interestForMonths + interestForDays;
   const interestAmount = Math.round(rawInterestAmount);
