@@ -91,9 +91,18 @@ rate-limiter cleanup (`src/lib/core/rate-limit.ts:14`) — that's harmless, leav
 **Now:** `processTransactionsForPassbooks()` replays **all** transactions and recomputes
 monthly snapshots, recomputing interest per month (`src/logic/reset-handler.ts:100`).
 
-**Change:** persist month-end checkpoints; on recalculate, replay only transactions since
-the last checkpoint and rewrite only changed months. Keep the full rebuild as an explicit
-"hard reset" option.
+**Change:** persist month-end checkpoints; on recalculate, **replay from the earliest
+dirty month** — not merely "since the last checkpoint" — and rewrite every month from
+there forward. Keep the full rebuild as an explicit "hard reset" option.
+
+> ⚠️ **Historical mutations must invalidate checkpoints.** The edit flow creates a
+> replacement transaction and then deletes the original
+> (`src/components/organisms/forms/transaction-form.tsx`,
+> `src/app/api/transaction/[id]/route.ts`), so an *old* transaction's month can change at
+> any time. Naively replaying only the tail would silently preserve stale pre-checkpoint
+> balances. Rule: when a transaction at month `M` is created/edited/deleted, invalidate
+> all checkpoints `>= M` and replay from the start of `M`. Track the earliest dirty month
+> per recalculate batch and start there.
 
 ### 1.7 (Optional) Normalize the passbook payload
 The free-form `payload` JSON is rewritten wholesale on every update and has no schema.
