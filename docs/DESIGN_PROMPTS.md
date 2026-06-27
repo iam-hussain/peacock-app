@@ -206,6 +206,51 @@ alerts only when their condition holds.
   anything destructive.
 - **Feel (suggestion):** scannable and safe; destructive actions clearly set apart.
 
+## 12b. Shareable summary image (capture / share)  ★
+
+**Purpose:** generate a single, clean **image** the admin can download and share (e.g. in a
+WhatsApp/Telegram group) that captures the club's current status at a glance — **a club
+summary plus every member's key numbers** — so members stay informed without logging in.
+
+**Where it lives:** a "Capture / Share image" action on the **dashboard** (primary). It may
+also be offered per-member on the member detail page (a single-member share card). Designer
+decides exactly where the trigger sits.
+
+**Creative latitude:** full freedom on how the image looks — this is a chance for something
+share-worthy and on-brand, not a raw screenshot. The designer owns the entire visual
+treatment, composition, and how dense vs spacious it is. The only requirements are the
+content below and that it reads cleanly as a downloaded/forwarded image on a phone.
+
+### What the generated image must contain
+- **Club summary header:** club name/identity, an "as of" date/time, and the headline club
+  figures — at least club/portfolio value and total members, plus the key ones (available
+  cash, total deposits, outstanding loans, interest pending — designer/PM picks the set).
+- **Per-member rows/cards:** for **every** (active) member — name (and avatar if it renders
+  well), **pending balance**, **total deposit**, **current loan (outstanding)**, and
+  **interest balance/pending**. Money formatted as ₹.
+- A small footer/branding mark so the image is recognizable when forwarded.
+
+### Behavior & functionality
+- Trigger → the app composes the image from live data → shows a **preview** → user can
+  **download** (PNG) and/or **share** (native share sheet on mobile where available).
+- **Scales with member count:** must look good for both a handful and many members — the
+  designer decides how (compact rows, multiple columns, or splitting into multiple images/
+  pages when the list is long). Don't let it become an unreadable wall.
+- **Crisp output:** high enough resolution to stay sharp when viewed/zoomed on a phone.
+- Optional toggles the designer may offer: choose which figures to include, include/exclude
+  inactive members, light/dark version of the image.
+
+### States
+- **Generating** (composing the image), **preview ready** (with download/share),
+  **empty** (no members yet), **error** (generation failed, retry).
+
+### Notes for build (not design)
+- This exposes member financials, so the capture action is **admin-only** (per the
+  permissions matrix in `PEACOCK_V2_MASTER.md §9`).
+- All figures come straight from the ledger reads in `V2_CALCULATIONS.md` / `PEACOCK_V2_MASTER.md §6`
+  (pending, total deposit, loan outstanding, interest pending, club value, member count) —
+  no new calculations needed.
+
 ## 13. Shared building blocks (design once, reuse)
 
 - Stat/metric display (with optional trend and a small inline chart).
