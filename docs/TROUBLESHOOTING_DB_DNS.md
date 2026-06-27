@@ -40,8 +40,17 @@ behavior on a redeploy, a region move, or a paused Atlas cluster).
 
 - Confirm the cluster is **active** (free M0 tiers auto-pause after inactivity —
   resume it).
-- Under **Network Access**, allow **`0.0.0.0/0`**. Serverless functions use
-  dynamic egress IPs, so a fixed allowlist will intermittently reject them.
+- Check **Network Access** is not the blocker. Note this is a *secondary*
+  check — the SRV DNS failure above happens **before** IP allow-listing is even
+  evaluated, so don't loosen network rules to chase a DNS error.
+  - **Do not** leave a production cluster open to **`0.0.0.0/0`**. If you open it
+    to confirm connectivity, treat it as a **temporary diagnostic step only** and
+    revert it immediately afterward.
+  - For serverless (dynamic egress IPs), prefer a constrained path instead of
+    public access: a **Vercel ↔ Atlas private connection / VPC peering**, or your
+    platform's **static-egress / NAT IP** feature, and allow-list that fixed
+    range. Only fall back to `0.0.0.0/0` if no such option is available, and pair
+    it with strong DB credentials and TLS (already implied by Atlas).
 
 ### 2. Use the non-SRV "seedlist" connection string (permanent fix)
 
