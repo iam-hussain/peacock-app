@@ -93,16 +93,57 @@ A few things that matter app-wide (suggestions, not mandates):
 - **Feel (suggestion):** scannable; should remain usable on a phone (a dense table is hard
   there — consider a per-member card form factor on small screens).
 
-## 6. Member detail — statement  (`/dashboard/member/[slug]`)
+## 6. Member detail page  (`/dashboard/member/[slug]`)
 
-- **Purpose:** a full picture of one member, like a personal statement.
-- **Must include:** member header (identity, status, joined, contribution progress); their
-  key balances (deposit balance, loan taken, interest due); their transaction history; their
-  loan history with status and interest paid/pending.
-- **Actions:** add an entry for this member; export a statement; navigate their history.
-- **States:** loading; empty per section (no transactions / no loans); relevant alerts
-  (e.g. a pending deposit).
-- **Feel (suggestion):** organized and personal; history is easier to read as a timeline.
+**Purpose:** one member's complete financial picture — a personal statement of everything
+they've put in, taken out, owe, and are owed.
+
+**Creative latitude:** be ambitious here. This is the page to make memorable and genuinely
+useful, not a generic profile. Designer chooses the whole presentation — how information is
+grouped, what's emphasized, how it flows, what's a chart vs a number vs a timeline. Do not
+follow a prescribed layout; invent the best way to tell this member's money story. The only
+hard requirement is that the right information is present and the loan logic below is honored.
+
+### Items that must be available (designer decides how/where)
+- **Identity & standing:** name, photo, status (active / inactive / left), date joined, how
+  long they've been in the club.
+- **Contribution health:** how much they've deposited vs how much was expected of them by now
+  (the gap = pending/ahead), plus any adjustments applied to them.
+- **Money in:** periodic deposits total, adjustments, and (if any) withdrawals — and within
+  withdrawals, how much was their own principal vs profit taken.
+- **Their stake / balance:** current member balance and their share of club profit (expected
+  return).
+- **Activity history:** a browsable record of this member's own transactions over time
+  (deposits, withdrawals, loan events, etc.).
+- **Alerts worth surfacing:** e.g. a deposit is pending, interest is overdue/accruing — only
+  show an alert when it's actually true.
+- **Actions:** record a new entry for this member, and export their statement.
+
+### How loans should appear — conditional on the member's actual data
+The loan section is **data-driven**: its presence, prominence, and content all depend on what
+the member actually has. A member may have **multiple concurrent loans**, only old closed
+ones, or none at all. Handle all three:
+
+- **Member has one or more ACTIVE loans →** loans are a **prominent** part of the page. For
+  **each active loan** show: principal taken, date taken, **outstanding principal**, interest
+  **accrued to date** (this keeps growing with time — compute live), interest **already paid**,
+  interest **still pending**, and a sense of repayment progress (paid vs remaining). If there
+  are several active loans, each is shown distinctly and a combined total (total outstanding,
+  total interest pending) is available.
+- **Member has only CLOSED/past loans (none active) →** don't give loans headline space.
+  Present them as **history** — a settled record (amount, period it ran, total interest paid,
+  closed date) that can be reviewed but doesn't dominate. Make it clear these are paid off.
+- **Member has NEVER taken a loan →** the loan section should **not occupy meaningful space**.
+  Either omit it entirely or reduce it to a quiet, neutral note (e.g. "No loans"). No empty
+  cards, no misleading zeros that look like a loan exists. Absence of loans should read as a
+  clean, healthy state — not a gap.
+
+So: **active loans = featured and live; closed loans = quiet history; no loans = effectively
+absent.** The page composition itself should shift based on which of these is true.
+
+### States
+Loading; per-section empty states (no transactions, no loans — see logic above); accurate
+alerts only when their condition holds.
 
 ## 7. Loans list  (`/dashboard/loan`)
 
