@@ -165,7 +165,77 @@ engine — the same characterization fixtures (v1 numbers) gate them.
 
 ---
 
-## 6. Why this is better
+## 6. Add / edit / delete entries — always correct, no recompute
+
+The ledger is **append-only**, and every change is itself a *balanced posting applied
+incrementally*. That's what keeps results correct after any mutation:
+
+| Action | What v2 does (one DB transaction) | Result |
+|--------|-----------------------------------|--------|
+| **Add** | insert balanced `Entry` lines + `Account.balance += line` for each | stocks update O(1); flows/derived reflect it on next read |
+| **Delete** | post a **`REVERSAL`** transaction with negated lines (`reversesId` set); `Account.balance` moves back | original stays for audit; balances exactly restored |
+| **Edit** | reverse the old transaction **and** post the corrected one, atomically | net effect = the edit; full history preserved |
+
+Why it's always right:
+- Every figure is either an **account balance** (kept exact because *every* posting and
+  reversal is applied to it) or a **`SUM` over current-effective entries** (a reversed entry
+  nets to zero). There is no separate "passbook" that can drift out of sync.
+- No replay, no rescans, no "recompute everything" — the cost of an edit is O(lines), the
+  same as the original write.
+- After the mutation, `revalidateTag()` refreshes only the affected cached views, so the UI
+  shows the new result immediately.
+
+> Contrast with v1: an edit is "create replacement + delete original", and the JSON passbook
+> plus `Summary` snapshots must be re-derived by a manual recalculate to stay consistent.
+
+---
+
+## 7. Analytics graphs — month-by-month, straight from the ledger
+
+The analytics page plots two kinds of series. **Both come directly from the ledger**, so a
+historical add/edit/delete *automatically* changes the relevant month — no snapshot rebuild.
+
+### a) Point-in-time series (balance "as of" a month-end)
+e.g. portfolio value, available cash, outstanding loans at the end of each month.
+An append-only ledger's superpower: the balance of any account **as of any date** is just the
+cumulative sum of its entries up to that date.
+```
+balanceAsOf(account, monthEnd) = Σ entry.amount WHERE account = a AND occurredAt <= monthEnd
+```
+One windowed/grouped SQL query produces the running month-end balance for the whole range.
+
+### b) Per-month flow series (activity within a month)
+e.g. deposits collected, interest collected, loans disbursed in month M.
+```
+flow(type, month) = Σ entry.amount WHERE type = t AND occurredAt IN [monthStart, monthEnd]
+GROUP BY date_trunc('month', occurredAt)
+```
+One grouped aggregate returns the entire time series at once.
+
+### c) Time-based interest per month
+Interest accrued through month-end M = `Σ activeLoans interestToDate(loan, monthEnd)`,
+computed on read for loans active in that window (same formula as §4).
+
+### Why this is strictly better than the Summary-snapshot approach
+- **Historical edits reflect instantly.** Because each point is computed from entries (not a
+  frozen `Summary` row), deleting/editing/redating a past transaction changes exactly the
+  months it should — no manual recalculate.
+- **Re-dating works for free.** Moving a transaction's `occurredAt` across months shifts it
+  between buckets automatically (both old and new month series recompute from entries).
+- **No snapshot table to maintain or get stale.** The `Summary` model and its bulk
+  `createMany` on recalculate disappear.
+
+### Performance note (optional rollup)
+A whole-club monthly series is a small **indexed** grouped query (`@@index([occurredAt])`,
+`@@index([type, occurredAt])`) — fine to run live and cache by tag. If the ledger ever grows
+large, add an **optional** `MonthlyRollup` cache that is *deterministically rebuilt from the
+ledger* and invalidated for the **earliest dirty month** on any historical mutation (the same
+rule called out in `REDESIGN_PLAN.md` §1.6). The ledger stays the single source of truth; the
+rollup is just a cache, never authoritative.
+
+---
+
+## 8. Why this is better
 
 - **No passbook, no payload JSON, no eager recompute.** Stocks are account balances updated
   O(1) per posting; flows are indexed `SUM`s; expected/interest are read-time pure functions.
